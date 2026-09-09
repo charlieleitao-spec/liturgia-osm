@@ -1,40 +1,68 @@
 name: Build APK Liturgia OSM
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ main ]
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
+    name: Gerar APK Liturgia OSM
     runs-on: ubuntu-latest
-    steps:
-      - name: Baixar o código do projeto
-        uses: actions/checkout@v4
 
-      - name: Configurar Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
+    steps:
+      - name: Baixar código do repositório
+        uses: actions/checkout@v5
 
       - name: Configurar JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
-          java-version: 21
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
 
-      - name: Instalar dependências
-        run: npm install
+      - name: Dar permissão de execução ao Gradle
+        run: chmod +x gradlew
 
-      - name: Adicionar plataforma Android
-        run: npx cap add android
+      - name: Verificar versão do Gradle
+        run: ./gradlew --version
 
-      - name: Sincronizar Capacitor
-        run: npx cap sync android
+      - name: Limpar compilação anterior
+        run: ./gradlew clean
 
-      - name: Dar permissão ao gradlew
-        run: chmod +x android/gradlew
+      - name: Compilar APK Debug
+        run: ./gradlew assembleDebug
 
+      - name: Verificar APK gerado
+        run: |
+          ls -lh app/build/outputs/apk/debug/
+          test -f app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Salvar APK como artefato
+        uses: actions/upload-artifact@v5
+        with:
+          name: Liturgia-OSM
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Renomear APK
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk \
+             app/build/outputs/apk/debug/Liturgia-OSM-v${{ github.run_number }}.apk
+
+      - name: Criar Release automática
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: "Liturgia OSM v${{ github.run_number }}"
+          generate_release_notes: true
+          files: app/build/outputs/apk/debug/Liturgia-OSM-v${{ github.run_number }}.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Gerar APK de debug
         run: cd android && ./gradlew assembleDebug
 
