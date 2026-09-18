@@ -1,10 +1,10 @@
 {
   "name": "liturgia-osm",
-  "version": "4.4.0",
+  "version": "4.5.0",
   "private": true,
   "description": "Liturgia OSM — Ordem dos Servos de Maria",
   "scripts": {
-    "build": "node -e \"require('fs').accessSync('www/index.html')\"",
+    "build": "node scripts/sync-lovable.mjs",
     "android:init": "npx cap add android",
     "android:sync": "npx cap sync android",
     "android:open": "npx cap open android",
