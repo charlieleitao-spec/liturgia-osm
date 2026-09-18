@@ -8,7 +8,7 @@ const queued = new Set(queue);
 const downloaded = new Set();
 
 const textExtensions = new Set([".html", ".js", ".css", ".json", ".webmanifest", ".txt"]);
-const assetPattern = /(?:["'(])((?:\/assets\/|\/santos\/)[^"'()\s]+|\.\/[^"'()\s]+\.(?:js|css|json|png|jpe?g|svg|webp|woff2?|ico))/g;
+const assetPattern = /(?:["'(`])((?:\/assets\/|\/santos\/)[^"'`()\s]+|\.\/[^"'`()\s]+\.(?:js|css|json|png|jpe?g|svg|webp|woff2?|ico))/g;
 
 function cleanIndex(html) {
   return html
