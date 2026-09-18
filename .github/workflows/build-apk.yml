@@ -38,6 +38,9 @@ jobs:
       - name: Criar projeto Android
         run: npx cap add android
 
+      - name: Ajustar compatibilidade do navegador interno
+        run: node scripts/patch-webview.mjs
+
       - name: Sincronizar o Capacitor
         run: npx cap sync android
 
