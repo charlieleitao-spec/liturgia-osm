@@ -5,7 +5,7 @@ const htmlPath = `${root}/santoral-osm-5-1 (7).html`;
 
 let html = await readFile(htmlPath, 'utf8');
 html = html
-  .replace('4.5.1 — edição offline', '4.5.2 — edição offline')
+  .replace('4.5.1 — edição offline', '4.5.3 — edição offline')
   .replace(
     '<a class="social-link" href="https://youtube.com/@savosmbrasil?si=Pcn71bJ212PwwLuY" target="_blank" rel="noopener noreferrer">',
     '<a class="social-link" href="https://www.youtube.com/@savosmbrasil" onclick="return openExternalLink(event, this.href)">'
@@ -23,23 +23,37 @@ html = html
 }
 
 function render(){`
+  )
+  .replace(
+    `function openDetail(id){
+  state.detailId = id;`,
+    `function openDetail(id){
+  state.tab = 'santoral';
+  state.detailId = id;`
+  )
+  .replace(
+    `  state.finalAntifona = null;
+  render();`,
+    `  state.finalAntifona = null;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab==='santoral'));
+  render();`
   );
 await writeFile(htmlPath, html);
 
 for (const file of ['package.json', 'package-lock.json']) {
   const path = `${root}/${file}`;
-  const value = (await readFile(path, 'utf8')).replaceAll('4.5.1', '4.5.2');
+  const value = (await readFile(path, 'utf8')).replaceAll('4.5.1', '4.5.3');
   await writeFile(path, value);
 }
 
 const gradlePath = `${root}/android/app/build.gradle`;
 let gradle = await readFile(gradlePath, 'utf8');
-gradle = gradle.replace('versionCode 46', 'versionCode 47').replace('versionName "4.5.1"', 'versionName "4.5.2"');
+gradle = gradle.replace('versionCode 46', 'versionCode 48').replace('versionName "4.5.1"', 'versionName "4.5.3"');
 await writeFile(gradlePath, gradle);
 
 const swPath = `${root}/sw.js`;
 let sw = await readFile(swPath, 'utf8');
-sw = sw.replace('liturgia-osm-v4.5.1-offline', 'liturgia-osm-v4.5.2-offline');
+sw = sw.replace('liturgia-osm-v4.5.1-offline', 'liturgia-osm-v4.5.3-offline');
 await writeFile(swPath, sw);
 
 await copyFile('icon-512-v452.png', `${root}/icon-512.png`);
@@ -53,4 +67,4 @@ for (const density of densities) {
   await copyFile('icon-512-v452.png', `${dir}/ic_launcher_foreground.png`);
 }
 
-console.log('Correções 4.5.2 aplicadas.');
+console.log('Correções 4.5.3 aplicadas.');
