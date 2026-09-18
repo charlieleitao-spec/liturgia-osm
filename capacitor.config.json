@@ -3,7 +3,12 @@
   "appName": "Liturgia OSM",
   "webDir": "www",
   "server": {
-    "androidScheme": "https"
+    "url": "https://osmliturgist-companion.lovable.app",
+    "androidScheme": "https",
+    "cleartext": false,
+    "allowNavigation": [
+      "osmliturgist-companion.lovable.app"
+    ]
   },
   "android": {
     "backgroundColor": "#15121c",
