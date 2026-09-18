@@ -56,9 +56,9 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Disponibilizar APK 4.5.2
+      - name: Disponibilizar APK 4.5.3
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.5.2-NOVO-ICONE-LINKS
+          name: Liturgia-OSM-4.5.3-NOVO-ICONE-LINKS
           path: projeto/liturgia-osm-main/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
