@@ -4,13 +4,13 @@
   "private": true,
   "description": "Liturgia OSM — Ordem dos Servos de Maria",
   "scripts": {
-    "build": "node scripts/build-web.mjs",
+    "build": "node -e \"require('fs').accessSync('www/index.html')\"",
     "android:init": "npx cap add android",
     "android:sync": "npx cap sync android",
     "android:open": "npx cap open android",
     "android:run": "npx cap run android",
-    "android:debug": "npm run android:sync && cd android && ./gradlew assembleDebug",
-    "android:release": "npm run android:sync && cd android && ./gradlew assembleRelease",
+    "android:debug": "npm run build && npm run android:sync && cd android && ./gradlew assembleDebug",
+    "android:release": "npm run build && npm run android:sync && cd android && ./gradlew assembleRelease",
     "pwa:serve": "npx serve www"
   },
   "dependencies": {
