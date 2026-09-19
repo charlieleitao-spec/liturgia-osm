@@ -1,4 +1,4 @@
-name: Build APK Liturgia OSM
+name: Build APK Liturgia OSM 4.5.4
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -14,51 +14,64 @@ jobs:
     timeout-minutes: 30
     defaults:
       run:
-        working-directory: projeto/liturgia-osm-main
+        working-directory: projeto
 
     steps:
       - name: Baixar o código
         uses: actions/checkout@v5
 
-      - name: Abrir pacote offline 4.5.1
+      - name: Abrir pacote 4.5.4
         working-directory: .
-        run: unzip -q Liturgia_OSM_4.5.1_MELHORADA_GitHub.zip -d projeto
+        run: |
+          mkdir -p projeto
+          unzip -q Liturgia-OSM-4.5.4-GitHub.zip -d projeto
 
       - name: Configurar Node.js 22
         uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: projeto/liturgia-osm-main/package-lock.json
+          cache-dependency-path: projeto/package-lock.json
 
-      - name: Aplicar novo ícone e corrigir links
-        working-directory: .
-        run: node apply-v452.mjs
+      - name: Ajustar dependências do Capacitor
+        run: |
+          npm pkg set "dependencies.@capacitor/android=8.5.1"
+          npm pkg set "dependencies.@capacitor/core=8.5.1"
+          npm pkg set "devDependencies.@capacitor/cli=8.5.1"
 
-      - name: Configurar JDK 21
+      - name: Configurar JDK 17
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 21
+          java-version: 17
 
       - name: Instalar dependências
         run: npm ci
-
-      - name: Preparar aplicativo offline
-        run: npm run build
 
       - name: Sincronizar o Capacitor
         run: npx cap sync android
 
       - name: Gerar APK
-        working-directory: projeto/liturgia-osm-main/android
+        working-directory: projeto/android
         run: |
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Disponibilizar APK 4.5.3
+      - name: Nomear APK
+        working-directory: .
+        run: cp projeto/android/app/build/outputs/apk/debug/app-debug.apk Liturgia-OSM-4.5.4.apk
+
+      - name: Disponibilizar APK
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.5.3-NOVO-ICONE-LINKS
-          path: projeto/liturgia-osm-main/android/app/build/outputs/apk/debug/app-debug.apk
+          name: Liturgia-OSM-4.5.4
+          path: Liturgia-OSM-4.5.4.apk
           if-no-files-found: error
+
+      - name: Publicar versão 4.5.4
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v4.5.4
+          name: Liturgia OSM 4.5.4
+          generate_release_notes: true
+          files: Liturgia-OSM-4.5.4.apk
