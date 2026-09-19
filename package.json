@@ -1,23 +1,8 @@
 {
   "name": "liturgia-osm",
-  "version": "4.5.3",
+  "version": "4.5.4",
   "private": true,
-  "description": "Liturgia OSM — Ordem dos Servos de Maria",
-  "scripts": {
-    "build": "node scripts/sync-lovable.mjs",
-    "android:init": "npx cap add android",
-    "android:sync": "npx cap sync android",
-    "android:open": "npx cap open android",
-    "android:run": "npx cap run android",
-    "android:debug": "npm run build && npm run android:sync && cd android && ./gradlew assembleDebug",
-    "android:release": "npm run build && npm run android:sync && cd android && ./gradlew assembleRelease",
-    "pwa:serve": "npx serve www"
-  },
-  "dependencies": {
-    "@capacitor/android": "8.5.1",
-    "@capacitor/core": "8.5.1"
-  },
-  "devDependencies": {
-    "@capacitor/cli": "8.5.1"
-  }
+  "scripts": {"android:add":"npx cap add android","sync":"npx cap sync android"},
+  "dependencies": {"@capacitor/android":"^7.4.3","@capacitor/core":"^7.4.3"},
+  "devDependencies": {"@capacitor/cli":"^7.4.3"}
 }
