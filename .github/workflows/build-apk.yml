@@ -1,4 +1,4 @@
-name: Build APK Liturgia OSM 4.8.8
+name: Build APK Liturgia OSM 4.9.0
 
 on:
   workflow_dispatch:
@@ -17,10 +17,10 @@ jobs:
       - name: Baixar o código
         uses: actions/checkout@v5
 
-      - name: Abrir pacote 4.8.8
+      - name: Abrir pacote 4.9.0
         run: |
           mkdir -p projeto
-          unzip -q Liturgia-OSM-4.8.8-GitHub.zip -d projeto
+          unzip -q Liturgia-OSM-4.9.0-GitHub.zip -d projeto
 
       - name: Configurar Node.js 22
         uses: actions/setup-node@v5
@@ -46,8 +46,8 @@ jobs:
       - name: Definir versão e segurança
         working-directory: projeto
         run: |
-          sed -i 's/versionCode [0-9][0-9]*/versionCode 40808/' android/app/build.gradle
-          sed -i 's/versionName "[^"]*"/versionName "4.8.8"/' android/app/build.gradle
+          sed -i 's/versionCode [0-9][0-9]*/versionCode 40900/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "4.9.0"/' android/app/build.gradle
           sed -i 's/buildTypes {/buildTypes {\n        debug { debuggable false }/' android/app/build.gradle
           sed -i 's/<application /<application android:allowBackup="false" /' android/app/src/main/AndroidManifest.xml
 
@@ -71,25 +71,25 @@ jobs:
           ./gradlew assembleDebug
 
       - name: Nomear APK
-        run: cp projeto/android/app/build/outputs/apk/debug/app-debug.apk Liturgia-OSM-4.8.8.apk
+        run: cp projeto/android/app/build/outputs/apk/debug/app-debug.apk Liturgia-OSM-4.9.0.apk
 
       - name: Verificar APK
         run: |
           APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
-          "${APKSIGNER}" verify --verbose --print-certs Liturgia-OSM-4.8.8.apk
+          "${APKSIGNER}" verify --verbose --print-certs Liturgia-OSM-4.9.0.apk
 
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.8.8
-          path: Liturgia-OSM-4.8.8.apk
+          name: Liturgia-OSM-4.9.0
+          path: Liturgia-OSM-4.9.0.apk
           if-no-files-found: error
 
-      - name: Publicar versão 4.8.8
+      - name: Publicar versão 4.9.0
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v4.8.8
-          name: Liturgia OSM 4.8.8
+          tag_name: v4.9.0
+          name: Liturgia OSM 4.9.0
           generate_release_notes: true
           overwrite_files: true
-          files: Liturgia-OSM-4.8.8.apk
+          files: Liturgia-OSM-4.9.0.apk
