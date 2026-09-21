@@ -57,7 +57,12 @@ jobs:
 
       - name: Aplicar ícone Servita
         working-directory: projeto
-        run: unzip -oq ../icone-android-liturgia-osm.zip -d android/app/src/main/res
+        run: |
+          mkdir -p icones-extraidos
+          unzip -oq ../icone-android-liturgia-osm.zip -d icones-extraidos
+          for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            cp icones-extraidos/mipmap-${density}-v4/ic_launcher*.png android/app/src/main/res/mipmap-${density}/
+          done
 
       - name: Gerar APK
         working-directory: projeto/android
