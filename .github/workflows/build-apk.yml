@@ -1,4 +1,4 @@
-name: Build APK Liturgia OSM 4.5.4
+name: Build APK Liturgia OSM 4.8.8
 
 on:
   workflow_dispatch:
@@ -12,19 +12,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    defaults:
-      run:
-        working-directory: projeto
 
     steps:
       - name: Baixar o código
         uses: actions/checkout@v5
 
-      - name: Abrir pacote 4.5.4
-        working-directory: .
+      - name: Abrir pacote 4.8.8
         run: |
           mkdir -p projeto
-          unzip -q Liturgia-OSM-4.5.4-GitHub.zip -d projeto
+          unzip -q Liturgia-OSM-4.8.8-GitHub.zip -d projeto
 
       - name: Configurar Node.js 22
         uses: actions/setup-node@v5
@@ -33,12 +29,6 @@ jobs:
           cache: npm
           cache-dependency-path: projeto/package-lock.json
 
-      - name: Ajustar dependências do Capacitor
-        run: |
-          npm pkg set "dependencies.@capacitor/android=8.5.1"
-          npm pkg set "dependencies.@capacitor/core=8.5.1"
-          npm pkg set "devDependencies.@capacitor/cli=8.5.1"
-
       - name: Configurar JDK 21
         uses: actions/setup-java@v5
         with:
@@ -46,9 +36,23 @@ jobs:
           java-version: 21
 
       - name: Instalar dependências
+        working-directory: projeto
         run: npm ci
 
+      - name: Criar projeto Android
+        working-directory: projeto
+        run: npx cap add android
+
+      - name: Definir versão e segurança
+        working-directory: projeto
+        run: |
+          sed -i 's/versionCode [0-9][0-9]*/versionCode 40808/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "4.8.8"/' android/app/build.gradle
+          sed -i 's/buildTypes {/buildTypes {\n        debug { debuggable false }/' android/app/build.gradle
+          sed -i 's/<application /<application android:allowBackup="false" /' android/app/src/main/AndroidManifest.xml
+
       - name: Sincronizar o Capacitor
+        working-directory: projeto
         run: npx cap sync android
 
       - name: Gerar APK
@@ -58,20 +62,24 @@ jobs:
           ./gradlew assembleDebug
 
       - name: Nomear APK
-        working-directory: .
-        run: cp projeto/android/app/build/outputs/apk/debug/app-debug.apk Liturgia-OSM-4.5.4.apk
+        run: cp projeto/android/app/build/outputs/apk/debug/app-debug.apk Liturgia-OSM-4.8.8.apk
+
+      - name: Verificar APK
+        run: |
+          APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
+          "${APKSIGNER}" verify --verbose --print-certs Liturgia-OSM-4.8.8.apk
 
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.5.4
-          path: Liturgia-OSM-4.5.4.apk
+          name: Liturgia-OSM-4.8.8
+          path: Liturgia-OSM-4.8.8.apk
           if-no-files-found: error
 
-      - name: Publicar versão 4.5.4
+      - name: Publicar versão 4.8.8
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v4.5.4
-          name: Liturgia OSM 4.5.4
+          tag_name: v4.8.8
+          name: Liturgia OSM 4.8.8
           generate_release_notes: true
-          files: Liturgia-OSM-4.5.4.apk
+          files: Liturgia-OSM-4.8.8.apk
