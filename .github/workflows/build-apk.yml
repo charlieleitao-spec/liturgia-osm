@@ -55,6 +55,10 @@ jobs:
         working-directory: projeto
         run: npx cap sync android
 
+      - name: Aplicar ícone Servita
+        working-directory: projeto
+        run: unzip -oq ../icone-android-liturgia-osm.zip -d android/app/src/main/res
+
       - name: Gerar APK
         working-directory: projeto/android
         run: |
@@ -82,4 +86,5 @@ jobs:
           tag_name: v4.8.8
           name: Liturgia OSM 4.8.8
           generate_release_notes: true
+          overwrite_files: true
           files: Liturgia-OSM-4.8.8.apk
