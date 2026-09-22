@@ -1,0 +1,97 @@
+name: Benchmark Android 4.9.2 vs 4.9.3
+
+on:
+  push:
+    branches: [benchmark-493]
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Preparar versão 4.9.2 instrumentada
+        run: |
+          mkdir app492
+          unzip -q Liturgia-OSM-4.9.2-GitHub.zip -d app492
+          node <<'NODE'
+          const fs=require('fs');const file='app492/www/index.html';let html=fs.readFileSync(file,'utf8');
+          const metric=`<script id="startupMetricBenchmark">window.addEventListener('DOMContentLoaded',()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{const nav=performance.getEntriesByType('navigation')[0];const paint=performance.getEntriesByName('first-contentful-paint')[0]||performance.getEntriesByName('first-paint')[0];console.info('[Liturgia OSM startup]',JSON.stringify({version:'4.9.2',domContentLoadedMs:Math.round(nav?.domContentLoadedEventEnd||performance.now()),firstPaintMs:paint?Math.round(paint.startTime):null,indexBytes:${Buffer.byteLength(html)}}));})));</script>`;
+          fs.writeFileSync(file,html.replace('</body>',metric+'</body>'));
+          NODE
+          cd app492
+          npm ci
+          npx cap add android
+          npx cap sync android
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Preparar versão 4.9.3 instrumentada
+        run: |
+          mkdir app493
+          unzip -q Liturgia-OSM-4.9.3-GitHub.zip -d app493
+          cd app493
+          npm ci
+          npm test
+          npx cap add android
+          npx cap sync android
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Executar cinco partidas a frio por versão
+        uses: ReactiveCircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          script: |
+            set -euo pipefail
+            mkdir -p benchmark-results
+            adb shell settings put global window_animation_scale 0
+            adb shell settings put global transition_animation_scale 0
+            adb shell settings put global animator_duration_scale 0
+            {
+              echo "device=$(adb shell getprop ro.product.model | tr -d '\r')"
+              echo "android=$(adb shell getprop ro.build.version.release | tr -d '\r')"
+              echo "sdk=$(adb shell getprop ro.build.version.sdk | tr -d '\r')"
+              echo "webview=$(adb shell dumpsys package com.google.android.webview | grep versionName | head -1 | xargs)"
+            } > benchmark-results/device.txt
+            benchmark_version() {
+              version="$1"; apk="$2"; output="benchmark-results/${version}.log"
+              adb install -r "$apk" >/dev/null
+              : > "$output"
+              for run in 1 2 3 4 5; do
+                adb shell am force-stop com.liturgia_osm.app
+                adb logcat -c
+                adb shell am start -W -n com.liturgia_osm.app/.MainActivity >/dev/null
+                for wait_try in $(seq 1 20); do
+                  line="$(adb logcat -d -v brief | grep -F '[Liturgia OSM startup]' | tail -1 || true)"
+                  if [ -n "$line" ]; then break; fi
+                  sleep 0.5
+                done
+                printf 'run=%s %s\n' "$run" "$line" >> "$output"
+              done
+              adb uninstall com.liturgia_osm.app >/dev/null
+            }
+            benchmark_version 4.9.2 app492/android/app/build/outputs/apk/debug/app-debug.apk
+            benchmark_version 4.9.3 app493/android/app/build/outputs/apk/debug/app-debug.apk
+            cat benchmark-results/device.txt benchmark-results/4.9.2.log benchmark-results/4.9.3.log
+
+      - name: Disponibilizar resultados
+        uses: actions/upload-artifact@v5
+        with:
+          name: benchmark-android-4.9.3
+          path: benchmark-results
+          if-no-files-found: error
