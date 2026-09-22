@@ -61,7 +61,7 @@ jobs:
           const result=await new Promise((resolve,reject)=>{
             const timer=setTimeout(()=>reject(new Error('CDP timeout')),5000);
             ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id===1){clearTimeout(timer);resolve(m)}};
-            ws.send(JSON.stringify({id:1,method:'Runtime.evaluate',params:{expression:"localStorage.getItem('osmStartupMetric')",returnByValue:true}}));
+            ws.send(JSON.stringify({id:1,method:'Runtime.evaluate',params:{expression:"(()=>{const raw=localStorage.getItem('osmStartupMetric');if(!raw)return null;const metric=JSON.parse(raw);const paint=performance.getEntriesByName('first-contentful-paint')[0]||performance.getEntriesByName('first-paint')[0];if(paint)metric.firstPaintMs=Math.round(paint.startTime);return JSON.stringify(metric)})()",returnByValue:true}}));
           });
           ws.close();
           const value=result?.result?.result?.value;
