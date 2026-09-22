@@ -92,9 +92,9 @@ jobs:
               adb shell am force-stop "$package"
               adb shell pm clear "$package" >/dev/null
               if [ -n "$component" ] && [ "$component" != "No activity found" ]; then
-                launch_output="$(timeout 10s adb shell am start -n "$component" 2>&1 || true)"
+                launch_output="$(adb shell am start -n "$component" 2>&1 || true)"
               else
-                launch_output="$(timeout 10s adb shell monkey -p "$package" -c android.intent.category.LAUNCHER 1 2>&1 || true)"
+                launch_output="$(adb shell monkey -p "$package" -c android.intent.category.LAUNCHER 1 2>&1 || true)"
               fi
               printf 'run=%s launcher=%s launch=%s\n' "$run" "${component:-null}" "$launch_output" >> "$output"
               metric=""
@@ -103,7 +103,7 @@ jobs:
                 if [ -n "$socket" ]; then
                   adb forward --remove tcp:9222 >/dev/null 2>&1 || true
                   adb forward tcp:9222 "localabstract:${socket}" >/dev/null 2>&1 || true
-                  metric="$(timeout 8s node read-webview-metric.mjs 2>/dev/null || true)"
+                  metric="$(node read-webview-metric.mjs 2>/dev/null || true)"
                   if [ -n "$metric" ]; then break; fi
                 fi
                 sleep 1
