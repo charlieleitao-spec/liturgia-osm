@@ -69,15 +69,18 @@ jobs:
             adb install -r "$apk" >/dev/null
             : > "$output"
             for run in 1 2 3 4 5; do
+              echo "Iniciando ${version} rodada ${run}"
               adb shell am force-stop com.liturgia_osm.app
               adb logcat -c
-              adb shell am start -W -n com.liturgia_osm.app/.MainActivity >/dev/null
+              launch_output="$(timeout 20s adb shell am start -W -n com.liturgia_osm.app/.MainActivity 2>&1 || true)"
+              total_time="$(printf '%s\n' "$launch_output" | sed -n 's/^TotalTime: //p' | tail -1)"
               for wait_try in $(seq 1 20); do
-                line="$(adb logcat -d -v brief | grep -F '[Liturgia OSM startup]' | tail -1 || true)"
+                line="$(timeout 3s adb logcat -d -v brief 2>/dev/null | grep -F '[Liturgia OSM startup]' | tail -1 || true)"
                 if [ -n "$line" ]; then break; fi
                 sleep 0.5
               done
-              printf 'run=%s %s\n' "$run" "$line" >> "$output"
+              printf 'run=%s androidTotalTimeMs=%s %s\n' "$run" "${total_time:-null}" "$line" >> "$output"
+              echo "Concluída ${version} rodada ${run}: Android=${total_time:-sem dado} ms"
             done
             adb uninstall com.liturgia_osm.app >/dev/null
           }
@@ -96,6 +99,7 @@ jobs:
           script: sh benchmark.sh
 
       - name: Disponibilizar resultados
+        if: always()
         uses: actions/upload-artifact@v5
         with:
           name: benchmark-android-4.9.3
