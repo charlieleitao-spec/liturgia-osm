@@ -65,24 +65,30 @@ jobs:
             echo "webview=$(adb shell dumpsys package com.google.android.webview | grep versionName | head -1 | xargs)"
           } > benchmark-results/device.txt
           benchmark_version() {
-            version="$1"; apk="$2"; output="benchmark-results/${version}.log"
+            version="$1"; apk="$2"; output="benchmark-results/${version}.log"; package="com.liturgia_osm.app"
             adb install -r "$apk" >/dev/null
+            component="$(adb shell cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.LAUNCHER "$package" | tr -d '\r' | tail -1)"
+            echo "${version} launcher=${component:-não encontrado}"
             : > "$output"
             for run in 1 2 3 4 5; do
               echo "Iniciando ${version} rodada ${run}"
-              adb shell am force-stop com.liturgia_osm.app
+              adb shell am force-stop "$package"
               adb logcat -c
-              launch_output="$(timeout 20s adb shell am start -W -n com.liturgia_osm.app/.MainActivity 2>&1 || true)"
-              total_time="$(printf '%s\n' "$launch_output" | sed -n 's/^TotalTime: //p' | tail -1)"
-              for wait_try in $(seq 1 20); do
+              if [ -n "$component" ] && [ "$component" != "No activity found" ]; then
+                launch_output="$(timeout 10s adb shell am start -n "$component" 2>&1 || true)"
+              else
+                launch_output="$(timeout 10s adb shell monkey -p "$package" -c android.intent.category.LAUNCHER 1 2>&1 || true)"
+              fi
+              printf 'run=%s launcher=%s launch=%s\n' "$run" "${component:-null}" "$launch_output" >> "$output"
+              for wait_try in $(seq 1 60); do
                 line="$(timeout 3s adb logcat -d -v brief 2>/dev/null | grep -F '[Liturgia OSM startup]' | tail -1 || true)"
                 if [ -n "$line" ]; then break; fi
                 sleep 0.5
               done
-              printf 'run=%s androidTotalTimeMs=%s %s\n' "$run" "${total_time:-null}" "$line" >> "$output"
-              echo "Concluída ${version} rodada ${run}: Android=${total_time:-sem dado} ms"
+              printf 'run=%s metric=%s\n' "$run" "${line:-null}" >> "$output"
+              echo "Concluída ${version} rodada ${run}: métrica=$([ -n "$line" ] && echo encontrada || echo ausente)"
             done
-            adb uninstall com.liturgia_osm.app >/dev/null
+            adb uninstall "$package" >/dev/null
           }
           benchmark_version 4.9.2 app492/android/app/build/outputs/apk/debug/app-debug.apk
           benchmark_version 4.9.3 app493/android/app/build/outputs/apk/debug/app-debug.apk
