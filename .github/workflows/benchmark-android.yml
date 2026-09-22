@@ -49,6 +49,43 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug
 
+      - name: Preparar script de medição
+        run: |
+          cat > benchmark.sh <<'SCRIPT'
+          #!/usr/bin/env sh
+          set -eu
+          mkdir -p benchmark-results
+          adb shell settings put global window_animation_scale 0
+          adb shell settings put global transition_animation_scale 0
+          adb shell settings put global animator_duration_scale 0
+          {
+            echo "device=$(adb shell getprop ro.product.model | tr -d '\r')"
+            echo "android=$(adb shell getprop ro.build.version.release | tr -d '\r')"
+            echo "sdk=$(adb shell getprop ro.build.version.sdk | tr -d '\r')"
+            echo "webview=$(adb shell dumpsys package com.google.android.webview | grep versionName | head -1 | xargs)"
+          } > benchmark-results/device.txt
+          benchmark_version() {
+            version="$1"; apk="$2"; output="benchmark-results/${version}.log"
+            adb install -r "$apk" >/dev/null
+            : > "$output"
+            for run in 1 2 3 4 5; do
+              adb shell am force-stop com.liturgia_osm.app
+              adb logcat -c
+              adb shell am start -W -n com.liturgia_osm.app/.MainActivity >/dev/null
+              for wait_try in $(seq 1 20); do
+                line="$(adb logcat -d -v brief | grep -F '[Liturgia OSM startup]' | tail -1 || true)"
+                if [ -n "$line" ]; then break; fi
+                sleep 0.5
+              done
+              printf 'run=%s %s\n' "$run" "$line" >> "$output"
+            done
+            adb uninstall com.liturgia_osm.app >/dev/null
+          }
+          benchmark_version 4.9.2 app492/android/app/build/outputs/apk/debug/app-debug.apk
+          benchmark_version 4.9.3 app493/android/app/build/outputs/apk/debug/app-debug.apk
+          cat benchmark-results/device.txt benchmark-results/4.9.2.log benchmark-results/4.9.3.log
+          SCRIPT
+
       - name: Executar cinco partidas a frio por versão
         uses: ReactiveCircus/android-emulator-runner@v2
         with:
@@ -56,38 +93,7 @@ jobs:
           arch: x86_64
           profile: pixel_6
           disable-animations: true
-          script: |
-            set -eu
-            mkdir -p benchmark-results
-            adb shell settings put global window_animation_scale 0
-            adb shell settings put global transition_animation_scale 0
-            adb shell settings put global animator_duration_scale 0
-            {
-              echo "device=$(adb shell getprop ro.product.model | tr -d '\r')"
-              echo "android=$(adb shell getprop ro.build.version.release | tr -d '\r')"
-              echo "sdk=$(adb shell getprop ro.build.version.sdk | tr -d '\r')"
-              echo "webview=$(adb shell dumpsys package com.google.android.webview | grep versionName | head -1 | xargs)"
-            } > benchmark-results/device.txt
-            benchmark_version() {
-              version="$1"; apk="$2"; output="benchmark-results/${version}.log"
-              adb install -r "$apk" >/dev/null
-              : > "$output"
-              for run in 1 2 3 4 5; do
-                adb shell am force-stop com.liturgia_osm.app
-                adb logcat -c
-                adb shell am start -W -n com.liturgia_osm.app/.MainActivity >/dev/null
-                for wait_try in $(seq 1 20); do
-                  line="$(adb logcat -d -v brief | grep -F '[Liturgia OSM startup]' | tail -1 || true)"
-                  if [ -n "$line" ]; then break; fi
-                  sleep 0.5
-                done
-                printf 'run=%s %s\n' "$run" "$line" >> "$output"
-              done
-              adb uninstall com.liturgia_osm.app >/dev/null
-            }
-            benchmark_version 4.9.2 app492/android/app/build/outputs/apk/debug/app-debug.apk
-            benchmark_version 4.9.3 app493/android/app/build/outputs/apk/debug/app-debug.apk
-            cat benchmark-results/device.txt benchmark-results/4.9.2.log benchmark-results/4.9.3.log
+          script: sh benchmark.sh
 
       - name: Disponibilizar resultados
         uses: actions/upload-artifact@v5
