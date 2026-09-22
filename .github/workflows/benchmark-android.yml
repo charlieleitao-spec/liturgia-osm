@@ -25,7 +25,7 @@ jobs:
           unzip -q Liturgia-OSM-4.9.2-GitHub.zip -d app492
           node <<'NODE'
           const fs=require('fs');const file='app492/www/index.html';let html=fs.readFileSync(file,'utf8');
-          const metric=`<script id="startupMetricBenchmark">window.addEventListener('DOMContentLoaded',()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{const nav=performance.getEntriesByType('navigation')[0];const paint=performance.getEntriesByName('first-contentful-paint')[0]||performance.getEntriesByName('first-paint')[0];console.info('[Liturgia OSM startup]',JSON.stringify({version:'4.9.2',domContentLoadedMs:Math.round(nav?.domContentLoadedEventEnd||performance.now()),firstPaintMs:paint?Math.round(paint.startTime):null,indexBytes:${Buffer.byteLength(html)}}));})));</script>`;
+          const metric=`<script id="startupMetricBenchmark">window.addEventListener('DOMContentLoaded',()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{const nav=performance.getEntriesByType('navigation')[0];const paint=performance.getEntriesByName('first-contentful-paint')[0]||performance.getEntriesByName('first-paint')[0];const metric={version:'4.9.2',domContentLoadedMs:Math.round(nav?.domContentLoadedEventEnd||performance.now()),firstPaintMs:paint?Math.round(paint.startTime):null,indexBytes:${Buffer.byteLength(html)}};try{localStorage.setItem('osmStartupMetric',JSON.stringify(metric));}catch(e){}console.info('[Liturgia OSM startup]',JSON.stringify(metric));})));</script>`;
           fs.writeFileSync(file,html.replace('</body>',metric+'</body>'));
           NODE
           cd app492
@@ -51,6 +51,23 @@ jobs:
 
       - name: Preparar script de medição
         run: |
+          cat > read-webview-metric.mjs <<'NODE'
+          const endpoint=process.argv[2]||'http://127.0.0.1:9222';
+          const pages=await (await fetch(endpoint+'/json')).json();
+          const page=pages.find(p=>p.type==='page'&&p.webSocketDebuggerUrl);
+          if(!page) process.exit(2);
+          const ws=new WebSocket(page.webSocketDebuggerUrl.replace(/^ws:\/\/[^/]+/,'ws://127.0.0.1:9222'));
+          await new Promise((resolve,reject)=>{ws.onopen=resolve;ws.onerror=reject});
+          const result=await new Promise((resolve,reject)=>{
+            const timer=setTimeout(()=>reject(new Error('CDP timeout')),5000);
+            ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id===1){clearTimeout(timer);resolve(m)}};
+            ws.send(JSON.stringify({id:1,method:'Runtime.evaluate',params:{expression:"localStorage.getItem('osmStartupMetric')",returnByValue:true}}));
+          });
+          ws.close();
+          const value=result?.result?.result?.value;
+          if(!value) process.exit(3);
+          console.log(value);
+          NODE
           cat > benchmark.sh <<'SCRIPT'
           #!/usr/bin/env sh
           set -eu
@@ -73,20 +90,26 @@ jobs:
             for run in 1 2 3 4 5; do
               echo "Iniciando ${version} rodada ${run}"
               adb shell am force-stop "$package"
-              adb logcat -c
+              adb shell pm clear "$package" >/dev/null
               if [ -n "$component" ] && [ "$component" != "No activity found" ]; then
                 launch_output="$(timeout 10s adb shell am start -n "$component" 2>&1 || true)"
               else
                 launch_output="$(timeout 10s adb shell monkey -p "$package" -c android.intent.category.LAUNCHER 1 2>&1 || true)"
               fi
               printf 'run=%s launcher=%s launch=%s\n' "$run" "${component:-null}" "$launch_output" >> "$output"
-              for wait_try in $(seq 1 60); do
-                line="$(timeout 3s adb logcat -d -v brief 2>/dev/null | grep -F '[Liturgia OSM startup]' | tail -1 || true)"
-                if [ -n "$line" ]; then break; fi
-                sleep 0.5
+              metric=""
+              for wait_try in $(seq 1 90); do
+                socket="$(adb shell cat /proc/net/unix 2>/dev/null | tr -d '\r' | grep -o 'webview_devtools_remote[^ ]*' | tail -1 || true)"
+                if [ -n "$socket" ]; then
+                  adb forward --remove tcp:9222 >/dev/null 2>&1 || true
+                  adb forward tcp:9222 "localabstract:${socket}" >/dev/null 2>&1 || true
+                  metric="$(timeout 8s node read-webview-metric.mjs 2>/dev/null || true)"
+                  if [ -n "$metric" ]; then break; fi
+                fi
+                sleep 1
               done
-              printf 'run=%s metric=%s\n' "$run" "${line:-null}" >> "$output"
-              echo "Concluída ${version} rodada ${run}: métrica=$([ -n "$line" ] && echo encontrada || echo ausente)"
+              printf 'run=%s metric=%s\n' "$run" "${metric:-null}" >> "$output"
+              echo "Concluída ${version} rodada ${run}: métrica=$([ -n "$metric" ] && echo encontrada || echo ausente)"
             done
             adb uninstall "$package" >/dev/null
           }
