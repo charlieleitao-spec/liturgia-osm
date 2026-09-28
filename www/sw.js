@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.6';
+const CACHE = 'liturgia-osm-v4.9.7';
 const CORE = [
   "./",
   "./index.html",
@@ -8,6 +8,7 @@ const CORE = [
   "./icon-512.png",
   "./data/santoral.json",
   "./data/oficios-osm.json",
+  "./data/hoje-familia-servita.json",
   "./media/servite-01.jpg",
   "./media/servite-02.webp",
   "./media/servite-03.jpg",
