@@ -38,6 +38,11 @@ const oficios = JSON.parse(fs.readFileSync(path.join(www, 'data/oficios-osm.json
 const hojeFamiliaServita = JSON.parse(fs.readFileSync(path.join(www, 'data/hoje-familia-servita.json'), 'utf8'));
 const sourceOffices = Object.values(hojeFamiliaServita).filter(item => item?.material?.horas);
 if (sourceOffices.length !== 18) errors.push(`Base Hoje na Família Servita inesperada: ${sourceOffices.length} ofícios completos.`);
+for (const saint of santoral) {
+  const dateKey = `${String(saint.month).padStart(2, '0')}-${String(saint.day).padStart(2, '0')}`;
+  const sourceBio = hojeFamiliaServita[dateKey]?.bio?.trim();
+  if (!sourceBio || saint.bio !== sourceBio) errors.push(`Introdução divergente da base Hoje na Família Servita: ${dateKey}.`);
+}
 for (const key of Object.keys(oficios)) if (!santoral[Number(key)]) errors.push(`Ofício sem celebração correspondente: ${key}`);
 const celebrationsWithoutOffice = santoral.map((_, index) => index).filter(index => !Object.hasOwn(oficios, String(index)));
 if (santoral.length !== 32 || Object.keys(oficios).length !== 26) errors.push(`Contagem inesperada: ${santoral.length} celebrações e ${Object.keys(oficios).length} ofícios.`);
@@ -65,4 +70,4 @@ if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);
 }
-console.log(JSON.stringify({ status: 'ok', version: '4.9.7', cachedFiles: required.length, externalLinks: allowedExternal.length, scripts: scripts.length, indexBytes: fs.statSync(path.join(www, 'index.html')).size, serviteBytes: fs.statSync(path.join(www, 'servite.html')).size, santoralEntries: santoral.length, officeEntries: Object.keys(oficios).length }, null, 2));
+console.log(JSON.stringify({ status: 'ok', version: '4.9.8', cachedFiles: required.length, externalLinks: allowedExternal.length, scripts: scripts.length, indexBytes: fs.statSync(path.join(www, 'index.html')).size, serviteBytes: fs.statSync(path.join(www, 'servite.html')).size, santoralEntries: santoral.length, officeEntries: Object.keys(oficios).length }, null, 2));
