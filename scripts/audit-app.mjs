@@ -6,7 +6,7 @@ const www = path.join(root, 'www');
 const html = fs.readFileSync(path.join(www, 'index.html'), 'utf8');
 const sw = fs.readFileSync(path.join(www, 'sw.js'), 'utf8');
 const manifest = JSON.parse(fs.readFileSync(path.join(www, 'manifest.webmanifest'), 'utf8'));
-const required = ['index.html', 'servite.html', 'data/santoral.json', 'data/oficios-osm.json', 'sw.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
+const required = ['index.html', 'servite.html', 'data/santoral.json', 'data/oficios-osm.json', 'data/hoje-familia-servita.json', 'sw.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 const errors = [];
 
 for (const file of required) {
@@ -26,7 +26,7 @@ const serviteHtml = fs.readFileSync(path.join(www, 'servite.html'), 'utf8');
 for (const forbidden of ['hymnLines % 4', 'isPsalmVerse', 'psalmMarked']) {
   if (serviteHtml.includes(forbidden)) errors.push(`Reconstrução artificial de estrofes detectada: ${forbidden}`);
 }
-if (!serviteHtml.includes('id="composicaoLiturgica496"')) errors.push('Estilo de composição litúrgica 4.9.6 ausente.');
+if (!serviteHtml.includes('id="composicaoLiturgica497"')) errors.push('Composição importada do Hoje na Família Servita ausente.');
 if (!serviteHtml.includes('*, †, hífens e outros sinais litúrgicos nunca são usados')) errors.push('Garantia de preservação das quebras do texto-fonte ausente.');
 const scripts = [html, serviteHtml].flatMap(source => [...source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(match => match[1]).filter(Boolean));
 scripts.forEach((script, index) => {
@@ -35,6 +35,9 @@ scripts.forEach((script, index) => {
 
 const santoral = JSON.parse(fs.readFileSync(path.join(www, 'data/santoral.json'), 'utf8'));
 const oficios = JSON.parse(fs.readFileSync(path.join(www, 'data/oficios-osm.json'), 'utf8'));
+const hojeFamiliaServita = JSON.parse(fs.readFileSync(path.join(www, 'data/hoje-familia-servita.json'), 'utf8'));
+const sourceOffices = Object.values(hojeFamiliaServita).filter(item => item?.material?.horas);
+if (sourceOffices.length !== 18) errors.push(`Base Hoje na Família Servita inesperada: ${sourceOffices.length} ofícios completos.`);
 for (const key of Object.keys(oficios)) if (!santoral[Number(key)]) errors.push(`Ofício sem celebração correspondente: ${key}`);
 const celebrationsWithoutOffice = santoral.map((_, index) => index).filter(index => !Object.hasOwn(oficios, String(index)));
 if (santoral.length !== 32 || Object.keys(oficios).length !== 26) errors.push(`Contagem inesperada: ${santoral.length} celebrações e ${Object.keys(oficios).length} ofícios.`);
@@ -62,4 +65,4 @@ if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);
 }
-console.log(JSON.stringify({ status: 'ok', version: '4.9.6', cachedFiles: required.length, externalLinks: allowedExternal.length, scripts: scripts.length, indexBytes: fs.statSync(path.join(www, 'index.html')).size, serviteBytes: fs.statSync(path.join(www, 'servite.html')).size, santoralEntries: santoral.length, officeEntries: Object.keys(oficios).length }, null, 2));
+console.log(JSON.stringify({ status: 'ok', version: '4.9.7', cachedFiles: required.length, externalLinks: allowedExternal.length, scripts: scripts.length, indexBytes: fs.statSync(path.join(www, 'index.html')).size, serviteBytes: fs.statSync(path.join(www, 'servite.html')).size, santoralEntries: santoral.length, officeEntries: Object.keys(oficios).length }, null, 2));
