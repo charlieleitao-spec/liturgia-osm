@@ -31,6 +31,7 @@ for (const marker of ['renderLiturgicalHourContent', 'today-servita-reader', "ad
   if (!serviteHtml.includes(marker)) errors.push(`Renderização semântica incompleta: ${marker}`);
 }
 if (!serviteHtml.includes('renderLiturgicalHourContent(txt)')) errors.push('Os ofícios ainda não usam o renderizador semântico.');
+if (!serviteHtml.includes('return root.outerHTML;')) errors.push('O invólucro visual do leitor está sendo descartado.');
 if (!serviteHtml.includes('function addPrecesLine(line)')) errors.push('Separação semântica das intenções das preces ausente.');
 if (!serviteHtml.includes("if(!splitReadingLine(rest)) add(rest, 'reading-body')")) errors.push('Leitura breve ainda não separa referência e corpo.');
 for (const marker of ['[data-theme="dark"] .today-servita-reader .antiphon', 'html,body,#app,#view{overflow-x:hidden}', 'white-space:normal!important']) {
@@ -79,4 +80,4 @@ if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);
 }
-console.log(JSON.stringify({ status: 'ok', version: '4.9.12', cachedFiles: required.length, externalLinks: allowedExternal.length, scripts: scripts.length, indexBytes: fs.statSync(path.join(www, 'index.html')).size, serviteBytes: fs.statSync(path.join(www, 'servite.html')).size, santoralEntries: santoral.length, officeEntries: Object.keys(oficios).length }, null, 2));
+console.log(JSON.stringify({ status: 'ok', version: '4.9.13', cachedFiles: required.length, externalLinks: allowedExternal.length, scripts: scripts.length, indexBytes: fs.statSync(path.join(www, 'index.html')).size, serviteBytes: fs.statSync(path.join(www, 'servite.html')).size, santoralEntries: santoral.length, officeEntries: Object.keys(oficios).length }, null, 2));
