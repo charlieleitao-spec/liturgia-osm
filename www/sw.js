@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.11';
+const CACHE = 'liturgia-osm-v4.9.12';
 const CORE = [
   "./",
   "./index.html",

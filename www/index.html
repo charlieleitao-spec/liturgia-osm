@@ -371,7 +371,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold-soft);outl
 .servite-overlay{position:fixed;inset:0;z-index:9999;background:var(--bg-deep);display:none;flex-direction:column}
 .servite-overlay.open{display:flex}.servite-head{height:58px;min-height:58px;display:flex;align-items:center;gap:12px;padding:0 14px;border-bottom:1px solid var(--line);background:var(--bg-card);position:relative;z-index:2}
 .servite-back{border:1px solid var(--line);background:transparent;color:var(--gold-soft);border-radius:12px;width:40px;height:40px;font-size:21px}.servite-title{font-family:var(--serif);font-size:19px;color:var(--text);font-weight:700}.servite-frame{border:0;width:100%;flex:1;background:var(--bg-deep)}
-body.servite-open{overflow:hidden}.servite-overlay .mini-tools{margin-left:auto;display:flex;gap:6px}.servite-overlay .mini-tools button{border:1px solid var(--line);background:transparent;color:var(--text);border-radius:10px;height:36px;min-width:36px}
+body.servite-open{overflow:hidden}body.servite-open .celebration-toggle,body.servite-open .floating-back,body.servite-open>.tabbar{display:none!important}.servite-overlay .mini-tools{margin-left:auto;display:flex;gap:6px}.servite-overlay .mini-tools button{border:1px solid var(--line);background:transparent;color:var(--text);border-radius:10px;height:36px;min-width:36px}
 </style>
 
 <style id="mainLanguageStyles">
@@ -623,7 +623,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.11';
+const APP_VERSION = '4.9.12';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1696,7 +1696,7 @@ body.celebration-mode .prayer-block,body.celebration-mode .bio-text,body.celebra
     return base.replace('<div class="section-title home-heading">Celebração OSM</div>',presidency+'<div class="section-title home-heading">Celebração OSM</div>');
   };
   const menu=document.querySelector('.main-menu');
-  if(menu){const nav=menu.querySelector('.menu-nav-grid');if(nav)nav.insertAdjacentHTML('beforeend','<button class="menu-action" onclick="closeMainMenu();openDailyLiturgy()">Missa do dia</button>');const status=menu.querySelector('.menu-status span:last-child');if(status)status.textContent='Versão 4.9.11 · fonte online com cópia offline';}
+  if(menu){const nav=menu.querySelector('.menu-nav-grid');if(nav)nav.insertAdjacentHTML('beforeend','<button class="menu-action" onclick="closeMainMenu();openDailyLiturgy()">Missa do dia</button>');const status=menu.querySelector('.menu-status span:last-child');if(status)status.textContent='Versão 4.9.12 · fonte online com cópia offline';}
   window.addEventListener('online',()=>{if(document.getElementById('dailyLiturgyOverlay').classList.contains('open'))loadDailyLiturgy(selectedDate);});
   render();
 })();
@@ -1719,7 +1719,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     const nav=performance.getEntriesByType('navigation')[0];
     const paint=performance.getEntriesByName('first-contentful-paint')[0]||performance.getEntriesByName('first-paint')[0];
-    const metric={version:'4.9.11',domContentLoadedMs:Math.round(nav?.domContentLoadedEventEnd||performance.now()),firstPaintMs:paint?Math.round(paint.startTime):null,indexBytes:228281};
+    const metric={version:'4.9.12',domContentLoadedMs:Math.round(nav?.domContentLoadedEventEnd||performance.now()),firstPaintMs:paint?Math.round(paint.startTime):null,indexBytes:228281};
     try{localStorage.setItem('osmStartupMetric',JSON.stringify(metric));}catch(e){}
     console.info('[Liturgia OSM startup]',JSON.stringify(metric));
   }));
