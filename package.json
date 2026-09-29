@@ -1,6 +1,6 @@
 {
   "name": "liturgia-osm",
-  "version": "4.9.9",
+  "version": "4.9.12",
   "private": true,
   "scripts": {"android:add":"npx cap add android","sync":"npx cap sync android","test":"node scripts/audit-app.mjs"},
   "dependencies": {
