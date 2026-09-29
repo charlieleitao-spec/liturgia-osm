@@ -392,7 +392,7 @@ main#view{
 }
 .bio-text{
   font-family:Georgia,'Times New Roman',serif; font-size:1.125rem; line-height:1.75; color:var(--paper);
-  white-space:pre-line; text-align:justify; text-justify:inter-word; hyphens:auto; overflow-wrap:anywhere;
+  white-space:pre-line; text-align:justify; text-justify:inter-word; hyphens:none; overflow-wrap:break-word;
   margin-bottom:6px;
 }
 .prayer-card{
@@ -406,7 +406,7 @@ main#view{
   color:var(--wine-soft); margin-bottom:10px;
 }
 .prayer-card .text{
-  font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1.1875rem; line-height:1.68; color:var(--text);
+  font-family:Georgia,'Times New Roman',serif; font-style:normal; font-size:1.02rem; line-height:1.58; color:var(--text);
   white-space:normal;
   overflow-wrap:break-word;
   word-break:normal;
@@ -798,7 +798,7 @@ body.direct-office-view .prayer-block{margin-top:0!important}
 .bio-text,
 .about-text{
   text-align:justify;
-  hyphens:auto;
+  hyphens:none;
   text-justify:inter-word;
 }
 .prayer-card .label,
@@ -822,23 +822,26 @@ body.direct-office-view .prayer-block{margin-top:0!important}
 
 <style id="renderizadorSemantico499">
 /* A mesma gramática visual usada em Hoje na Família Servita. */
-.liturgical-hour{font-family:Georgia,'Times New Roman',serif;color:var(--text);font-size:1.04rem}
-.liturgical-block{padding:18px 0;border-top:1px solid var(--border)}
+.liturgical-hour{font-family:Georgia,'Times New Roman',serif;color:var(--text);font-size:1.02rem;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+.liturgical-block{padding:18px 0;border-top:1px solid var(--line)}
 .liturgical-block:first-child{border-top:0}
 .liturgical-heading{margin:0 0 16px;text-align:center;color:var(--wine);font:700 1.12rem Georgia,'Times New Roman',serif;letter-spacing:.075em;text-transform:uppercase}
-.liturgical-antiphon{max-width:680px;margin:14px auto;padding:12px 15px;text-align:center;line-height:1.58;background:#f7f3e9;border-top:2px solid var(--gold-soft);border-bottom:1px solid #e5dac1;border-radius:10px}
+.liturgical-antiphon{max-width:680px;margin:14px auto;padding:12px 15px;text-align:center;line-height:1.58;color:#2b2924;background:#f7f3e9;border-top:2px solid var(--gold-soft);border-bottom:1px solid #e5dac1;border-radius:10px}
 .liturgical-rubric{max-width:680px;margin:13px auto;text-align:center;color:var(--wine);font-style:italic;line-height:1.55}
-.liturgical-psalm-title{max-width:680px;margin:22px auto 13px;text-align:center;color:var(--navy);font-weight:700;line-height:1.35}
-.liturgical-stanza{max-width:680px;margin:0 auto 22px;text-align:center;line-height:1.5}
+.liturgical-psalm-title{max-width:680px;margin:22px auto 13px;text-align:center;color:#173f70;font-weight:700;line-height:1.35}
+.liturgical-stanza{max-width:700px;margin:0 auto 22px;padding:0 2px;text-align:center;line-height:1.5}
 .liturgical-stanza:last-child{margin-bottom:0}
 .liturgical-line{display:block;margin:0;white-space:pre-wrap}
-.liturgical-response,.liturgical-preces-response{max-width:680px;margin:10px auto 18px;padding:9px 12px;text-align:center;line-height:1.55;border-top:1px solid #dbc9cc}
+.liturgical-response,.liturgical-preces-response{max-width:680px;margin:10px auto 18px;padding:9px 12px;text-align:center;line-height:1.55;border-top:1px solid var(--line)}
 .liturgical-preces-intro,.liturgical-preces-intention,.liturgical-prayer{max-width:680px;margin:0 auto 20px;text-align:center;line-height:1.58;white-space:pre-wrap}
 .liturgical-reading-ref{margin:0 0 6px;font-weight:700;line-height:1.5}
 .liturgical-reading-title{margin:0 0 12px;color:var(--wine);font-style:italic;line-height:1.5}
 .liturgical-reading-body{margin:0 0 18px;text-align:justify;line-height:1.7;white-space:pre-wrap}
 .liturgical-text{max-width:680px;margin:0 auto 16px;text-align:center;line-height:1.58;white-space:pre-wrap}
-@media(max-width:420px){.liturgical-hour{font-size:1rem}.liturgical-block{padding:16px 0}.liturgical-stanza{margin-bottom:20px}.liturgical-antiphon{padding:11px 10px}.liturgical-reading-body{text-align:left}}
+@media(max-width:420px){.liturgical-hour{font-size:.96rem}.liturgical-block{padding:16px 0}.liturgical-stanza{margin-bottom:20px}.liturgical-antiphon{padding:11px 10px}.liturgical-reading-body{text-align:left}.prayer-card{padding:16px}.prayer-card .text{font-size:1rem!important;line-height:1.52!important}}
+[data-theme="dark"] .liturgical-antiphon{color:var(--text);background:#17263d;border-color:rgba(217,182,92,.48)}
+[data-theme="dark"] .liturgical-psalm-title{color:var(--gold-soft)}
+[data-theme="dark"] .liturgical-rubric,[data-theme="dark"] .liturgical-heading{color:var(--wine-soft)}
 </style>
 
 <style id="regraFloatingBack486">
