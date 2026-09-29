@@ -9,6 +9,9 @@ const manifest = JSON.parse(fs.readFileSync(path.join(www, 'manifest.webmanifest
 const required = ['index.html', 'servite.html', 'data/santoral.json', 'data/oficios-osm.json', 'data/hoje-familia-servita.json', 'sw.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 const errors = [];
 
+for (const marker of ['OFFICE_HOURS_BY_ID', 'officeHoursForSaint(s)', 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis']) {
+  if (!html.includes(marker)) errors.push(`Correção de coerência entre hora e conteúdo ausente: ${marker}`);
+}
 for (const file of required) {
   if (!fs.existsSync(path.join(www, file)) || fs.statSync(path.join(www, file)).size === 0) errors.push(`Arquivo ausente ou vazio: ${file}`);
 }
@@ -33,6 +36,7 @@ for (const marker of ['renderLiturgicalHourContent', 'today-servita-reader', "ad
 if (!serviteHtml.includes('renderLiturgicalHourContent(txt)')) errors.push('Os ofícios ainda não usam o renderizador semântico.');
 if (!serviteHtml.includes('return root.outerHTML;')) errors.push('O invólucro visual do leitor está sendo descartado.');
 if (!serviteHtml.includes('function addPrecesLine(line)')) errors.push('Separação semântica das intenções das preces ausente.');
+if (serviteHtml.includes('|Como no|')) errors.push('Versos iniciados por “como no” ainda podem ser classificados como rubrica.');
 if (!serviteHtml.includes("if(!splitReadingLine(rest)) add(rest, 'reading-body')")) errors.push('Leitura breve ainda não separa referência e corpo.');
 for (const marker of ['[data-theme="dark"] .today-servita-reader .antiphon', 'overflow-x:clip!important', 'touch-action:pan-y', 'contain:inline-size', 'white-space:normal!important']) {
   if (!serviteHtml.includes(marker)) errors.push(`Ajuste visual 4.9.12 ausente: ${marker}`);
@@ -83,4 +87,4 @@ if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);
 }
-console.log(JSON.stringify({ status: 'ok', version: '4.9.14', cachedFiles: required.length, externalLinks: allowedExternal.length, scripts: scripts.length, indexBytes: fs.statSync(path.join(www, 'index.html')).size, serviteBytes: fs.statSync(path.join(www, 'servite.html')).size, santoralEntries: santoral.length, officeEntries: Object.keys(oficios).length }, null, 2));
+console.log(JSON.stringify({ status: 'ok', version: '4.9.15', cachedFiles: required.length, externalLinks: allowedExternal.length, scripts: scripts.length, indexBytes: fs.statSync(path.join(www, 'index.html')).size, serviteBytes: fs.statSync(path.join(www, 'servite.html')).size, santoralEntries: santoral.length, officeEntries: Object.keys(oficios).length }, null, 2));
