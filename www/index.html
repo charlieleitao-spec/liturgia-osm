@@ -370,7 +370,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--gold-soft);outl
 <style id="serviteIntegrationStyle">
 .servite-overlay{position:fixed;inset:0;z-index:9999;background:var(--bg-deep);display:none;flex-direction:column}
 .servite-overlay.open{display:flex}.servite-head{height:58px;min-height:58px;display:flex;align-items:center;gap:12px;padding:0 14px;border-bottom:1px solid var(--line);background:var(--bg-card);position:relative;z-index:2}
-.servite-back{border:1px solid var(--line);background:transparent;color:var(--gold-soft);border-radius:12px;width:40px;height:40px;font-size:21px}.servite-title{font-family:var(--serif);font-size:19px;color:var(--text);font-weight:700}.servite-frame{border:0;width:100%;flex:1;background:var(--bg-deep)}
+.servite-back{border:1px solid var(--line);background:transparent;color:var(--gold-soft);border-radius:12px;width:40px;height:40px;font-size:21px}.servite-title{min-width:0;flex:1;font-family:var(--serif);font-size:19px;color:var(--text);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.servite-frame{border:0;width:100%;flex:1;background:var(--bg-deep)}
 body.servite-open{overflow:hidden}body.servite-open .celebration-toggle,body.servite-open .floating-back,body.servite-open>.tabbar{display:none!important}.servite-overlay .mini-tools{margin-left:auto;display:flex;gap:6px}.servite-overlay .mini-tools button{border:1px solid var(--line);background:transparent;color:var(--text);border-radius:10px;height:36px;min-width:36px}
 </style>
 
@@ -623,7 +623,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.14';
+const APP_VERSION = '4.9.15';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -784,12 +784,30 @@ const OFFICE_HOURS=[
   ['horaMedia','Hora Média'],
   ['vesperas','Vésperas']
 ];
+// Exibe somente as horas realmente presentes no texto oficial de cada ofício.
+// Trechos sem cabeçalho de hora pertencem ao Ofício das Leituras/comum indicado.
+const OFFICE_HOURS_BY_ID={
+  0:['invitatorio','oficio','laudes','horaMedia','vesperas'],1:['oficio'],2:['oficio','laudes','vesperas'],
+  3:['invitatorio','oficio','laudes','horaMedia','vesperas'],4:['laudes','vesperas'],6:['invitatorio','oficio','laudes','vesperas'],
+  7:['invitatorio','oficio','laudes','vesperas'],8:['oficio'],9:['laudes','vesperas'],10:['laudes','vesperas'],
+  11:['invitatorio','oficio','laudes','vesperas'],12:['oficio'],14:['oficio'],15:['oficio'],
+  16:['invitatorio','oficio','laudes','vesperas'],18:['invitatorio','laudes','vesperas'],19:['oficio'],20:['oficio'],
+  22:['laudes','vesperas'],23:['invitatorio','oficio','laudes','vesperas'],25:['laudes','vesperas'],27:['laudes','vesperas'],
+  28:['invitatorio','oficio','laudes','vesperas'],29:['invitatorio','oficio','laudes','vesperas'],30:['oficio'],31:['oficio']
+};
+function officeHoursForSaint(s){
+  const officeId=officeIdForSaint(s);
+  const keys=officeId===null?[]:(OFFICE_HOURS_BY_ID[officeId]||['oficio']);
+  return OFFICE_HOURS.filter(([key])=>keys.includes(key));
+}
 function openSantoralOfficeHour(saintId,hour){
   const saint=SANTORAL.find(x=>x._id===saintId);
   const officeId=officeIdForSaint(saint);
   if(officeId===null) return;
-  openServite('oficio:'+officeId+':'+hour);
-  const label=(OFFICE_HOURS.find(x=>x[0]===hour)||[])[1]||'Ofício';
+  const available=officeHoursForSaint(saint);
+  const actual=available.some(([key])=>key===hour)?hour:(available[0]?.[0]||'oficio');
+  openServite('oficio:'+officeId+':'+actual);
+  const label=(OFFICE_HOURS.find(x=>x[0]===actual)||[])[1]||'Ofício';
   const title=document.getElementById('serviteTitle');
   if(title) title.textContent=(saint?saint.title+' — ':'')+label;
 }
@@ -804,7 +822,7 @@ function calendarCelebrationRow(s){
     </div>
     <div class="calendar-entry-actions">
       <button onclick="openSaint(${s._id})">Santoral</button>
-      ${hasOffice?`<button class="office" onclick="openSantoralOfficeHour(${s._id},'oficio')">Ofício</button>`:''}
+      ${hasOffice?`<button class="office" onclick="openSantoralOfficeHour(${s._id},'${officeHoursForSaint(s)[0]?.[0]||'oficio'}')">Ofício</button>`:''}
     </div>
   </article>`;
 }
@@ -903,7 +921,7 @@ function viewDetail(id){
     <div class="card office-hours-card fade-in">
       <div class="office-hours-intro">Ofício próprio desta celebração</div>
       <div class="office-hours-grid">
-        ${OFFICE_HOURS.map(([key,label])=>`<button class="office-hour-btn" onclick="openSantoralOfficeHour(${s._id},'${key}')">${label}<span>›</span></button>`).join('')}
+        ${officeHoursForSaint(s).map(([key,label])=>`<button class="office-hour-btn" onclick="openSantoralOfficeHour(${s._id},'${key}')">${label}<span>›</span></button>`).join('')}
       </div>
     </div>` : ''}
   `;
@@ -1696,7 +1714,7 @@ body.celebration-mode .prayer-block,body.celebration-mode .bio-text,body.celebra
     return base.replace('<div class="section-title home-heading">Celebração OSM</div>',presidency+'<div class="section-title home-heading">Celebração OSM</div>');
   };
   const menu=document.querySelector('.main-menu');
-  if(menu){const nav=menu.querySelector('.menu-nav-grid');if(nav)nav.insertAdjacentHTML('beforeend','<button class="menu-action" onclick="closeMainMenu();openDailyLiturgy()">Missa do dia</button>');const status=menu.querySelector('.menu-status span:last-child');if(status)status.textContent='Versão 4.9.14 · fonte online com cópia offline';}
+  if(menu){const nav=menu.querySelector('.menu-nav-grid');if(nav)nav.insertAdjacentHTML('beforeend','<button class="menu-action" onclick="closeMainMenu();openDailyLiturgy()">Missa do dia</button>');const status=menu.querySelector('.menu-status span:last-child');if(status)status.textContent='Versão 4.9.15 · fonte online com cópia offline';}
   window.addEventListener('online',()=>{if(document.getElementById('dailyLiturgyOverlay').classList.contains('open'))loadDailyLiturgy(selectedDate);});
   render();
 })();
@@ -1719,7 +1737,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     const nav=performance.getEntriesByType('navigation')[0];
     const paint=performance.getEntriesByName('first-contentful-paint')[0]||performance.getEntriesByName('first-paint')[0];
-    const metric={version:'4.9.14',domContentLoadedMs:Math.round(nav?.domContentLoadedEventEnd||performance.now()),firstPaintMs:paint?Math.round(paint.startTime):null,indexBytes:228281};
+    const metric={version:'4.9.15',domContentLoadedMs:Math.round(nav?.domContentLoadedEventEnd||performance.now()),firstPaintMs:paint?Math.round(paint.startTime):null,indexBytes:228281};
     try{localStorage.setItem('osmStartupMetric',JSON.stringify(metric));}catch(e){}
     console.info('[Liturgia OSM startup]',JSON.stringify(metric));
   }));
