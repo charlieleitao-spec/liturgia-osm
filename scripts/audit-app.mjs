@@ -34,8 +34,11 @@ if (!serviteHtml.includes('renderLiturgicalHourContent(txt)')) errors.push('Os o
 if (!serviteHtml.includes('return root.outerHTML;')) errors.push('O invólucro visual do leitor está sendo descartado.');
 if (!serviteHtml.includes('function addPrecesLine(line)')) errors.push('Separação semântica das intenções das preces ausente.');
 if (!serviteHtml.includes("if(!splitReadingLine(rest)) add(rest, 'reading-body')")) errors.push('Leitura breve ainda não separa referência e corpo.');
-for (const marker of ['[data-theme="dark"] .today-servita-reader .antiphon', 'html,body,#app,#view{overflow-x:hidden}', 'white-space:normal!important']) {
+for (const marker of ['[data-theme="dark"] .today-servita-reader .antiphon', 'overflow-x:clip!important', 'touch-action:pan-y', 'contain:inline-size', 'white-space:normal!important']) {
   if (!serviteHtml.includes(marker)) errors.push(`Ajuste visual 4.9.12 ausente: ${marker}`);
+}
+for (const legacyStyle of ['invitatorioEvidente475', 'invitatorioRefinado476', 'oficioLeituras477', 'laudes480', 'horaMedia482', 'vesperas483']) {
+  if (!serviteHtml.includes(`id="${legacyStyle}" media="not all"`)) errors.push(`Estilo legado ainda ativo: ${legacyStyle}`);
 }
 if (!serviteHtml.includes('*, †, hífens e outros sinais litúrgicos nunca são usados')) errors.push('Garantia de preservação das quebras do texto-fonte ausente.');
 const scripts = [html, serviteHtml].flatMap(source => [...source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(match => match[1]).filter(Boolean));
@@ -80,4 +83,4 @@ if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);
 }
-console.log(JSON.stringify({ status: 'ok', version: '4.9.13', cachedFiles: required.length, externalLinks: allowedExternal.length, scripts: scripts.length, indexBytes: fs.statSync(path.join(www, 'index.html')).size, serviteBytes: fs.statSync(path.join(www, 'servite.html')).size, santoralEntries: santoral.length, officeEntries: Object.keys(oficios).length }, null, 2));
+console.log(JSON.stringify({ status: 'ok', version: '4.9.14', cachedFiles: required.length, externalLinks: allowedExternal.length, scripts: scripts.length, indexBytes: fs.statSync(path.join(www, 'index.html')).size, serviteBytes: fs.statSync(path.join(www, 'servite.html')).size, santoralEntries: santoral.length, officeEntries: Object.keys(oficios).length }, null, 2));
