@@ -14,8 +14,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Santoral OSM — Servos de Maria</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="media/fonts/fonts.css">
 <style>
 :root{
   --bg-deep:#EFE4BC;
@@ -883,7 +882,7 @@ let SANTORAL = [];
 const SANTORAL_IMAGES = {
   'Santo Antônio Maria Pucci': 'media/servite-12.jpg',
   'Sete Santos Fundadores': 'media/servite-11.jpg',
-  'São Peregrino de Forlì': 'media/servite-10.jpg',
+  'São Peregrino de Forlì': 'media/servite-10.webp',
   'B. Tomás de Orvieto': 'media/servite-09.jpg',
   'São Filipe Benício': 'media/servite-08.jpg',
   'B. Cecília Eusepi': 'media/servite-07.jpg',
@@ -2294,7 +2293,7 @@ async function initServite(){
     fetch('data/santoral.json').then(r=>r.json()),
     fetch('data/oficios-osm.json').then(r=>r.json())
   ]);
-  SANTORAL = santoralData.map((item,index)=>({...item, oficio:oficiosData[index]||null, _id:index}));
+  SANTORAL = santoralData.map((item,index)=>({...item, special:item.special??'', oficio:oficiosData[index]||null, _id:index}));
   SANTORAL.forEach((s,i)=> s._id = i);
 document.querySelector('.tab-btn[data-tab="hoje"]').classList.add('active');
 try{

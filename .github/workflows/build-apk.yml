@@ -1,4 +1,4 @@
-name: Build APK Liturgia OSM 4.9.15
+name: Build APK Liturgia OSM 4.9.16
 
 on:
   workflow_dispatch:
@@ -41,8 +41,8 @@ jobs:
 
       - name: Definir versão e segurança
         run: |
-          sed -i 's/versionCode [0-9][0-9]*/versionCode 40915/' android/app/build.gradle
-          sed -i 's/versionName "[^"]*"/versionName "4.9.15"/' android/app/build.gradle
+          sed -i 's/versionCode [0-9][0-9]*/versionCode 40916/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "4.9.16"/' android/app/build.gradle
           sed -i 's/buildTypes {/buildTypes {\n        debug { debuggable false }/' android/app/build.gradle
           sed -i 's/<application /<application android:allowBackup="false" /' android/app/src/main/AndroidManifest.xml
 
@@ -64,25 +64,25 @@ jobs:
           ./gradlew assembleDebug
 
       - name: Nomear APK
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk Liturgia-OSM-4.9.15.apk
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk Liturgia-OSM-4.9.16.apk
 
       - name: Verificar APK
         run: |
           APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
-          "${APKSIGNER}" verify --verbose --print-certs Liturgia-OSM-4.9.15.apk
+          "${APKSIGNER}" verify --verbose --print-certs Liturgia-OSM-4.9.16.apk
 
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.9.15
-          path: Liturgia-OSM-4.9.15.apk
+          name: Liturgia-OSM-4.9.16
+          path: Liturgia-OSM-4.9.16.apk
           if-no-files-found: error
 
-      - name: Publicar versão 4.9.15
+      - name: Publicar versão 4.9.16
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v4.9.15
-          name: Liturgia OSM 4.9.15
+          tag_name: v4.9.16
+          name: Liturgia OSM 4.9.16
           generate_release_notes: true
           overwrite_files: true
-          files: Liturgia-OSM-4.9.15.apk
+          files: Liturgia-OSM-4.9.16.apk

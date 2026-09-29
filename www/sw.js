@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.15';
+const CACHE = 'liturgia-osm-v4.9.16';
 const CORE = [
   "./",
   "./index.html",
@@ -18,9 +18,20 @@ const CORE = [
   "./media/servite-07.jpg",
   "./media/servite-08.jpg",
   "./media/servite-09.jpg",
-  "./media/servite-10.jpg",
+  "./media/servite-10.webp",
   "./media/servite-11.jpg",
   "./media/servite-12.jpg",
+  "./media/fonts/fonts.css",
+  "./media/fonts/cinzel-normal-latin-ext.woff2",
+  "./media/fonts/cinzel-normal-latin.woff2",
+  "./media/fonts/cormorant-garamond-italic-latin-ext.woff2",
+  "./media/fonts/cormorant-garamond-italic-latin.woff2",
+  "./media/fonts/cormorant-garamond-normal-latin-ext.woff2",
+  "./media/fonts/cormorant-garamond-normal-latin.woff2",
+  "./media/fonts/eb-garamond-italic-latin-ext.woff2",
+  "./media/fonts/eb-garamond-italic-latin.woff2",
+  "./media/fonts/eb-garamond-normal-latin-ext.woff2",
+  "./media/fonts/eb-garamond-normal-latin.woff2",
   "./media/servite-13.png"
 ];
 

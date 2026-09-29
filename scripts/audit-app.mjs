@@ -5,6 +5,7 @@ const root = path.resolve(new URL('..', import.meta.url).pathname);
 const www = path.join(root, 'www');
 const html = fs.readFileSync(path.join(www, 'index.html'), 'utf8');
 const sw = fs.readFileSync(path.join(www, 'sw.js'), 'utf8');
+const fontCssPath = path.join(www, 'media/fonts/fonts.css');
 const manifest = JSON.parse(fs.readFileSync(path.join(www, 'manifest.webmanifest'), 'utf8'));
 const required = ['index.html', 'servite.html', 'data/santoral.json', 'data/oficios-osm.json', 'data/hoje-familia-servita.json', 'sw.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 const errors = [];
@@ -26,6 +27,23 @@ if (manifest.start_url !== './' || manifest.display !== 'standalone') errors.pus
 if (html.includes('�')) errors.push('Foi encontrado caractere de substituição no conteúdo.');
 
 const serviteHtml = fs.readFileSync(path.join(www, 'servite.html'), 'utf8');
+if (!serviteHtml.includes('href="media/fonts/fonts.css"')) errors.push('Folha local das fontes do Santoral ausente.');
+if (serviteHtml.includes('fonts.googleapis.com') || serviteHtml.includes('fonts.gstatic.com')) errors.push('O Santoral ainda depende de fontes externas.');
+if (!fs.existsSync(fontCssPath) || !sw.includes('./media/fonts/fonts.css')) errors.push('Folha de fontes não está disponível no cache offline.');
+if (fs.existsSync(fontCssPath)) {
+  const fontCss = fs.readFileSync(fontCssPath, 'utf8');
+  if (/url\(["']?https?:/i.test(fontCss)) errors.push('A folha de fontes ainda aponta para a internet.');
+  for (const match of fontCss.matchAll(/url\(["']?([^"')]+)["']?\)/g)) {
+    const relative = path.posix.normalize(path.posix.join('media/fonts', match[1]));
+    if (!fs.existsSync(path.join(www, relative)) || !sw.includes(`./${relative}`)) errors.push(`Fonte ausente do projeto ou do cache offline: ${relative}`);
+  }
+}
+const coreMatch = sw.match(/const CORE = \[([\s\S]*?)\];/);
+if (coreMatch) {
+  for (const [, file] of coreMatch[1].matchAll(/"\.\/([^\"]+)"/g)) {
+    if (file !== '' && !fs.existsSync(path.join(www, file))) errors.push(`Arquivo do cache offline ausente: ${file}`);
+  }
+} else errors.push('Lista CORE do cache offline não encontrada.');
 for (const forbidden of ['hymnLines % 4', 'isPsalmVerse', 'psalmMarked']) {
   if (serviteHtml.includes(forbidden)) errors.push(`Reconstrução artificial de estrofes detectada: ${forbidden}`);
 }
@@ -87,4 +105,5 @@ if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);
 }
-console.log(JSON.stringify({ status: 'ok', version: '4.9.15', cachedFiles: required.length, externalLinks: allowedExternal.length, scripts: scripts.length, indexBytes: fs.statSync(path.join(www, 'index.html')).size, serviteBytes: fs.statSync(path.join(www, 'servite.html')).size, santoralEntries: santoral.length, officeEntries: Object.keys(oficios).length }, null, 2));
+const appVersion = html.match(/const APP_VERSION = '([^']+)'/)?.[1] ?? 'unknown';
+console.log(JSON.stringify({ status: 'ok', version: appVersion, cachedFiles: required.length, externalLinks: allowedExternal.length, scripts: scripts.length, indexBytes: fs.statSync(path.join(www, 'index.html')).size, serviteBytes: fs.statSync(path.join(www, 'servite.html')).size, santoralEntries: santoral.length, officeEntries: Object.keys(oficios).length }, null, 2));
