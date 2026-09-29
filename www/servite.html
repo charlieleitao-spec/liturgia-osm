@@ -1377,7 +1377,9 @@ function renderLiturgicalHourContent(text){
     }
     add(line);
   });
-  return root.innerHTML;
+  // O invólucro carrega o escopo visual canônico do Hoje na Família Servita.
+  // Devolver somente innerHTML descartava essa classe e reativava o cartão antigo.
+  return root.outerHTML;
 }
 
 // Splits a saint's raw "oficio" text into its canonical-hour sections:
