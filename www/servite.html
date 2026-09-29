@@ -822,7 +822,7 @@ body.direct-office-view .prayer-block{margin-top:0!important}
 
 <style id="renderizadorSemantico499">
 /* A mesma gramática visual usada em Hoje na Família Servita. */
-.liturgical-hour{font-family:Georgia,'Times New Roman',serif;color:var(--text)}
+.liturgical-hour{font-family:Georgia,'Times New Roman',serif;color:var(--text);font-size:1.04rem}
 .liturgical-block{padding:18px 0;border-top:1px solid var(--border)}
 .liturgical-block:first-child{border-top:0}
 .liturgical-heading{margin:0 0 16px;text-align:center;color:var(--wine);font:700 1.12rem Georgia,'Times New Roman',serif;letter-spacing:.075em;text-transform:uppercase}
@@ -838,7 +838,7 @@ body.direct-office-view .prayer-block{margin-top:0!important}
 .liturgical-reading-title{margin:0 0 12px;color:var(--wine);font-style:italic;line-height:1.5}
 .liturgical-reading-body{margin:0 0 18px;text-align:justify;line-height:1.7;white-space:pre-wrap}
 .liturgical-text{max-width:680px;margin:0 auto 16px;text-align:center;line-height:1.58;white-space:pre-wrap}
-@media(max-width:420px){.liturgical-block{padding:16px 0}.liturgical-stanza{margin-bottom:20px}.liturgical-antiphon{padding:11px 12px}.liturgical-reading-body{text-align:left}}
+@media(max-width:420px){.liturgical-hour{font-size:1rem}.liturgical-block{padding:16px 0}.liturgical-stanza{margin-bottom:20px}.liturgical-antiphon{padding:11px 10px}.liturgical-reading-body{text-align:left}}
 </style>
 
 <style id="regraFloatingBack486">
@@ -1386,6 +1386,12 @@ function renderLiturgicalHourContent(text){
     add(match[2].trim(), 'liturgical-reading-body');
     return true;
   }
+  function addPrecesLine(line){
+    // Mantém o texto integral e recupera apenas as intenções explicitamente
+    // iniciadas por uma nova invocação na própria fonte.
+    const intentions = line.split(/(?<=\.)\s+(?=(?:Pastor eterno|Senhor Jesus|Cristo(?: ressuscitado)?),)/);
+    intentions.forEach(intention => add(intention, precesCount++ === 0 ? 'liturgical-preces-intro' : 'liturgical-preces-intention'));
+  }
 
   lines.forEach(raw => {
     if(!raw.trim()){
@@ -1403,7 +1409,13 @@ function renderLiturgicalHourContent(text){
     if((match = line.match(/^(LEITURA BREVE|RESPONS[ÓO]RIO BREVE|RESPONS[ÓO]RIO|SALMODIA)\b\s*[:.–—-]?\s*(.*)$/i))){
       startBlock(match[1]);
       const rest = match[2].trim();
-      if(rest) add(rest, /^RESPONS/i.test(match[1]) ? 'liturgical-response' : 'liturgical-rubric');
+      if(rest){
+        if(/^LEITURA/i.test(match[1])){
+          if(!splitReadingLine(rest)) add(rest, 'liturgical-reading-body');
+        }else{
+          add(rest, /^RESPONS/i.test(match[1]) ? 'liturgical-response' : 'liturgical-rubric');
+        }
+      }
       return;
     }
     if(LITURGICAL_HEAD_RE.test(line)){
@@ -1435,7 +1447,7 @@ function renderLiturgicalHourContent(text){
       return;
     }
     if(currentHead==='PRECES'){
-      add(line, precesCount++ === 0 ? 'liturgical-preces-intro' : 'liturgical-preces-intention');
+      addPrecesLine(line);
       return;
     }
     if(/^(ORAÇÃO|PAI[- ]NOSSO|CONCLUSÃO)$/.test(currentHead)){
