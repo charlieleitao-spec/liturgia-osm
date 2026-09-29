@@ -26,15 +26,15 @@ const serviteHtml = fs.readFileSync(path.join(www, 'servite.html'), 'utf8');
 for (const forbidden of ['hymnLines % 4', 'isPsalmVerse', 'psalmMarked']) {
   if (serviteHtml.includes(forbidden)) errors.push(`Reconstrução artificial de estrofes detectada: ${forbidden}`);
 }
-if (!serviteHtml.includes('id="composicaoLiturgica497"')) errors.push('Composição importada do Hoje na Família Servita ausente.');
-for (const marker of ['renderLiturgicalHourContent', 'id="renderizadorSemantico499"', 'liturgical-antiphon', 'liturgical-psalm-title', 'liturgical-preces-intention']) {
+if (!serviteHtml.includes('id="leitorServitaCanonico4912"')) errors.push('Leitor canônico do Hoje na Família Servita ausente.');
+for (const marker of ['renderLiturgicalHourContent', 'today-servita-reader', "add(line,'antiphon')", "add(line,'psalm-title')", "'preces-intention'"]) {
   if (!serviteHtml.includes(marker)) errors.push(`Renderização semântica incompleta: ${marker}`);
 }
 if (!serviteHtml.includes('renderLiturgicalHourContent(txt)')) errors.push('Os ofícios ainda não usam o renderizador semântico.');
 if (!serviteHtml.includes('function addPrecesLine(line)')) errors.push('Separação semântica das intenções das preces ausente.');
-if (!serviteHtml.includes("if(!splitReadingLine(rest)) add(rest, 'liturgical-reading-body')")) errors.push('Leitura breve ainda não separa referência e corpo.');
-for (const marker of ['[data-theme="dark"] .liturgical-antiphon', '-webkit-text-size-adjust:100%', 'font-style:normal; font-size:1.02rem']) {
-  if (!serviteHtml.includes(marker)) errors.push(`Ajuste visual 4.9.11 ausente: ${marker}`);
+if (!serviteHtml.includes("if(!splitReadingLine(rest)) add(rest, 'reading-body')")) errors.push('Leitura breve ainda não separa referência e corpo.');
+for (const marker of ['[data-theme="dark"] .today-servita-reader .antiphon', 'html,body,#app,#view{overflow-x:hidden}', 'white-space:normal!important']) {
+  if (!serviteHtml.includes(marker)) errors.push(`Ajuste visual 4.9.12 ausente: ${marker}`);
 }
 if (!serviteHtml.includes('*, †, hífens e outros sinais litúrgicos nunca são usados')) errors.push('Garantia de preservação das quebras do texto-fonte ausente.');
 const scripts = [html, serviteHtml].flatMap(source => [...source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(match => match[1]).filter(Boolean));
@@ -79,4 +79,4 @@ if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);
 }
-console.log(JSON.stringify({ status: 'ok', version: '4.9.11', cachedFiles: required.length, externalLinks: allowedExternal.length, scripts: scripts.length, indexBytes: fs.statSync(path.join(www, 'index.html')).size, serviteBytes: fs.statSync(path.join(www, 'servite.html')).size, santoralEntries: santoral.length, officeEntries: Object.keys(oficios).length }, null, 2));
+console.log(JSON.stringify({ status: 'ok', version: '4.9.12', cachedFiles: required.length, externalLinks: allowedExternal.length, scripts: scripts.length, indexBytes: fs.statSync(path.join(www, 'index.html')).size, serviteBytes: fs.statSync(path.join(www, 'servite.html')).size, santoralEntries: santoral.length, officeEntries: Object.keys(oficios).length }, null, 2));
