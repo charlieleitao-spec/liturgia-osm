@@ -623,7 +623,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.8';
+const APP_VERSION = '4.9.9';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1696,7 +1696,7 @@ body.celebration-mode .prayer-block,body.celebration-mode .bio-text,body.celebra
     return base.replace('<div class="section-title home-heading">Celebração OSM</div>',presidency+'<div class="section-title home-heading">Celebração OSM</div>');
   };
   const menu=document.querySelector('.main-menu');
-  if(menu){const nav=menu.querySelector('.menu-nav-grid');if(nav)nav.insertAdjacentHTML('beforeend','<button class="menu-action" onclick="closeMainMenu();openDailyLiturgy()">Missa do dia</button>');const status=menu.querySelector('.menu-status span:last-child');if(status)status.textContent='Versão 4.9.8 · fonte online com cópia offline';}
+  if(menu){const nav=menu.querySelector('.menu-nav-grid');if(nav)nav.insertAdjacentHTML('beforeend','<button class="menu-action" onclick="closeMainMenu();openDailyLiturgy()">Missa do dia</button>');const status=menu.querySelector('.menu-status span:last-child');if(status)status.textContent='Versão 4.9.9 · fonte online com cópia offline';}
   window.addEventListener('online',()=>{if(document.getElementById('dailyLiturgyOverlay').classList.contains('open'))loadDailyLiturgy(selectedDate);});
   render();
 })();
@@ -1719,7 +1719,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     const nav=performance.getEntriesByType('navigation')[0];
     const paint=performance.getEntriesByName('first-contentful-paint')[0]||performance.getEntriesByName('first-paint')[0];
-    const metric={version:'4.9.8',domContentLoadedMs:Math.round(nav?.domContentLoadedEventEnd||performance.now()),firstPaintMs:paint?Math.round(paint.startTime):null,indexBytes:228281};
+    const metric={version:'4.9.9',domContentLoadedMs:Math.round(nav?.domContentLoadedEventEnd||performance.now()),firstPaintMs:paint?Math.round(paint.startTime):null,indexBytes:228281};
     try{localStorage.setItem('osmStartupMetric',JSON.stringify(metric));}catch(e){}
     console.info('[Liturgia OSM startup]',JSON.stringify(metric));
   }));

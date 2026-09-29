@@ -820,6 +820,27 @@ body.direct-office-view .prayer-block{margin-top:0!important}
 }
 </style>
 
+<style id="renderizadorSemantico499">
+/* A mesma gramática visual usada em Hoje na Família Servita. */
+.liturgical-hour{font-family:Georgia,'Times New Roman',serif;color:var(--text)}
+.liturgical-block{padding:18px 0;border-top:1px solid var(--border)}
+.liturgical-block:first-child{border-top:0}
+.liturgical-heading{margin:0 0 16px;text-align:center;color:var(--wine);font:700 1.12rem Georgia,'Times New Roman',serif;letter-spacing:.075em;text-transform:uppercase}
+.liturgical-antiphon{max-width:680px;margin:14px auto;padding:12px 15px;text-align:center;line-height:1.58;background:#f7f3e9;border-top:2px solid var(--gold-soft);border-bottom:1px solid #e5dac1;border-radius:10px}
+.liturgical-rubric{max-width:680px;margin:13px auto;text-align:center;color:var(--wine);font-style:italic;line-height:1.55}
+.liturgical-psalm-title{max-width:680px;margin:22px auto 13px;text-align:center;color:var(--navy);font-weight:700;line-height:1.35}
+.liturgical-stanza{max-width:680px;margin:0 auto 22px;text-align:center;line-height:1.5}
+.liturgical-stanza:last-child{margin-bottom:0}
+.liturgical-line{display:block;margin:0;white-space:pre-wrap}
+.liturgical-response,.liturgical-preces-response{max-width:680px;margin:10px auto 18px;padding:9px 12px;text-align:center;line-height:1.55;border-top:1px solid #dbc9cc}
+.liturgical-preces-intro,.liturgical-preces-intention,.liturgical-prayer{max-width:680px;margin:0 auto 20px;text-align:center;line-height:1.58;white-space:pre-wrap}
+.liturgical-reading-ref{margin:0 0 6px;font-weight:700;line-height:1.5}
+.liturgical-reading-title{margin:0 0 12px;color:var(--wine);font-style:italic;line-height:1.5}
+.liturgical-reading-body{margin:0 0 18px;text-align:justify;line-height:1.7;white-space:pre-wrap}
+.liturgical-text{max-width:680px;margin:0 auto 16px;text-align:center;line-height:1.58;white-space:pre-wrap}
+@media(max-width:420px){.liturgical-block{padding:16px 0}.liturgical-stanza{margin-bottom:20px}.liturgical-antiphon{padding:11px 12px}.liturgical-reading-body{text-align:left}}
+</style>
+
 <style id="regraFloatingBack486">
 .regra-floating-back{
  position:fixed!important;
@@ -1315,6 +1336,117 @@ function renderPrayer(text){
   }).join('');
 }
 
+const LITURGICAL_HEAD_RE = /^(?:\d+[.)-]?\s*)?(HINO|SALMODIA|PRIMEIRA LEITURA|SEGUNDA LEITURA|LEITURA BREVE|RESPONS[ÓO]RIO(?: BREVE)?(?:\s+.*)?|C[ÂA]NTICO EVANG[ÉE]LICO|PRECES|PAI[- ]NOSSO|ORA[ÇC][ÃA]O|CONCLUS[ÃA]O)\s*[:.-]?\s*$/i;
+
+// Estrutura o ofício sem alterar, completar ou reconstruir o texto-fonte.
+// Linhas e estrofes procedem exclusivamente das quebras existentes na fonte.
+function renderLiturgicalHourContent(text){
+  const root = document.createElement('div');
+  root.className = 'liturgical-hour';
+  const lines = formatLiturgicalStanzas(text).split('\n');
+  let block = null;
+  let currentHead = '';
+  let stanza = null;
+  let precesCount = 0;
+
+  function startBlock(label){
+    block = document.createElement('section');
+    block.className = 'liturgical-block';
+    currentHead = String(label || '').replace(/^\d+[.)-]?\s*/, '').replace(/\s*[:.-]?\s*$/, '').toUpperCase();
+    precesCount = 0;
+    stanza = null;
+    if(label){
+      const heading = document.createElement('div');
+      heading.className = 'liturgical-heading';
+      heading.textContent = label;
+      block.appendChild(heading);
+    }
+    root.appendChild(block);
+  }
+  function add(value, className='liturgical-text', target=block){
+    if(!target){ startBlock(''); target = block; }
+    const node = document.createElement('div');
+    node.className = className;
+    node.textContent = value;
+    target.appendChild(node);
+    return node;
+  }
+  function addStanzaLine(line){
+    if(!stanza){
+      stanza = document.createElement('div');
+      stanza.className = 'liturgical-stanza';
+      block.appendChild(stanza);
+    }
+    add(line, 'liturgical-line', stanza);
+  }
+  function splitReadingLine(line){
+    const match = line.match(/^((?:cf\.\s*)?(?:[1-3]\s*)?[A-ZÁÉÍÓÚÂÊÔÃÕÇ][A-Za-zÁ-ú.]*\s+\d{1,3}[,.:]\d{1,3}[a-z]?(?:[-–]\d{1,3}[a-z]?)?(?:\.\d{1,3}[a-z]?(?:[-–]\d{1,3}[a-z]?)?)*(?:\s*;\s*(?:\d{1,3}[,.:])?\d{1,3}[a-z]?(?:[-–]\d{1,3}[a-z]?)?)*)\s+(.*)$/i);
+    if(!match) return false;
+    add(match[1].trim(), 'liturgical-reading-ref');
+    add(match[2].trim(), 'liturgical-reading-body');
+    return true;
+  }
+
+  lines.forEach(raw => {
+    if(!raw.trim()){
+      stanza = null;
+      return;
+    }
+    const line = raw.trim().replace(/^[•▪◦]\s*/, '');
+    let match;
+
+    if((match = line.match(/^(ORA[ÇC][ÃA]O|C[ÂA]NTICO EVANG[ÉE]LICO)\s*(\([^)]*\))\s*$/i))){
+      startBlock(match[1]);
+      add(match[2].slice(1,-1).trim(), 'liturgical-rubric');
+      return;
+    }
+    if((match = line.match(/^(LEITURA BREVE|RESPONS[ÓO]RIO BREVE|RESPONS[ÓO]RIO|SALMODIA)\b\s*[:.–—-]?\s*(.*)$/i))){
+      startBlock(match[1]);
+      const rest = match[2].trim();
+      if(rest) add(rest, /^RESPONS/i.test(match[1]) ? 'liturgical-response' : 'liturgical-rubric');
+      return;
+    }
+    if(LITURGICAL_HEAD_RE.test(line)){
+      startBlock(line);
+      return;
+    }
+    if((match = line.match(/^HINO\b\s*(\([^)]*\))?\s*(.*)$/i))){
+      startBlock('HINO');
+      if(match[1]) add(match[1].slice(1,-1).trim(), 'liturgical-rubric');
+      if(match[2]) addStanzaLine(match[2].trim());
+      return;
+    }
+    if(!block) startBlock('');
+
+    if(/^(?:Ant\.|Antífona)\s*\d*/i.test(line)){ stanza=null; add(line,'liturgical-antiphon'); return; }
+    if(/^(Salmo|Cântico|C[âa]ntico)\s+/i.test(line)){ stanza=null; add(line,'liturgical-psalm-title'); return; }
+    if(/^(V\.|R\.|℣\.|℟\.)\s*/.test(line)){ stanza=null; add(line, currentHead==='PRECES'?'liturgical-preces-response':'liturgical-response'); return; }
+    if(/^(Escolhe-se|Salmos? do|Salmos? e cântico|Como no|Do Comum|Quando esta memória|Antífona e salmos|Salmodia complementar)/i.test(line)){
+      stanza=null; add(line,'liturgical-rubric'); return;
+    }
+    if(/^(PRIMEIRA LEITURA|SEGUNDA LEITURA|LEITURA BREVE)$/.test(currentHead)){
+      if(splitReadingLine(line)) return;
+      if(/^(Da|Do|Dos|Das)\s+/.test(line) && line.length < 180) add(line,'liturgical-reading-ref');
+      else add(line,'liturgical-reading-body');
+      return;
+    }
+    if(currentHead==='HINO' || currentHead==='SALMODIA'){
+      addStanzaLine(line);
+      return;
+    }
+    if(currentHead==='PRECES'){
+      add(line, precesCount++ === 0 ? 'liturgical-preces-intro' : 'liturgical-preces-intention');
+      return;
+    }
+    if(/^(ORAÇÃO|PAI[- ]NOSSO|CONCLUSÃO)$/.test(currentHead)){
+      add(line,'liturgical-prayer');
+      return;
+    }
+    add(line);
+  });
+  return root.innerHTML;
+}
+
 // Splits a saint's raw "oficio" text into its canonical-hour sections:
 // Invitatório (merged into Ofício), Ofício das Leituras, Laudes, Hora Média, Vésperas (I/II merged).
 function splitOficioByHour(text){
@@ -1399,7 +1531,7 @@ function renderOficioTabs(oficioText){
   const canticleText = active.key === 'laudes' ? BENEDICTUS_TEXT : (active.key === 'vesperas' ? MAGNIFICAT_TEXT : null);
   const body = segs.map(s => {
     const txt = active.key === 'invitatorio' ? `${s.text}\n\n${INVITATORIO_SALMO}` : (canticleText ? insertCanticleAfterAntiphon(s.text, canticleText) : s.text);
-    return `${s.label ? `<div class="hour-sublabel">${escapeHtml(s.label)}</div>` : ''}<div>${renderPrayer(txt)}</div>`;
+    return `${s.label ? `<div class="hour-sublabel">${escapeHtml(s.label)}</div>` : ''}<div>${renderLiturgicalHourContent(txt)}</div>`;
   }).join('<div class="hour-divider"></div>');
   const finalAntifona = active.key === 'vesperas' ? renderFinalAntifonaBlock() : '';
   return `
