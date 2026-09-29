@@ -27,6 +27,10 @@ for (const forbidden of ['hymnLines % 4', 'isPsalmVerse', 'psalmMarked']) {
   if (serviteHtml.includes(forbidden)) errors.push(`Reconstrução artificial de estrofes detectada: ${forbidden}`);
 }
 if (!serviteHtml.includes('id="composicaoLiturgica497"')) errors.push('Composição importada do Hoje na Família Servita ausente.');
+for (const marker of ['renderLiturgicalHourContent', 'id="renderizadorSemantico499"', 'liturgical-antiphon', 'liturgical-psalm-title', 'liturgical-preces-intention']) {
+  if (!serviteHtml.includes(marker)) errors.push(`Renderização semântica incompleta: ${marker}`);
+}
+if (!serviteHtml.includes('renderLiturgicalHourContent(txt)')) errors.push('Os ofícios ainda não usam o renderizador semântico.');
 if (!serviteHtml.includes('*, †, hífens e outros sinais litúrgicos nunca são usados')) errors.push('Garantia de preservação das quebras do texto-fonte ausente.');
 const scripts = [html, serviteHtml].flatMap(source => [...source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(match => match[1]).filter(Boolean));
 scripts.forEach((script, index) => {
@@ -70,4 +74,4 @@ if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);
 }
-console.log(JSON.stringify({ status: 'ok', version: '4.9.8', cachedFiles: required.length, externalLinks: allowedExternal.length, scripts: scripts.length, indexBytes: fs.statSync(path.join(www, 'index.html')).size, serviteBytes: fs.statSync(path.join(www, 'servite.html')).size, santoralEntries: santoral.length, officeEntries: Object.keys(oficios).length }, null, 2));
+console.log(JSON.stringify({ status: 'ok', version: '4.9.9', cachedFiles: required.length, externalLinks: allowedExternal.length, scripts: scripts.length, indexBytes: fs.statSync(path.join(www, 'index.html')).size, serviteBytes: fs.statSync(path.join(www, 'servite.html')).size, santoralEntries: santoral.length, officeEntries: Object.keys(oficios).length }, null, 2));
