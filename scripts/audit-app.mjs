@@ -80,8 +80,8 @@ for (const saint of santoral) {
 }
 for (const key of Object.keys(oficios)) if (!santoral[Number(key)]) errors.push(`Ofício sem celebração correspondente: ${key}`);
 const celebrationsWithoutOffice = santoral.map((_, index) => index).filter(index => !Object.hasOwn(oficios, String(index)));
-if (santoral.length !== 32 || Object.keys(oficios).length !== 26) errors.push(`Contagem inesperada: ${santoral.length} celebrações e ${Object.keys(oficios).length} ofícios.`);
-if (celebrationsWithoutOffice.join(',') !== '5,13,17,21,24,26') errors.push(`Relação Santoral/Ofícios alterada: índices sem ofício ${celebrationsWithoutOffice.join(',')}.`);
+if (santoral.length !== 32 || Object.keys(oficios).length !== 30) errors.push(`Contagem inesperada: ${santoral.length} celebrações e ${Object.keys(oficios).length} ofícios.`);
+if (celebrationsWithoutOffice.join(',') !== '5,17') errors.push(`Relação Santoral/Ofícios alterada: índices sem ofício ${celebrationsWithoutOffice.join(',')}.`);
 const monteSenario = santoral.find(item => item.day === 22 && item.month === 9 && item.title === 'Dedicação da Basílica de Monte Senário');
 if (!monteSenario || !Object.hasOwn(oficios, String(santoral.indexOf(monteSenario)))) errors.push('A celebração e o Ofício de Monte Senário não estão associados a 22 de setembro.');
 const boaventuraPistoia = santoral.filter(item => item.title === 'B. Boaventura de Pistoia');
