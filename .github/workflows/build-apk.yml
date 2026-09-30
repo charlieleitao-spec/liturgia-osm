@@ -1,4 +1,4 @@
-name: Build APK Liturgia OSM 4.9.16
+name: Build APK Liturgia OSM 4.9.17
 
 on:
   workflow_dispatch:
@@ -41,9 +41,8 @@ jobs:
 
       - name: Definir versão e segurança
         run: |
-          sed -i 's/versionCode [0-9][0-9]*/versionCode 40916/' android/app/build.gradle
-          sed -i 's/versionName "[^"]*"/versionName "4.9.16"/' android/app/build.gradle
-          sed -i 's/buildTypes {/buildTypes {\n        debug { debuggable false }/' android/app/build.gradle
+          sed -i 's/versionCode [0-9][0-9]*/versionCode 40917/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "4.9.17"/' android/app/build.gradle
           sed -i 's/<application /<application android:allowBackup="false" /' android/app/src/main/AndroidManifest.xml
 
       - name: Sincronizar o Capacitor
@@ -57,32 +56,53 @@ jobs:
             cp icones-extraidos/mipmap-${density}-v4/ic_launcher*.png android/app/src/main/res/mipmap-${density}/
           done
 
-      - name: Gerar APK
+      - name: Verificar credenciais de assinatura
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          test -n "$KEYSTORE_B64" || (echo 'Secret ANDROID_KEYSTORE_BASE64 ausente' && exit 1)
+          test -n "$KS_PASS" || (echo 'Secret ANDROID_KEYSTORE_PASSWORD ausente' && exit 1)
+          test -n "$KEY_ALIAS" || (echo 'Secret ANDROID_KEY_ALIAS ausente' && exit 1)
+          test -n "$KEY_PASS" || (echo 'Secret ANDROID_KEY_PASSWORD ausente' && exit 1)
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > release.jks
+
+      - name: Gerar APK release
         working-directory: android
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleRelease
 
-      - name: Nomear APK
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk Liturgia-OSM-4.9.16.apk
+      - name: Alinhar e assinar APK
+        env:
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          BUILD_TOOLS="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)"
+          "$BUILD_TOOLS/zipalign" -f -v 4 android/app/build/outputs/apk/release/app-release-unsigned.apk Liturgia-OSM-4.9.17-aligned.apk
+          "$BUILD_TOOLS/apksigner" sign --ks release.jks --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$KS_PASS" --key-pass "pass:$KEY_PASS" --out Liturgia-OSM-4.9.17.apk Liturgia-OSM-4.9.17-aligned.apk
+          rm -f release.jks Liturgia-OSM-4.9.17-aligned.apk
 
-      - name: Verificar APK
+      - name: Verificar APK assinado
         run: |
           APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
-          "${APKSIGNER}" verify --verbose --print-certs Liturgia-OSM-4.9.16.apk
+          "$APKSIGNER" verify --verbose --print-certs Liturgia-OSM-4.9.17.apk
 
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.9.16
-          path: Liturgia-OSM-4.9.16.apk
+          name: Liturgia-OSM-4.9.17
+          path: Liturgia-OSM-4.9.17.apk
           if-no-files-found: error
 
-      - name: Publicar versão 4.9.16
+      - name: Publicar versão 4.9.17
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v4.9.16
-          name: Liturgia OSM 4.9.16
+          tag_name: v4.9.17
+          name: Liturgia OSM 4.9.17
           generate_release_notes: true
           overwrite_files: true
-          files: Liturgia-OSM-4.9.16.apk
+          files: Liturgia-OSM-4.9.17.apk
