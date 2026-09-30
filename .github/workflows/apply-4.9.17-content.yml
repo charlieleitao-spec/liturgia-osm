@@ -5,6 +5,7 @@ on:
     branches: [liturgia-4.9.17-conteudo]
     paths:
       - 'scripts/patch-4.9.17.mjs'
+      - 'scripts/audit-app.mjs'
       - '.github/workflows/apply-4.9.17-content.yml'
 
 permissions:
@@ -17,6 +18,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: liturgia-4.9.17-conteudo
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
