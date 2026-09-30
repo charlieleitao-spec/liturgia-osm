@@ -7,7 +7,6 @@ const auditPath = 'scripts/audit-app.mjs';
 const officesPath = 'www/data/oficios-osm.json';
 
 // Recover the last audited canonical Santoral before applying the 4.9.17 delta.
-// This prevents a simplified uploaded copy from replacing the canonical biographies.
 const canonicalSantoral = execFileSync('git', ['show', '48faab4:www/data/santoral.json'], { encoding: 'utf8' });
 fs.writeFileSync(santoralPath, canonicalSantoral.endsWith('\n') ? canonicalSantoral : canonicalSantoral + '\n');
 
@@ -50,4 +49,20 @@ for (const entry of additions) {
 const orderedOffices = Object.fromEntries(Object.entries(offices).sort(([a], [b]) => Number(a) - Number(b)));
 if (Object.keys(orderedOffices).length !== 30) throw new Error(`Esperados 30 Ofícios; encontrados ${Object.keys(orderedOffices).length}.`);
 fs.writeFileSync(officesPath, JSON.stringify(orderedOffices, null, 2) + '\n');
-console.log('Patch 4.9.17: Santoral canônico recuperado, Boaventura em 15/12 e quatro Ofícios adicionados.');
+
+// Promote all technical version markers to 4.9.17.
+const replaceRequired = (path, from, to) => {
+  let text = fs.readFileSync(path, 'utf8');
+  if (!text.includes(from) && !text.includes(to)) throw new Error(`Marcador de versão não encontrado em ${path}: ${from}`);
+  text = text.split(from).join(to);
+  fs.writeFileSync(path, text);
+};
+replaceRequired('www/index.html', "const APP_VERSION = '4.9.16';", "const APP_VERSION = '4.9.17';");
+replaceRequired('package.json', '"version": "4.9.16"', '"version": "4.9.17"');
+replaceRequired('package-lock.json', '"version": "4.9.16"', '"version": "4.9.17"');
+let build = fs.readFileSync('.github/workflows/build-apk.yml', 'utf8');
+build = build.split('4.9.16').join('4.9.17').split('40916').join('40917');
+if (!build.includes('Liturgia-OSM-4.9.17.apk') || !build.includes('tag_name: v4.9.17') || !build.includes('versionCode 40917')) throw new Error('Falha ao promover workflow Android para 4.9.17.');
+fs.writeFileSync('.github/workflows/build-apk.yml', build);
+
+console.log('Patch 4.9.17 aplicado: conteúdo litúrgico, Boaventura 15/12 e versão técnica 4.9.17.');
