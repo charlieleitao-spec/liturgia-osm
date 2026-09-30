@@ -85,7 +85,7 @@ if (celebrationsWithoutOffice.join(',') !== '5,13,17,21,24,26') errors.push(`Rel
 const monteSenario = santoral.find(item => item.day === 22 && item.month === 9 && item.title === 'Dedicação da Basílica de Monte Senário');
 if (!monteSenario || !Object.hasOwn(oficios, String(santoral.indexOf(monteSenario)))) errors.push('A celebração e o Ofício de Monte Senário não estão associados a 22 de setembro.');
 const boaventuraPistoia = santoral.filter(item => item.title === 'B. Boaventura de Pistoia');
-if (boaventuraPistoia.length !== 1 || boaventuraPistoia[0].day !== 14 || boaventuraPistoia[0].month !== 12) errors.push('Boaventura de Pistoia deve aparecer somente em 14 de dezembro.');
+if (boaventuraPistoia.length !== 1 || boaventuraPistoia[0].day !== 15 || boaventuraPistoia[0].month !== 12) errors.push('Boaventura de Pistoia deve aparecer somente em 15 de dezembro.');
 const generated = fs.readdirSync(www, { recursive: true, withFileTypes: true }).filter(entry => entry.isFile()).map(entry => path.join(entry.parentPath || entry.path, entry.name));
 for (const file of generated) {
   const size = fs.statSync(file).size;
