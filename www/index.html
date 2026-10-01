@@ -627,7 +627,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.17';
+const APP_VERSION = '4.9.20';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1259,13 +1259,7 @@ function adjacentCelebration(id,delta){
   const j=i+delta;
   return (j>=0&&j<ordered.length)?ordered[j]:null;
 }
-function celebrationNav(id){
-  const prev=adjacentCelebration(id,-1), next=adjacentCelebration(id,1);
-  return `<nav class="celebration-nav" aria-label="Navegação entre celebrações">
-    <button class="action-btn" ${prev?`onclick="openSaint(${prev._id})"`:'disabled aria-disabled="true"'}>‹ Anterior</button>
-    <button class="action-btn" ${next?`onclick="openSaint(${next._id})"`:'disabled aria-disabled="true"'}>Próxima ›</button>
-  </nav>`;
-}
+function celebrationNav(id){ return ''; }
 function viewSaintDetail(id){
   let h=viewDetail(id);
   h=h.replace('<div class="detail-header fade-in">',`<div class="detail-header fade-in" style="position:relative;">${favButton('saint',id)}`);
@@ -1338,7 +1332,7 @@ viewHoje=function(){
    <button onclick="openServite('coroa')"><b>Sete Dores</b><span>›</span></button>
    ${saint && saintHasOffice(saint)
      ? `<button onclick="openSantoralOfficeHour(${saint._id},'${officeHoursForSaint(saint)[0]?.[0]||'oficio'}')"><b>Ofício próprio</b><span>›</span></button>`
-     : `<button onclick="openServite('oficio')"><b>Ofício</b><span>›</span></button>`}
+     : `<button onclick="openServite('oficio')"><b>Ofício geral</b><span>›</span></button>`}
    <button onclick="openServite('sabado')"><b>Sábado Mariano</b><span>›</span></button>
  </div>
 
