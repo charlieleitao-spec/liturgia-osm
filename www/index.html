@@ -338,6 +338,9 @@ main#view{padding-top:14px;}
 .action-row{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 2px}
 .action-btn{border:1px solid var(--line);background:var(--bg-panel-2);color:var(--gold-soft);border-radius:18px;padding:8px 12px;font-family:Georgia,'Times New Roman',serif;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;cursor:pointer}
 .action-btn:active{transform:translateY(1px)}
+.celebration-nav{display:flex;gap:8px;justify-content:space-between;align-items:center;width:100%;max-width:100%;margin:18px 0 4px;overflow:hidden}
+.celebration-nav .action-btn{flex:1 1 0;min-width:0;max-width:48%;white-space:normal;overflow-wrap:anywhere}
+.celebration-nav .action-btn:disabled{opacity:.38;cursor:default;transform:none}
 .toast{position:fixed;left:50%;bottom:82px;transform:translateX(-50%);z-index:99;background:var(--paper);color:var(--bg-deep);padding:9px 13px;border-radius:18px;font-size:13px;box-shadow:var(--shadow);max-width:86%;text-align:center}
 
 .today-chip{display:block;margin:0 auto 12px;border:1px solid var(--line);background:var(--bg-panel-2);color:var(--gold-soft);border-radius:18px;padding:6px 12px;font-family:Georgia,'Times New Roman',serif;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;}
@@ -1237,9 +1240,27 @@ function openSaint(id){
   render(); window.scrollTo(0,0);
 }
 function openDevo(key, sub){ state.tab='oracoes'; localStorage.setItem('osmLastTab','oracoes'); state.detailId=null; state.devo=key; state.devoSub=(sub===undefined?null:sub); let title=key; try{ if(key.startsWith('varias')) title=PRAYERS.devotions.variasHome[parseInt(key.slice(6))].title; else title=(DEVO_LIST.find(x=>x.key===key)||{}).title||key; }catch(e){} addRecent('prayer',key,title,'Oração'); render(); window.scrollTo(0,0); }
+function celebrationOrder(){
+  return [...SANTORAL].sort((a,b)=>(a.month-b.month)||(a.day-b.day)||String(a.title).localeCompare(String(b.title),'pt-BR'));
+}
+function adjacentCelebration(id,delta){
+  const ordered=celebrationOrder();
+  const i=ordered.findIndex(x=>x._id===id);
+  if(i<0) return null;
+  const j=i+delta;
+  return (j>=0&&j<ordered.length)?ordered[j]:null;
+}
+function celebrationNav(id){
+  const prev=adjacentCelebration(id,-1), next=adjacentCelebration(id,1);
+  return `<nav class="celebration-nav" aria-label="Navegação entre celebrações">
+    <button class="action-btn" ${prev?`onclick="openSaint(${prev._id})"`:'disabled aria-disabled="true"'}>‹ Anterior</button>
+    <button class="action-btn" ${next?`onclick="openSaint(${next._id})"`:'disabled aria-disabled="true"'}>Próxima ›</button>
+  </nav>`;
+}
 function viewSaintDetail(id){
   let h=viewDetail(id);
-  return h.replace('<div class="detail-header fade-in">',`<div class="detail-header fade-in" style="position:relative;">${favButton('saint',id)}`);
+  h=h.replace('<div class="detail-header fade-in">',`<div class="detail-header fade-in" style="position:relative;">${favButton('saint',id)}`);
+  return h + celebrationNav(id);
 }
 const _oldSimple=simpleTextDetail;
 simpleTextDetail=function(title,sub,text,backFn){let h=_oldSimple(title,sub,text,backFn);let key=state.devo||title;return h.replace('<div class="detail-header fade-in">',`<div class="detail-header fade-in" style="position:relative;">${favButton('prayer',key)}`)}
