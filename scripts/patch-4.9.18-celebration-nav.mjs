@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+const path='www/index.html';
+let s=fs.readFileSync(path,'utf8');
+const needle="function viewSaintDetail(id){\n  let h=viewDetail(id);\n  return h.replace('<div class=\"detail-header fade-in\">',`<div class=\"detail-header fade-in\" style=\"position:relative;\">${favButton('saint',id)}`);\n}";
+if(!s.includes(needle)) throw new Error('Expected viewSaintDetail block not found; aborting.');
+const replacement=`function celebrationOrder(){\n  return [...SANTORAL].sort((a,b)=>(a.month-b.month)||(a.day-b.day)||String(a.title).localeCompare(String(b.title),'pt-BR'));\n}\nfunction adjacentCelebration(id,delta){\n  const ordered=celebrationOrder();\n  const i=ordered.findIndex(x=>x._id===id);\n  if(i<0) return null;\n  const j=i+delta;\n  return (j>=0&&j<ordered.length)?ordered[j]:null;\n}\nfunction celebrationNav(id){\n  const prev=adjacentCelebration(id,-1), next=adjacentCelebration(id,1);\n  return \`<nav class=\"celebration-nav\" aria-label=\"Navegação entre celebrações\">\n    <button class=\"action-btn\" \${prev?\`onclick=\"openSaint(\${prev._id})\"\`:'disabled aria-disabled=\"true\"'}>‹ Anterior</button>\n    <button class=\"action-btn\" \${next?\`onclick=\"openSaint(\${next._id})\"\`:'disabled aria-disabled=\"true\"'}>Próxima ›</button>\n  </nav>\`;\n}\nfunction viewSaintDetail(id){\n  let h=viewDetail(id);\n  h=h.replace('<div class=\"detail-header fade-in\">',\`<div class=\"detail-header fade-in\" style=\"position:relative;\">\${favButton('saint',id)}\`);\n  return h + celebrationNav(id);\n}`;
+s=s.replace(needle,replacement);
+const cssNeedle='.action-btn:active{transform:translateY(1px)}';
+if(!s.includes(cssNeedle)) throw new Error('Expected action button CSS not found; aborting.');
+s=s.replace(cssNeedle,cssNeedle+`\n.celebration-nav{display:flex;gap:8px;justify-content:space-between;align-items:center;width:100%;max-width:100%;margin:18px 0 4px;overflow:hidden}\n.celebration-nav .action-btn{flex:1 1 0;min-width:0;max-width:48%;white-space:normal;overflow-wrap:anywhere}\n.celebration-nav .action-btn:disabled{opacity:.38;cursor:default;transform:none}`);
+fs.writeFileSync(path,s);
+console.log('4.9.18 celebration navigation patch applied');
