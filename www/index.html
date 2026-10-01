@@ -1505,10 +1505,11 @@ function openServite(view){
   document.getElementById('serviteTitle').textContent=serviteNames[currentServiteView]||'Recursos OSM';
   fr.src=serviteUrl(currentServiteView);
   ov.classList.add('open');ov.setAttribute('aria-hidden','false');document.body.classList.add('servite-open');
+  if(!history.state?.serviteOverlay) history.pushState({...history.state,serviteOverlay:true},'');
 }
-function closeServite(){const ov=document.getElementById('serviteOverlay'),fr=document.getElementById('serviteFrame');ov.classList.remove('open');ov.setAttribute('aria-hidden','true');document.body.classList.remove('servite-open');fr.src='about:blank';}
+function closeServite(fromHistory=false){const ov=document.getElementById('serviteOverlay'),fr=document.getElementById('serviteFrame');const wasOpen=ov?.classList.contains('open');ov.classList.remove('open');ov.setAttribute('aria-hidden','true');document.body.classList.remove('servite-open');fr.src='about:blank';if(wasOpen&&!fromHistory&&history.state?.serviteOverlay)history.back();}
 function serviteReload(){if(currentServiteView)document.getElementById('serviteFrame').src=serviteUrl(currentServiteView)+'&reload='+Date.now();}
-window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverlay')?.classList.contains('open'))closeServite();});
+window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverlay')?.classList.contains('open'))closeServite(true);});
 </script>
 
 <style id="interface490">
