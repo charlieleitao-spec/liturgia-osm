@@ -768,7 +768,7 @@ function viewHoje(){
 }
 
 
-const SANTORAL_OFFICE_MAP = {"santo antonio maria pucci": 0, "12/1": 0, "b. tiago de \"citta della pieve\"": 1, "15/1": 1, "b. joaquim de sena": 2, "3/2": 2, "sete santos fundadores": 3, "17/2": 3, "b. isabel picenardi": 4, "19/2": 4, "sao peregrino de forli": 6, "4/5": 6, "b.a. virgem maria, mae e medianeira": 7, "8/5": 7, "b. benincasa de montepulciano": 8, "11/5": 8, "b. francisco de sena": 9, "12/5": 9, "b. tiago filipe de faenza": 10, "30/5": 10, "santa juliana de florenca": 11, "19/6": 11, "b. tomas de orvieto": 12, "27/6": 12, "b. ubaldo de sansepolcro": 14, "4/7": 14, "santa clelia barbieri": 15, "13/7": 15, "sao filipe benicio": 16, "23/8": 16, "santo agostinho": 18, "28/8": 18, "b. andre de sansepolcro": 19, "31/8": 19, "b. joana de florenca": 20, "1/9": 20, "b. boaventura de forli": 22, "6/9": 22, "nossa senhora das dores": 23, "15/9": 23, "dedicacao da basilica de monte senario": 25, "22/9": 25, "b. joao angelo de milao": 27, "25/10": 27, "todos os santos e santas da ordem": 28, "16/11": 28, "comemoracao dos defuntos da ordem": 29, "17/11": 29, "b. jeronimo de sant'angelo in vado": 30, "10/12": 30, "b. boaventura de pistoia": 31, "14/12": 31};
+const SANTORAL_OFFICE_MAP = {"santo antonio maria pucci": 0, "12/1": 0, "b. tiago de \"citta della pieve\"": 1, "15/1": 1, "b. joaquim de sena": 2, "3/2": 2, "sete santos fundadores": 3, "17/2": 3, "b. isabel picenardi": 4, "19/2": 4, "sao peregrino de forli": 6, "4/5": 6, "b.a. virgem maria, mae e medianeira": 7, "8/5": 7, "b. benincasa de montepulciano": 8, "11/5": 8, "b. francisco de sena": 9, "12/5": 9, "b. tiago filipe de faenza": 10, "30/5": 10, "santa juliana de florenca": 11, "19/6": 11, "b. tomas de orvieto": 12, "27/6": 12, "b. ubaldo de sansepolcro": 14, "4/7": 14, "santa clelia barbieri": 15, "13/7": 15, "sao filipe benicio": 16, "23/8": 16, "santo agostinho": 18, "28/8": 18, "b. andre de sansepolcro": 19, "31/8": 19, "b. joana de florenca": 20, "1/9": 20, "b. boaventura de forli": 22, "6/9": 22, "nossa senhora das dores": 23, "15/9": 23, "dedicacao da basilica de monte senario": 25, "22/9": 25, "b. joao angelo de milao": 27, "25/10": 27, "todos os santos e santas da ordem": 28, "16/11": 28, "comemoracao dos defuntos da ordem": 29, "17/11": 29, "b. jeronimo de sant'angelo in vado": 30, "10/12": 30, "b. boaventura de pistoia": 31, "15/12": 31};
 function normalizeSaintKey(v){
   return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 }
@@ -781,6 +781,15 @@ function officeIdForSaint(s){
   return null;
 }
 function saintHasOffice(s){ return officeIdForSaint(s)!==null; }
+const OFFICE_CLASSIFICATION={
+  0:'Ofício próprio',3:'Ofício próprio',6:'Ofício próprio',11:'Ofício próprio',16:'Ofício próprio',18:'Ofício próprio',23:'Ofício próprio',28:'Ofício próprio',29:'Ofício próprio',
+  1:'Comum com elementos próprios',8:'Comum com elementos próprios',12:'Comum com elementos próprios',13:'Comum com elementos próprios',14:'Comum com elementos próprios',15:'Comum com elementos próprios',19:'Comum com elementos próprios',20:'Comum com elementos próprios',21:'Comum com elementos próprios',24:'Comum com elementos próprios',26:'Comum com elementos próprios',30:'Comum com elementos próprios',
+  2:'Elementos próprios + Comum',4:'Elementos próprios + Comum',7:'Elementos próprios + Comum',9:'Elementos próprios + Comum',10:'Elementos próprios + Comum',22:'Elementos próprios + Comum',25:'Elementos próprios + Comum',27:'Elementos próprios + Comum',31:'Elementos próprios + Comum'
+};
+function officeClassificationForSaint(s){
+  const id=officeIdForSaint(s);
+  return id===null?'':(OFFICE_CLASSIFICATION[id]||'Liturgia das Horas desta celebração');
+}
 const OFFICE_HOURS=[
   ['invitatorio','Invitatório'],
   ['oficio','Ofício das Leituras'],
@@ -923,7 +932,7 @@ function viewDetail(id){
     ${saintHasOffice(s) ? `
     <div class="section-title" style="margin-top:28px;">Liturgia das Horas</div>
     <div class="card office-hours-card fade-in">
-      <div class="office-hours-intro">Ofício próprio desta celebração</div>
+      <div class="office-hours-intro">${officeClassificationForSaint(s)}</div>
       <div class="office-hours-grid">
         ${officeHoursForSaint(s).map(([key,label])=>`<button class="office-hour-btn" onclick="openSantoralOfficeHour(${s._id},'${key}')">${label}<span>›</span></button>`).join('')}
       </div>
