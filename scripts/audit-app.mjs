@@ -21,10 +21,15 @@ if (appVersion && cacheVersion !== appVersion) errors.push(`Versão divergente: 
 if (appVersion && !buildWorkflow.includes(`versionName "${appVersion}"`)) errors.push(`Workflow não usa versionName ${appVersion}.`);
 if (appVersion && !buildWorkflow.includes(`Liturgia-OSM-${appVersion}.apk`)) errors.push(`Workflow não nomeia o APK como ${appVersion}.`);
 if (appVersion && !buildWorkflow.includes(`tag_name: v${appVersion}`)) errors.push(`Workflow não publica a tag v${appVersion}.`);
-// Detecta apenas a antiga navegação redundante de celebrações, sem confundir
-// controles legítimos de calendário ou a navegação nominal que deve permanecer.
-if (/function\s+celebrationNav\s*\(/.test(html) || />\s*‹\s*Anterior\s*</.test(html) || />\s*Próxima\s*›\s*</.test(html)) errors.push('Navegação genérica Anterior/Próxima reapareceu.');
-if (!html.includes('Celebração anterior') || !html.includes('Próxima celebração')) errors.push('Navegação nominal entre celebrações ausente.');
+// Gate estrutural: a navegação redundante antiga era criada exclusivamente por
+// celebrationNav(). Não testamos palavras como “Anterior”/“Próxima”, pois elas
+// também podem existir legitimamente em outros controles da interface.
+if (/function\s+celebrationNav\s*\(/.test(html) || /\bcelebrationNav\s*\(/.test(html)) {
+  errors.push('Navegação genérica Anterior/Próxima reapareceu.');
+}
+const nominalPrevCount = (html.match(/Celebração anterior/g) || []).length;
+const nominalNextCount = (html.match(/Próxima celebração/g) || []).length;
+if (nominalPrevCount < 1 || nominalNextCount < 1) errors.push('Navegação nominal entre celebrações ausente.');
 
 for (const marker of ['OFFICE_HOURS_BY_ID', 'officeHoursForSaint(s)', 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis']) {
   if (!html.includes(marker)) errors.push(`Correção de coerência entre hora e conteúdo ausente: ${marker}`);
