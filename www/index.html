@@ -810,7 +810,7 @@ const OFFICE_HOURS_BY_ID={
 };
 function officeHoursForSaint(s){
   const officeId=officeIdForSaint(s);
-  const keys=officeId===null?[]:(OFFICE_HOURS_BY_ID[officeId]||['oficio']);
+  const keys=officeId===null?[]:(OFFICE_HOURS_BY_ID[officeId]||[]);
   return OFFICE_HOURS.filter(([key])=>keys.includes(key));
 }
 function openSantoralOfficeHour(saintId,hour){
