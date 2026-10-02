@@ -39,11 +39,43 @@ jobs:
       - name: Criar projeto Android
         run: npx cap add android
 
+      - name: Configurar assinatura estável
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          test -n "$ANDROID_KEYSTORE_BASE64" || { echo "::error::Falta o secret ANDROID_KEYSTORE_BASE64"; exit 1; }
+          test -n "$ANDROID_KEYSTORE_PASSWORD" || { echo "::error::Falta o secret ANDROID_KEYSTORE_PASSWORD"; exit 1; }
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/liturgia-osm-release.jks
+          chmod 600 android/app/liturgia-osm-release.jks
+          keytool -list -keystore android/app/liturgia-osm-release.jks -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias liturgia-osm >/dev/null
+          printf 'ANDROID_KEYSTORE_PASSWORD=%s\n' "$ANDROID_KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('android/app/build.gradle')
+          s = p.read_text()
+          signing = """    signingConfigs {
+                  stable {
+                      storeFile file('liturgia-osm-release.jks')
+                      storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+                      keyAlias 'liturgia-osm'
+                      keyPassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+                  }
+              }
+          """
+          if 'signingConfigs {' in s:
+              raise SystemExit('Unexpected existing signingConfigs block; inspect before patching')
+          if 'android {' not in s or 'buildTypes {' not in s:
+              raise SystemExit('Unexpected Capacitor Gradle template')
+          s = s.replace('android {', 'android {\n' + signing, 1)
+          p.write_text(s)
+          PY
+
       - name: Definir versão e segurança
         run: |
           sed -i 's/versionCode [0-9][0-9]*/versionCode 40920/' android/app/build.gradle
           sed -i 's/versionName "[^"]*"/versionName "4.9.20"/' android/app/build.gradle
-          sed -i 's/buildTypes {/buildTypes {\n        debug { debuggable false }/' android/app/build.gradle
+          sed -i 's/buildTypes {/buildTypes {\n        debug { debuggable false; signingConfig signingConfigs.stable }/' android/app/build.gradle
           sed -i 's/<application /<application android:allowBackup="false" /' android/app/src/main/AndroidManifest.xml
 
       - name: Sincronizar o Capacitor
@@ -86,3 +118,4 @@ jobs:
           generate_release_notes: true
           overwrite_files: true
           files: Liturgia-OSM-4.9.20.apk
+
