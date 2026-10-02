@@ -14,13 +14,15 @@ const entries=[...mapMatch[1].matchAll(/(\d+):\[([^\]]*)\]/g)];
 const map={};
 for(const [,id,raw] of entries) map[id]=[...raw.matchAll(/'([^']+)'/g)].map(x=>x[1]);
 
-const allowed=new Set(['invitatorio','oficio','laudes','horaMedia','vesperas']);
+const allowed=new Set(['invitatorio','oficio','laudes','horaMedia','vesperas','primeirasVesperas','segundasVesperas']);
 const headingPatterns={
   invitatorio:/^Invitatório\s*$/im,
   oficio:/^Ofício das Leituras\s*$/im,
   laudes:/^Laudes\s*$/im,
   horaMedia:/^(Hora Média|Tércia|Sexta|Noa)\s*$/im,
-  vesperas:/^Vésperas\s*$/im
+  primeirasVesperas:/^(I|1ª|Primeiras)\s+Vésperas\s*$/im,
+  vesperas:/^Vésperas\s*$/im,
+  segundasVesperas:/^(II|2ª|Segundas)\s+Vésperas\s*$/im
 };
 const commonOnlyIds=new Set(['13','21','24','26']);
 const commonInstruction=/usa-se o Comum/i;
@@ -42,9 +44,13 @@ for(const [id,textValue] of Object.entries(offices)){
   } else {
     if(!map[id].length) errors.push(`Ofício ${id}: nenhuma hora definida.`);
     for(const hour of map[id]) if(!allowed.has(hour)) errors.push(`Ofício ${id}: hora desconhecida ${hour}.`);
-    // Cabeçalhos variam nos textos históricos. A ausência literal é aviso, não falha,
-    // porque OFFICE_HOURS_BY_ID já representa a estrutura editorial validada do app.
     for(const hour of map[id]) if(hour!=='invitatorio' && !detected.includes(hour)) warnings.push(`Ofício ${id} (${saint?.title}): ${hour} declarada sem cabeçalho literal padronizado.`);
+
+    // Se a fonte-mestra distingue I/II Vésperas, a estrutura editorial não pode
+    // reduzi-las silenciosamente a uma única chave genérica "vesperas".
+    if(detected.includes('primeirasVesperas') && !map[id].includes('primeirasVesperas')) errors.push(`Ofício ${id} (${saint?.title}): possui I Vésperas na fonte, mas a estrutura ainda não as distingue.`);
+    if(detected.includes('segundasVesperas') && !map[id].includes('segundasVesperas')) errors.push(`Ofício ${id} (${saint?.title}): possui II Vésperas na fonte, mas a estrutura ainda não as distingue.`);
+    if((detected.includes('primeirasVesperas') || detected.includes('segundasVesperas')) && map[id].includes('vesperas')) warnings.push(`Ofício ${id} (${saint?.title}): chave genérica vesperas coexistindo com I/II Vésperas; revisar interface.`);
   }
   if(!text.trim()) errors.push(`Ofício ${id}: texto vazio.`);
 }
