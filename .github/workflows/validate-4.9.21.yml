@@ -29,3 +29,13 @@ jobs:
 
       - name: Auditar integração e funcionamento offline
         run: npm test
+
+      - name: Comparar fontes litúrgicas
+        run: node scripts/compare-liturgical-sources.mjs
+
+      - name: Resumo da comparação
+        if: always()
+        run: |
+          if [ -f source-comparison-4.9.21.json ]; then
+            node -e "const r=require('./source-comparison-4.9.21.json'); console.log(JSON.stringify({sourceOfTruth:r.sourceOfTruth,celebrations:r.celebrations,masterOffices:r.masterOffices,subsidiaryStructured:r.subsidiaryStructured,masterOnly:r.masterOnly.length,candidatesForEnrichment:r.candidatesForEnrichment.length},null,2))"
+          fi
