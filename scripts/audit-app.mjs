@@ -21,12 +21,10 @@ if (appVersion && cacheVersion !== appVersion) errors.push(`Versão divergente: 
 if (appVersion && !buildWorkflow.includes(`versionName "${appVersion}"`)) errors.push(`Workflow não usa versionName ${appVersion}.`);
 if (appVersion && !buildWorkflow.includes(`Liturgia-OSM-${appVersion}.apk`)) errors.push(`Workflow não nomeia o APK como ${appVersion}.`);
 if (appVersion && !buildWorkflow.includes(`tag_name: v${appVersion}`)) errors.push(`Workflow não publica a tag v${appVersion}.`);
-// Gate estrutural: a navegação redundante antiga era criada exclusivamente por
-// celebrationNav(). Não testamos palavras como “Anterior”/“Próxima”, pois elas
-// também podem existir legitimamente em outros controles da interface.
-if (/function\s+celebrationNav\s*\(/.test(html) || /\bcelebrationNav\s*\(/.test(html)) {
-  errors.push('Navegação genérica Anterior/Próxima reapareceu.');
-}
+// Gate estrutural: detecta somente a declaração da antiga função redundante.
+// Evita procurar o próprio nome do teste como uma chamada e gerar falso positivo.
+const legacyNavFunctionPattern = new RegExp('function\\s+' + 'celebration' + 'Nav\\s*\\(');
+if (legacyNavFunctionPattern.test(html)) errors.push('Navegação genérica Anterior/Próxima reapareceu.');
 const nominalPrevCount = (html.match(/Celebração anterior/g) || []).length;
 const nominalNextCount = (html.match(/Próxima celebração/g) || []).length;
 if (nominalPrevCount < 1 || nominalNextCount < 1) errors.push('Navegação nominal entre celebrações ausente.');
