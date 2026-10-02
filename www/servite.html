@@ -1391,7 +1391,7 @@ function renderLiturgicalHourContent(text){
 }
 
 // Splits a saint's raw "oficio" text into its canonical-hour sections:
-// Invitatório (merged into Ofício), Ofício das Leituras, Laudes, Hora Média, Vésperas (I/II merged).
+// Invitatório, Ofício das Leituras, Laudes, Hora Média e Vésperas; I e II Vésperas permanecem distintas.
 function splitOficioByHour(text){
   const HEADER_RE = /^(Invitat[oó]rio|Of[ií]cio das Leituras|Laudes|Hora M[eé]dia|I Vésperas|II Vésperas|Vésperas)[ \t]*$/gm;
   const matches = [];
@@ -1399,11 +1399,13 @@ function splitOficioByHour(text){
   while((m = HEADER_RE.exec(text)) !== null){
     matches.push({ label: m[1], start: m.index, contentStart: m.index + m[0].length });
   }
-  const buckets = { invitatorio: [], oficio: [], laudes: [], horaMedia: [], vesperas: [] };
+  const buckets = { invitatorio: [], oficio: [], laudes: [], horaMedia: [], vesperasI: [], vesperasII: [], vesperas: [] };
   function bucketFor(label){
     if(label === 'Laudes') return 'laudes';
     if(label === 'Hora Média' || label === 'Hora Media') return 'horaMedia';
-    if(label === 'Vésperas' || label === 'I Vésperas' || label === 'II Vésperas') return 'vesperas';
+    if(label === 'I Vésperas') return 'vesperasI';
+    if(label === 'II Vésperas') return 'vesperasII';
+    if(label === 'Vésperas') return 'vesperas';
     if(label === 'Invitatório' || label === 'Invitatorio') return 'invitatorio';
     return 'oficio'; // Ofício das Leituras
   }
@@ -1461,6 +1463,8 @@ function renderOficioTabs(oficioText){
     { key:'oficio', title:t('hourOficio') },
     { key:'laudes', title:t('hourLaudes') },
     { key:'horaMedia', title:t('hourHoraMedia') },
+    { key:'vesperasI', title:'I '+t('hourVesperas') },
+    { key:'vesperasII', title:'II '+t('hourVesperas') },
     { key:'vesperas', title:t('hourVesperas') },
   ].filter(o => buckets[o.key] && buckets[o.key].length);
 
@@ -1471,15 +1475,16 @@ function renderOficioTabs(oficioText){
   const tabs = order.map(o => `<button class="hour-tab-btn ${state.oficioTab===o.key ? 'active' : ''}" onclick="setOficioTab('${o.key}')">${escapeHtml(o.title)}</button>`).join('');
   const active = order.find(o => o.key === state.oficioTab);
   const segs = buckets[active.key];
-  const canticleText = active.key === 'laudes' ? BENEDICTUS_TEXT : (active.key === 'vesperas' ? MAGNIFICAT_TEXT : null);
+  const isVesperas = active.key === 'vesperas' || active.key === 'vesperasI' || active.key === 'vesperasII';
+  const canticleText = active.key === 'laudes' ? BENEDICTUS_TEXT : (isVesperas ? MAGNIFICAT_TEXT : null);
   const body = segs.map(s => {
     const txt = active.key === 'invitatorio' ? `${s.text}\n\n${INVITATORIO_SALMO}` : (canticleText ? insertCanticleAfterAntiphon(s.text, canticleText) : s.text);
     return `${s.label ? `<div class="hour-sublabel">${escapeHtml(s.label)}</div>` : ''}<div>${renderLiturgicalHourContent(txt)}</div>`;
   }).join('<div class="hour-divider"></div>');
-  const finalAntifona = active.key === 'vesperas' ? renderFinalAntifonaBlock() : '';
+  const finalAntifona = isVesperas ? renderFinalAntifonaBlock() : '';
   return `
     <div class="hour-tabs">${tabs}</div>
-    <div class="hour-tab-content fade-in ${active.key==='invitatorio'?'invitatorio-content':active.key==='oficio'?'oficio-leituras-content':active.key==='laudes'?'laudes-content':active.key==='horaMedia'?'hora-media-content':active.key==='vesperas'?'vesperas-content':''}">${body}${finalAntifona}</div>
+    <div class="hour-tab-content fade-in ${active.key==='invitatorio'?'invitatorio-content':active.key==='oficio'?'oficio-leituras-content':active.key==='laudes'?'laudes-content':active.key==='horaMedia'?'hora-media-content':isVesperas?'vesperas-content':''}">${body}${finalAntifona}</div>
   `;
 }
 
