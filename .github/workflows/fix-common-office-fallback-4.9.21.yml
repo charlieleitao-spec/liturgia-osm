@@ -1,0 +1,61 @@
+name: Corrigir fallback dos Ofícios comuns 4.9.21
+
+on:
+  push:
+    branches: [develop-4.9.21]
+    paths:
+      - '.github/workflows/fix-common-office-fallback-4.9.21.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v5
+        with:
+          ref: develop-4.9.21
+
+      - name: Corrigir fallback sem alterar outros conteúdos
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('www/index.html')
+          s = p.read_text(encoding='utf-8')
+          old = "const keys=officeId===null?[]:(OFFICE_HOURS_BY_ID[officeId]||['oficio']);"
+          new = "const keys=officeId===null?[]:(OFFICE_HOURS_BY_ID[officeId]||[]);"
+          if old not in s:
+              if new in s:
+                  print('Correção já aplicada.')
+                  raise SystemExit(0)
+              raise SystemExit('Trecho esperado não encontrado; nenhuma alteração feita.')
+          if s.count(old) != 1:
+              raise SystemExit(f'Esperava 1 ocorrência, encontrei {s.count(old)}; nenhuma alteração feita.')
+          p.write_text(s.replace(old, new, 1), encoding='utf-8')
+          PY
+
+      - name: Executar auditorias
+        run: npm test
+
+      - name: Confirmar diff mínimo
+        shell: bash
+        run: |
+          git diff --check
+          git diff -- www/index.html
+
+      - name: Gravar correção na branch de desenvolvimento
+        shell: bash
+        run: |
+          if git diff --quiet -- www/index.html; then
+            echo 'Nada a gravar.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add www/index.html
+          git commit -m 'fix: não inventar Ofício das Leituras para remissões ao Comum'
+          git push origin HEAD:develop-4.9.21
