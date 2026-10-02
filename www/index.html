@@ -795,17 +795,19 @@ const OFFICE_HOURS=[
   ['oficio','Ofício das Leituras'],
   ['laudes','Laudes'],
   ['horaMedia','Hora Média'],
+  ['vesperasI','I Vésperas'],
+  ['vesperasII','II Vésperas'],
   ['vesperas','Vésperas']
 ];
 // Exibe somente as horas realmente presentes no texto oficial de cada ofício.
 // Trechos sem cabeçalho de hora pertencem ao Ofício das Leituras/comum indicado.
 const OFFICE_HOURS_BY_ID={
   0:['invitatorio','oficio','laudes','horaMedia','vesperas'],1:['oficio'],2:['oficio','laudes','vesperas'],
-  3:['invitatorio','oficio','laudes','horaMedia','vesperas'],4:['laudes','vesperas'],6:['invitatorio','oficio','laudes','vesperas'],
+  3:['invitatorio','oficio','laudes','horaMedia','vesperasI','vesperasII'],4:['laudes','vesperas'],6:['invitatorio','oficio','laudes','vesperas'],
   7:['invitatorio','oficio','laudes','vesperas'],8:['oficio'],9:['laudes','vesperas'],10:['laudes','vesperas'],
   11:['invitatorio','oficio','laudes','vesperas'],12:['oficio'],14:['oficio'],15:['oficio'],
   16:['invitatorio','oficio','laudes','vesperas'],18:['invitatorio','laudes','vesperas'],19:['oficio'],20:['oficio'],
-  22:['laudes','vesperas'],23:['invitatorio','oficio','laudes','vesperas'],25:['laudes','vesperas'],27:['laudes','vesperas'],
+  22:['laudes','vesperas'],23:['invitatorio','oficio','laudes','vesperasI','vesperasII'],25:['laudes','vesperas'],27:['laudes','vesperas'],
   28:['invitatorio','oficio','laudes','vesperas'],29:['invitatorio','oficio','laudes','vesperas'],30:['oficio'],31:['oficio']
 };
 function officeHoursForSaint(s){
