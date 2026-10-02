@@ -1,0 +1,31 @@
+name: Validar Liturgia OSM 4.9.21
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [develop-4.9.21]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v5
+
+      - name: Configurar Node.js 22
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Auditar integração e funcionamento offline
+        run: npm test
