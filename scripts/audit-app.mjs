@@ -21,7 +21,9 @@ if (appVersion && cacheVersion !== appVersion) errors.push(`Versão divergente: 
 if (appVersion && !buildWorkflow.includes(`versionName "${appVersion}"`)) errors.push(`Workflow não usa versionName ${appVersion}.`);
 if (appVersion && !buildWorkflow.includes(`Liturgia-OSM-${appVersion}.apk`)) errors.push(`Workflow não nomeia o APK como ${appVersion}.`);
 if (appVersion && !buildWorkflow.includes(`tag_name: v${appVersion}`)) errors.push(`Workflow não publica a tag v${appVersion}.`);
-if (/function\s+celebrationNav\s*\(/.test(html) || /‹\s*Anterior/.test(html) || /Próxima\s*›/.test(html)) errors.push('Navegação genérica Anterior/Próxima reapareceu.');
+// Detecta apenas a antiga navegação redundante de celebrações, sem confundir
+// controles legítimos de calendário ou a navegação nominal que deve permanecer.
+if (/function\s+celebrationNav\s*\(/.test(html) || />\s*‹\s*Anterior\s*</.test(html) || />\s*Próxima\s*›\s*</.test(html)) errors.push('Navegação genérica Anterior/Próxima reapareceu.');
 if (!html.includes('Celebração anterior') || !html.includes('Próxima celebração')) errors.push('Navegação nominal entre celebrações ausente.');
 
 for (const marker of ['OFFICE_HOURS_BY_ID', 'officeHoursForSaint(s)', 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis']) {
