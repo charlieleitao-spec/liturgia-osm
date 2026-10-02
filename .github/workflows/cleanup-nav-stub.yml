@@ -1,0 +1,34 @@
+name: Limpar stub legado de navegação
+
+on:
+  push:
+    paths:
+      - '.github/workflows/cleanup-nav-stub.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Remover stub e chamada legados
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('www/index.html')
+          s = p.read_text(encoding='utf-8')
+          old_func = "function celebrationNav(id){ return ''; }\n"
+          old_return = "  return h + celebrationNav(id);"
+          if old_func not in s or old_return not in s:
+              raise SystemExit('Padrão legado esperado não encontrado; nenhuma alteração aplicada.')
+          s = s.replace(old_func, '', 1)
+          s = s.replace(old_return, '  return h;', 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add www/index.html
+          git commit -m "fix: remover stub legado celebrationNav"
+          git push
