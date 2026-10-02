@@ -7,8 +7,22 @@ const html = fs.readFileSync(path.join(www, 'index.html'), 'utf8');
 const sw = fs.readFileSync(path.join(www, 'sw.js'), 'utf8');
 const fontCssPath = path.join(www, 'media/fonts/fonts.css');
 const manifest = JSON.parse(fs.readFileSync(path.join(www, 'manifest.webmanifest'), 'utf8'));
+const packageJson = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+const buildWorkflow = fs.readFileSync(path.join(root, '.github/workflows/build-apk.yml'), 'utf8');
 const required = ['index.html', 'servite.html', 'data/santoral.json', 'data/oficios-osm.json', 'data/hoje-familia-servita.json', 'sw.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 const errors = [];
+
+// Gates de versão e regressões de navegação.
+const appVersion = html.match(/const APP_VERSION = '([^']+)'/)?.[1];
+const cacheVersion = sw.match(/const CACHE = 'liturgia-osm-v([^']+)'/)?.[1];
+if (!appVersion) errors.push('APP_VERSION não encontrado no index.html.');
+if (appVersion && packageJson.version !== appVersion) errors.push(`Versão divergente: index=${appVersion}, package=${packageJson.version}.`);
+if (appVersion && cacheVersion !== appVersion) errors.push(`Versão divergente: index=${appVersion}, cache=${cacheVersion}.`);
+if (appVersion && !buildWorkflow.includes(`versionName "${appVersion}"`)) errors.push(`Workflow não usa versionName ${appVersion}.`);
+if (appVersion && !buildWorkflow.includes(`Liturgia-OSM-${appVersion}.apk`)) errors.push(`Workflow não nomeia o APK como ${appVersion}.`);
+if (appVersion && !buildWorkflow.includes(`tag_name: v${appVersion}`)) errors.push(`Workflow não publica a tag v${appVersion}.`);
+if (/function\s+celebrationNav\s*\(/.test(html) || /‹\s*Anterior/.test(html) || /Próxima\s*›/.test(html)) errors.push('Navegação genérica Anterior/Próxima reapareceu.');
+if (!html.includes('Celebração anterior') || !html.includes('Próxima celebração')) errors.push('Navegação nominal entre celebrações ausente.');
 
 for (const marker of ['OFFICE_HOURS_BY_ID', 'officeHoursForSaint(s)', 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis']) {
   if (!html.includes(marker)) errors.push(`Correção de coerência entre hora e conteúdo ausente: ${marker}`);
@@ -105,5 +119,4 @@ if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);
 }
-const appVersion = html.match(/const APP_VERSION = '([^']+)'/)?.[1] ?? 'unknown';
-console.log(JSON.stringify({ status: 'ok', version: appVersion, cachedFiles: required.length, externalLinks: allowedExternal.length, scripts: scripts.length, indexBytes: fs.statSync(path.join(www, 'index.html')).size, serviteBytes: fs.statSync(path.join(www, 'servite.html')).size, santoralEntries: santoral.length, officeEntries: Object.keys(oficios).length }, null, 2));
+console.log(JSON.stringify({ status: 'ok', version: appVersion ?? 'unknown', cachedFiles: required.length, externalLinks: allowedExternal.length, scripts: scripts.length, indexBytes: fs.statSync(path.join(www, 'index.html')).size, serviteBytes: fs.statSync(path.join(www, 'servite.html')).size, santoralEntries: santoral.length, officeEntries: Object.keys(oficios).length }, null, 2));
