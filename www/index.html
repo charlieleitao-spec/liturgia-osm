@@ -1259,11 +1259,10 @@ function adjacentCelebration(id,delta){
   const j=i+delta;
   return (j>=0&&j<ordered.length)?ordered[j]:null;
 }
-function celebrationNav(id){ return ''; }
 function viewSaintDetail(id){
   let h=viewDetail(id);
   h=h.replace('<div class="detail-header fade-in">',`<div class="detail-header fade-in" style="position:relative;">${favButton('saint',id)}`);
-  return h + celebrationNav(id);
+  return h;
 }
 const _oldSimple=simpleTextDetail;
 simpleTextDetail=function(title,sub,text,backFn){let h=_oldSimple(title,sub,text,backFn);let key=state.devo||title;return h.replace('<div class="detail-header fade-in">',`<div class="detail-header fade-in" style="position:relative;">${favButton('prayer',key)}`)}
