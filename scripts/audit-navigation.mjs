@@ -81,7 +81,8 @@ assert.ok(saintController,'A navegação contextual do santo deve estar instalad
 for(const required of ['openDailyLiturgy','openSantoralOfficeHour','MEMORIA_LITURGICA','state.saintDetailSection4924']) assert.ok(saintController.includes(required),'Rota contextual ausente: '+required);
 assert.ok(saintController.includes('O Livro de Oração não traz uma Memória Litúrgica cadastrada'),'Santos sem texto-fonte não podem receber conteúdo inventado.');
 assert.ok(saintController.includes('base local não contém um formulário de Missa próprio individual'),'A Missa por data deve ser identificada com precisão.');
-const saintButtons=['vida','liturgia','oracoes'].map(id=>({dataset:{tab:id},classList:{toggle(){}},setAttribute(){}}));
+const saintButtons=['vida','liturgia','oracoes'].map(id=>({dataset:{tab:id},active:false,attrs:{},classList:{toggle(name,value){if(name==='active')this.owner.active=value;},owner:null},setAttribute(name,value){this.attrs[name]=value;}}));
+saintButtons.forEach(button=>{button.classList.owner=button;});
 const saintViewNode={innerHTML:''};
 const saintContext={
   state:{tab:'santoral',detailId:null,devo:null,devoSub:null,prayerSection:'praticas'},
@@ -101,11 +102,15 @@ saintContext.openDetail(10);
 assert.match(saintViewNode.innerHTML,/Biografia de teste/,'Abrir um santo deve iniciar em Vida.');
 saintContext.setTab('liturgia');
 assert.match(saintViewNode.innerHTML,/Missa da data/,'Liturgia deve exibir o caminho de Missa da data.');
-assert.match(saintViewNode.innerHTML,/openDailyLiturgy\\(\\'\\d{4}-01-15\\'\\)/,'A Missa deve receber a data do santo.');
+assert.match(saintViewNode.innerHTML,/openDailyLiturgy\('\d{4}-01-15'\)/,'A Missa deve receber a data do santo.');
 assert.match(saintViewNode.innerHTML,/Laudes/,'O Ofício deve abrir apenas as horas disponíveis.');
 saintContext.setTab('oracoes');
 for(const text of ['Hino da fonte','Antífona da fonte','Salmo da fonte','Vida da fonte','Oração da fonte']) assert.ok(saintViewNode.innerHTML.includes(text),'Memória Litúrgica deve mostrar texto-fonte: '+text);
 assert.match(saintViewNode.innerHTML,/Fonte: Livro de Oração/,'A celebração deve identificar o livro-fonte.');
-assert.match(saintViewNode.innerHTML,/aria-current="page"/,'A navegação do santo deve indicar a aba atual.');
+assert.equal(saintButtons[1].attrs['aria-current'],'page','A navegação contextual deve marcar a seção ativa.');
+assert.equal(saintButtons[1].active,true,'Liturgia deve permanecer ativa ao consultar a Missa do santo.');
+saintContext.MEMORIA_LITURGICA.celebrations=[];
+saintContext.render();
+assert.match(saintViewNode.innerHTML,/O Livro de Oração não traz uma Memória Litúrgica cadastrada/,'Santos sem texto-fonte devem receber estado sem conteúdo, não um texto inventado.');
 
 console.log('Auditoria aprovada: navegação geral, detalhe do santo, conteúdo-fonte e leitor incorporado.');
