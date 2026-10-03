@@ -78,7 +78,7 @@ assert.ok(servite.includes('embedded-resource-mode .topbar'), 'O recurso incorpo
 
 const saintController=html.match(/<script id="canonicalSaintNavigation4925">([\s\S]*?)<\/script>/)?.[1]||'';
 assert.ok(saintController,'A navegação revisada do santo deve estar instalada.');
-for(const required of ['openDailyLiturgy','openSantoralOfficeHour','MEMORIA_LITURGICA','state.saintDetailSection4925','Voltar ao Santoral','function smartBack']) assert.ok(saintController.includes(required),'Rota ou retorno ausente: '+required);
+for(const required of ['openDailyLiturgy','openSantoralOfficeHour','MEMORIA_LITURGICA','state.saintDetailSection4925','Voltar ao Santoral','smartBack=function']) assert.ok(saintController.includes(required),'Rota ou retorno ausente: '+required);
 assert.ok(saintController.includes('O Livro de Oração não traz uma Memória Litúrgica cadastrada'),'Santos sem texto-fonte não podem receber conteúdo inventado.');
 assert.ok(saintController.includes('base local não contém um formulário de Missa próprio individual'),'A Missa por data deve ser identificada com precisão.');
 const saintButtons=['vida','liturgia','oracoes'].map(id=>({dataset:{tab:id},active:false,attrs:{},classList:{toggle(name,value){if(name==='active')this.owner.active=value;},owner:null},setAttribute(name,value){this.attrs[name]=value;}}));
