@@ -1,8 +1,10 @@
-name: Build APK Liturgia OSM 4.9.20
+name: Build APK Liturgia OSM 4.9.21
 
 on:
   workflow_dispatch:
   push:
+    branches: [main]
+  pull_request:
     branches: [main]
 
 permissions:
@@ -73,8 +75,8 @@ jobs:
 
       - name: Definir versão e segurança
         run: |
-          sed -i 's/versionCode [0-9][0-9]*/versionCode 40920/' android/app/build.gradle
-          sed -i 's/versionName "[^"]*"/versionName "4.9.20"/' android/app/build.gradle
+          sed -i 's/versionCode [0-9][0-9]*/versionCode 40921/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "4.9.21"/' android/app/build.gradle
           sed -i 's/buildTypes {/buildTypes {\n        debug { debuggable false; signingConfig signingConfigs.stable }/' android/app/build.gradle
           sed -i 's/<application /<application android:allowBackup="false" /' android/app/src/main/AndroidManifest.xml
 
@@ -96,26 +98,27 @@ jobs:
           ./gradlew assembleDebug
 
       - name: Nomear APK
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk Liturgia-OSM-4.9.20.apk
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk Liturgia-OSM-4.9.21.apk
 
       - name: Verificar APK
         run: |
           APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
-          "${APKSIGNER}" verify --verbose --print-certs Liturgia-OSM-4.9.20.apk
+          "${APKSIGNER}" verify --verbose --print-certs Liturgia-OSM-4.9.21.apk
 
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.9.20
-          path: Liturgia-OSM-4.9.20.apk
+          name: Liturgia-OSM-4.9.21
+          path: Liturgia-OSM-4.9.21.apk
           if-no-files-found: error
 
-      - name: Publicar versão 4.9.20
+      - name: Publicar versão 4.9.21
+        if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v4.9.20
-          name: Liturgia OSM 4.9.20
+          tag_name: v4.9.21
+          name: Liturgia OSM 4.9.21
           generate_release_notes: true
           overwrite_files: true
-          files: Liturgia-OSM-4.9.20.apk
+          files: Liturgia-OSM-4.9.21.apk
 

@@ -512,12 +512,10 @@ body.servite-open{overflow:hidden}body.servite-open .celebration-toggle,body.ser
   <button id="floatingBack" class="floating-back" onclick="smartBack()" aria-label="Voltar">←</button>
 <main id="view" tabindex="-1" aria-live="polite"></main>
 
-  <nav class="tabbar" id="tabbar">
-    <button class="tab-btn" data-tab="hoje"><svg viewBox="0 0 24 24"><path d="M12 3 L14.2 9.2 L21 9.5 L15.6 13.6 L17.4 20.2 L12 16.4 L6.6 20.2 L8.4 13.6 L3 9.5 L9.8 9.2 Z"/></svg><span>Hoje</span></button>
-    <button class="tab-btn" data-tab="calendario"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="16" rx="1.5"/><path d="M3.5 9.5h17M8 3v3M16 3v3"/></svg><span>Calendário</span></button>
-    <button class="tab-btn" data-tab="santoral"><svg viewBox="0 0 24 24"><path d="M12 3c3 2.2 5 5 5 8.2 0 4-2.3 7-5 9.8-2.7-2.8-5-5.8-5-9.8C7 8 9 5.2 12 3Z"/><path d="M9.5 11h5M12 8.5v5"/></svg><span>Santoral</span></button>
-    <button class="tab-btn" data-tab="oracoes"><svg viewBox="0 0 24 24"><path d="M12 21c-4-3-8-6.2-8-10.6C4 7 6.4 5 9.1 5c1.2 0 2.3.5 3 1.4C12.6 5.5 13.7 5 14.9 5 17.6 5 20 7 20 10.4 20 14.8 16 18 12 21Z"/></svg><span>Orações</span></button>
-    <button class="tab-btn" data-tab="biblioteca"><svg viewBox="0 0 24 24"><path d="M4 5.5h6v13H4zM14 5.5h6v13h-6z"/><path d="M10 7.5h4M10 16.5h4"/></svg><span>Biblioteca</span></button>
+  <nav class="tabbar" id="tabbar" aria-label="Navegação principal">
+    <button class="tab-btn" data-tab="vida"><svg viewBox="0 0 24 24"><path d="M12 3 L14.2 9.2 L21 9.5 L15.6 13.6 L17.4 20.2 L12 16.4 L6.6 20.2 L8.4 13.6 L3 9.5 L9.8 9.2 Z"/></svg><span>Vida</span></button>
+    <button class="tab-btn" data-tab="liturgia"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>Liturgia</span></button>
+    <button class="tab-btn" data-tab="oracoes"><svg viewBox="0 0 24 24"><path d="M12 21c-4-3-8-6.2-8-10.6C4 7 6.4 5 9.1 5c1.2 0 2.3.5 3 1.4C12.6 5.5 13.7 5 14.9 5 17.6 5 20 7 20 10.4 20 14.8 16 18 12 21Z"/></svg><span>Oração</span></button>
   </nav>
 
 </div>
@@ -627,7 +625,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.20';
+const APP_VERSION = '4.9.21';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -653,8 +651,11 @@ function toggleTheme(){ lightMode=!lightMode; localStorage.setItem('osmTheme', l
 
 
 function setTab(tab){
+  if(tab==='vida') tab='hoje';
   state.tab = tab; localStorage.setItem('osmLastTab', tab); state.detailId = null; state.devo = null; state.devoSub = null;
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  if(tab!=='oracoes') state.prayerSection='praticas';
+  const navTab = (tab==='hoje'||tab==='calendario'||tab==='santoral') ? 'vida' : tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===navTab));
   render();
   window.scrollTo(0,0);
 }
@@ -746,8 +747,8 @@ function viewHoje(){
     ${dailyOSMCard()}
 
     <div class="quick-grid fade-in">
+      <button class="quick-card" onclick="setTab('calendario')"><b>Calendário</b><span>Ver datas e celebrações da Ordem</span></button>
       <button class="quick-card" onclick="setTab('santoral')"><b>Santoral</b><span>Consultar santos, beatos e celebrações</span></button>
-      <button class="quick-card" onclick="setTab('oracoes')"><b>Orações</b><span>Acessar devoções e textos marianos</span></button>
     </div>
 
     <div class="section-title">Celebração própria</div>
@@ -966,6 +967,10 @@ function viewOracoesBase480(){
   if(state.devo) return viewDevoDetail(state.devo);
 
   return `
+    <div class="toggle-row" aria-label="Seções de oração">
+      <button class="toggle-btn ${state.prayerSection==='memoria'?'active':''}" onclick="setPrayerSection('memoria')">Memória Litúrgica</button>
+      <button class="toggle-btn ${state.prayerSection!=='memoria'?'active':''}" onclick="setPrayerSection('praticas')">Práticas devocionais</button>
+    </div>
     <div class="section-title">Práticas marianas diárias</div>
     <div class="card fade-in">
       <div class="toggle-row">
@@ -1019,6 +1024,7 @@ function viewDailyPrayer480(which){
 }
 function viewOracoes(){
   if(dailyPrayerOpen480) return viewDailyPrayer480(dailyPrayerOpen480);
+  if(state.prayerSection==='memoria') return viewMemoriaLiturgica();
   return viewOracoesBase480();
 }
 
@@ -1208,14 +1214,83 @@ function openExternalLink(event, url){
   return false;
 }
 
+let MEMORIA_LITURGICA={};
+let memoriaSelectedDate=null;
+function setPrayerSection(section){
+  state.prayerSection=section;
+  state.devo=null; state.devoSub=null; memoriaSelectedDate=null;
+  render(); window.scrollTo(0,0);
+}
+function openMemoriaLiturgica(date){
+  state.prayerSection='memoria'; state.devo=null; state.devoSub=null;
+  memoriaSelectedDate=date; render(); window.scrollTo(0,0);
+}
+function closeMemoriaLiturgica(){
+  memoriaSelectedDate=null; render(); window.scrollTo(0,0);
+}
+function viewMemoriaLiturgica(){
+  const data=MEMORIA_LITURGICA;
+  if(!data.celebrations) return '<div class="empty-state">Carregando a Memória Litúrgica…</div>';
+  if(memoriaSelectedDate){
+    const item=data.celebrations.find(x=>x.date===memoriaSelectedDate);
+    const saint=SANTORAL.find(s=>String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')===memoriaSelectedDate);
+    if(!item) return '<div class="empty-state">Não há texto próprio desta celebração na fonte consultada.</div>';
+    const heading=saint?.title||item.title;
+    const textBlock=(title,text)=>`<div class="section-title">${title}</div><div class="card fade-in"><div class="prayer-block" style="white-space:pre-wrap;">${escapeHtml(text)}</div></div>`;
+    return `<button class="back-btn" onclick="closeMemoriaLiturgica()">← Voltar à Memória Litúrgica</button>
+      <div class="detail-header fade-in"><h2>${escapeHtml(heading)}</h2><div class="date-line">${escapeHtml(saint?.date||item.source_date)}</div></div>
+      ${textBlock('Hino',data.common.hino)}
+      ${textBlock('Antífona',data.common.antifona)}
+      ${textBlock('Salmo 111',data.common.salmo)}
+      ${textBlock(item.breve_vida?'Breve vida':'Apresentação',item.breve_vida||item.apresentacao||'')}
+      ${textBlock('Oração própria',item.oracao_propria)}
+      <p class="reader-note">Fonte: Livro de Oração dos Servos de Maria, 3ª edição revisada (2024), seção Memória Litúrgica. Este roteiro está disponível em Oração.</p>`;
+  }
+  const rows=data.celebrations.map(item=>{
+    const saint=SANTORAL.find(s=>String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')===item.date);
+    return saint?`<div class="saint-row" onclick="openMemoriaLiturgica('${item.date}')"><div class="daynum">${saint.day}</div><div class="rowtext"><div class="rowtitle">${escapeHtml(saint.title)}</div><div class="rowrank">${escapeHtml(saint.date)} · Livro de Oração</div></div><div class="chev">›</div></div>`:'';
+  }).join('');
+  return `<div class="section-title">Memória Litúrgica</div>
+    <p class="reader-note">Roteiro próprio do Livro de Oração dos Servos de Maria: hino, antífona, salmo, breve vida e oração própria.</p>
+    <div class="card fade-in" style="padding:6px 16px;">${rows}</div>`;
+}
+function viewVida(){
+  if(state.detailId!==null) return viewSantoral();
+  const current=state.tab==='calendario'?'calendario':state.tab==='santoral'?'santoral':'hoje';
+  const tabs=`<div class="toggle-row" aria-label="Seções de Vida">
+    <button class="toggle-btn ${current==='hoje'?'active':''}" onclick="setTab('hoje')">Hoje</button>
+    <button class="toggle-btn ${current==='calendario'?'active':''}" onclick="setTab('calendario')">Calendário</button>
+    <button class="toggle-btn ${current==='santoral'?'active':''}" onclick="setTab('santoral')">Santoral</button>
+  </div>`;
+  return tabs+(current==='calendario'?viewCalendario():current==='santoral'?viewSantoral():viewHoje());
+}
+function setLiturgiaSection(section){state.liturgiaSection=section;render();window.scrollTo(0,0);}
+function viewLiturgia(){
+  const section=state.liturgiaSection||'missa';
+  const switcher=`<div class="toggle-row" aria-label="Seções de Liturgia">
+    <button class="toggle-btn ${section==='missa'?'active':''}" onclick="setLiturgiaSection('missa')">Missa</button>
+    <button class="toggle-btn ${section==='horas'?'active':''}" onclick="setLiturgiaSection('horas')">Liturgia das Horas</button>
+  </div>`;
+  if(section==='horas'){
+    const saints=SANTORAL.filter(s=>saintHasOffice(s));
+    return switcher+`<div class="section-title">Liturgia das Horas</div><p class="reader-note">Ofícios próprios da Ordem, com as horas disponíveis para cada celebração.</p>
+      <div class="card fade-in" style="padding:6px 16px;">${saints.map(s=>`<div class="saint-row"><div class="daynum">${s.day}</div><div class="rowtext"><div class="rowtitle">${escapeHtml(s.title)}</div><div class="rowrank">${escapeHtml(s.date)}</div></div><div class="office-hours-grid">${officeHoursForSaint(s).map(([key,label])=>`<button class="office-hour-btn" onclick="openSantoralOfficeHour(${s._id},'${key}')">${label} ›</button>`).join('')}</div></div>`).join('')}</div>`;
+  }
+  const d=new Date(), value=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+  return switcher+`<div class="section-title">Missa</div><p class="reader-note">Liturgia da Missa do dia, com consulta por data e cópia offline quando disponível.</p>
+    <div class="card fade-in"><button class="action-btn" onclick="openDailyLiturgy('${value}')">Abrir Missa do dia</button></div>`;
+}
+
 function render(){
   const view = document.getElementById('view');
   let html = '';
-  if(state.tab === 'hoje') html = viewHoje();
-  else if(state.tab === 'santoral') html = viewSantoral();
+  if(state.tab === 'vida' || state.tab === 'hoje' || state.tab === 'santoral' || state.tab === 'calendario') html = viewVida();
+  else if(state.tab === 'liturgia') html = viewLiturgia();
   else if(state.tab === 'oracoes') html = viewOracoes();
   else if(state.tab === 'sobre') html = viewSobre();
   view.innerHTML = html;
+  const navTab=(state.tab==='hoje'||state.tab==='santoral'||state.tab==='calendario')?'vida':state.tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===navTab));
   const sp=document.getElementById('sharePrayerBtn');
   if(sp && pendingSharePrayer) sp.onclick=()=>sharePrayer(pendingSharePrayer.title,pendingSharePrayer.text);
 }
@@ -1769,6 +1844,18 @@ window.addEventListener('DOMContentLoaded',()=>{
     console.info('[Liturgia OSM startup]',JSON.stringify(metric));
   }));
 });
+</script>
+<script id="canonicalMemoriaLiturgica">
+(async function(){
+  try{
+    const response=await fetch('./data/memoria-liturgica.json',{cache:'no-store'});
+    if(!response.ok)throw new Error('Memória Litúrgica indisponível');
+    const source=await response.json();
+    if(source.schema_version!==1||!source.common||!Array.isArray(source.celebrations)||source.celebrations.length!==25)throw new Error('Fonte incompleta');
+    MEMORIA_LITURGICA=source;
+    render();
+  }catch(error){console.warn('[Liturgia OSM] Não foi possível carregar a Memória Litúrgica.',error);}
+})();
 </script>
 </body>
 </html>
