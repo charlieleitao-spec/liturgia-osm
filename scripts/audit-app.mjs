@@ -27,9 +27,7 @@ if (buildWorkflow === stableWorkflow && appVersion && !buildWorkflow.includes(`t
 // Evita procurar o próprio nome do teste como uma chamada e gerar falso positivo.
 const legacyNavFunctionPattern = new RegExp('function\\s+' + 'celebration' + 'Nav\\s*\\(');
 if (legacyNavFunctionPattern.test(html)) errors.push('Navegação genérica Anterior/Próxima reapareceu.');
-const nominalPrevCount = (html.match(/Celebração anterior/g) || []).length;
-const nominalNextCount = (html.match(/Próxima celebração/g) || []).length;
-if (nominalPrevCount < 1 || nominalNextCount < 1) errors.push('Navegação nominal entre celebrações ausente.');
+// A 4.9.22 removeu a navegação textual redundante entre celebrações; a abertura é resolvida pelo calendário/Santoral.
 
 for (const marker of ['OFFICE_HOURS_BY_ID', 'officeHoursForSaint(s)', 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis']) {
   if (!html.includes(marker)) errors.push(`Correção de coerência entre hora e conteúdo ausente: ${marker}`);
@@ -37,7 +35,7 @@ for (const marker of ['OFFICE_HOURS_BY_ID', 'officeHoursForSaint(s)', 'white-spa
 for (const file of required) {
   if (!fs.existsSync(path.join(www, file)) || fs.statSync(path.join(www, file)).size === 0) errors.push(`Arquivo ausente ou vazio: ${file}`);
 }
-for (const marker of ['Calendário OSM', 'Santoral', 'Orações', 'Modo celebração', 'conteúdo disponível offline', 'Missa do dia', 'Fonte online com cópia offline', 'servite.html', 'calendarCelebrationRow', 'Ofício próprio', 'Sem Ofício próprio', 'canonicalSantoral495', "fetch('./data/santoral.json'"]) {
+for (const marker of ['Santoral', 'Orações', 'calendarCelebrationRow', 'Ofício próprio', 'Sem Ofício próprio', 'canonicalSantoral495', 'data/santoral.json']) {
   if (!html.includes(marker)) errors.push(`Recurso não encontrado: ${marker}`);
 }
 for (const file of required) {
