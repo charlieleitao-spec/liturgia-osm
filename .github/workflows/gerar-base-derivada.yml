@@ -18,15 +18,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Obter base derivada atual
-        run: |
-          mkdir -p derived
-          curl --fail --silent --show-error --location \
-            https://raw.githubusercontent.com/charlieleitao-spec/hoje-familia-servita/main/servita.json \
-            --output derived/servita.json
-
       - name: Gerar a partir das fontes canônicas
-        run: node scripts/gerar-servita.js derived/servita.json derived/servita.generated.json
+        run: node scripts/gerar-servita.js derived/servita.generated.json
 
       - name: Validar resultado
         run: |
