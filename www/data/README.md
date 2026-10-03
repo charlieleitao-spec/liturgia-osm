@@ -22,3 +22,12 @@ Quando houver correção de calendário, biografia ou texto litúrgico:
 A celebração do B. Boaventura de Pistoia está consolidada em **15 de dezembro**.
 
 Normalização estabelecida em 3 de outubro de 2026.
+
+
+## Automação da base derivada
+
+O script `scripts/gerar-servita.js` gera o arquivo consumido pelo Hoje na Família Servita. A geração usa o `santoral.json` como autoridade para id, data, título, nome original e biografia, preservando temporariamente a estrutura litúrgica já evoluída do `servita.json`.
+
+O workflow `.github/workflows/gerar-base-derivada.yml` é disparado quando as fontes canônicas ou o gerador mudam. Para publicar no outro repositório, requer o secret `HOJE_FAMILIA_SERVITA_TOKEN` com permissão de escrita somente no repositório `hoje-familia-servita`.
+
+Esta etapa conservadora evita perda das divisões por horas/seções enquanto `oficios-osm.json` ainda estiver em formato textual contínuo. A normalização futura do próprio `oficios-osm.json` permitirá eliminar essa dependência residual.
