@@ -1,0 +1,63 @@
+name: Gerar base derivada OSM
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "www/data/santoral.json"
+      - "www/data/oficios-osm.json"
+      - "scripts/gerar-servita.js"
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Obter base derivada atual
+        run: |
+          mkdir -p derived
+          curl --fail --silent --show-error --location \
+            https://raw.githubusercontent.com/charlieleitao-spec/hoje-familia-servita/main/servita.json \
+            --output derived/servita.json
+
+      - name: Gerar a partir das fontes canônicas
+        run: node scripts/gerar-servita.js derived/servita.json derived/servita.generated.json
+
+      - name: Validar resultado
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const x=JSON.parse(fs.readFileSync('derived/servita.generated.json','utf8'));
+          if(Object.keys(x).length<30) throw new Error('Base incompleta');
+          if(x['12-14'] || !x['12-15']) throw new Error('Calendário de Boaventura inválido');
+          for(const [k,v] of Object.entries(x)){
+            if(!v.data || !v.titulo || !v.nome_original) throw new Error('Registro incompleto: '+k);
+          }
+          console.log('Base derivada validada:',Object.keys(x).length,'celebrações');
+          NODE
+
+      - name: Publicar no Hoje na Família Servita
+        env:
+          GH_TOKEN: ${{ secrets.HOJE_FAMILIA_SERVITA_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::Configure o secret HOJE_FAMILIA_SERVITA_TOKEN com permissão de escrita no repositório hoje-familia-servita."
+            exit 1
+          fi
+          git clone https://x-access-token:${GH_TOKEN}@github.com/charlieleitao-spec/hoje-familia-servita.git target
+          cp derived/servita.generated.json target/servita.json
+          cd target
+          if git diff --quiet -- servita.json; then
+            echo "Base derivada já está atualizada."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add servita.json
+          git commit -m "Atualiza base derivada a partir do Liturgia OSM"
+          git push
