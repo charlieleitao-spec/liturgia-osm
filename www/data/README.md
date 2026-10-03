@@ -26,8 +26,11 @@ Normalização estabelecida em 3 de outubro de 2026.
 
 ## Automação da base derivada
 
-O script `scripts/gerar-servita.js` gera o arquivo consumido pelo Hoje na Família Servita. A geração usa o `santoral.json` como autoridade para id, data, título, nome original e biografia, preservando temporariamente a estrutura litúrgica já evoluída do `servita.json`.
+O script `scripts/gerar-servita.js` gera integralmente o arquivo consumido pelo Hoje na Família Servita a partir das duas fontes mestras.
 
-O workflow `.github/workflows/gerar-base-derivada.yml` é disparado quando as fontes canônicas ou o gerador mudam. Para publicar no outro repositório, requer o secret `HOJE_FAMILIA_SERVITA_TOKEN` com permissão de escrita somente no repositório `hoje-familia-servita`.
+### Schema v2 dos Ofícios
+`oficios-osm.json` possui `schema_version: 2` e uma coleção `celebracoes` indexada por `MM-DD`. Cada celebração declara `tipo_material` e `material`. Quando há Ofício próprio, `material.horas` organiza Invitatório, Ofício das Leituras, Laudes, Hora Média e Vésperas. Quando há apenas textos próprios, `material.secoes` mantém as seções editoriais. Celebrações sem material próprio são declaradas explicitamente.
 
-Esta etapa conservadora evita perda das divisões por horas/seções enquanto `oficios-osm.json` ainda estiver em formato textual contínuo. A normalização futura do próprio `oficios-osm.json` permitirá eliminar essa dependência residual.
+O workflow `.github/workflows/gerar-base-derivada.yml` é disparado quando `santoral.json`, `oficios-osm.json` ou o gerador mudam. Ele não depende de nenhuma cópia anterior de `servita.json`: reconstrói a base do zero, valida-a e a publica no outro repositório quando o secret `HOJE_FAMILIA_SERVITA_TOKEN` estiver configurado com permissão de escrita.
+
+Assim, `santoral.json + oficios-osm.json` constituem a fonte única de verdade para os dados compartilhados.
