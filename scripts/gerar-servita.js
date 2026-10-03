@@ -5,6 +5,9 @@ const path=require('path');
 
 const santoral=JSON.parse(fs.readFileSync('www/data/santoral.json','utf8'));
 const oficios=JSON.parse(fs.readFileSync('www/data/oficios-osm.json','utf8'));
+const memoria=JSON.parse(fs.readFileSync('www/data/memoria-liturgica.json','utf8'));
+if(memoria.schema_version!==1 || !Array.isArray(memoria.celebrations)) throw new Error('memoria-liturgica.json fora do schema canônico v1');
+const memoriasPorData=new Map(memoria.celebrations.map(item=>[item.date,item]));
 const outPath=process.argv[2]||'derived/servita.json';
 if(oficios.schema_version!==2 || !oficios.celebracoes) throw new Error('oficios-osm.json fora do schema canônico v2');
 
@@ -23,12 +26,14 @@ for(const s of santoral){
     nome_original:s.name,
     bio:s.bio||'',
     tipo_material:lit.tipo_material,
-    material:lit.material||{}
+    material:lit.material||{},
+    memoria_liturgica:memoriasPorData.get(key)||null
   };
 }
 const extra=Object.keys(oficios.celebracoes).filter(k=>!result[k]);
 if(extra.length) throw new Error('Datas litúrgicas sem entrada no santoral: '+extra.join(', '));
 if(result['12-14']) throw new Error('Data antiga de Boaventura (14/12) detectada');
+if(Object.values(result).filter(item=>item.memoria_liturgica).length!==24) throw new Error('Memórias litúrgicas devem corresponder à fonte: esperadas 24');
 if(!result['12-15']) throw new Error('Boaventura (15/12) ausente');
 
 fs.mkdirSync(path.dirname(outPath),{recursive:true});
