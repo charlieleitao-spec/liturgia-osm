@@ -1454,8 +1454,26 @@ function insertCanticleAfterAntiphon(text, canticleText){
   return text; // no antiphon found in this segment; leave unchanged
 }
 
-function renderOficioTabs(oficioText){
-  const buckets = splitOficioByHour(oficioText);
+function wrapSection(text){ return text ? [{label:null,text}] : []; }
+
+function renderOficioTabs(oficioData){
+  let buckets;
+  if(oficioData && typeof oficioData==='object' && oficioData.horas){
+    const h=oficioData.horas;
+    const wrap=(value,label=null)=>value ? [{label,text:typeof value==='string'?value:(value.text||'')}] : [];
+    buckets={
+      invitatorio:wrap(h.invitatorio),
+      oficio:wrap(h.oficio_leituras),
+      laudes:wrap(h.laudes),
+      horaMedia:wrap(h.hora_media),
+      vesperas:wrap(h.vesperas)
+    };
+  }else if(oficioData && typeof oficioData==='object' && Array.isArray(oficioData.secoes)){
+    const text=oficioData.secoes.map(s=>[s.titulo||'',s.texto||s.text||''].filter(Boolean).join('\n')).join('\n\n');
+    buckets={invitatorio:[],oficio:wrapSection(text),laudes:[],horaMedia:[],vesperas:[]};
+  }else{
+    buckets = splitOficioByHour(String(oficioData||''));
+  }
   const order = [
     { key:'invitatorio', title:t('hourInvitatorio') },
     { key:'oficio', title:t('hourOficio') },
@@ -2293,7 +2311,12 @@ async function initServite(){
     fetch('data/santoral.json').then(r=>r.json()),
     fetch('data/oficios-osm.json').then(r=>r.json())
   ]);
-  SANTORAL = santoralData.map((item,index)=>({...item, special:item.special??'', oficio:oficiosData[index]||null, _id:index}));
+  const celebracoes = oficiosData && oficiosData.schema_version===2 ? oficiosData.celebracoes : {};
+  SANTORAL = santoralData.map((item,index)=>{
+    const key=String(item.month).padStart(2,'0')+'-'+String(item.day).padStart(2,'0');
+    const lit=celebracoes[key]||null;
+    return {...item, special:item.special??'', oficio:lit&&lit.tipo_material!=='sem_material_proprio' ? lit.material : null, tipo_material:lit?.tipo_material||'sem_material_proprio', _id:index};
+  });
   SANTORAL.forEach((s,i)=> s._id = i);
 document.querySelector('.tab-btn[data-tab="hoje"]').classList.add('active');
 try{
