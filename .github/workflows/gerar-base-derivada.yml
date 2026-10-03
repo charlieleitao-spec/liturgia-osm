@@ -7,6 +7,7 @@ on:
     paths:
       - "www/data/santoral.json"
       - "www/data/oficios-osm.json"
+      - "www/data/memoria-liturgica.json"
       - "scripts/gerar-servita.js"
 
 permissions:
@@ -26,7 +27,13 @@ jobs:
           node - <<'NODE'
           const fs=require('fs');
           const x=JSON.parse(fs.readFileSync('derived/servita.generated.json','utf8'));
-          if(Object.keys(x).length<30) throw new Error('Base incompleta');
+          if(Object.keys(x).length!==32) throw new Error('Santoral derivado incompleto');
+          const memoria=Object.values(x).filter(item=>item.memoria_liturgica);
+          if(memoria.length!==24) throw new Error('Memória Litúrgica incompleta');
+          for(const item of memoria){
+            const m=item.memoria_liturgica;
+            if(!m.breve_vida || !m.oracao_propria || !m.date) throw new Error('Registro da Memória Litúrgica incompleto: '+item.data);
+          }
           if(x['12-14'] || !x['12-15']) throw new Error('Calendário de Boaventura inválido');
           for(const [k,v] of Object.entries(x)){
             if(!v.data || !v.titulo || !v.nome_original) throw new Error('Registro incompleto: '+k);
