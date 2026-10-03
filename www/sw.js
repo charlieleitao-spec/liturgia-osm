@@ -9,7 +9,6 @@ const CORE = [
   "./data/santoral.json",
   "./data/oficios-osm.json",
   "./data/memoria-liturgica.json",
-  "./data/hoje-familia-servita.json",
   "./media/servite-01.jpg",
   "./media/servite-02.webp",
   "./media/servite-03.jpg",
