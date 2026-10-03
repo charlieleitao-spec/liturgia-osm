@@ -10,7 +10,7 @@ const nav = html.match(/<nav class="tabbar" id="tabbar"[\s\S]*?<\/nav>/)?.[0] ||
 const tabIds = [...nav.matchAll(/data-tab="([^"]+)"/g)].map(match => match[1]);
 assert.deepEqual(tabIds, ['vida', 'liturgia', 'oracoes'], 'A barra principal deve ter exatamente Vida, Liturgia e Oração.');
 
-const controller = html.match(/<script id="canonicalPrimaryNavigation4922">([\s\S]*?)<\/script>/)?.[1] || '';
+const controller = html.match(/<script id="canonicalPrimaryNavigation4923">([\s\S]*?)<\/script>/)?.[1] || '';
 assert.ok(controller, 'O controlador canônico de navegação deve executar depois das camadas antigas.');
 for (const route of ['viewVida()', 'viewLiturgia()', 'viewOracoes()', 'viewMemoriaLiturgica()', 'viewOracoesBase480()']) {
   assert.ok(controller.includes(route), 'Rota ausente no controlador: ' + route);
@@ -66,5 +66,13 @@ assert.deepEqual(buttons.map(button => button.querySelector().textContent), ['Vi
 context.state.prayerSection = 'praticas';
 context.render();
 assert.match(view.innerHTML, /ROTA_PRATICAS/, 'As práticas devocionais devem permanecer em Oração.');
-assert.equal(JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')).version, '4.9.22');
-console.log('Auditoria da navegação aprovada: abas, destinos e rótulos conferidos.');
+assert.equal(JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')).version, '4.9.23');
+const usability = html.match(/<script id="canonicalUsability4923">([\s\S]*?)<\/script>/)?.[1] || '';
+assert.ok(usability, 'A tela inicial simplificada deve estar presente.');
+assert.ok(usability.includes("openLiturgiaSection"), 'Os atalhos da Liturgia devem ter destino funcional.');
+assert.ok(usability.includes("duplicateNavigation?.remove()"), 'O menu não deve repetir a navegação principal.');
+assert.ok(html.includes('new AbortController()') && html.includes('12000'), 'A consulta da Missa deve terminar com mensagem quando o serviço demora.');
+const servite = readFileSync(resolve(root, 'www/servite.html'), 'utf8');
+assert.ok(servite.includes('embedded-resource-mode .tabbar'), 'O recurso incorporado não deve abrir uma segunda barra de navegação.');
+assert.ok(servite.includes('embedded-resource-mode .topbar'), 'O recurso incorporado deve usar o cabeçalho do aplicativo.');
+console.log('Auditoria aprovada: abas, destinos, tela inicial e leitor incorporado.');
