@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Fonte única: santoral.json + oficios-osm.json (schema v2).
 const fs=require('fs');
 const path=require('path');
 
