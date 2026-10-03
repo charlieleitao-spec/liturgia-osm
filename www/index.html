@@ -625,7 +625,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.21';
+const APP_VERSION = '4.9.22';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1855,6 +1855,71 @@ window.addEventListener('DOMContentLoaded',()=>{
     MEMORIA_LITURGICA=source;
     render();
   }catch(error){console.warn('[Liturgia OSM] Não foi possível carregar a Memória Litúrgica.',error);}
+})();
+</script>
+<script id="canonicalPrimaryNavigation4922">
+(function(){
+  const labels={
+    pt:{vida:'Vida',liturgia:'Liturgia',oracoes:'Oração'},
+    la:{vida:'Vita',liturgia:'Liturgia',oracoes:'Oratio'},
+    it:{vida:'Vita',liturgia:'Liturgia',oracoes:'Preghiera'},
+    en:{vida:'Life',liturgia:'Liturgy',oracoes:'Prayer'}
+  };
+  const legacyLanguageRenderer=applyMainLanguage;
+  applyMainLanguage=function(){
+    if(typeof legacyLanguageRenderer==='function') legacyLanguageRenderer();
+    const selected=labels[MAIN_LANG]||labels.pt;
+    document.querySelectorAll('#tabbar .tab-btn').forEach(button=>{
+      const label=button.querySelector('span');
+      if(label&&selected[button.dataset.tab]) label.textContent=selected[button.dataset.tab];
+    });
+  };
+  viewOracoes=function(){
+    if(dailyPrayerOpen480) return viewDailyPrayer480(dailyPrayerOpen480);
+    if(state.devo) return viewDevoDetail(state.devo);
+    if(state.prayerSection==='memoria'){
+      const tabs='<div class="toggle-row" aria-label="Seções de Oração"><button class="toggle-btn active" onclick="setPrayerSection(\'memoria\')">Memória Litúrgica</button><button class="toggle-btn" onclick="setPrayerSection(\'praticas\')">Práticas devocionais</button></div>';
+      return tabs+viewMemoriaLiturgica();
+    }
+    return viewOracoesBase480();
+  };
+  setTab=function(tab){
+    const allowed=['vida','hoje','calendario','santoral','liturgia','oracoes','biblioteca','sobre'];
+    if(!allowed.includes(tab)) return;
+    state.tab=tab;
+    localStorage.setItem('osmLastTab',tab==='vida'?'hoje':tab);
+    state.detailId=null; state.devo=null; state.devoSub=null;
+    if(tab!=='oracoes'){state.prayerSection='praticas';memoriaSelectedDate=null;}
+    render();
+    window.scrollTo(0,0);
+  };
+  render=function(){
+    const view=document.getElementById('view');
+    let html='';
+    if(['vida','hoje','calendario','santoral'].includes(state.tab)) html=viewVida();
+    else if(state.tab==='liturgia') html=viewLiturgia();
+    else if(state.tab==='oracoes') html=viewOracoes();
+    else if(state.tab==='biblioteca') html=viewBiblioteca();
+    else html=viewSobre();
+    view.innerHTML=html;
+    const activeTab=['vida','hoje','calendario','santoral'].includes(state.tab)?'vida':state.tab;
+    document.querySelectorAll('#tabbar .tab-btn').forEach(button=>{
+      const active=button.dataset.tab===activeTab;
+      button.classList.toggle('active',active);
+      button.setAttribute('aria-current',active?'page':'false');
+    });
+    if(typeof applyMainLanguage==='function') applyMainLanguage();
+    if(typeof updateBackButton==='function') updateBackButton();
+  };
+  updateBackButton=function(){
+    const button=document.getElementById('floatingBack');
+    if(!button) return;
+    const hasDetail=!!(state.detailId||state.devo||state.devoSub);
+    const overlay=['serviteOverlay','languageOverlay','mainMenuOverlay','dailyLiturgyOverlay'].some(id=>document.getElementById(id)?.classList.contains('open'));
+    const mainTab=['vida','hoje','liturgia','oracoes'].includes(state.tab);
+    button.classList.toggle('show',hasDetail||overlay||!mainTab);
+  };
+  render();
 })();
 </script>
 </body>
