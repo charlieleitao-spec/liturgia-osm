@@ -58,14 +58,14 @@ for (const [date, item] of Object.entries(offices.celebracoes || {})) {
 if (byDate.get('09-22')?.title !== 'Dedicação da Basílica de Monte Senário') fail('Monte Senário deve permanecer em 22/09.');
 if (byDate.get('12-15')?.title !== 'B. Boaventura de Pistoia' || byDate.has('12-14')) fail('Boaventura de Pistoia deve permanecer em 15/12.');
 
-if (memoria.schema_version !== 1 || !memoria.common || !Array.isArray(memoria.celebrations) || memoria.celebrations.length !== 24) fail('Base da Memória Litúrgica incompleta.');
+if (memoria.schema_version !== 1 || !memoria.common || !Array.isArray(memoria.celebrations) || memoria.celebrations.length !== 25) fail('Base da Memória Litúrgica incompleta.');
 for (const part of ['hino', 'antifona', 'salmo']) if (!memoria.common?.[part]?.trim()) fail('Parte comum ausente na Memória Litúrgica: ' + part);
 const memoryDates = new Set();
 for (const item of memoria.celebrations || []) {
   if (!byDate.has(item.date)) fail('Memória sem celebração correspondente: ' + item.date);
   if (memoryDates.has(item.date)) fail('Data duplicada na Memória Litúrgica: ' + item.date);
   memoryDates.add(item.date);
-  for (const field of ['title', 'breve_vida', 'oracao_propria']) if (!item[field]?.trim()) fail(`Texto ${field} ausente em ${item.date}.`);
+  for (const field of ['title', 'breve_vida', 'oracao_propria']) if (field==='breve_vida' ? (!item.breve_vida?.trim()&&!item.apresentacao?.trim()) : (!item[field]?.trim())) fail(`Texto ${field} ausente em ${item.date}.`);
 }
 if (!memoria.source?.includes('Livro de Oração dos Servos de Maria')) fail('Fonte da Memória Litúrgica não identificada.');
 
