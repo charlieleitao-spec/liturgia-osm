@@ -1,16 +1,24 @@
 # Base comum OSM
 
-Este diretório é a fonte canônica de dados compartilhados dos projetos Liturgia OSM e Hoje na Família Servita.
+Este diretório contém as **fontes canônicas normalizadas** dos dados compartilhados.
 
-## Arquivos canônicos
-- `santoral.json`: calendário/santoral servita e dados biográficos.
-- `oficios-osm.json`: textos próprios dos ofícios da Ordem.
-- `hoje-familia-servita.json`: base consolidada usada pelo leitor Hoje na Família Servita, derivada dos dados mais evoluídos do Liturgia OSM.
+## Fontes canônicas
 
-## Regra de manutenção
-1. Correções de datas, biografias e textos litúrgicos devem ser feitas primeiro neste diretório do Liturgia OSM.
-2. O Hoje na Família Servita deve receber a base `hoje-familia-servita.json` sem manter uma variante editorial independente.
-3. Não reintroduzir 14 de dezembro para o B. Boaventura de Pistoia: a base consolidada deste projeto usa 15 de dezembro.
-4. Antes de publicar uma sincronização, validar o JSON e comparar chaves/datas para evitar perda de celebrações.
+- `santoral.json` — identidade da celebração: data, título, grau, biografia e metadados.
+- `oficios-osm.json` — conteúdo litúrgico próprio: Ofício das Leituras, Laudes, Vésperas, antífonas, hinos, leituras, responsórios e orações.
 
-Base comum consolidada em 3 de outubro de 2026.
+Esses dois arquivos constituem a base mestra do Liturgia OSM.
+
+## Dados derivados
+
+O projeto **Hoje na Família Servita** mantém `servita.json` como arquivo compilado/derivado para seu leitor leve. Ele não deve ser editado como fonte editorial independente.
+
+Quando houver correção de calendário, biografia ou texto litúrgico:
+1. corrigir primeiro `santoral.json` e/ou `oficios-osm.json`;
+2. validar a estrutura e as datas;
+3. regenerar/sincronizar o `servita.json` do Hoje na Família Servita;
+4. não manter cópias editoriais paralelas no Liturgia OSM.
+
+A celebração do B. Boaventura de Pistoia está consolidada em **15 de dezembro**.
+
+Normalização estabelecida em 3 de outubro de 2026.
