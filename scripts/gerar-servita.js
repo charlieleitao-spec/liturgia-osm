@@ -33,7 +33,7 @@ for(const s of santoral){
 const extra=Object.keys(oficios.celebracoes).filter(k=>!result[k]);
 if(extra.length) throw new Error('Datas litúrgicas sem entrada no santoral: '+extra.join(', '));
 if(result['12-14']) throw new Error('Data antiga de Boaventura (14/12) detectada');
-if(Object.values(result).filter(item=>item.memoria_liturgica).length!==24) throw new Error('Memórias litúrgicas devem corresponder à fonte: esperadas 24');
+if(Object.values(result).filter(item=>item.memoria_liturgica).length!==25) throw new Error('Memórias litúrgicas devem corresponder à fonte: esperadas 24');
 if(!result['12-15']) throw new Error('Boaventura (15/12) ausente');
 
 fs.mkdirSync(path.dirname(outPath),{recursive:true});
