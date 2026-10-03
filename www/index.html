@@ -747,8 +747,8 @@ function viewHoje(){
     ${dailyOSMCard()}
 
     <div class="quick-grid fade-in">
+      <button class="quick-card" onclick="setTab('calendario')"><b>Calendário</b><span>Ver datas e celebrações da Ordem</span></button>
       <button class="quick-card" onclick="setTab('santoral')"><b>Santoral</b><span>Consultar santos, beatos e celebrações</span></button>
-      <button class="quick-card" onclick="setTab('oracoes')"><b>Orações</b><span>Acessar devoções e textos marianos</span></button>
     </div>
 
     <div class="section-title">Celebração própria</div>
@@ -1254,6 +1254,16 @@ function viewMemoriaLiturgica(){
     <p class="reader-note">Roteiro próprio do Livro de Oração dos Servos de Maria: hino, antífona, salmo, breve vida e oração própria.</p>
     <div class="card fade-in" style="padding:6px 16px;">${rows}</div>`;
 }
+function viewVida(){
+  if(state.detailId!==null) return viewSantoral();
+  const current=state.tab==='calendario'?'calendario':state.tab==='santoral'?'santoral':'hoje';
+  const tabs=`<div class="toggle-row" aria-label="Seções de Vida">
+    <button class="toggle-btn ${current==='hoje'?'active':''}" onclick="setTab('hoje')">Hoje</button>
+    <button class="toggle-btn ${current==='calendario'?'active':''}" onclick="setTab('calendario')">Calendário</button>
+    <button class="toggle-btn ${current==='santoral'?'active':''}" onclick="setTab('santoral')">Santoral</button>
+  </div>`;
+  return tabs+(current==='calendario'?viewCalendario():current==='santoral'?viewSantoral():viewHoje());
+}
 function setLiturgiaSection(section){state.liturgiaSection=section;render();window.scrollTo(0,0);}
 function viewLiturgia(){
   const section=state.liturgiaSection||'missa';
@@ -1274,10 +1284,8 @@ function viewLiturgia(){
 function render(){
   const view = document.getElementById('view');
   let html = '';
-  if(state.tab === 'vida' || state.tab === 'hoje') html = viewHoje();
+  if(state.tab === 'vida' || state.tab === 'hoje' || state.tab === 'santoral' || state.tab === 'calendario') html = viewVida();
   else if(state.tab === 'liturgia') html = viewLiturgia();
-  else if(state.tab === 'santoral') html = viewSantoral();
-  else if(state.tab === 'calendario') html = viewCalendario();
   else if(state.tab === 'oracoes') html = viewOracoes();
   else if(state.tab === 'sobre') html = viewSobre();
   view.innerHTML = html;
