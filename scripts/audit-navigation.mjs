@@ -94,8 +94,8 @@ const saintContext={
   saintHasOffice(){return true;},officeClassificationForSaint(){return 'Ofício próprio';},
   officeHoursForSaint(){return [['laudes','Laudes']];},openSantoralOfficeHour(){},openDailyLiturgy(){},
   applyMainLanguage(){},updateBackButton(){},
-  render(){saintViewNode.innerHTML='ROOT';},setTab(tab){this.state.tab=tab;this.state.detailId=null;this.render();},
-  openDetail(id){this.state.detailId=id;this.render();},openSaint(id){this.state.detailId=id;this.render();},closeDetail(){}
+  render(){saintViewNode.innerHTML='ROOT';},setTab(tab){saintContext.state.tab=tab;saintContext.state.detailId=null;saintContext.render();},
+  openDetail(id){saintContext.state.detailId=id;saintContext.render();},openSaint(id){saintContext.state.detailId=id;saintContext.render();},closeDetail(){}
 };
 vm.runInNewContext(saintController,saintContext);
 saintContext.openDetail(10);
