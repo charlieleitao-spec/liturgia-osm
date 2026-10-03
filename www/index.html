@@ -1242,7 +1242,7 @@ function viewMemoriaLiturgica(){
       ${textBlock('Hino',data.common.hino)}
       ${textBlock('Antífona',data.common.antifona)}
       ${textBlock('Salmo 111',data.common.salmo)}
-      ${textBlock('Breve vida',item.breve_vida)}
+      ${textBlock(item.breve_vida?'Breve vida':'Apresentação',item.breve_vida||item.apresentacao||'')}
       ${textBlock('Oração própria',item.oracao_propria)}
       <p class="reader-note">Fonte: Livro de Oração dos Servos de Maria, 3ª edição revisada (2024), seção Memória Litúrgica. Este roteiro está disponível em Oração.</p>`;
   }
@@ -1851,7 +1851,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     const response=await fetch('./data/memoria-liturgica.json',{cache:'no-store'});
     if(!response.ok)throw new Error('Memória Litúrgica indisponível');
     const source=await response.json();
-    if(source.schema_version!==1||!source.common||!Array.isArray(source.celebrations)||source.celebrations.length!==24)throw new Error('Fonte incompleta');
+    if(source.schema_version!==1||!source.common||!Array.isArray(source.celebrations)||source.celebrations.length!==25)throw new Error('Fonte incompleta');
     MEMORIA_LITURGICA=source;
     render();
   }catch(error){console.warn('[Liturgia OSM] Não foi possível carregar a Memória Litúrgica.',error);}
