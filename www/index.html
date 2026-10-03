@@ -625,7 +625,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.22';
+const APP_VERSION = '4.9.23';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1589,7 +1589,7 @@ if ("serviceWorker" in navigator && !window.Capacitor?.isNativePlatform?.()) {
   <div class="servite-head">
     <button class="servite-back" onclick="closeServite()" aria-label="Voltar">‹</button>
     <div class="servite-title" id="serviteTitle">Recurso OSM</div>
-    <div class="mini-tools"><button onclick="serviteReload()" aria-label="Recarregar">↻</button></div>
+    <div class="mini-tools"><button onclick="serviteAdjustFont(-1)" aria-label="Diminuir fonte">A−</button><button onclick="serviteAdjustFont(1)" aria-label="Aumentar fonte">A+</button><button onclick="serviteReload()" aria-label="Recarregar">↻</button></div>
   </div>
   <iframe id="serviteFrame" class="servite-frame" title="Conteúdo OSM"></iframe>
 </div>
@@ -1599,7 +1599,7 @@ if ("serviceWorker" in navigator && !window.Capacitor?.isNativePlatform?.()) {
 let currentServiteView='';
 const serviteNames={regra:'Regra OSSM',rosario:'Rosário',coroa:'Coroa das Sete Dores',oficio:'Ofício',sabado:'Sábado Mariano',idioma:'Idiomas',completo:'Recursos OSM'};
 function serviteUrl(view){return 'servite.html?view='+encodeURIComponent(view||'completo');}
-function openServite(view){
+function serviteAdjustFont(delta){try{const frame=document.getElementById('serviteFrame');const change=frame?.contentWindow?.changeFontSize;if(typeof change==='function')change(delta);}catch(error){console.warn('[Liturgia OSM] Controle de fonte do recurso indisponível.',error);}} function openServite(view){
   currentServiteView=view||'completo';
   const ov=document.getElementById('serviteOverlay'),fr=document.getElementById('serviteFrame');
   document.getElementById('serviteTitle').textContent=serviteNames[currentServiteView]||'Recursos OSM';
@@ -1757,7 +1757,7 @@ body.celebration-mode .prayer-block,body.celebration-mode .bio-text,body.celebra
 @media(max-width:380px){.presidency-grid{grid-template-columns:1fr}.presidency-card{min-height:92px}}
 </style>
 <div id="dailyLiturgyOverlay" class="daily-liturgy-overlay" aria-hidden="true">
-  <div class="daily-liturgy-head"><button onclick="closeDailyLiturgy()" aria-label="Voltar">‹</button><div><b>Missa do dia</b><small>Fonte online com cópia offline</small></div><button onclick="toggleCelebrationMode()" aria-label="Modo celebração">◉</button></div>
+  <div class="daily-liturgy-head"><button onclick="closeDailyLiturgy()" aria-label="Voltar">‹</button><div><b>Missa do dia</b><small>Consulta online; datas baixadas ficam salvas</small></div><button onclick="toggleCelebrationMode()" aria-label="Modo celebração">◉</button></div>
   <div class="daily-liturgy-body"><div class="daily-date-nav"><button onclick="moveDailyDate(-1)" aria-label="Dia anterior">‹</button><input id="dailyLiturgyDate" type="date" onchange="loadDailyLiturgy(this.value)"><button onclick="moveDailyDate(1)" aria-label="Dia seguinte">›</button></div><div id="dailyLiturgyContent"></div></div>
 </div>
 <script id="dailyLiturgy492Script">
@@ -1801,10 +1801,10 @@ body.celebration-mode .prayer-block,body.celebration-mode .bio-text,body.celebra
     if(!navigator.onLine){if(!cached)target.innerHTML='<div class="daily-error">Esta data ainda não foi salva. Conecte-se à internet uma vez para baixar a liturgia.</div>';return;}
     try{
       const [year,month,day]=selectedDate.split('-');
-      const response=await fetch(`${API}?dia=${day}&mes=${month}&ano=${year}`,{headers:{Accept:'application/json'}});
+      const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),12000);let response;try{response=await fetch(`${API}?dia=${day}&mes=${month}&ano=${year}`,{headers:{Accept:'application/json'},signal:controller.signal});}finally{clearTimeout(timeout);}
       if(!response.ok)throw new Error('Liturgia não encontrada');
       const data=await response.json();saveCache(selectedDate,data);target.innerHTML=renderMass({savedAt:new Date().toISOString(),data},false);
-    }catch(error){if(!cached)target.innerHTML=`<div class="daily-error">Não foi possível baixar esta liturgia.<br><button class="daily-retry" onclick="loadDailyLiturgy('${safe(selectedDate)}')">Tentar novamente</button></div>`;}
+    }catch(error){if(!cached){const message=error?.name==='AbortError'?'A consulta demorou mais que o esperado. Verifique a conexão e tente novamente.':'Não foi possível acessar o serviço da Missa. Verifique a conexão e tente novamente.';target.innerHTML=`<div class="daily-error">${safe(message)}<br><button class="daily-retry" onclick="loadDailyLiturgy('${safe(selectedDate)}')">Tentar novamente</button></div>`;}}
   };
   window.openDailyLiturgy=function(date){document.getElementById('dailyLiturgyOverlay').classList.add('open');document.getElementById('dailyLiturgyOverlay').setAttribute('aria-hidden','false');loadDailyLiturgy(date||localISO());};
   window.closeDailyLiturgy=function(){document.getElementById('dailyLiturgyOverlay').classList.remove('open');document.getElementById('dailyLiturgyOverlay').setAttribute('aria-hidden','true');if(document.body.classList.contains('celebration-mode'))toggleCelebrationMode();};
@@ -1857,7 +1857,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   }catch(error){console.warn('[Liturgia OSM] Não foi possível carregar a Memória Litúrgica.',error);}
 })();
 </script>
-<script id="canonicalPrimaryNavigation4922">
+<script id="canonicalPrimaryNavigation4923">
 (function(){
   const labels={
     pt:{vida:'Vida',liturgia:'Liturgia',oracoes:'Oração'},
@@ -1919,6 +1919,42 @@ window.addEventListener('DOMContentLoaded',()=>{
     const mainTab=['vida','hoje','liturgia','oracoes'].includes(state.tab);
     button.classList.toggle('show',hasDetail||overlay||!mainTab);
   };
+  render();
+})();
+</script>
+<script id="canonicalUsability4923">
+(function(){
+  window.openLiturgiaSection=function(section){
+    state.liturgiaSection=section==='horas'?'horas':'missa';
+    setTab('liturgia');
+  };
+  viewHoje=function(){
+    const today=todayInfo();
+    const saint=findSaintForToday();
+    const next=saint?null:findNextSaint();
+    const celebration=saint||next;
+    const online=navigator.onLine!==false;
+    let celebrationCard='<div class="empty-state">Não há celebração servita cadastrada para hoje.</div>';
+    if(celebration){
+      const title=saint?'Celebração de hoje':'Próxima celebração OSM';
+      const photo=saintImageHtml(celebration,false);
+      celebrationCard='<button class="home-celebration card fade-in" onclick="openDetail('+celebration._id+')" aria-label="Abrir '+escapeHtml(celebration.title)+'">'+photo+'<span class="home-celebration-text"><span class="rank">'+title+'</span><b>'+escapeHtml(celebration.title)+'</b><span class="date-line">'+escapeHtml(celebration.date)+'</span></span><span class="chev">›</span></button>';
+    }
+    const prayer=dailyPrayerSuggestion();
+    return '<div class="connection-strip '+(online?'':'offline')+'"><span class="connection-dot"></span><strong>'+(online?'Conexão disponível':'Modo offline')+'</strong><span>Calendário, Santoral e orações no aparelho</span></div>'+
+      '<section class="liturgical-hero home-hero fade-in"><div class="liturgical-kicker">Ordem dos Servos de Maria</div><div class="home-date-line"><strong>'+today.day+'</strong><span>'+escapeHtml(MONTHS[today.month-1])+'</span></div><div class="liturgical-title">Ao lado da Mãe, aos pés da Cruz</div><div class="liturgical-sub">'+escapeHtml(today.weekday)+'</div></section>'+
+      '<div class="section-title home-heading">Celebração Servita</div>'+celebrationCard+
+      '<div class="section-title home-heading">Liturgia</div><div class="presidency-grid fade-in">'+
+        '<button class="presidency-card" onclick="openLiturgiaSection(\'missa\')"><span class="presidency-icon">✠</span><b>Missa do dia</b><small>Consulta online; cada data baixada fica salva</small></button>'+
+        '<button class="presidency-card" onclick="openLiturgiaSection(\'horas\')"><span class="presidency-icon">☷</span><b>Liturgia das Horas</b><small>Ofícios próprios OSM disponíveis offline</small></button>'+
+      '</div>'+
+      '<div class="section-title home-heading">Oração do dia</div><div class="home-prayer-card card fade-in"><div><span class="rank">'+escapeHtml(prayer.label)+'</span><h3>'+(state.angelus==='rainha'?'Rainha do Céu':'O Anjo do Senhor')+'</h3><p>'+escapeHtml(prayer.note)+'</p></div><button class="action-btn" onclick="openDailyPrayer480(\''+escapeHtml(state.angelus)+'\')">Rezar</button></div>'+
+      recentCard()+
+      '<p class="offline-note"><b>Observação:</b> a Missa do dia precisa de internet na primeira consulta de cada data; depois, fica salva para acesso offline.</p>';
+  };
+  const menuSections=[...document.querySelectorAll('.main-menu .menu-section')];
+  const duplicateNavigation=menuSections.find(section=>section.querySelector('.menu-label')?.textContent.trim()==='Navegação');
+  duplicateNavigation?.remove();
   render();
 })();
 </script>
