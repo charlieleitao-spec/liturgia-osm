@@ -69,8 +69,20 @@ for (const item of memoria.celebrations || []) {
 }
 if (!memoria.source?.includes('Livro de Oração dos Servos de Maria')) fail('Fonte da Memória Litúrgica não identificada.');
 
-for (const key of ['vigilia', 'coroa', 'via_matris']) {
-  if (!html.includes(`key:'${key}'`) || !servite.includes(key)) fail('Prática devocional separada ausente: ' + key);
+const devotionalDataKeys = {
+  vigilia: '"vigilia": {',
+  coroa: '"coroa": "',
+  via_matris: '"via_matris": {'
+};
+const devotionalRoutes = {
+  vigilia: ["function viewVigilia()", "openDevo('vigilia'"],
+  coroa: ["PRAYERS.devotions.coroa", "key === 'coroa'"],
+  via_matris: ["function viewViaMatris()", "openDevo('via_matris'"]
+};
+for (const key of Object.keys(devotionalDataKeys)) {
+  if (!html.includes(devotionalDataKeys[key]) || !devotionalRoutes[key].every(marker => html.includes(marker))) {
+    fail('Prática devocional ou rota ausente: ' + key);
+  }
 }
 for (const script of [html, servite].flatMap(source => [...source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(match => match[1]).filter(Boolean))) {
   try { new Function(script); } catch (error) { fail('Erro de sintaxe JavaScript: ' + error.message); }
