@@ -126,7 +126,7 @@ assert.equal(massClosed,true,'Voltar deve fechar a Missa aberta antes de trocar 
 const homeFunction=html.match(/function viewHoje\(\)\{[\s\S]*?\n\}/)?.[0];
 assert.ok(homeFunction,'Hoje deve ter uma única tela de entrada.');
 const homeContext={
-  state:{angelus:'anjo'},navigator:{onLine:true},
+  state:{angelus:'anjo'},navigator:{onLine:true},MONTHS:['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'],
   todayInfo(){return {day:3,month:10,weekday:'sábado'};},findSaintForToday(){return null;},findNextSaint(){return {_id:0,id:0,title:'Santo de teste',date:'3 de outubro',day:3,month:10,rank:'Santo'};},
   escapeHtml(value){return String(value);},saintImageHtml(){return '<span></span>';},dailyPrayerSuggestion(){return {label:'Prática',note:'Texto cadastrado'};},
   openDailyPrayer480(){},recentCard(){return '';},setTab(){},openLiturgiaSection(){}
