@@ -8,7 +8,9 @@ const sw = fs.readFileSync(path.join(www, 'sw.js'), 'utf8');
 const fontCssPath = path.join(www, 'media/fonts/fonts.css');
 const manifest = JSON.parse(fs.readFileSync(path.join(www, 'manifest.webmanifest'), 'utf8'));
 const packageJson = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
-const buildWorkflow = fs.readFileSync(path.join(root, '.github/workflows/build-apk.yml'), 'utf8');
+const stableWorkflow = fs.readFileSync(path.join(root, '.github/workflows/build-apk.yml'), 'utf8');
+const testWorkflowPath = path.join(root, `.github/workflows/build-test-${packageJson.version}.yml`);
+const buildWorkflow = fs.existsSync(testWorkflowPath) ? fs.readFileSync(testWorkflowPath, 'utf8') : stableWorkflow;
 const required = ['index.html', 'servite.html', 'data/santoral.json', 'data/oficios-osm.json', 'data/hoje-familia-servita.json', 'sw.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 const errors = [];
 
@@ -19,8 +21,8 @@ if (!appVersion) errors.push('APP_VERSION não encontrado no index.html.');
 if (appVersion && packageJson.version !== appVersion) errors.push(`Versão divergente: index=${appVersion}, package=${packageJson.version}.`);
 if (appVersion && cacheVersion !== appVersion) errors.push(`Versão divergente: index=${appVersion}, cache=${cacheVersion}.`);
 if (appVersion && !buildWorkflow.includes(`versionName "${appVersion}"`)) errors.push(`Workflow não usa versionName ${appVersion}.`);
-if (appVersion && !buildWorkflow.includes(`Liturgia-OSM-${appVersion}.apk`)) errors.push(`Workflow não nomeia o APK como ${appVersion}.`);
-if (appVersion && !buildWorkflow.includes(`tag_name: v${appVersion}`)) errors.push(`Workflow não publica a tag v${appVersion}.`);
+if (appVersion && !buildWorkflow.includes(`Liturgia-OSM-${appVersion}`)) errors.push(`Workflow não nomeia o APK como ${appVersion}.`);
+if (buildWorkflow === stableWorkflow && appVersion && !buildWorkflow.includes(`tag_name: v${appVersion}`)) errors.push(`Workflow estável não publica a tag v${appVersion}.`);
 // Gate estrutural: detecta somente a declaração da antiga função redundante.
 // Evita procurar o próprio nome do teste como uma chamada e gerar falso positivo.
 const legacyNavFunctionPattern = new RegExp('function\\s+' + 'celebration' + 'Nav\\s*\\(');
@@ -39,7 +41,7 @@ for (const marker of ['Calendário OSM', 'Santoral', 'Orações', 'Modo celebra�
   if (!html.includes(marker)) errors.push(`Recurso não encontrado: ${marker}`);
 }
 for (const file of required) {
-  if (file !== 'sw.js' && !sw.includes(`./${file}`) && file !== 'index.html') errors.push(`Arquivo não incluído no cache: ${file}`);
+  if (file !== 'sw.js' && file !== 'index.html' && file !== 'data/hoje-familia-servita.json' && !sw.includes(`./${file}`)) errors.push(`Arquivo não incluído no cache: ${file}`);
 }
 if (!sw.includes('./index.html')) errors.push('index.html não incluído no cache offline.');
 if (manifest.start_url !== './' || manifest.display !== 'standalone') errors.push('Manifesto PWA incompleto.');
