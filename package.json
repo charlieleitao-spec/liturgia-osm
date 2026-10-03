@@ -1,11 +1,11 @@
 {
   "name": "liturgia-osm",
-  "version": "4.9.20",
+  "version": "4.9.21",
   "private": true,
   "scripts": {
     "android:add": "npx cap add android",
     "sync": "npx cap sync android",
-    "test": "node scripts/audit-app.mjs && node scripts/audit-integration.mjs && node scripts/check-image-sizes.mjs"
+    "test": "node scripts/audit-servita-base.mjs && node scripts/check-image-sizes.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.5.1",
