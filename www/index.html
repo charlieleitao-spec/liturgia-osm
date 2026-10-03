@@ -625,7 +625,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.20';
+const APP_VERSION = '4.9.21';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1836,6 +1836,18 @@ window.addEventListener('DOMContentLoaded',()=>{
     console.info('[Liturgia OSM startup]',JSON.stringify(metric));
   }));
 });
+</script>
+<script id="canonicalMemoriaLiturgica">
+(async function(){
+  try{
+    const response=await fetch('./data/memoria-liturgica.json',{cache:'no-store'});
+    if(!response.ok)throw new Error('Memória Litúrgica indisponível');
+    const source=await response.json();
+    if(source.schema_version!==1||!source.common||!Array.isArray(source.celebrations)||source.celebrations.length!==24)throw new Error('Fonte incompleta');
+    MEMORIA_LITURGICA=source;
+    render();
+  }catch(error){console.warn('[Liturgia OSM] Não foi possível carregar a Memória Litúrgica.',error);}
+})();
 </script>
 </body>
 </html>
