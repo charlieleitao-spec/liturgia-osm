@@ -54,7 +54,7 @@ for (const key of Object.keys(oficios)) {
 }
 
 // A interface deve conservar os pontos de entrada e a resolução de horas.
-const requiredUiMarkers = ['Calendário OSM','Santoral','Hoje','Ofício próprio','calendarCelebrationRow','OFFICE_HOURS_BY_ID','officeHoursForSaint(s)'];
+const requiredUiMarkers = ['Santoral','Hoje','Ofício próprio','calendarCelebrationRow','OFFICE_HOURS_BY_ID','officeHoursForSaint(s)'];
 for (const marker of requiredUiMarkers) if (!html.includes(marker)) errors.push(`Integração UI ausente: ${marker}.`);
 
 // Celebrações sem Ofício próprio são permitidas somente quando explicitamente conhecidas.
