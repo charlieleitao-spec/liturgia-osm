@@ -72,13 +72,13 @@ if (!memoria.source?.includes('Livro de Oração dos Servos de Maria')) fail('Fo
 for (const key of ['vigilia', 'coroa', 'via_matris']) {
   if (!html.includes(`key:'${key}'`) || !servite.includes(key)) fail('Prática devocional separada ausente: ' + key);
 }
-for (const script of [html, servite].flatMap(source => [...source.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)].map(match => match[1]).filter(Boolean))) {
+for (const script of [html, servite].flatMap(source => [...source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(match => match[1]).filter(Boolean))) {
   try { new Function(script); } catch (error) { fail('Erro de sintaxe JavaScript: ' + error.message); }
 }
 if (html.includes('�') || servite.includes('�')) fail('Caractere de substituição encontrado em texto.');
 
 if (errors.length) {
-  console.error(['AUDITORIA DA BASE SERVITA: FALHA', ...errors].join('\\n'));
+  console.error(['AUDITORIA DA BASE SERVITA: FALHA', ...errors].join('\n'));
   process.exit(1);
 }
 console.log(JSON.stringify({
