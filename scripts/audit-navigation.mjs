@@ -66,7 +66,7 @@ assert.deepEqual(buttons.map(button => button.querySelector().textContent), ['Vi
 context.state.prayerSection = 'praticas';
 context.render();
 assert.match(view.innerHTML, /ROTA_PRATICAS/, 'As práticas devocionais devem permanecer em Oração.');
-assert.equal(JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8' )).version, '4.9.24');
+assert.equal(JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8' )).version, '4.9.25');
 const usability = html.match(/<script id="canonicalUsability4923">([\s\S]*?)<\/script>/)?.[1] || '';
 assert.ok(usability, 'A tela inicial simplificada deve estar presente.');
 assert.ok(usability.includes("openLiturgiaSection"), 'Os atalhos da Liturgia devem ter destino funcional.');
@@ -76,30 +76,35 @@ const servite = readFileSync(resolve(root, 'www/servite.html'), 'utf8');
 assert.ok(servite.includes('embedded-resource-mode .tabbar'), 'O recurso incorporado não deve abrir uma segunda barra de navegação.');
 assert.ok(servite.includes('embedded-resource-mode .topbar'), 'O recurso incorporado deve usar o cabeçalho do aplicativo.');
 
-const saintController=html.match(/<script id="canonicalSaintContext4924">([\s\S]*?)<\/script>/)?.[1]||'';
-assert.ok(saintController,'A navegação contextual do santo deve estar instalada.');
-for(const required of ['openDailyLiturgy','openSantoralOfficeHour','MEMORIA_LITURGICA','state.saintDetailSection4924']) assert.ok(saintController.includes(required),'Rota contextual ausente: '+required);
+const saintController=html.match(/<script id="canonicalSaintNavigation4925">([\s\S]*?)<\/script>/)?.[1]||'';
+assert.ok(saintController,'A navegação revisada do santo deve estar instalada.');
+for(const required of ['openDailyLiturgy','openSantoralOfficeHour','MEMORIA_LITURGICA','state.saintDetailSection4925','Voltar ao Santoral','function smartBack']) assert.ok(saintController.includes(required),'Rota ou retorno ausente: '+required);
 assert.ok(saintController.includes('O Livro de Oração não traz uma Memória Litúrgica cadastrada'),'Santos sem texto-fonte não podem receber conteúdo inventado.');
 assert.ok(saintController.includes('base local não contém um formulário de Missa próprio individual'),'A Missa por data deve ser identificada com precisão.');
 const saintButtons=['vida','liturgia','oracoes'].map(id=>({dataset:{tab:id},active:false,attrs:{},classList:{toggle(name,value){if(name==='active')this.owner.active=value;},owner:null},setAttribute(name,value){this.attrs[name]=value;}}));
 saintButtons.forEach(button=>{button.classList.owner=button;});
 const saintViewNode={innerHTML:''};
+const massOverlay={open:false,classList:{contains(name){return name==='open'&&massOverlay.open;}}};
 const saintContext={
   state:{tab:'santoral',detailId:null,devo:null,devoSub:null,prayerSection:'praticas'},
-  SANTORAL:[{_id:10,id:10,title:'Santo de teste',date:'15 de janeiro',day:15,month:1,rank:'Santo',bio:'Biografia de teste',prayer:'Oração cadastrada'}],
+  SANTORAL:[{_id:0,id:0,title:'Santo de teste',date:'15 de janeiro',day:15,month:1,rank:'Santo',bio:'Biografia de teste',prayer:'Oração cadastrada'}],
   MEMORIA_LITURGICA:{common:{hino:'Hino da fonte',antifona:'Antífona da fonte',salmo:'Salmo da fonte'},celebrations:[{date:'01-15',title:'Santo de teste',breve_vida:'Vida da fonte',oracao_propria:'Oração da fonte'}]},
-  document:{getElementById(id){return id==='view'?saintViewNode:null;},querySelectorAll(){return saintButtons;}},
-  window:{scrollY:120,scrollTo(){}},requestAnimationFrame(fn){fn();},
+  document:{getElementById(id){return id==='view'?saintViewNode:id==='dailyLiturgyOverlay'?massOverlay:null;},querySelectorAll(){return saintButtons;},addEventListener(){}},
+  window:{scrollY:120,scrollTo(){},addEventListener(){}},requestAnimationFrame(fn){fn();},
   localStorage:{setItem(){}},escapeHtml(value){return String(value);},saintImageHtml(){return '';},shareSaint(){},
   saintHasOffice(){return true;},officeClassificationForSaint(){return 'Ofício próprio';},
   officeHoursForSaint(){return [['laudes','Laudes']];},openSantoralOfficeHour(){},openDailyLiturgy(){},
-  applyMainLanguage(){},updateBackButton(){},
+  applyMainLanguage(){},updateBackButton(){},smartBack(){},closeMainMenu(){},closeLanguagePanel(){},
+  closeDailyLiturgy(){massOverlay.open=false;},closeDailyPrayer480(){},closeMemoriaLiturgica(){},closeDevo(){},
+  dailyPrayerOpen480:null,memoriaSelectedDate:null,
   render(){saintViewNode.innerHTML='ROOT';},setTab(tab){saintContext.state.tab=tab;saintContext.state.detailId=null;saintContext.render();},
   openDetail(id){saintContext.state.detailId=id;saintContext.render();},openSaint(id){saintContext.state.detailId=id;saintContext.render();},closeDetail(){}
 };
 vm.runInNewContext(saintController,saintContext);
-saintContext.openDetail(10);
-assert.match(saintViewNode.innerHTML,/Biografia de teste/,'Abrir um santo deve iniciar em Vida.');
+saintContext.openDetail(0);
+assert.match(saintViewNode.innerHTML,/Biografia de teste/,'O primeiro santo (id 0) deve abrir corretamente em Vida.');
+assert.match(saintViewNode.innerHTML,/Voltar ao Santoral/,'A tela do santo deve mostrar retorno textual e visível.');
+assert.equal(saintButtons[0].active,true,'Vida deve ficar ativa ao abrir o santo.');
 saintContext.setTab('liturgia');
 assert.match(saintViewNode.innerHTML,/Missa da data/,'Liturgia deve exibir o caminho de Missa da data.');
 assert.equal(saintButtons[1].attrs['aria-current'],'page','Liturgia deve ficar ativa dentro do santo.');
@@ -114,5 +119,11 @@ assert.equal(saintButtons[2].active,true,'Oração deve receber o estado ativo.'
 saintContext.MEMORIA_LITURGICA.celebrations=[];
 saintContext.render();
 assert.match(saintViewNode.innerHTML,/O Livro de Oração não traz uma Memória Litúrgica cadastrada/,'Santos sem texto-fonte devem receber estado sem conteúdo, não um texto inventado.');
+saintContext.smartBack();
+assert.equal(saintContext.state.detailId,null,'O botão voltar deve sair do detalhe, inclusive para o id 0.');
+assert.equal(saintContext.state.tab,'santoral','O retorno deve restaurar o Santoral de origem.');
+massOverlay.open=true;
+saintContext.smartBack();
+assert.equal(massOverlay.open,false,'Voltar do aparelho deve fechar a sobreposição da Missa antes de sair da tela.');
+console.log('Auditoria aprovada: rotas, botões de seção, Missa, Ofício, Memória e retorno do Santo/overlay.');
 
-console.log('Auditoria aprovada: navegação geral, detalhe do santo, conteúdo-fonte e leitor incorporado.');
