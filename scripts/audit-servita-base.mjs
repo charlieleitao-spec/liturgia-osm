@@ -22,7 +22,8 @@ assert.equal(santoral.length, 32);
 assert.equal(offices.schema_version, 3);
 assert.equal(Object.keys(offices.celebracoes || {}).length, 32);
 assert.equal(memory.schema_version, 2);
-assert.equal(memory.celebrations?.length, 25);
+assert.equal(memory.memory_dates?.length, 25);
+assert.ok(memory.celebrations?.length > 0 && memory.celebrations.length <= memory.memory_dates.length);
 assert.ok(offices.celebracoes['10-03']?.material?.horas?.textos_proprios?.oracao, 'oração deve permanecer como campo separado no esquema 3');
 
 const core = [...sw.matchAll(/["']\.\/(.*?)["']/g)].map(match => match[1]);
@@ -31,4 +32,4 @@ for (const file of core) assert.ok(fs.existsSync(path.join(root, 'www', file)), 
 for (const item of santoral) {
   if (item.image) assert.ok(fs.existsSync(path.join(root, 'www', item.image)), 'Imagem ausente: ' + item.image);
 }
-console.log(JSON.stringify({ status: 'ok', version: pkg.version, santoral: santoral.length, oficios: Object.keys(offices.celebracoes).length, memoria: memory.celebrations.length, core: core.length }, null, 2));
+console.log(JSON.stringify({ status: 'ok', version: pkg.version, santoral: santoral.length, oficios: Object.keys(offices.celebracoes).length, memoria: memory.memory_dates.length, memoriaComTexto: memory.celebrations.length, core: core.length }, null, 2));
