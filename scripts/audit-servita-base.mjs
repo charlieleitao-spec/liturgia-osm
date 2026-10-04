@@ -17,6 +17,7 @@ const santoral = parse('www/data/santoral.json');
 const offices = parse('www/data/oficios-osm.json');
 const memoria = parse('www/data/memoria-liturgica.json');
 const workflow = read('.github/workflows/build-apk.yml');
+const derivedWorkflow = read('.github/workflows/gerar-base-derivada.yml');
 const requiredFiles = [
   'www/index.html', 'www/servite.html', 'www/data/santoral.json',
   'www/data/oficios-osm.json', 'www/data/memoria-liturgica.json',
@@ -39,6 +40,7 @@ for (const marker of ['function viewLiturgia()', 'Liturgia das Horas', '>Missa<'
 if (!html.includes('fetch(\'./data/memoria-liturgica.json\'')) fail('A interface não carrega a fonte da Memória Litúrgica.');
 if (!sw.includes('./data/memoria-liturgica.json')) fail('Memória Litúrgica não está no cache offline.');
 if (sw.includes('./data/hoje-familia-servita.json')) fail('Cache referencia arquivo derivado ausente da base canônica.');
+if (!derivedWorkflow.includes("if: github.event_name == 'workflow_dispatch' && inputs.publish == true") || !derivedWorkflow.includes('default: false')) fail('A publicação no Hoje deve exigir acionamento manual explícito após validar o APK.');
 
 if (!Array.isArray(santoral) || santoral.length !== 32) fail('Santoral canônico inesperado.');
 const byDate = new Map();
@@ -120,4 +122,3 @@ console.log(JSON.stringify({
   devotions: ['vigilia', 'coroa', 'via_matris'],
   offlineMemory: true
 }, null, 2));
-

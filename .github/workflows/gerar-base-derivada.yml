@@ -2,6 +2,12 @@ name: Gerar base derivada OSM
 
 on:
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Publicar no Hoje após validação prática do APK
+        type: boolean
+        required: true
+        default: false
   push:
     branches: [main]
     paths:
@@ -27,6 +33,7 @@ jobs:
           node scripts/audit-generated-servita.mjs derived/servita.generated.json
 
       - name: Publicar no Hoje na Família Servita
+        if: github.event_name == 'workflow_dispatch' && inputs.publish == true
         env:
           GH_TOKEN: ${{ secrets.HOJE_FAMILIA_SERVITA_TOKEN }}
         run: |
@@ -46,4 +53,3 @@ jobs:
           git add servita.json
           git commit -m "Atualiza base derivada a partir do Liturgia OSM"
           git push
-
