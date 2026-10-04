@@ -7,7 +7,7 @@ import vm from 'node:vm';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const html=readFileSync(resolve(root,'www/index.html'),'utf8');
 const version=JSON.parse(readFileSync(resolve(root,'package.json'),'utf8')).version;
-assert.equal(version,'4.9.28','A experiência de navegação deve ter versão própria.');
+assert.equal(version,'4.9.29','A experiência de navegação deve ter versão própria.');
 
 const nav=html.match(/<nav class="tabbar" id="tabbar"[\s\S]*?<\/nav>/)?.[0]||'';
 const tabIds=[...nav.matchAll(/data-tab="([^"]+)"/g)].map(match=>match[1]);
@@ -109,6 +109,8 @@ const noPrayerHub=context.window.renderCelebrationHub(3);
 assert.match(noPrayerHub,/O Santoral não traz oração própria cadastrada/,'A ausência de oração do Santoral deve ser explícita.');
 const partialHub=context.window.renderCelebrationHub(2);
 assert.match(partialHub,/Textos próprios do Ofício/,'Material incompleto não deve ser apresentado como Liturgia das Horas completa.');
+assert.match(partialHub,/<div class=\\"hub-actions\\">/,'O HTML dos botões do Ofício deve permanecer válido.');
+assert.doesNotMatch(partialHub,/class=\\"hub-actions>/,'A marcação do container de ações não pode ficar aberta.');
 context.window.openSaintSection(0,'liturgia');
 assert.equal(openedId,0,'Atalho deve abrir o Santo, inclusive id 0.');
 assert.equal(scrolledId,'hub-liturgia','Atalho deve ir ao bloco selecionado.');

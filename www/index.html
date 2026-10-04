@@ -654,7 +654,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.28';
+const APP_VERSION = '4.9.29';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1849,7 +1849,7 @@ loadCanonicalSantoral();
       const classification=officeClassificationForSaint(s);
       const officeTitle=classification==='Ofício próprio'?'Liturgia das Horas':'Textos próprios do Ofício';
       office='<div class="hub-card"><div class="hub-card-title">'+officeTitle+'</div>'+
-        '<p class="hub-card-note">'+escapeHtml(classification)+'</p><div class="hub-actions>'+
+        '<p class="hub-card-note">'+escapeHtml(classification)+'</p><div class="hub-actions">'+
         hours.map(function(pair){return '<button class="hub-action" onclick="openSantoralOfficeHour('+s._id+',\''+pair[0]+'\')">'+escapeHtml(pair[1])+'<span>›</span></button>';}).join('')+
         '</div></div>';
     }else{
