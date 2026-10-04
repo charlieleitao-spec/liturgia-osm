@@ -81,23 +81,25 @@ jobs:
           sed -i 's/versionName "[^"]*"/versionName "4.9.36"/' android/app/build.gradle
           python3 - <<'PY'
           from pathlib import Path
-          import re
           p = Path('android/app/build.gradle')
           s = p.read_text()
-          match = re.search(r'(?m)^\\s*release\\s*\\{[^{}]*\\}', s)
-          if not match:
+          start = s.find('release {')
+          if start < 0:
               raise SystemExit('Could not locate the release build type in generated Gradle file')
-          block = match.group(0)
-          block = re.sub(r'minifyEnabled\\s+false', 'minifyEnabled true', block)
-          if 'minifyEnabled true' not in block:
-              block = block.replace('{', '{\\n            minifyEnabled true', 1)
-          if 'shrinkResources' not in block:
-              block = block.replace('{', '{\\n            shrinkResources true', 1)
-          if 'signingConfig' not in block:
-              block = block.replace('{', '{\\n            signingConfig signingConfigs.stable', 1)
-          if 'proguardFiles' not in block:
-              block = block.replace('}', "            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'\\n        }")
-          s = s[:match.start()] + block + s[match.end():]
+          end = s.find('}', start) + 1
+          if end <= start:
+              raise SystemExit('Could not parse the release build type in generated Gradle file')
+          block = s[start:end]
+          block = block.replace('minifyEnabled false', 'minifyEnabled true')
+          additions = []
+          for key, value in [('minifyEnabled', 'true'), ('shrinkResources', 'true'), ('signingConfig', 'signingConfigs.stable')]:
+              if key not in block:
+                  additions.append(key + ' ' + value)
+          if 'proguard-rules.pro' not in block:
+              additions.append("proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'")
+          if additions:
+              block = block.replace('{', '{ ' + '; '.join(additions) + '; ', 1)
+          s = s[:start] + block + s[end:]
           p.write_text(s)
           PY
           cat >> android/app/proguard-rules.pro <<'EOF'
