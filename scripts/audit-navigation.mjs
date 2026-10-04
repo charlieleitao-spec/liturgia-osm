@@ -6,46 +6,48 @@ import vm from 'node:vm';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const html=readFileSync(resolve(root,'www/index.html'),'utf8');
+const appJs=readFileSync(resolve(root,'www/app.js'),'utf8');
+const source=html+'\n'+appJs;
 const version=JSON.parse(readFileSync(resolve(root,'package.json'),'utf8')).version;
-assert.equal(version,'4.9.32','A experiência de navegação deve ter versão própria.');
+assert.equal(version,'4.9.33','A experiência de navegação deve ter versão própria.');
 
 const nav=html.match(/<nav class="tabbar" id="tabbar"[\s\S]*?<\/nav>/)?.[0]||'';
 const tabIds=[...nav.matchAll(/data-tab="([^"]+)"/g)].map(match=>match[1]);
 assert.deepEqual(tabIds,['vida','liturgia','oracoes'],'O rodapé deve ter Vida, Liturgia e Oração, nessa ordem.');
 for(const name of ['viewHoje','setTab','render']){
   const expression=new RegExp('(?:function\\s+'+name+'\\s*\\(|'+name+'\\s*=\\s*function\\s*\\()','g');
-  assert.equal([...html.matchAll(expression)].length,1,name+' deve ter uma única implementação.');
+  assert.equal([...source.matchAll(expression)].length,1,name+' deve ter uma única implementação.');
 }
-for(const obsolete of ['canonicalSaintNavigation4925','canonicalPrimaryNavigation4923','canonicalUsability4923']) assert.ok(!html.includes(obsolete),'A camada antiga deve ser removida: '+obsolete);
+for(const obsolete of ['canonicalSaintNavigation4925','canonicalPrimaryNavigation4923','canonicalUsability4923']) assert.ok(!source.includes(obsolete),'A camada antiga deve ser removida: '+obsolete);
 assert.doesNotMatch(html,/const\s+SANTORAL\s*=\s*\[/,'O Santoral não pode ser embutido em uma cópia antiga no HTML.');
-assert.match(html,/let SANTORAL\s*=\s*\[\]/,'A lista começa vazia e aguarda o JSON canônico.');
-assert.ok(html.includes("typeof item.title!=='string'")&&html.includes("typeof item.bio!=='string'"),'O loader deve validar os campos do schema do Santoral.');
-assert.ok(!/canonical\.length\s*<\s*32/.test(html),'A carga não pode usar um limite de quantidade como validação de schema.');
-assert.equal([...html.matchAll(/function\s+openDevo\s*\(/g)].length,1,'openDevo deve ter uma única implementação.');
+assert.match(source,/let SANTORAL\s*=\s*\[\]/,'A lista começa vazia e aguarda o JSON canônico.');
+assert.ok(source.includes("typeof item.title!=='string'")&&source.includes("typeof item.bio!=='string'"),'O loader deve validar os campos do schema do Santoral.');
+assert.ok(!/canonical\.length\s*<\s*32/.test(source),'A carga não pode usar um limite de quantidade como validação de schema.');
+assert.equal([...source.matchAll(/function\s+openDevo\s*\(/g)].length,1,'openDevo deve ter uma única implementação.');
 const staticIds=[...html.matchAll(/\bid="([^"]+)"/g)].map(match=>match[1]);
 assert.equal(new Set(staticIds).size,staticIds.length,'IDs HTML devem ser únicos.');
-assert.ok(!html.includes('duplicateNavigation'),'O menu não deve remover sua seção Navegação depois de montá-la.');
-assert.ok(html.includes('menu-label\">Navegação</div><div class=\"menu-nav-grid\"'),'A seção Navegação do menu precisa permanecer no HTML gerado.');
+assert.ok(!source.includes('duplicateNavigation'),'O menu não deve remover sua seção Navegação depois de montá-la.');
+assert.ok(source.includes('menu-label\">Navegação</div><div class=\"menu-nav-grid\"'),'A seção Navegação do menu precisa permanecer no HTML gerado.');
 
-const hubScript=html.match(/<script id="canonicalNavigation4926">([\s\S]*?)<\/script>/)?.[1]||'';
+const hubScript=appJs.match(/\/\* BEGIN SCRIPT BLOCK: canonicalNavigation4926 \*\/([\s\S]*?)\/\* END SCRIPT BLOCK: canonicalNavigation4926 \*\//)?.[1]||'';
 assert.ok(hubScript,'O controlador central de navegação deve estar presente.');
-for(const route of ['renderCelebrationHub','openSaintSection','openDailyLiturgy','openSantoralOfficeHour','shareSaint','smartBack']) assert.ok(html.includes(route),'Destino sem ligação: '+route);
+for(const route of ['renderCelebrationHub','openSaintSection','openDailyLiturgy','openSantoralOfficeHour','shareSaint','smartBack']) assert.ok(source.includes(route),'Destino sem ligação: '+route);
 for(const id of ['hub-vida','hub-liturgia','hub-oracao','hub-navegacao']) assert.ok(hubScript.includes(id),'Bloco do Santo ausente: '+id);
 assert.match(html,/id="floatingBack"[^>]*onclick="smartBack\(\)"/,'O botão de retorno geral deve estar ligado.');
-assert.ok(html.includes('Voltar ao Santoral'),'O hub deve oferecer retorno visível.');
-assert.ok(html.includes("openSaintSection('+celebration._id+"),'Hoje deve oferecer atalhos para os blocos do Santo.');
-assert.ok(html.includes("setTab(\\'calendario\\')")&&html.includes("setTab(\\'santoral\\')"),'Calendário e Santoral devem continuar acessíveis pela Vida.');
+assert.ok(source.includes('Voltar ao Santoral'),'O hub deve oferecer retorno visível.');
+assert.ok(source.includes("openSaintSection('+celebration._id+"),'Hoje deve oferecer atalhos para os blocos do Santo.');
+assert.ok(source.includes("setTab(\\'calendario\\')")&&source.includes("setTab(\\'santoral\\')"),'Calendário e Santoral devem continuar acessíveis pela Vida.');
 
-const prayerView=html.slice(html.indexOf('function viewOracoesBase480()'),html.indexOf('let dailyPrayerOpen480'));
+const prayerView=source.slice(source.indexOf('function viewOracoesBase480()'),source.indexOf('let dailyPrayerOpen480'));
 assert.ok(!prayerView.includes('Memória Litúrgica'),'Oração deve conter práticas; a Memória fica no Santo.');
-for(const practice of ['Rosário','Regra OSSM','Coroa de Nossa Senhora das Dores','Via Matris']) assert.ok(html.includes(practice),'Prática devocional ausente: '+practice);
+for(const practice of ['Rosário','Regra OSSM','Coroa de Nossa Senhora das Dores','Via Matris']) assert.ok(source.includes(practice),'Prática devocional ausente: '+practice);
 
 const santoral=JSON.parse(readFileSync(resolve(root,'www/data/santoral.json'),'utf8'));
 const offices=JSON.parse(readFileSync(resolve(root,'www/data/oficios-osm.json'),'utf8'));
 const memory=JSON.parse(readFileSync(resolve(root,'www/data/memoria-liturgica.json'),'utf8'));
 const masses=JSON.parse(readFileSync(resolve(root,'www/data/missas-osm.json'),'utf8'));
 assert.equal(santoral.length,32);
-const santoralLoader=html.match(/<script id="canonicalSantoral495">([\s\S]*?)<\/script>/)?.[1]||'';
+const santoralLoader=appJs.match(/\/\* BEGIN SCRIPT BLOCK: canonicalSantoral495 \*\/([\s\S]*?)\/\* END SCRIPT BLOCK: canonicalSantoral495 \*\//)?.[1]||'';
 assert.ok(santoralLoader,'O loader do Santoral canônico deve estar presente.');
 const loaderContext={SANTORAL:[],santoralReady:false,santoralLoading:true,santoralLoadError:false,window:{},render(){},console:{warn(){}},loadCanonicalOffices:async function(){this.oficiosReady=true;},fetch(){return Promise.resolve({ok:true,json(){return Promise.resolve(santoral);}});}};
 vm.runInNewContext(santoralLoader,loaderContext);
@@ -62,10 +64,10 @@ const coverage=Object.values(offices.celebracoes).reduce((result,item)=>{result[
 assert.deepEqual(coverage,{oficio_proprio:11,textos_proprios:16,sem_material_proprio:5},'A classificação canônica deve refletir a cobertura efetiva dos textos.');
 assert.equal(memory.memory_dates.length,25,'A cobertura da Memória Litúrgica deve permanecer em 25 celebrações.');
 assert.equal(memory.celebrations.length,10,'A Memória deve guardar apenas textos próprios distintos do Santoral.');
-const memoryLoader=html.match(/<script id="canonicalMemoriaLiturgica">([\s\S]*?)<\/script>/)?.[1]||'';
+const memoryLoader=appJs.match(/\/\* BEGIN SCRIPT BLOCK: canonicalMemoriaLiturgica \*\/([\s\S]*?)\/\* END SCRIPT BLOCK: canonicalMemoriaLiturgica \*\//)?.[1]||'';
 assert.ok(memoryLoader.includes('source.schema_version!==2')&&memoryLoader.includes('source.memory_dates.length!==25'),'O loader deve validar a cobertura compacta da Memória.');
-assert.ok(!html.includes('SANTORAL_OFFICE_MAP')&&!html.includes('OFFICE_CLASSIFICATION')&&!html.includes('OFFICE_HOURS_BY_ID'),'Não deve haver mapas de Ofício embutidos.');
-const officeFns=html.slice(html.indexOf('function officeDateKey'),html.indexOf('function calendarCelebrationRow'));
+assert.ok(!source.includes('SANTORAL_OFFICE_MAP')&&!source.includes('OFFICE_CLASSIFICATION')&&!source.includes('OFFICE_HOURS_BY_ID'),'Não deve haver mapas de Ofício embutidos.');
+const officeFns=source.slice(source.indexOf('function officeDateKey'),source.indexOf('function calendarCelebrationRow'));
 let openedOffice=null;
 const officeContext={SANTORAL:santoral.map(x=>({...x,_id:x.id})),OFICIOS_OSM:offices,OFFICE_HOURS:[['invitatorio','Invitatório'],['oficio','Ofício das Leituras'],['laudes','Laudes'],['horaMedia','Hora Média'],['vesperas','Vésperas']],openServite(value){openedOffice=value;},document:{getElementById(){return null;}}};
 vm.runInNewContext(officeFns,officeContext);
@@ -75,14 +77,14 @@ const bonaventure=officeContext.SANTORAL.find(x=>x.id===31);
 assert.equal(officeContext.officeClassificationForSaint(bonaventure),'Ofício das Leituras próprio','O rótulo deve distinguir as Leituras próprias das Laudes e Vésperas.');
 const nonHourSaint=officeContext.SANTORAL.find(x=>x.id===26);
 assert.deepEqual(Array.from(officeContext.officeHoursForSaint(nonHourSaint),x=>Array.from(x)),[['oficio','Textos próprios']],'Seções próprias sem bloco de horas também devem abrir.');
-assert.ok(html.includes('Fonte da oração: Santoral da Ordem.'),'A oração alternativa deve identificar sua fonte real.');
-assert.ok(html.includes('editorial_notes')&&html.includes('Nota da fonte:'),'Divergências editoriais de data devem permanecer visíveis.')
+assert.ok(source.includes('Fonte da oração: Santoral da Ordem.'),'A oração alternativa deve identificar sua fonte real.');
+assert.ok(source.includes('editorial_notes')&&source.includes('Nota da fonte:'),'Divergências editoriais de data devem permanecer visíveis.')
 assert.deepEqual(Array.from(officeContext.officeHoursForSaint(officeSaint),x=>Array.from(x)),[['laudes','Laudes'],['vesperas','Vésperas']]);
 officeContext.openSantoralOfficeHour(officeSaint._id,'laudes');
 assert.equal(openedOffice,'oficio:4:laudes','A hora deve abrir o registro correspondente do JSON.');
 assert.ok(!officeContext.saintHasOffice(officeContext.SANTORAL.find(x=>x.id===13)),'Celebração sem material não deve receber Ofício próprio.');
 assert.equal((santoral.filter(x=>x.prayer&&x.prayer.includes('\n')).length),0,'Orações do Santoral devem estar normalizadas no arquivo de dados.');
-assert.ok(!html.includes('flowPrayerText'),'Não deve haver normalização duplicada no runtime.');
+assert.ok(!source.includes('flowPrayerText'),'Não deve haver normalização duplicada no runtime.');
 for(const date of ['08-28','09-15','11-17']) assert.ok(!memory.celebrations.some(item=>item.date===date),'A ausência de fonte deve ser explícita para '+date);
 assert.equal(masses.schema_version,1);
 assert.deepEqual(masses.celebrations,[],'Nenhum texto de Missa pode ser criado sem fonte conferida.');
@@ -119,10 +121,10 @@ assert.match(hub,/openSantoralOfficeHour\(0,'laudes'\)/,'A hora disponível deve
 for(const text of ['Hino de fonte','Antífona de fonte','Salmo de fonte','Oração com linha bem-aventurada.\n\nNova frase.']) assert.ok(hub.includes(text),'Texto-fonte ausente: '+text);
 assert.ok(hub.includes('Fonte da oração: Santoral da Ordem.'),'A oração fallback deve apontar para o Santoral.');
 assert.ok(hub.includes('Fonte dos textos comuns: Livro de Oração'),'Os textos comuns devem manter a fonte do Livro de Oração.');
-assert.ok(!html.includes('flowPrayerText'),'A fonte normalizada não deve ser reformatada no runtime.');
-assert.ok(html.includes('CACHE_MAX_AGE=30*24*60*60*1000'),'O cache da Missa precisa de validade explícita.');
-assert.ok(html.includes('offline por até 30 dias'),'A cópia da Missa precisa informar seu prazo local.');
-assert.ok(!html.includes('startupMetric493')&&!html.includes('osmStartupMetric'),'A métrica de inicialização persistente foi removida.');
+assert.ok(!source.includes('flowPrayerText'),'A fonte normalizada não deve ser reformatada no runtime.');
+assert.ok(source.includes('CACHE_MAX_AGE=30*24*60*60*1000'),'O cache da Missa precisa de validade explícita.');
+assert.ok(source.includes('offline por até 30 dias'),'A cópia da Missa precisa informar seu prazo local.');
+assert.ok(!source.includes('startupMetric493')&&!source.includes('osmStartupMetric'),'A métrica de inicialização persistente foi removida.');
 assert.match(hub,/Anterior/);
 assert.match(hub,/Próxima/);
 assert.match(hub,/shareSaint\(0\)/);
@@ -157,7 +159,7 @@ const routingContext={
   viewVida(){return 'VIDA_HOME';},viewLiturgia(){return 'LITURGIA_HOME';},viewOracoes(){return 'PRATICAS_HOME';},viewBiblioteca(){return 'BIBLIOTECA';},viewSobre(){return 'SOBRE';},
   applyMainLanguage(){},updateBackButton(){}
 };
-const rootFunctions=[html.match(/function setTab\(tab\)\{[\s\S]*?\n\}/)?.[0],html.match(/function render\(\)\{[\s\S]*?\n\}/)?.[0]];
+const rootFunctions=[source.match(/function setTab\(tab\)\{[\s\S]*?\n\}/)?.[0],source.match(/function render\(\)\{[\s\S]*?\n\}/)?.[0]];
 assert.ok(rootFunctions.every(Boolean),'O roteador principal deve ter as funções canônicas.');
 vm.runInNewContext(rootFunctions.join('\n'),routingContext);
 routingContext.oficiosReady=false;
@@ -182,7 +184,7 @@ const backContext={
   closeMainMenu(){},closeLanguagePanel(){},closeServite(){},closeDailyPrayer480(){},closeMemoriaLiturgica(){},closeDevo(){},closeDetail(){detailClosed=true;},setLiturgiaSection(){},setTab(){},
   dailyPrayerOpen480:null,memoriaSelectedDate:null,updateBackButton(){}
 };
-const smartBackFunction=html.match(/function smartBack\(\)\{[\s\S]*?\n\}/)?.[0];
+const smartBackFunction=source.match(/function smartBack\(\)\{[\s\S]*?\n\}/)?.[0];
 assert.ok(smartBackFunction,'Retorno global deve existir.');
 vm.runInNewContext(smartBackFunction,backContext);
 backContext.smartBack();
@@ -190,7 +192,7 @@ assert.equal(detailClosed,true,'Voltar deve fechar o detalhe mesmo para o santo 
 backContext.state.detailId=null;massNode.open=true;backContext.smartBack();
 assert.equal(massClosed,true,'Voltar deve fechar a Missa aberta antes de trocar de tela.');
 
-const homeFunction=html.match(/function viewHoje\(\)\{[\s\S]*?\n\}/)?.[0];
+const homeFunction=source.match(/function viewHoje\(\)\{[\s\S]*?\n\}/)?.[0];
 assert.ok(homeFunction,'Hoje deve ter uma única tela de entrada.');
 const homeContext={
   state:{angelus:'anjo'},navigator:{onLine:true},MONTHS:['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'],
@@ -203,7 +205,7 @@ const home=homeContext.viewHoje();
 for(const action of ['Vida','Liturgia','Oração','Calendário','Santoral'])assert.ok(home.includes(action),'Atalho ausente na tela Hoje: '+action);
 
 
-const liturgiaFunction=html.match(/function viewLiturgia\(\)\{[\s\S]*?\n\}/)?.[0];
+const liturgiaFunction=source.match(/function viewLiturgia\(\)\{[\s\S]*?\n\}/)?.[0];
 assert.ok(liturgiaFunction,'A aba Liturgia precisa de um único destino.');
 const liturgiaContext={
   state:{liturgiaSection:'horas'},oficiosReady:true,SANTORAL:[{_id:0,id:0,day:15,title:'Santo de teste',date:'15 de janeiro'}],

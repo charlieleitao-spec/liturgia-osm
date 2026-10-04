@@ -9,6 +9,8 @@ const errors = [];
 const fail = message => errors.push(message);
 
 const html = read('www/index.html');
+const appJs = read('www/app.js');
+const code = html + '\n' + appJs;
 const appCss = read('www/app.css');
 const servite = read('www/servite.html');
 const sw = read('www/sw.js');
@@ -20,7 +22,7 @@ const memoria = parse('www/data/memoria-liturgica.json');
 const workflow = read('.github/workflows/build-apk.yml');
 const derivedWorkflow = read('.github/workflows/gerar-base-derivada.yml');
 const requiredFiles = [
-  'www/index.html', 'www/app.css', 'www/servite.html', 'www/data/santoral.json',
+  'www/index.html', 'www/app.css', 'www/app.js', 'www/servite.html', 'www/data/santoral.json',
   'www/data/oficios-osm.json', 'www/data/memoria-liturgica.json',
   'www/sw.js', 'www/manifest.webmanifest', 'www/icon-192.png', 'www/icon-512.png'
 ];
@@ -28,7 +30,7 @@ const requiredFiles = [
 for (const file of requiredFiles) {
   if (!fs.existsSync(path.join(root, file)) || fs.statSync(path.join(root, file)).size === 0) fail('Arquivo ausente ou vazio: ' + file);
 }
-const version = html.match(/const APP_VERSION = '([^']+)'/)?.[1];
+const version = appJs.match(/const APP_VERSION = '([^']+)'/)?.[1];
 if (!version || app.version !== version) fail('Versão do app e package.json divergentes.');
 if (!version || !sw.includes(`liturgia-osm-v${version}`)) fail('Cache offline não acompanha a versão do app.');
 if (!version || !workflow.includes(`versionName "${version}"`) || !workflow.includes(`Liturgia-OSM-${version}.apk`) || !workflow.includes(`tag_name: v${version}`)) fail('Workflow Android não acompanha a versão do app.');
@@ -36,15 +38,15 @@ if (manifest.start_url !== './' || manifest.display !== 'standalone') fail('Mani
 
 if (!html.includes('data-tab="vida"') || !html.includes('data-tab="liturgia"') || !html.includes('data-tab="oracoes"')) fail('Navegação Vida | Liturgia | Oração incompleta.');
 for (const marker of ['function viewLiturgia()', 'Liturgia das Horas', '>Missa<', 'function viewMemoriaLiturgica()', 'Memória Litúrgica']) {
-  if (!html.includes(marker)) fail('Interface ausente: ' + marker);
+  if (!code.includes(marker)) fail('Interface ausente: ' + marker);
 }
-if (!html.includes('fetch(\'./data/memoria-liturgica.json\'')) fail('A interface não carrega a fonte da Memória Litúrgica.');
-if (!sw.includes('./data/memoria-liturgica.json')||!sw.includes('./app.css')) fail('Memória Litúrgica ou CSS não está no cache offline.');
+if (!code.includes('fetch(\'./data/memoria-liturgica.json\'')) fail('A interface não carrega a fonte da Memória Litúrgica.');
+if (!sw.includes('./data/memoria-liturgica.json')||!sw.includes('./app.css')||!sw.includes('./app.js')) fail('Memória Litúrgica ou CSS não está no cache offline.');
 if (sw.includes('./data/hoje-familia-servita.json')) fail('Cache referencia arquivo derivado ausente da base canônica.');
 if (!derivedWorkflow.includes("if: github.event_name == 'workflow_dispatch' && inputs.publish == true") || !derivedWorkflow.includes('default: false')) fail('A publicação no Hoje deve exigir acionamento manual explícito após validar o APK.');
 
 if (!Array.isArray(santoral) || santoral.length !== 32) fail('Santoral canônico inesperado.');
-if (html.includes('SANTORAL_IMAGES')||servite.includes('SANTORAL_IMAGES')) fail('A imagem do santo deve vir do campo canônico image no Santoral.');
+if (code.includes('SANTORAL_IMAGES')||servite.includes('SANTORAL_IMAGES')) fail('A imagem do santo deve vir do campo canônico image no Santoral.');
 for (const saint of santoral) if (saint.image) {
   if (!fs.existsSync(path.join(www,saint.image))) fail(`Imagem ausente para ${saint.title}: ${saint.image}`);
   if (!sw.includes(`./${saint.image}`)) fail(`Imagem fora do cache offline: ${saint.image}`);
@@ -105,11 +107,11 @@ const devotionalRoutes = {
   via_matris: ["function viewViaMatris()", "openDevo('via_matris'"]
 };
 for (const key of Object.keys(devotionalDataKeys)) {
-  if (!html.includes(devotionalDataKeys[key]) || !devotionalRoutes[key].every(marker => html.includes(marker))) {
+  if (!code.includes(devotionalDataKeys[key]) || !devotionalRoutes[key].every(marker => code.includes(marker))) {
     fail('Prática devocional ou rota ausente: ' + key);
   }
 }
-for (const script of [html, servite].flatMap(source => [...source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(match => match[1]).filter(Boolean))) {
+for (const script of [appJs, html, servite].flatMap(source => [...source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(match => match[1]).filter(Boolean))) {
   try { new Function(script); } catch (error) { fail('Erro de sintaxe JavaScript: ' + error.message); }
 }
 const readerStart=servite.indexOf('function renderOficioTabs(');
@@ -125,6 +127,7 @@ else {
 }
 if (html.includes('�') || servite.includes('�')) fail('Caractere de substituição encontrado em texto.');
 
+try { new Function(appJs); } catch (error) { fail('Erro de sintaxe em www/app.js: ' + error.message); }
 if (errors.length) {
   console.error(['AUDITORIA DA BASE SERVITA: FALHA', ...errors].join('\n'));
   process.exit(1);

@@ -1,0 +1,1281 @@
+/* BEGIN SCRIPT BLOCK: legacy-block-2 */
+let SANTORAL = [];
+let OFICIOS_OSM = null;
+let santoralReady = false;
+let oficiosReady = false;
+let oficiosLoadError = false;
+let santoralLoading = true;
+let santoralLoadError = false;
+function saintImageHtml(s, detail=false){
+  const src=s.image;
+  if(!src) return '';
+  return detail ? `<div class="saint-image-detail fade-in"><img src="${src}" alt="Imagem de ${escapeHtml(s.title)}"></div>` : `<div class="saint-thumb"><img src="${src}" alt="Imagem de ${escapeHtml(s.title)}"></div>`;
+}
+const PRAYERS = {"daily": {"anjo": "D. O anjo do Senhor anunciou a Maria.\nT. E Ela concebeu do Espírito Santo.\n   Ave Maria, cheia de graça, o Senhor é convosco, bendita sois vós entre as mulheres e bendito é o fruto do vosso ventre, Jesus. Santa Maria, Mãe de Deus, rogai por nós pecadores, agora e na hora da nossa morte. Amém.\n\nD. Eis aqui a serva do Senhor.\nT. Faça-se em mim segundo a vossa Palavra.\n   Ave Maria...\n\nD. E o Verbo Divino se fez carne.\nT. E habitou entre nós.\n   Ave Maria...\n\nD. Rogai por nós, Santa Mãe de Deus.\nT. Para que sejamos dignos das promessas de Cristo.\n\nOremos\n\nD. Derramai, Senhor, a vossa graça em nossas almas, a fim de que nós que, pela anunciação do anjo, viemos ao conhecimento da Encarnação do vosso Filho, cheguemos, por sua paixão e morte, à glória da ressurreição. Pelo mesmo Cristo Senhor nosso.\nT. Amém!\n\nD. Glória ao Pai, ao Filho e ao Espírito Santo.\nT. Como era no princípio, agora e sempre. Amém.", "rainha": "D. Rainha do céu, alegrai-vos, aleluia!\nT. Pois o Senhor que merecestes trazer em vosso seio, aleluia!\n\nD. Ressuscitou como disse, aleluia!\nT. Rogai a Deus por nós, aleluia!\n\nD. Alegrai-vos e exultai, ó Virgem Maria, aleluia!\nT. Porque o Senhor ressuscitou verdadeiramente, aleluia!\n\nOremos\n\nD. Ó Deus que, na gloriosa ressurreição do vosso Filho, destes alegria ao mundo inteiro, por intercessão da Virgem Maria, concedei-nos gozar a alegria perene da vida eterna. Por Cristo nosso Senhor.\nT. Amém!"}, "devotions": {"vigilia": {"formula1": "Primeira fórmula\n Santa Maria,\n Senhora Dos Seus Servos\nSalmodia\n\n1ª Ant. Bendita és tu entre as mulheres e bendito o fruto\n do teu ventre.\n\n SALMO 8\n Majestade de Deus e dignidade do homem\n\"O Todo-Poderoso fez grandes coisas por mim\" (Lc\n1,49).\n– 2Ó Senhor nosso Deus, como é grande *\nvosso nome por todo o universo!\n– Desdobrastes nos céus vossa glória *\ncom grandeza, esplendor, majestade.\n= 3O perfeito louvor vos é dado †\npelos lábios dos mais pequeninos, *\nde crianças que a mãe amamenta.\n– Eis a força que opondes aos maus, *\nreduzindo o inimigo ao silêncio.\n– 4Contemplando estes céus que plasmastes *\ne formastes com dedos de artista;\n\n– vendo a lua e estrelas brilhantes, *\n perguntamos: ‘Senhor, que é o homem,\n– para dele assim vos lembrardes *\ne o tratardes com tanto carinho?’\n– 6Pouco abaixo de Deus o fizestes, *\ncoroando-o de glória e esplendor;\n– 7vós lhe destes poder sobre tudo, *\nvossas obras aos pés lhe pusestes:\n– 8as ovelhas, os bois, os rebanhos, *\ntodo o gado e as feras da mata;\n– 9passarinhos e peixes dos mares, *\ntodo ser que se move nas águas.\n– 10Ó Senhor nosso Deus, como é grande *\nvosso nome por todo o universo!\n1ª Ant. Bendita és tu entre as mulheres e bendito o fruto\n do teu ventre.\n2ª Ant. Santa Mãe de Deus, como aroma precioso\n emanas suave perfume.\n\n SALMO 18\n Hino ao Criador do universo e Senhor da lei\n\n\"Quando o Verbo se fez carne, como um esposo, uniu-\nse à natureza humana: tálamo das núpcias foram as\nentranhas da Virgem Maria\" (Santo Agostinho)\n– 2Os céus proclamam a glória do Senhor, *\ne o firmamento, a obra de suas mãos;\n– 3o dia ao dia transmite esta mensagem, *\na noite à noite publica esta notícia.\n– 4Não são discursos nem frases ou palavras, *\nnem são vozes que possam ser ouvidas;\n– 5seu som ressoa e se espalha em toda a terra, *\nchega aos confins do universo a sua voz.\n– 6Armou no alto uma tenda para o sol; *\nele desponta no céu e se levanta\n– como um esposo do quarto nupcial, *\ncomo um herói exultante em seu caminho.\n– 7De um extremo do céu põe-se a correr *\ne vai traçando o seu rastro luminoso,\n– até que possa chegar ao outro extremo, *\ne nada pode fugir ao seu calor.\n\n– 8A lei do Senhor Deus é perfeita, *\nconforto para a alma!\n– O testemunho do Senhor é fiel, *\nsabedoria dos humildes.\n\n– 9Os preceitos do Senhor são precisos, *\nalegria ao coração.\n– O mandamento do Senhor é brilhante, *\npara os olhos é uma luz.\n– 10É puro o temor do Senhor, *\nimutável para sempre.\n– Os julgamentos do Senhor são corretos *\ne justos igualmente.\n– 11Mais desejáveis do que o ouro são eles, *\ndo que o ouro refinado.\n– Suas palavras são mais doces que o mel, *\nque o mel que sai dos favos.\n– 12E vosso servo, instruído por elas, *\nse empenha em guardá-las.\n– 13Mas quem pode perceber suas faltas? *\nPerdoai as que não vejo!\n\n– 14E preservai o vosso servo do orgulho: *\nnão domine sobre mim!\n– E assim puro, eu serei preservado *\ndos delitos mais perversos.\n– 15Que vos agrade o cantar dos meus lábios *\ne a voz da minha alma;\n– que ela chegue até vós, ó Senhor, *\n\nmeu Rochedo e Redentor!\n\n2ª Ant. Santa Mãe de Deus, como aroma precioso\n emanas suave perfume!\n\n3ª Ant. Ao prodígio da tua virgindade elevemos com\n júbilo um hino de alegria!\n\n SALMO 23\n O Senhor entra no seu Templo\n\"As portas do céu abriram-se ao Cristo quando\nassumiu a natureza humana\" (Santo Irineu)\n– 1Ao Senhor pertence a terra e o que ela encerra, *\no mundo inteiro com os seres que o povoam;\n– 2porque ele a tornou firme sobre os mares, *\ne sobre as águas a mantém inabalável.\n\n– 3“Quem subirá até o monte do Senhor, *\nquem ficará em sua santa habitação?”\n= 4“Quem tem mãos puras e inocente coração, †\nquem não dirige sua mente para o crime, *\nnem jura falso para o dano de seu próximo.\n– 5Sobre este desce a bênção do Senhor *\ne a recompensa de seu Deus e Salvador”.\n– 6“É assim a geração dos que o procuram, *\ne do Deus de Israel buscam a face”.\n\n= 7“Ó portas, levantai vossos frontões! †\nElevai-vos bem mais alto, antigas portas, *\na fim de que o Rei da glória possa entrar!”\n= 8Dizei-nos: “Quem é este Rei da glória?” †\n“É o Senhor, o valoroso, o onipotente, *\no Senhor, o poderoso nas batalhas!”\n\n= 9“Ó portas, levantai vossos frontões! †\nElevai-vos bem mais alto, antigas portas, *\na fim de que o Rei da glória possa entrar!”\n= 10Dizei-nos: “Quem é este Rei da glória?” †\n“O Rei da glória é o Senhor onipotente, *\no Rei da glória é o Senhor Deus do universo!”\n3ª Ant. Ao prodígio da tua virgindade, elevemos com\n júbilo um hino de alegria!\nIntrodução às leituras\nD. Ave Maria, cheia de graça, o Senhor é convosco.\nT. Bendita sois vós entre as mulheres e bendito é o fruto\n do vosso ventre, Jesus!\nAbsolvição\n\nD. Pelas preces e méritos da bem-aventurada Virgem\n Maria e de todos os santos, o Senhor nos conduza ao\n Reino dos céus.\nT. Amém!\n\nPrimeira leitura\nL. Invoca sobre mim a bênção do Senhor.\nD. Com seu divino Filho proteja-nos a Virgem Mãe.\nT. Amém!\n\nL. Santa Maria, Virgem das virgens, Mãe e Filha do\n Rei dos reis, dá-nos teu conforto nas dificuldades da\n vida. Por tua misericordiosa intercessão, o Senhor\n nos conceda o prêmio do céu e o reino eterno junto\n com seus eleitos. E tu, Senhor, tem piedade de nós!\nT. Demos graças a Deus!\n\nResponsório\nT. Como poderei louvar-te, Santa Virgem Maria? *\n Aquele que os céus não podem conter, o encerraste\n em teu seio!\nL. Bendita és tu entre as mulheres e bendito é o fruto\n do teu ventre!\nT. Aquele que os céus não podem conter, o encerraste\n em teu seio!\n\nSegunda leitura\nL. Invoca sobre mim a bênção do Senhor.\n\nD. A Virgem imaculada interceda por nós junto ao\n Senhor.\nT. Amém!\nL. Santa Maria, Mãe piedosa, intercede por nós,\n Virgem santa! Apresenta nossas súplicas ao teu Filho\n que, nascido para a nossa salvação, reina agora nos\n céus. Sua misericordiosa graça apague os nossos\n pecados. E tu, Senhor, tem piedade de nós!\nT. Demos graças a Deus!\nResponsório\nT. Feliz és tu, Virgem Maria, pois trouxeste o Criador\n do mundo! * Deste à luz aquele que te criou e\n permaneceste sempre virgem!\nL. Ave, ó cheia de graça, o Senhor é contigo.\nT. Deste à luz aquele que te criou e permaneceste\n sempre virgem!\nTerceira leitura\nL. Invoca sobre mim a bênção do Senhor.\nD. Pela intercessão da Virgem Maria, o Senhor nos\n conceda a paz e a salvação.\nT. Amém!\nL. Santa Mãe de Deus, tu que foste digna de trazer em\n teu seio aquele que o universo não pode conter, acolhe\n a nossa súplica! Tua misericordiosa intercessão nos\n\n obtenha o perdão das culpas e tua maternal presença\n nos conduza à morada da luz, onde com teu Filho\n reinas eternamente. E tu, Senhor, tem piedade de nós!\nT. Demos graças a Deus!\n\nSalve Rainha\n\n Salve, Rainha, Mãe de misericórdia, vida, doçura e\nesperança nossa, salve! A vós bradamos os degredados\nfilhos de Eva. A vós suspiramos, gemendo e chorando\nneste vale de lágrimas. Eia, pois, advogada nossa, esses\nvossos olhos a nós volvei! E depois deste desterro,\nmostrai-nos Jesus, bendito fruto do vosso ventre. Ó\nclemente, ó piedosa, ó doce sempre Virgem Maria!\n\nD. Rogai por nós, santa Mãe de Deus!\nT. Para que sejamos dignos das promessas de Cristo.\n\nOremos\n\nD. Deus onipotente e eterno, que pela cooperação do\n Espírito Santo, preparastes, no corpo e na alma da\n bem-aventurada Virgem Maria, uma habitação digna\n do vosso Filho, fazei que celebrando com alegria sua\n memória, ela nos livre, por sua maternal intercessão,\n de todos os males da vida presente e da morte eterna.\n Por Cristo nosso Senhor.\nT. Amém!\n\n Oração pela Igreja pela Ordem\n Ó Senhor, por vossa misericórdia, dissolvei os\nvínculos dos nossos pecados e, pela intercessão da\nbem-aventurada Virgem Maria, Mãe de Deus, dos\nnossos Sete Santos Pais, do vosso servo São Filipe e de\ntodos os santos, guardai e santificai o papa NN, o nosso\nprior geral NN, a nós vossos servos, nossas\ncomunidades e benfeitores.\n Afastai do mal nossos pais, parentes e amigos e\nenriquecei-os de virtude. Concedei-nos saúde e paz.\nAfastai os inimigos visíveis e invisíveis e purificai-nos\nde todo desejo mundano. Dai serenidade aos ares e\nfertilidade aos campos.\n Libertai o mundo da fome, da guerra e de qualquer\noutro flagelo. Preservai ilesa de toda calamidade esta\ncidade e seus habitantes. Dai vosso amor a nossos\namigos e também a nossos inimigos, e concedei aos\nfiéis defuntos o eterno repouso. Amém!", "formula2": "Segunda fórmula\n Santa Maria\n Serva Do Senhor\nIntrodução\n\nD. Bendita sois vós entre as mulheres\nT. E bendito é o fruto do vosso ventre.\n\nD. Louvai comigo o Senhor pelas maravilhas que fez\n em Maria.\nT. Grandes e admiráveis são as tuas obras, Senhor\n Deus todo-poderoso! Justos e verdadeiros os teus\n caminhos, ó Rei do universo!\n\nHino\n \"Serva humilde eu sou do Senhor,\n em mim se faça segundo disseste\".\n Terra obediente tu és, ó Maria,\n terra que acolhe, que ama e adora.\n Filha querida do povo escolhido,\n santo rebento que brota em flor,\n flor desejada, esperada por todos,\n flor que embeleza o deserto do mundo.\n\n Dia após dia a Igreja repita\n as santas palavras da serva fiel:\n tudo haverá de voltar como outrora,\n quando Deus Pai caminhava no Éden.\n Glória à Trindade, Pai, Filho e Espírito,\n que desde sempre renovam o mundo:\n pois que nos deram uma Virgem e Mãe,\n beleza intacta de toda a criação.\n1ª Ant. Ave, Virgem fiel, mulher da nova aliança,\n primícias do Reino.\n SALMO 110\n Grandes são as obras do Senhor\n\"A minh'alma engrandece o Senhor, pois o Todo-\npoderoso fez em mim grandes coisas\" (Lc 1,46. 49).\n\n– 1Eu agradeço a Deus de todo o coração *\njunto com todos os seus justos reunidos!\n– 2Que grandiosas são as obras do Senhor, *\nelas merecem todo o amor e admiração!\n\n– 3Que beleza e esplendor são os seus feitos! *\nSua justiça permanece eternamente!\n– 4O Senhor bom e clemente nos deixou *\na lembrança de suas grandes maravilhas.\n\n– 5Ele dá o alimento aos que o temem *\ne jamais esquecerá sua Aliança.\n– 6Ao seu povo manifesta seu poder, *\ndando a ele a herança das nações.\n\n– 7Suas obras são verdade e são justiça, *\nseus preceitos, todos eles, são estáveis,\n– 8confirmados para sempre e pelos séculos, *\nrealizados na verdade e retidão.\n\n= 9Enviou libertação para o seu povo, †\nconfirmou sua Aliança para sempre. *\nSeu nome é santo e é digno de respeito.\n\n= 10Temer a Deus é o princípio do saber, †\ne é sábio todo aquele que o pratica. *\nPermaneça eternamente o seu louvor.\n\n1ª Ant. - Ave, Virgem fiel, mulher da nova aliança,\n primícias do Reino.\nOração sálmica\n Nós vos agradecemos, Senhor, porque por meio de\nMaria, vossa serva fiel, nos destes o Mediador da nova\nAliança. Concedei, vos pedimos, cumprir com amor os\n\nvossos preceitos e ser fiéis à vossa Palavra e ao nosso\ncompromisso de serviço. Por Cristo nosso Senhor.\nAmém!\n2ª Ant. Ave, gloriosa Mãe de Cristo, em ti os humildes\n são exaltados, por ti renasce a esperança dos\n pobres.\n SALMO 112\n A glória e a misericórdia do Senhor\n\"Olhou para a humildade de sua serva... Exaltou os\nhumildes\" (Lc 1, 48. 52).\n\n– 1Louvai, louvai, ó servos do Senhor, *\nlouvai, louvai o nome do Senhor!\n– 2Bendito seja o nome do Senhor, *\nagora e por toda a eternidade!\n– 3Do nascer do sol até o seu ocaso, *\nlouvado seja o nome do Senhor!\n– 4O Senhor está acima das nações, *\nsua glória vai além dos altos céus.\n= 5Quem pode comparar-se ao nosso Deus, †\nao Senhor, que no alto céu temo seu trono *\n e se inclina para olhar o céu e a terra?\n– 7Levanta da poeira o indigente *\ne do lixo ele retira o pobrezinho,\n– 8para fazê-lo assentar-se com os nobres, *\nassentar-se com os nobres do seu povo.\n\n– 9Faz a estéril, mãe feliz em sua casa, *\nvivendo rodeada de seus filhos.\n2ª Ant. - Ave, gloriosa Mãe de Cristo, em ti os humildes\n são exaltados, por ti renasce a esperança dos\n pobres.\nOração sálmica\n\nDo nascer ao pôr do sol, louvado seja o vosso nome,\nSenhor, porque escolhestes Maria, mulher humilde e\npobre, para ser a Mãe gloriosa do vosso Filho. Primeira\nentre os remidos, vós a colocastes na Igreja como Mãe\nfeliz de muitos filhos. Por Cristo nosso Senhor. Amém!\n3ª Ant. Ave, mulher da esperança! De ti nasceu a luz do\n mundo, por ti nos veio o Pão da vida.\n SALMO 145\n Bem-aventurado aquele que espera no Senhor\n\"Sua misericórdia perdura de geração em geração\npara aqueles que o temem\" (Lc 1, 50).\n\n= 1Bendize, minh’alma, ao Senhor! †\n Bendirei ao Senhor toda a vida, *\ncantarei ao meu Deus sem cessar!\n\n– 3Não ponhais vossa fé nos que mandam, *\nnão há homem que possa salvar.\n\n = 4Ao faltar-lhe o respiro ele volta †\npara a terra de onde saiu; *\nnesse dia seus planos perecem.\n= 5É feliz todo homem que busca †\nseu auxílio no Deus de Jacó, *\ne que põe no Senhor a esperança.\n– 6O Senhor fez o céu e a terra, *\nfez o mar e o que neles existe.\n\n– O Senhor é fiel para sempre, *\n faz justiça aos que são oprimidos;\n – ele dá alimento aos famintos, *\né o Senhor quem liberta os cativos.\n\n= 8O Senhor abre os olhos aos cegos, †\no Senhor faz erguer-se o caído, *\no Senhor ama aquele que é justo.\n\n= 9É o Senhor quem protege o estrangeiro, †\nquem ampara a viúva e o órfão, *\nmas confunde os caminhos dos maus.\n\n=10O Senhor reinará para sempre! †\nÓ Sião, o teu Deus reinará *\npara sempre e por todos os séculos!\n\n3ª Ant. Ave, mulher da esperança! De ti nasceu a luz do\n mundo, por ti nos veio o Pão da vida.\nOração sálmica\n\n Ó Senhor, suba até vós o louvor perene dos Servos\nde Santa Maria, porque enviastes o vosso Filho para\nanunciar a Boa Nova aos pobres e proclamar a\nliberdade aos cativos. Reavivai em nós o compromisso\nde socorrer aos mais necessitados com amor fraterno e\nde defender os oprimidos com coragem evangélica. Por\nCristo nosso Senhor. Amém!\n\nIntrodução à leitura\n\nD. Bem-aventurada aquela que acreditou.\nT. Nela encarnou-se o Filho de Deus.\n\nPrimeira leitura\n\n À VIRGEM DO SIM\n\nL. Santa Maria, serva humilde do Senhor, gloriosa Mãe\n de Cristo, salve! Virgem fiel, ventre consagrado ao\n Verbo, ensina-nos a ser dóceis à voz do Espírito, a\n viver na escuta da Palavra, atentos a seus apelos no\n segredo do coração, vigilantes em suas\n manifestações na vida dos irmãos, nos\n acontecimentos da história, nos sofrimentos e nas\n\n alegrias da criação. Virgem da escuta, criatura\n orante, acolhe a súplica dos teus servos!\nResponsório\n\nT. Tu és, ó Maria, a terra prometida, figura do Reino\n que há de vir, * Igreja vivente do Verbo.\nL. Tu a terra sagrada que Cristo ainda geras. Tu a\n custódia vivente da Palavra.\nT. Igreja vivente do Verbo.\nSegunda leitura\n À VIRGEM DO \"MAGNIFICAT\"\nL. Santa Maria, mulher humilde e pobre, bendita do\n Altíssimo, salve! Virgem da esperança, profecia dos\n novos tempos, une ao teu canto as nossas vozes e\n acompanha-nos em nosso caminho, para que\n anunciemos a vinda do Reino e a total libertação dos\n seres humanos. Levando Cristo aos irmãos e irmãs e\n realizando com eles uma intensa comunhão de amor,\n glorificaremos contigo a misericórdia do Senhor e\n cantaremos as alegrias da vida e da salvação.\n Virgem, arca da nova Aliança, primícias da Igreja,\n acolhe as súplicas dos teus servos!\n\nResponsório\n\nT. Tu és a voz do antigo Israel, regozijo do pequeno\n resto, * canto de alegria da virgem Igreja.\nL. Por ti sobe o louvor de todos os remidos, dos pobres\n e humildes que esperam em Deus.\nT. Canto de alegria da virgem Igreja.\n\nTerceira leitura\n À VIRGEM AO PÉ DA CRUZ\nL. Santa Maria, mulher da dor, Mãe dos viventes,\n salve! Nova Eva, Virgem esposa junto à cruz, onde\n se consuma o amor e jorra a vida. Mãe dos\n discípulos, sê tu a imagem-guia em nosso\n compromisso de serviço. Ensina-nos a estar a teu\n lado aos pés das infinitas cruzes da humanidade,\n onde teu Filho continua crucificado; a viver e\n testemunhar o amor cristão, acolhendo todo ser\n humano como irmão; a renunciar ao disfarçado\n egoísmo para seguir a Cristo, única luz da\n humanidade. Virgem da Páscoa, glória do Espírito\n Santo, acolhe a súplica dos teus servos!\n\n SÚPLICA DOS SERVOS DE MARIA\n A NOSSA SENHORA\n Bondade, que nos abres o infinito\n tesouro da graça, Santa Mãe,\n infunde em teus servos a esperança.\n\n Virtude, que com bondade nos socorres\n na incerta e difícil caminhada,\n dá-nos a fidelidade em teu serviço!\n Reaviva em nós\n o antigo e sagrado compromisso\n de servir aos irmãos no amor\n e, com o olhar fixo em ti, seguir a Cristo!\nDespedida\nD. Proteja-nos Santa Maria e benigna nos acompanhe\n pelos caminhos da vida.\nT. Amém!"}, "coroa": "Pelo aporte determinante que os Servos de Maria deram à\nsua composição e pelo amor com que a divulgaram na Igreja, a\nCoroa de Nossa Senhora das Dores (ou a Coroa das Sete Dores)\npode ser considerada uma prática de piedade própria da\nOrdem.\n Não se sabe bem como começou. É muito provável que sua\norigem coincida com o crescimento do culto a Nossa Senhora\ndas Dores do início do século XVII.\n Apresentamos aqui duas fórmulas da Coroa: a primeira\né a tradicional; a segunda é nova, também articulada em \"sete\ndores\": é uma fórmula alternativa, que celebra o inesgotável\nmistério da dor da Virgem Maria a partir da categoria bíblica\nda rejeição, de profundo conteúdo teológico e presente na vida\nde Jesus.\n\n PRIMEIRA FÓRMULA\n\nD. Em nome do Pai, do Filho e do Espírito Santo.\nT. Amém!\n\nD. Nós vos louvamos e vos bendizemos, Senhor.\nT. Porque associastes a Virgem Mãe à obra da\n salvação.\nD. Contemplamos a vossa dor, Santa Maria.\nT. Para seguir-vos no caminho da fé.\n1ª DOR: Maria escuta com fé a profecia de Simeão (Lc\n 2,24-35).\n [Pai nosso e 7 Ave-Marias].\n2ª DOR: Maria foge para o Egito com Jesus e José (Mt\n 2,13-14).\n [Pai nosso e 7 Ave-Marias].\n3ª DOR: Maria procura Jesus, perdido em Jerusalém\n (Lc 2,43-45).\n [Pai nosso e 7 Ave-Marias].\n4ª DOR: Maria encontra-se com Jesus no caminho do\n Calvário (Lc 23, 25-27).\n [Pai nosso e 7 Ave-Marias].\n5ª DOR: Maria ao pé da cruz do Filho (Jo 19,25-27).\n [Pai nosso e 7 Ave-Marias].\n\n6ª DOR: Maria recebe nos braços o corpo de Jesus\n descido da cruz (Mc 15, 42-45).\n [Pai nosso e 7 Ave-Marias].\n\n7ª DOR: Maria deposita o corpo de Jesus no sepulcro, à\n espera da ressurreição (Jo 19, 40-42).\n [Pai nosso e 7 Ave-Marias].\nD. Nós vos louvamos, Santa Maria.\nT. Mãe fiel junto à cruz do Filho.\nD. Bendita sois vós, Rainha dos mártires: associada à\n paixão de Cristo, vos tornastes nossa Mãe.\nT. Sinal de esperança em nosso caminho.\n SEGUNDA FÓRMULA\nD. Em nome do Pai, do Filho e do Espírito Santo.\nT. Amém!\nD. Nós vos louvamos e vos bendizemos, Senhor.\nT. Porque associastes a Virgem Mãe à obra da salvação.\nD. Contemplamos a vossa dor, Santa Maria.\nT. Para seguir-vos no caminho da fé.\n\n1ª DOR: Jesus, Filho de Deus, nasce numa gruta: não\n havia lugar para a mãe na hospedaria (Lc 2,6-7).\n [Pai nosso e 7 Ave-Marias].\n\n2ª DOR: Jesus, Salvador dos homens, sinal de\n contradição (Lc 2,33-35).\n [Pai nosso e 7 Ave-Marias].\n3ª DOR: Jesus, Messias recém-nascido, é perseguido\n por Herodes (Mt 2,13-14).\n [Pai nosso e 7 Ave-Marias].\n\n4ª DOR: Jesus, irmão dos homens, é desprezado por\n seus concidadãos (Lc 4,28-29).\n [Pai nosso e 7 Ave-Marias].\n5ª DOR: Jesus, o Santo de Deus, é preso pelos sumos\n sacerdotes e abandonado pelos discípulos (Mt\n 26, 49-50).\n [Pai nosso e 7 Ave-Marias].\n\n6ª DOR: Jesus, o Justo, morre na cruz (Jo 19,25-27).\n [Pai nosso e 7 Ave-Marias].\n7ª DOR: Jesus, Mestre e Senhor, é perseguido nos seus\n discípulos (At 12, 1-3).\n [Pai nosso e 7 Ave-Marias].\nD. Nós vos louvamos, Santa Maria.\nT. Mãe fiel junto à cruz do Filho.\nD. Bendita sois vós, Rainha dos mártires; associada à\n paixão de Cristo, vos tornastes nossa Mãe.\nT. Sinal de esperança em nosso caminho.\n\n LADAINHA\n DE NOSSA SENHORA DAS DORES\nSenhor, tende piedade de nós! [repete-se]\nCristo, tende piedade de nós!\nSenhor, tende piedade de nós!\nCristo, ouvi-nos.\nCristo, atendei-nos.\n\nDeus Pai que estais no céu, Tende piedade de nós!\nDeus Filho, Redentor do mundo,\nEspírito Santo Paráclito,\nSantíssima Trindade que sois um só Deus,\n\nMãe do crucificado, Rogai por nós!\nMãe de coração traspassado,\nMãe do Cristo Redentor,\nMãe dos discípulos de Jesus,\nMãe dos redimidos,\nMãe dos viventes,\nVirgem obediente,\nVirgem oferente,\nVirgem fiel,\nVirgem do silêncio,\nVirgem do perdão,\nVirgem da espera,\n\nMulher do exílio,\nMulher forte,\nMulher intrépida,\nMulher da dor,\nMulher da nova aliança,\nMulher da esperança.\n\nNova Eva,\nCooperadora do Redentor,\nServa da reconciliação,\nDefesa dos inocentes,\nCoragem dos perseguidos,\nFortaleza dos oprimidos,\nEsperança dos pecadores,\nConsolação dos aflitos,\nRefúgio dos marginalizados.\nConforto dos exilados,\nSustentáculo dos fracos,\nAlívio dos enfermos,\n\nRainha dos mártires,\nGlória da Igreja,\nVirgem da Páscoa,\nCordeiro de Deus, que tirais os pecados do mundo\nT. Perdoai-nos, Senhor!\n\nCordeiro de Deus, que tirais os pecados do mundo\nT. Ouvi-nos, Senhor!\nCordeiro de Deus, que tirais os pecados do mundo\nT. Tende piedade de nós!\n\nOração\n\n Ó Deus, quisestes que a vida da Virgem Maria\nfosse marcada pelo mistério da dor. Humildemente vos\npedimos: concedei-nos trilhar a seu lado o caminho da\nfé e unir nossos sofrimentos à paixão de Cristo, para\nque se tornem momentos de graça e instrumentos de\nsalvação. Por Cristo nosso Senhor. Amém!", "stabat": "Estava a Mãe dolorosa,\njunto da cruz, lacrimosa,\nenquanto o filho pendia.\n\nNa sua alma agoniada\nenterrou-se a dura espada\nde uma antiga profecia.\n\nOh! quão triste e quão aflita,\nentre todas, Mãe bendita,\nque só tinha aquele Filho!\n\nQuanta angústia não sentia\nMãe piedosa, quando via\nas penas do Filho seu!\n\nQuem não chora, vendo isto:\ncontemplando a Mãe do Cristo\nnum suplício tão enorme?\n\nQuem haverá que resista,\nse a Mãe assim se contrista\npadecendo com seu Filho?\nPor culpa de sua gente,\nvia Jesus, inocente,\nentregando o seu espírito.\n\nVê agora o seu amado\npelo Pai abandonado,\nao flagelo submetido.\nFaze, ó Mãe, fonte de amor,\nque eu sinta o espinho da dor,\npara contigo chorar.\n\nFaze arder meu coração\ndo Cristo Deus na paixão,\npara que o possa agradar.\nÓ Santa Mãe, dá-me isto:\ntrazer as chagas do Cristo\ngravadas no coração.\nDo teu Filho, que por mim\nentrega-se a morte assim,\ndivide as penas comigo.\nOh! dá-me, enquanto viver,\ncom Cristo compadecer,\nchorando sempre contigo.\nJunto à cruz eu quero estar,\nquero o meu pranto juntar\nàs lágrimas que derramas.\nVirgem, que às virgens aclara,\nnão sejas comigo avara:\ndá-me contigo chorar.\n\nTraga em mim do Cristo a morte,\nda paixão seja consorte,\nsuas chagas celebrando.\n\nPor elas seja eu rasgado,\npela cruz inebriado,\npelo sangue de teu Filho!\nNo julgamento consegue\nque às chamas não se entregue\nquem por ti é defendido.\nQuando do mundo eu partir,\ndai-me, ó Cristo, conseguir,\npor vossa Mãe, a vitória.\n\nQuando o meu corpo morrer,\npossa a alma merecer\ndo Reino celeste a glória. Amém!", "via_matris": {"intro": "Assim como celebramos a Via Sacra, caminho\npercorrido por Jesus na sua paixão e morte de cruz,\ncelebramos também a Via Matris, isto é, o caminho\nde dor percorrido por Maria, desde a profecia do justo\nSimeão, passando pela fuga para o Egito e a perda de\nJesus no Templo até sua paixão e morte na cruz. Foi\no caminho que ela fez ao lado de Jesus, cooperando\ncom ele na obra de redenção humana.\n Celebramos as dores de Maria não para mover-\nnos de compaixão por ela, pelo que ela sofreu, mas\nantes para encher-nos de coragem e enfrentar como\nela, “de pé”, os sofrimentos desta vida e, ao mesmo\ntempo, para colocar-nos, como ela, aos pés das\ninfinitas cruzes que afligem os homens e mulheres de\nhoje, para levar-lhes conforto e esperança de\nlibertação. Não é, portanto, uma celebração para\nprovocar sentimentalismo pietista, mas sim\ncompaixão e solidariedade com os que sofrem.\n\n14 O presente texto da Via Matris foi composto por frei José M. Milanez, seguindo o\n\n roteiro tradicional, isto é: leitura bíblica, reflexão, invocações e canto.\n\n Desde as origens, os Servos de Maria sempre\ntiveram a Virgem Gloriosa, Mãe da Misericórdia, como\nsua Senhora, Fundadora e Guia. A partir do século XVII\naté meados do século XX, a devoção a Nossa Senhora\ndas Dores passou a ser considerada como o aspecto\npredominante do seu carisma mariano.\n A Via Matris é uma expressão dessa devoção e\nfoi introduzida no Brasil em 1920, quando os\nprimeiros Servos de Maria aqui chegaram. Até a\ndécada de sessenta do século passado era celebrada\ntoda sexta-feira em nossas igrejas. Depois, ficou\nalguns anos esquecida e hoje volta a ser valorizada.\n O presente roteiro da Via Matris segue o\nesquema tradicional, isto é: leitura do evangelho, breve\nreflexão, invocações e canto. Esse exercício de piedade\nevoca as sete principais dores da vida de Maria. Como\na Via Sacra, celebra-se em procissão, passando de uma\nestação para outra. Cada estação representa uma das\nsete dores de Maria.\n A origem dessa prática de piedade remonta ao\nséculo XVIII. Era praticada inicialmente, de maneira\nprivada, nas igrejas dos Servos de Maria da Espanha. É\nde 1842 um documento conservado até hoje, que ensina\ncomo celebrar a Via Matris.\n Esse piedoso exercício é conhecido também\ncomo “Novena perpétua de Nossa Senhora das Dores”\ne teve como seu maior propagador frei Tiago M. Keane\n\n(1901-1975), servita norte-americano que, em 1937,\nintroduziu sua celebração toda sexta-feira na igreja dos\nServos de Maria de Chicago, dedicada à Nossa Senhora\ndas Dores. Daí a devoção expandiu-se rapidamente em\n45 Estados do país e em cerca de 20 países do mundo.\nFrei Tiago escreveu um livreto intitulado “Novena em\nhonra de Nossa Mãe Dolorosa” que alcançou a tiragem\nde seis milhões de exemplares e dezessete edições, e\nfoi traduzido em vinte e dois idiomas15.\n A primeira edição em língua portuguesa foi\npublicada em São Paulo, em 1942. No frontispício do\nlivreto diz-se que foi “extraída de fontes aprovadas e\nadaptada para uso do povo pelo Revdo. Frei Thiago M.\nKeane, O.S.M., e traduzida para o português por frei\nThiago M. Mattioli, O.S.M.”16.\n Os trechos evangélicos são tirados da Bíblia\nSagrada, tradução da CNBB. As orações e a breve\nreflexão que segue à leitura evangélica são uma\nhumilde tentativa do autor para adaptar o conteúdo da\nmensagem e da oração à nossa realidade brasileira. A\nestrofe e o refrão do canto entoado enquanto se passa\n\n Esses dados sobre a Via Matris foram extraídos do Dicionário de Mariologia (dirigido por\n Stefano de Fiores e Salvatore Meo), edição em língua portuguesa, Paulus, São Paulo 1995,\n p. 426-427; cf. também ALESSIO MARIA ROSSI, Manuale di storia dell’Ordine dei Servi\n di Maria, Roma 1956, p. 448-449.\n Novena Perpétua em honra de Nossa Senhora das Dores, trad. frei Thiago M. Mattioli,\n Tipografia do Orfanato Cristóvão Colombo, São Paulo, 1942, 26 p.\n\nde uma estação para outra são do cancioneiro popular\ntradicional.", "stations": [{"title": "1ª Dor — Profecia de Simeão", "text": "D. Nós vos adoramos, Senhor Jesus Cristo e vos\n bendizemos\nT. Porque associastes a Virgem Maria à obra da\n Salvação.\nC. Contemplamos vossas dores, ó Mãe de Deus!\nT. Queremos seguir-vos no caminho da fé.\nC. Santa Maria, Mãe de Deus!\nT. Rogai por nós, pecadores.\nEvangelho de Lucas (2, 22.25a.34-35)\n Quando se completaram os dias da purificação,\nsegundo a lei de Moisés, levaram o menino a\nJerusalém para apresentá-lo ao Senhor... Vivia em\nJerusalém um homem piedoso e justo, chamado\nSimeão, que esperava a consolação de Israel. Simeão\nos abençoou e disse a Maria, a Mãe: «Este menino será\n\ncausa de queda e de reerguimento para muitos em\nIsrael. Ele será um sinal de contradição. E a ti, uma\nespada traspassará tua alma, e assim serão revelados\nos pensamentos de muitos corações».\n\nReflexão\n L.1 - Jesus, segundo Simeão, haveria de ser um\nsinal de contradição. De fato, para aqueles que o\nrejeitaram e o levaram à cruz, foi motivo de queda e\nde condenação; para aqueles que o aceitaram e\nacreditaram nele, foi motivo de reerguimento e de\nsalvação. Maria guardava todas essas coisas e as\nmeditava no seu coração (Lc 2,19), mas seu olhar\ndeixava transparecer a dor. O poeta contempla o olhar\nde Maria e canta:\n Num sonho todo feito de incerteza,\n de noturna e indizível ansiedade,\n é que eu vi teu olhar de piedade\n e, mais que piedade, de tristeza 17.\n L.2 - Maria conviveu com Jesus em Nazaré e o\nacompanhou na vida pública. Participou de suas\nalegrias e tristezas, mas principalmente do seu\nsofrimento, quando o viu abandonado pelos seus\ndiscípulos, traído por Judas, negado por Pedro,\ncondenado à morte e pregado na cruz. Tudo isso foi\n Trata-se de ANTERO DE QUENTAL (†1891). É a 1ª estrofe do soneto À Virgem Santíssima,\n cheia de graça, Mãe de misericórdia, citado por CLODOVIS M. BOFF, OSM, Nossa Senhora\n das Bem-aventuranças, Edições Paulinas, São Paulo, 1984, p. 20.\n\ncomo uma espada a lhe traspassar a alma. O célebre\nhino Stabat Mater, que descreve a presença de Maria ao\npé da cruz, assim recorda as palavras do justo Simeão:\n«Na sua alma agoniada / enterrou-se a dura espada / de\numa antiga profecia».\n L.3 - Pensemos nas mães dos dias de hoje que\nveem seus filhos levados à morte, vítimas das guerras,\nda fome e de todo tipo de violência. A “espada”\ncontinua a traspassar o coração de muitas mães. O\nhomem e a mulher foram feitos para ter vida e vida em\nabundância e não para morrer, vítimas das “espadas”\nfabricadas pela maldade humana.\nOração\nC. Senhor Deus, nosso Pai, pelas palavras de Simeão,\n predissestes uma vida de sofrimento para a mãe do\n vosso Filho. Suplicantes, vos pedimos: a exemplo da\n Virgem das Dores, cujo coração foi traspassado pela\n espada da dor, saibamos enfrentar os sofrimentos da\n vida presente e ser solidários com as dores dos\n irmãos. Por Cristo nosso Senhor.\nT. Amém!\nInvocações\n C. Ave, Maria, cheia de graça...\n T. Santa Maria, mãe de Deus...\n\n C. Nossa Senhora das Dores.\n T. Rogai por nós!\nCanto\n\n De Simeão as vozes no templo escutais\n cruéis profecias. Bendita sejais!\n Bendita sejais, Senhora das Dores,\n ouvi nossos rogos, mãe dos pecadores!"}, {"title": "2ª Dor — Fuga para o Egito", "text": "D. Nós vos adoramos, Senhor Jesus Cristo e vos\n bendizemos\nT. Porque associastes a Virgem Maria à obra da\n Salvação.\n\nC. Contemplamos vossas dores, ó Mãe de Deus!\nT. Queremos seguir-vos no caminho da fé.\nC. Santa Maria, Mãe de Deus!\nT. Rogai por nós, pecadores.\nEvangelho de São Mateus (2,13-15)\n Depois que os magos se retiraram, o anjo do\nSenhor apareceu em sonho a José e lhe disse: «Levanta-\nte, toma o menino e sua mãe e foge para o Egito! Fica\nlá até que eu te avise, porque Herodes vai procurar o\nmenino para matá-lo». José levantou-se, de noite, com\no menino e a mãe, e partiu para o Egito e lá ficou até a\nmorte de Herodes. Assim se cumpriu o que o Senhor\ntinha dito pelo profeta: “Do Egito chamei o meu filho”.\nReflexão\n L.1 - Herodes dissera aos magos: “Quando\nencontrardes o menino, avisai-me para que também eu\nvá adorá-lo” (Mt 2,8). Mas, conhecendo as más\n\nintenções dele, os magos voltaram para suas terras por\noutro caminho. Herodes então encheu-se de furor,\nporque não podia admitir que houvesse outro rei em\nIsrael. Diante das ameaças de Herodes, José, avisado\npelo anjo do Senhor, teve que fugir com a esposa e a\ncriança.\n L.2 - Abandonar a própria terra e casa, a oficina\nde carpinteiro, parentes e amigos, e rumar para uma\nterra longínqua e desconhecida, percorrendo de Belém\nao delta do Nilo mais de 250 quilômetros, foram atos\nde coragem e de fé de Maria e de José. Mas a ordem de\nDeus era clara: “José, toma o menino e sua mãe e foge\npara o Egito! Fica lá até que eu te avise”. Era preciso\nsalvar o filho a qualquer custo.\n L.3 - Quantos são hoje os que vivem exilados ou\nmigrando de um lugar para outro, sempre fugindo dos\nHerodes atuais, que se chamam perseguição, racismo,\nconflitos étnicos, fome, desemprego, falta de moradia,\nde assistência médica e de educação, e sempre\nbuscando, no desconhecido, melhores condições de\nvida. Milhões são os prófugos, exilados e migrantes\nque vagueiam pelo mundo, longe de sua terra, dos\nparentes e amigos, erradicados de sua cultura. A\nhistória se repete. É o desterro forçado da Família de\nNazaré que se prolonga na história da humanidade.\n\nOração\nC. Senhor Deus, nosso Pai, fizestes da Virgem Maria a\n mulher forte que conheceu a pobreza e o sofrimento,\n a fuga e o exílio. Suplicantes, vos pedimos: a exemplo\n da Virgem das Dores, saibamos lutar para defender a\n vida e os direitos da pessoa humana contra as\n injustiças e a perseguição dos prepotentes. Por Cristo\n nosso Senhor.\nT. Amém!\nInvocações\n C. Ave, Maria, cheia de graça...\n T. Santa Maria, mãe de Deus...\n C. Nossa Senhora das Dores\n T. Rogai por nós!\n\nCanto\n Manda o céu um anjo dizer que fujais\n do bárbaro Herodes, Bendita sejais!\n Bendita sejais, Senhora das Dores,\n ouvi nossos rogos, mãe dos pecadores!"}, {"title": "3ª Dor — Jesus perdido em Jerusalém", "text": "C. Nós vos louvamos, Senhor Jesus Cristo e vos\n bendizemos.\nT. Porque associastes a Virgem Maria à obra da\n salvação.\n\nC. Contemplamos vossas dores, ó Mãe de Deus!\nT. Queremos seguir-vos no caminho da fé.\n\nC. Santa Maria, Mãe de Deus!\nT. Rogai por nós, pecadores.\nEvangelho de Lucas (2, 41-49)\n\n Todos os anos, os pais de Jesus iam a Jerusalém\npara a festa da Páscoa. Quando o menino completou\ndoze anos, eles foram para a festa, como de costume.\nTerminados os dias da festa, enquanto voltavam, Jesus\nficou em Jerusalém, sem que seus pais percebessem.\nPensando que se encontrasse na caravana, caminharam\num dia inteiro. Começaram então a procurá-lo entre os\nparentes e conhecidos. Mas não o encontrando,\nvoltaram a Jerusalém à sua procura. Depois de três dias,\no encontraram no templo, sentado entre os mestres,\nouvindo-os e fazendo-lhes perguntas.\n\nReflexão\n\n L.1 - Aos doze anos, todo menino judeu era\nlevado ao templo e entregue aos mestres da lei para que\nlhe ensinassem a Lei do Senhor, que se encontra no\nPentateuco, os primeiros cinco livros da Bíblia. Assim\nfizeram seus pais com Jesus. Só que os pais, quando já\nestavam no caminho de volta para Nazaré, se dão conta\nque o Menino não está na caravana.\n L.2 - Podemos imaginar a aflição de Maria e José\nque o procuram por toda parte, não o encontram e têm\nque voltar a Jerusalém. E já tinham feito o caminho de\num dia. É bom saber que Nazaré dista de Jerusalém\nmais de cem quilômetros. À angústia une-se o cansaço\nda viagem. Além do mais, Maria e José ainda\nguardavam na memória as ameaças de Herodes e a fuga\npara o Egito.\n L.3 - É dramática hoje a situação de tantas\ncrianças perdidas, que vagueiam pelas ruas e praças das\ncidades, fugidas de casa ou roubadas às suas famílias,\nmatriculadas pelo destino na escola das drogas, da\nprostituição e da violência, alvo elas próprias de todo\ntipo de violência. São as “crianças de rua” que vemos\npor aí: maltrapilhas, sujas, drogadas, dormindo na\ncalçada, pedindo esmola, assaltando os passantes.\nVivendo assim, o que vão aprender para a vida essas\ncrianças? Como poderão crescer sadias? Quando\n\naparecerá alguém que vá procurá-las e resgatá-las dessa\nsituação?\nOração\n\nC. Senhor Deus, nosso Pai, por três dias, Maria e José\n procuraram, aflitos, o filho Jesus. Suplicantes, vos\n pedimos: amparados pela Virgem das Dores,\n busquemos na penitência e na conversão o\n reencontro com o vosso Filho, e sejamos solidários\n com tantas crianças, que vagueiam pelas ruas e\n praças vítimas da injustiça social, da desagregação\n familiar e da violência. Por Cristo nosso Senhor.\nT. Amém!\nInvocações\n\n C. Ave, Maria, cheia de graça...\n T. Santa Maria, mãe de Deus...\n C. Nossa Senhora das Dores\n T. Rogai por nós!\nCanto\n Voltando do templo, Jesus não achais.\n Que susto sofrestes! Bendita sejais!\n Bendita sejais, Senhora das Dores,\n ouvi nossos rogos, mãe dos pecadores!"}, {"title": "4ª Dor — Encontro no caminho do Calvário", "text": "C. Nós vos louvamos,\n Senhor Jesus Cristo e vos bendizemos.\nT. Porque associastes a Virgem Maria à obra da\n salvação.\nC. Nós contemplamos vossas dores, ó Mãe de Deus!\nT. Queremos seguir-vos no caminho da fé.\nC. Santa Maria, Mãe de Deus!\nT. Rogai por nós, pecadores.\nEvangelho de Lucas (23,26-28)\n Enquanto levavam Jesus, tomaram um certo\nSimão de Cirene, que voltava do campo, e mandaram-\nno carregar a cruz atrás de Jesus. Seguia-o uma grande\nmultidão do povo, bem como de mulheres que batiam\nno peito e choravam por ele. Jesus, porém, voltou-se\npara elas e disse: “Mulheres de Jerusalém, não choreis\npor mim! Chora por vós mesmas e por vossos filhos!”\n\n L.1 – O Evangelho não diz explicitamente se no\nmeio da “grande multidão que o seguia” ou das\n“mulheres que batiam no peito” estava também a mãe\nde Jesus, mas certamente ela devia estar. De fato, logo\ndepois o Evangelho de João diz que ela estava junto à\ncruz do Filho agonizante, ao lado do discípulo amado e\nde outras mulheres.\n\n L.2 - É o encontro doloroso da mãe aflita com o\nfilho condenado à morte. Ao sofrimento físico de Jesus\njunta-se o sofrimento daquela que vê o filho, que passara\na vinda pregando e fazendo o bem, ser incompreendido,\ninjustiçado, caluniado e condenado à morte de cruz.\nJesus e Maria unem-se na dor para realizar a obra de\nredenção da humanidade.\n L.3 - Quem nunca viu, nos dias de hoje, mães\nperderem seus filhos, vítimas da violência e da maldade\nhumana? Referindo-se a Maria, assim canta o poeta18:\n Tu és, ó mãe, toda mãe que hoje ama;\n tu és, ó mãe, toda a mãe que hoje chora\n seu filho morto, seu filho traído,\n mães aos milhares, mães amortalhadas!\n Filhos que sempre se estão a matar,\n Trata-se de frei DAVID M. TUROLDO, escritor e poeta da Ordem dos Servos de Maria, que\n compôs os hinos dos Ofícios Próprios OSM. Esses versos são do hino do Ofício das Leituras\n da festa da “Bem-aventurada Virgem Maria ao pé da Cruz”.\n\n Filhos vendidos, traídos, sem número,\n filhos feridos e em cruzes pregados:\n ímpia bandeira de um ímpio poder.\nOração\nC. Senhor Deus, nosso Pai, no caminho do Calvário,\n vosso filho Jesus e Maria sua mãe se encontram.\n Suplicantes, vos pedimos: a exemplo da Virgem das\n Dores, saibamos ir ao encontro dos que sofrem,\n compreendendo, compartilhando e aliviando suas\n dores. Por Cristo nosso Senhor.\nT. Amém!\n\nInvocações\n\n C. Ave, Maria, cheia de graça...\n T. Santa Maria, mãe de Deus...\n C. Nossa Senhora das Dores\n T. Rogai por nós!\nCanto\n\n Que dor indizível quando o encontrais\n com a cruz às costas. Bendita sejais!\n Bendita sejais, Senhora das Dores,\n ouvi nossos rogos, mãe dos pecadores!"}, {"title": "5ª Dor — Maria ao pé da cruz", "text": "C. Nós vos louvamos, Senhor Jesus Cristo e vos\n bendizemos.\nT. Porque associastes a Virgem Maria à obra da\n salvação.\nC. Nós contemplamos vossas dores, ó Mãe de\n Deus!\nT. Queremos seguir-vos no caminho da fé.\nC. Santa Maria, Mãe de Deus!\nT. Rogai por nós, pecadores.\nEvangelho de João (19,25-27)\n Junto à cruz de Jesus estavam de pé sua mãe e a\nirmã de sua mãe, Maria de Cléofas, e Maria Madalena.\nJesus, ao ver sua mãe, ao lado dela, o discípulo que ele\namava, disse à mãe: “Mulher, eis o teu filho!” Depois\ndisse ao discípulo: “Eis a tua mãe!” A partir daquela\nhora, o discípulo a acolheu junto de sim\n\nReflexão\n\n L.1 - É a cena clássica do Calvário, descrita por\nJoão e tão comentada pelos santos Padres da Igreja, que\na iconografia ilustrou com as mais variadas formas e\nestilos e que o poeta canta dizendo19: Sim, no\nCalvário, ó Mãe, tu choraste,\n ao pé da cruz, traspassada de dor:\n como pudeste sofrer tanto assim,\n sem sucumbir, nem fugir, nem gritar?\n L.2 - Eram poucos ao pé da Cruz. Dos doze\ndiscípulos, apenas um. De todos os que haviam sido\nbeneficiados pelos milagres e curas de Jesus, ninguém.\nMas lá estava Maria, a mãe, de pé, e outras mulheres.\nColocar-se com Maria aos pés das infinitas cruzes que\nafligem os homens e as mulheres do nosso tempo é\nmissão prioritária do cristão. “Tive fome e me destes de\ncomer; tive sede e me destes de beber; fui peregrino e\nme acolhestes; estive nu e me vestistes, enfermo e me\nvisitastes, preso e viestes ver-me...” (Mt 25,35-36)\n L.3 - Basta olhar ao nosso redor, abrir um jornal\nou ver um noticiário de TV para constatar quantas são\nas cruzes que afligem a humanidade de hoje. “Toda\ncriação espera ser libertada da escravidão”, exclama São\nPaulo (Rm 8,21). Que fazer? É nosso dever de cristãos e\nde Servos de Maria colocar-nos aos pés dessas infinitas\n Do Hino das Vésperas da festa da B. Virgem Maria ao pé da Cruz.\n\ncruzes, onde o Filho do Homem continua sendo\ncrucificado nos irmãos e irmãs, para levar-lhes conforto\ne esperança de libertação. Maria, a mãe da misericórdia\ne da compaixão, nos dá o exemplo. Seja ela a nossa\nimagem-guia.\nOração\nC. Senhor Deus, nosso Pai, que ao pé da cruz\n associastes a Virgem Maria à paixão e morte do\n vosso Filho, fazendo-a corredentora da humanidade.\n Suplicantes, vos pedimos: a exemplo da Virgem das\n Dores, saibamos colocar-nos a seu lado aos pés das\n cruzes da humanidade onde vosso Filho continua\n crucificado em nossos irmãos e irmãs, para levar-\n lhes conforto esperança de libertação. Por Cristo\n nosso Senhor.\nT. Amém!\nInvocações\n C. Ave Maria, cheia de graça...\n T. Santa Maria, Mãe de Deus...\n C. Nossa Senhora das Dores,\n T. Rogai por nós!\nCanto\n A dor ainda cresce quando contemplais\n Jesus expirando. Bendita sejais!\n Bendita sejais, Senhora das Dores,\n ouvi nossos rogos, mãe dos pecadores!"}, {"title": "6ª Dor — Jesus depositado nos braços de Maria", "text": "C. Nós vos louvamos, Senhor Jesus Cristo e vos\n bendizemos.\nT. Porque associastes a Virgem Maria à obra da\n salvação.\nC. Nós contemplamos vossas dores, ó Mãe de Deus!\nT. Queremos seguir-vos no caminho da fé.\nC. Santa Maria, Mãe de Deus!\nT. Rogai por nós, pecadores.\nEvangelho de Marcos (15,43-46a)\n José de Arimateia, membro respeitável do\nSinédrio, que também esperava o reino de Deus, cheio\nde coragem foi a Pilatos pedir o corpo de Jesus.\n Pilatos ficou admirado quando soube que Jesus\nestava morto. Chamou o centurião e perguntou se tinha\nmorrido havia muito tempo. Informado pelo centurião,\n\nPilatos entregou o corpo a José. Ele comprou um lençol\nde linho, desceu Jesus da cruz e envolveu-o no lençol.\nReflexão\n L.1 – Eis a “Pietà” (a Piedade), obra-prima de\nMichelangelo, venerada na basílica de São Pedro, no\nVaticano, e reproduzida em milhares de cópias\nespalhadas pelo mundo inteiro. Maria, sentada,\naconchega ao colo seu filho morto. A perfeição dos\ntraços das imagens marmóreas de Jesus e de Maria e a\ndor reproduzida com solenidade e perfeição no rosto da\nmãe despertam piedade e compaixão.\n L.2 - Diante desse quadro, canta o poeta 20:\nPouco mais tarde da cruz o tiraram,\ne o depuseram, ó Mãe, em teu colo.\nNão parecias gerá-lo de novo?\ne qual criança de peito aleitá-lo?\n Eras o colo de todas as mães.\n Vendo-te assim, quem não há de chorar?\n Era uma cena jamais antes vista!\n És a Piedade que abraça quem sofre!\n L.3 - Abraçar a dor do irmão, abraçar a causa dos\npobres, dos excluídos, dos doentes, dos angustiados e\ndeprimidos, não é para os fracos. É para os fortes. Para\naqueles que, como Maria, sabem permanecer de pé junto\nà cruz e não se abalam nem desanimam diante do\nsofrimento. Para aqueles que alicerçam sua vida em Deus\ne na sua Palavra. Para aqueles que, diante da morte,\n Do hino das II Vésperas da solenidade de Nossa Senhora das Dores, 15 de setembro.\n\nacreditam na ressurreição, e por isso lutam para renovar\no mundo e se empenham com obras de caridade e de\nmisericórdia, a exemplo do bom samaritano. Sim, porque\nnão existe fé sem obras. “Mostra-me tua fé sem as obras\nque eu, por minhas obras, te mostrarei a fé“, diz São\nTiago.\nOração\nC. Senhor Deus, nosso Pai, estando “tudo consumado”,\n o corpo do vosso filho foi descido da cruz e entregue\n nos braços de sua mãe. Suplicantes, vos pedimos: a\n exemplo da Virgem das Dores, tenhamos os braços\n sempre abertos para acolher os excluídos da\n sociedade, escutar seus clamores e solidarizar-nos\n com eles na luta pela vida. Por Cristo nosso Senhor.\nT. Amém!\n Invocações\n C. Ave, Maria, cheia de graça...\n T. Santa Maria, Mãe de Deus...\n C. Nossa Senhora das Dores\n T. Rogai por nós!\n Canto\n No vosso regaço seu corpo abrigais,\n com ele abraçada, bendita sejais!\n Bendita sejais, Senhora das Dores,\n ouvi nossos rogos, mãe dos pecadores."}, {"title": "7ª Dor — Sepultamento de Jesus", "text": "C. Nós vos louvamos, Senhor Jesus Cristo e vos\n bendizemos.\nT. Porque associastes a Virgem Maria à obra da\n salvação.\nC. Nós contemplamos vossas dores, ó Mãe de Deus!\nT. Queremos seguir-vos no caminho da fé.\nC. Santa Maria, Mãe de Deus!\nT. Rogai por nós, pecadores.\nEvangelho de João (19,40-42)\n Eles pegaram então o corpo de Jesus e o\nenvolveram, com perfumes, em faixas de linho, do\nmodo como os judeus costumam sepultar. No lugar\nonde Jesus foi crucificado, havia um jardim e, no\njardim, um túmulo novo, onde ninguém tinha sido\nainda sepultado. Por ser dia de preparação para os\n\njudeus, e como o túmulo estava perto, foi lá que eles\ncolocaram Jesus.\n\n Reflexão\n\n L.1 - Foi um enterro de pobre, feito às pressas no\nfinal da tarde, e poucos o acompanharam, como reza a\nLiturgia:\n Para o sepulcro o levam amigos,\n não mais que sete, segundo João:\n foi o enterro mais pobre do mundo,\n ouve-se apenas a pedra a rolar... 21\nTudo parece ter chegado ao fim. A Mãe, João e os\npoucos amigos e amigas, depois que o túmulo foi\nfechado com a pedra, voltam para casa. A desolação é\ntotal. A dor da mãe alcança seu nível mais profundo:\nagora sem marido e sem filho. Estava só! É Nossa\nSenhora da Soledade.\n L.2 - Mas Ela não perde a esperança: seu Filho\nressuscitará, como ele mesmo disse. Ela o deposita no\nsepulcro, sim, mas espera sua ressurreição. Ademais,\nEla toma consciência do alcance das palavras de Jesus:\n«Eis aí o teu filho!» E assume a sua função de mãe de\ntodos os homens e mulheres. No Natal, tornara-se mãe\nde Jesus. Agora, no Calvário, mãe de todos os seres\n\n Hino das II Vésperas do Ofício da Solenidade de Nossa Senhora das Dores.\n\nhumanos. E, mais tarde, em Pentecostes, mãe da Igreja.\nMaria alcança a plenitude da maternidade.\n L.3 - Esta a fé que deve acompanhar-nos quando\nsepultamos uma pessoa querida: o corpo é posto debaixo\nda terra, mas sua “vida” continua. Uma vez gerados no\nventre materno, nossa “vida” dura para sempre: alguns\nanos, envolvida no corpo humano, depois, revestida de\num “corpo incorruptível”. Como será isso? Deus sabe\ne isso nos basta.\nOração\nC. Senhor Deus, nosso Pai, junto com alguns irmãos e\n irmãs, a Virgem Mãe, aflita, acompanhou seu filho à\n sepultura. Suplicantes, vos pedimos: a exemplo da\n Virgem das Dores, saibamos caminhar lado a lado\n com aqueles que sofrem, para criarmos com eles\n uma aliança de amor, que os ajude a superar o medo\n da morte com a esperança da ressurreição. Por Cristo\n nosso Senhor.\nT. Amém!\nInvocações\n C. Ave, Maria, cheia de graça...\n T. Santa Maria, mãe de Deus...\n C. Nossa Senhora das Dores\n T. Rogai por nós!\n\nCanto\n\n Sem filho, e tal filho! Então suportais\n cruel soledade. Bendita sejais!\n Bendita sejais, Senhora das Dores,\n ouvi nossos rogos, mãe dos pecadores.\n\n[Termina-se a “Via Matris”, recitando a ladainha de\nNossa Senhora das Dores (cf. p.), seguida do oremos\n(cf. p. ) e da bênção final]."}]}, "ladainhas": [{"title": "Ladainha dos Servos de Maria", "text": "Senhor, tende piedade de nós. [repete-se]\nCristo, tende piedade de nós.\nSenhor, tende piedade de nós.\nCristo, ouvi-nos.\nCristo, atendei-nos.\n\nDeus Pai do céu, Tende piedade de nós!\nDeus Filho, redentor do mundo,\nEspírito Santo Paráclito,\nSantíssima Trindade que sois um só Deus,\n\nAve Maria, Virgem morada do Espírito, Rogai por nós!\nAve Maria, Virgem Mãe,\nAve Maria, Virgem fiel,\nAve Maria, Virgem sábia,\nAve Maria, Virgem prudente,\nAve Maria, Virgem orante,\nAve Maria, Mãe de Deus,\nAve Maria, Mãe de Cristo,\nAve Maria, Mãe do Salvador,\nAve Maria, Mãe do Homem novo,\nAve Maria, Mãe da graça,\nAve Maria, Mãe da misericórdia,\nAve Maria, sede da sabedoria,\nAve Maria, templo de santidade,\nAve Maria, arca da aliança,\nAve Maria, estrela do mar,\nAve Maria, escada do céu,\nAve Maria, porta do paraíso,\nAve Maria, conforto dos pobres,\nAve Maria, refúgio dos marginalizados,\nAve Maria, saúde dos enfermos,\nAve Maria, guia dos peregrinos,\nAve Maria, esperança dos pecadores,\nAve Maria, alegria dos teus servos,\nAve Maria, mestra da santidade,\nAve Maria, mestra da humildade,\nAve Maria, mestra da obediência,\nAve Maria, mestra da fortaleza,\nAve Maria, mestra da contemplação,\nAve Maria, mestra do serviço,\nAve Maria, fonte de vida,\nAve Maria, fonte de luz,\nAve Maria, fonte de beleza,\nAve Maria, fonte de alegria,\nAve Maria, fonte de perdão,\nAve Maria, fonte de comunhão,\nAve Maria, rainha dos humildes,\nAve Maria, rainha dos mansos,\nAve Maria, rainha dos misericordiosos,\nAve Maria, rainha dos puros de coração,\nAve Maria, rainha dos construtores da paz,\nAve Maria, rainha dos teus servos,\n\nCordeiro de Deus, que tirais os pecados do mundo,\nT. Perdoai-nos, Senhor!\nCordeiro de Deus, que tirais os pecados do mundo,\nT. Ouvi-nos, Senhor!\nCordeiro de Deus, que tirais os pecados do mundo,\nT. Tende piedade de nós!\n\nOração\n\nÓ Deus, amigo dos homens, fiel à aliança e às promessas, que no anúncio a Maria realizastes a espera da humanidade, escutai a nossa oração: pela disponibilidade que encontrastes na Virgem Maria, filha de Sião e nossa irmã, fazei que nós, vossos servos, sejamos sempre dóceis à Palavra e abertos ao vosso Espírito. Por Cristo nosso Senhor. Amém!"}, {"title": "Ladainha de Santa Maria da Esperança", "text": "Senhor, tende piedade de nós. [repete-se]\nCristo, tende piedade de nós.\nSenhor, tende piedade de nós.\nCristo, ouvi-nos.\nCristo, atendei-nos.\n\nDeus Pai do céu, Tende piedade de nós!\nDeus Filho, redentor do mundo,\nEspírito Santo Paráclito,\nSantíssima Trindade que sois um só Deus,\n\nSanta Maria da esperança, Rogai por nós!\nSanta Maria do caminho,\nSanta Maria da luz,\nPlenitude de Israel,\nAurora do mundo novo,\nFonte da alegria messiânica,\nMãe de Deus,\nMãe do Messias libertador,\nMãe dos redimidos,\nMãe de todos os povos,\n\nDiscípula de Cristo,\nTestemunha de Cristo,\nIrmã dos homens,\nInício da Igreja,\nMãe da Igreja,\nModelo da Igreja,\nImagem da Igreja,\nServa do Senhor,\nServa da Palavra,\nServa do Reino,\nVirgem do silêncio,\nVirgem da escuta,\nVirgem do canto,\nVirgem da contemplação,\nMaria, dignidade da mulher,\nMaria, grandeza da mulher,\nMaria, destino da mulher,\nMulher bendita entre as mulheres,\nMulher fiel ao compromisso,\nMulher fiel no seguimento,\nMulher fiel ao pé da cruz,\n\nEstrela da evangelização,\nEducadora da fé,\nMestra da vida,\nPresença luminosa,\nPresença orante,\nPresença acolhedora,\nPresença operante,\nEsperança dos pobres,\nConfiança dos homens,\nSustentáculo da evangelização,\nAlívio dos oprimidos,\nDefesa dos inocentes,\nFortaleza dos perseguidos,\nConforto dos exilados,\nVoz de comunhão,\nVoz dos pobres,\nVoz do Espírito,\n\nSinal do rosto materno de Deus,\nSinal da presença do Pai,\nSinal da misericórdia do Filho,\nSinal da fecundidade do Espírito,\n\nCordeiro de Deus, que tirais os pecados do mundo,\nT. Perdoai-nos, Senhor!\nCordeiro de Deus, que tirais os pecados do mundo,\nT. Ouvi-nos, Senhor!\nCordeiro de Deus, que tirais os pecados do mundo,\nT. Tende piedade de nós!\n\nOração\n\nPai Santo, que no caminho da Igreja, peregrina sobre a terra, colocastes como sinal luminoso a bem-aventurada Virgem Maria: por sua intercessão, sustentai nossa fé e reacendei nossa esperança, para que nenhum obstáculo nos desvie do caminho que leva à salvação. Por Cristo nosso Senhor. Amém!"}, {"title": "Ladainha de Puebla", "text": "Senhor, tende piedade de nós. [repete-se]\nCristo, tende piedade de nós.\nSenhor, tende piedade de nós.\nCristo, ouvi-nos.\nCristo, atendei-nos.\n\nDeus Pai do céu, Tende piedade de nós!\nDeus Filho, redentor do mundo,\nEspírito Santo Paráclito,\nSantíssima Trindade que sois um só Deus,\n\nDiscípula perfeita do Senhor, Libertai vosso povo.\nModelo do cristão,\nRealização mais alta do Evangelho,\nFace materna de Deus,\nRosto do homem novo,\nCoração tão grande quanto o mundo,\nMulher forte do povo,\nMulher pobre e sofredora,\nMulher perseguida e exilada,\nAnunciadora da justiça dos oprimidos,\nInspiradora da opção pelos pobres,\nMulher que dignifica a mulher,\nSinal do nosso corpo glorificado,\nSinal da criação redimida,\nSinal do homem todo salvo,\nIntercessora de todos os povos,\nDespertadora da fé no Cristo,\nEncarnação viva do evangelho,\nFiel companheira do Senhor,\nProtagonista, com Cristo, da história,\nGuarda do destino da América Latina,\nMãe educadora da fé,\nPedagoga do evangelho,\nEstrela da evangelização,\n\nCordeiro de Deus, que tirais os pecados do mundo,\nT. Perdoai-nos, Senhor!\nCordeiro de Deus, que tirais os pecados do mundo,\nT. Ouvi-nos, Senhor!\nCordeiro de Deus, que tirais os pecados do mundo,\nT. Tende piedade de nós!"}], "variasHome": [{"title": "Bênção da refeição", "text": "Comum\n Bendito sejais, Senhor Deus, nosso Pai, que\nfazeis germinar os frutos da terra, por estes dons que\ncolocastes sobre a nossa mesa. Abençoai aqueles que,\ncom seu trabalho, os cultivaram, os que os prepararam\ncomo alimento e a nós que estamos para recebê-los\ncom o coração agradecido, enquanto esperamos\nencontrar-nos um dia todos reunidos no vosso Reino\neterno. Por Cristo nosso Senhor. Amém!\nNas festas marianas\n\n Senhor Deus, nosso Pai, que na Virgem Maria\ndestes à Igreja a imagem profética do seu futuro;\nabençoai a nós e ao alimento que estamos para tomar e\nfazei que, celebrando hoje a bendita entre as mulheres,\npossamos refletir em nós sua vida de obediência e de\namor. Por Cristo nosso Senhor. Amém!\nNas visitas de familiares e amigos\n Senhor nosso Deus, que de muitas maneiras\nconvidais os seres humanos, ajudai-nos a compreender\no dom da graça da hospitalidade, para que saibamos\nreconhecer a vossa presença no irmão que nos visita.\nSede bendito agora e sempre. Amém!\n\nNos momentos de alegria\n Ó Deus, fonte da alegria, por meio do vosso\nFilho, nos fazeis participar das vossas maravilhas: nós\nvos bendizemos pelos dons do vosso amor, em modo\nparticular hoje ...[explicitar o motivo da alegria], e vos\npedimos que transformeis as alegrias deste dia em\njúbilo perene no céu. Por Cristo nosso Senhor. Amém!"}, {"title": "Pelas vocações", "text": "I. Ó Maria, que chamastes os nossos Sete Santos\nPais e, ao longo dos séculos, tantos outros homens e\nmulheres, para servir a Cristo e aos irmãos, inspirando-\nse no Evangelho e no vosso exemplo, concedei-nos\nhoje também a graça de muitas vocações para a vossa\nOrdem.\n Fazei que a nossa Família seja sempre a casa por\nvós abençoada e amada, de modo que, quantos a\nescolherem como sua morada, vivam generosamente os\nensinamentos do vosso Filho e se coloquem\ninteiramente a serviço da Igreja e dos seres humanos.\nAmém!\n II. Senhor, humildemente vos pedimos: concedei\nque os Servos e as Servas de Santa Maria vivam uma\nvida fraterna e santa e se tornem neste mundo\ntestemunhas de bondade e de misericórdia.\n\n Que as nossas comunidades e fraternidades sejam\ncaminho, ponte e sinal para os que desejam ir ao vosso\nencontro; sejam luz para os que precisam de luz, paz\npara os que buscam a paz e serviço para os que dele\nprecisam; sejam apelo à oração, fraternidade que\nliberta os seres humanos da solidão e lugar onde a luz\ndo Ressuscitado se irradie em formas de vida humana.\nAmém!"}, {"title": "Pelas missões", "text": "Ó Virgem Maria, Rainha dos apóstolos,\nchamastes os nossos Santos Primeiros Pais ao\nseguimento do vosso Filho Jesus e os enviastes no meio\ndos homens para testemunhar o Evangelho em\ncomunhão fraterna.\n Acompanhai e guiai os nossos irmãos e irmãs que\nassumiram o compromisso de irradiar no mundo o\ncarisma da nossa vocação, e intercedei por nós junto ao\nSenhor, para que a grande messe da humanidade possa\ncontar com operários dignos e em número suficiente\npara a colheita. Amém!"}, {"title": "Pelos doentes", "text": "Ó Deus misericordioso, salvação eterna dos que\ncreem, escutai as preces que vos fazemos por...[diz-se\no nome do(a) doente] e fazei que ele (ela) volte ao\nconvívio da vossa Igreja onde possa render-vos graças\n\ne proclamar as vossas maravilhas. Por Cristo nosso\nSenhor. Amém!"}, {"title": "Pelos defuntos", "text": "Antífona\n\n Senhor, fonte de luz, iluminai as minhas trevas.\nLibertados pelo amor de Cristo, possamos esperar a\nvida eterna. Outros me haviam falado de vós, mas\nagora meus olhos vos veem.\n\nSalmo 129\n- Das profundezas, Senhor, a ti eu clamo. *\n Senhor, escuta o meu apelo;\n- teus ouvidos estejam bem atentos *\n ao clamor de minha súplica.\n- Se levares em conta, Senhor, nossas faltas, *\n Senhor, quem poderá subsistir?\n- Mas em ti encontra-se o perdão, *\n eu temo e espero.\n\n- Minha alma espera no Senhor, *\n em sua palavra tenho confiança;\n- minha alma espera pelo Senhor, *\n mais confiante do que o vigia\n\n esperando pela aurora.\n\n- Que o vigia espere pela aurora, *\n e Israel pelo Senhor.\n\n- Porque no Senhor encontra-se a graça, *\n copiosa redenção\n- é ele quem redimirá Israel *\n de todas as suas faltas.\nOração [reza-se uma das seguintes orações]\n I. Pai Santo, luz e salvação dos homens, vós nos\nrevelastes as riquezas do vosso amor através do mundo\ncriado e, sobretudo, em vosso próprio Filho.\n Concedei, pois, que nossos irmãos e irmãs\ndefuntos, que viveram em comunhão fraterna na busca\nda vossa face, possam entrar em vossa morada e\ncontemplar o que sempre desejaram ver.\n E a nós, que continuamos a buscar-vos, concedei a\ngraça de fortalecer a nossa esperança e de recobrar\nnovo alento no caminho que conduz à terra dos vivos.\nPor Cristo nosso Senhor. Amém!\n II. Ó Deus, em Cristo vosso Filho, destes aos\nhomens, peregrinos nesta terra, o penhor de uma segura\nesperança e a fonte da água viva.\n Sede benigno com os nossos irmãos e irmãs que,\ntendo completado sua peregrinação terrena, partiram\ndeste mundo rumo à morada eterna.\n\n Saciai com vosso amor a sede que eles têm de vós\ne introduzi-os em vossa casa, onde sejam festivamente\nrecebidos no convívio dos santos. Por Cristo nosso\nSenhor. Amém!\n\n III. Senhor, vós conheceis a fraqueza humana e,\ncomo Pai bondoso e rico em misericórdia, não vos\ncansais de esperar nosso retorno para abraçar-nos e dar-\nnos o vosso perdão.\n Tende piedade dos nossos irmãos e irmãs que,\ninvestidos pelo vento da morte, tirastes do meio de nós.\nDai-lhes, Senhor, descanso junto a vós, para que, com\na Virgem Mãe e com os irmãos já transfigurados por\nvosso amor, possam louvar eternamente a vossa\nmisericórdia. Por Cristo nosso Senhor. Amém!"}]}};
+/* END SCRIPT BLOCK: legacy-block-2 */
+
+/* BEGIN SCRIPT BLOCK: legacy-block-3 */
+// ===================== helpers =====================
+const MONTHS = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const WEEKDAYS = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+
+function todayInfo(){
+  const d = new Date();
+  return { day:d.getDate(), month:d.getMonth()+1, weekday:WEEKDAYS[d.getDay()], monthName:MONTHS[d.getMonth()] };
+}
+
+function findSaintForToday(){
+  const t = todayInfo();
+  return SANTORAL.find(s => s.day === t.day && s.month === t.month) || null;
+}
+
+function findNextSaint(){
+  const t = todayInfo();
+  const withKey = SANTORAL.map(s => ({...s, key: s.month*100+s.day}));
+  const todayKey = t.month*100+t.day;
+  const future = withKey.filter(s=>s.key > todayKey).sort((a,b)=>a.key-b.key);
+  if(future.length) return future[0];
+  return withKey.sort((a,b)=>a.key-b.key)[0];
+}
+
+function escapeHtml(str){
+  return (str||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function showToast(message){
+  const old=document.getElementById('osmToast'); if(old) old.remove();
+  const el=document.createElement('div'); el.id='osmToast'; el.className='toast'; el.textContent=message;
+  document.body.appendChild(el); setTimeout(()=>el.remove(),2200);
+}
+async function shareText(title,text){
+  const payload={title:title,text:text};
+  try{
+    if(navigator.share){ await navigator.share(payload); return; }
+    if(navigator.clipboard){ await navigator.clipboard.writeText(text); showToast('Texto copiado para a área de transferência.'); return; }
+  }catch(e){ if(e && e.name==='AbortError') return; }
+  try{
+    const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); showToast('Texto copiado para a área de transferência.');
+  }catch(e){ showToast('Não foi possível partilhar neste dispositivo.'); }
+}
+function shareSaint(id){
+  const x=SANTORAL.find(v=>v._id===id); if(!x) return;
+  let text=`${x.title}\n${x.date}\n\n${x.bio}`;
+  if(x.prayer) text+=`\n\nOração\n${x.prayer}`;
+  text+='\n\nLiturgia OSM';
+  shareText(x.title,text);
+}
+function sharePrayer(title,text){ shareText(title,`${title}\n\n${text}\n\nLiturgia OSM`); }
+
+// render a prayer block, coloring "D." / "T." rubrics
+function renderPrayer(text){
+  const esc = escapeHtml(text);
+  return esc.replace(/^(D\.|T\.|C\.|L\.\d?|L\.)/gm, '<span class="rubric">$1</span>');
+}
+
+// ===================== calendário litúrgico básico =====================
+function easterSunday(year){
+  const a=year%19, b=Math.floor(year/100), c=year%100, d=Math.floor(b/4), e=b%4;
+  const f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3);
+  const h=(19*a+b-d-g+15)%30, i=Math.floor(c/4), k=c%4;
+  const l=(32+2*e+2*i-h-k)%7, m=Math.floor((a+11*h+22*l)/451);
+  const month=Math.floor((h+l-7*m+114)/31)-1;
+  const day=((h+l-7*m+114)%31)+1;
+  return new Date(year,month,day,12,0,0);
+}
+function isPaschalSeason(date=new Date()){
+  const easter=easterSunday(date.getFullYear());
+  const pentecost=new Date(easter); pentecost.setDate(easter.getDate()+49); pentecost.setHours(23,59,59,999);
+  return date>=easter && date<=pentecost;
+}
+function dailyPrayerSuggestion(date=new Date()){
+  return isPaschalSeason(date)
+    ? {key:'rainha', label:'Tempo Pascal', note:'No Tempo Pascal, a tradição reza o Rainha do Céu (Regina Caeli).'}
+    : {key:'anjo', label:'Tempo do ano', note:'Fora do Tempo Pascal, a tradição reza o Anjo do Senhor (Angelus).'};
+}
+
+// ===================== state =====================
+const APP_VERSION = '4.9.33';
+const storedTab = localStorage.getItem('osmLastTab');
+const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
+const dailySuggestion = dailyPrayerSuggestion();
+let pendingSharePrayer = null;
+let state = { tab: 'hoje', angelus:dailySuggestion.key, detailId:null, search:'', devo:null, devoSub:null };
+let readerScale = parseFloat(localStorage.getItem('osmReaderScale') || '1');
+let lightMode = localStorage.getItem('osmTheme') === 'light';
+function applyPreferences(){
+  readerScale = Math.max(.76, Math.min(1.56, readerScale));
+  document.documentElement.style.setProperty('--reader-scale', readerScale.toFixed(2));
+  document.body.classList.toggle('light-mode', lightMode);
+  const b=document.getElementById('themeBtn'); if(b) b.textContent = lightMode ? '☾' : '☼'; document.querySelectorAll('.reader-scale-value').forEach(rv=>rv.textContent=Math.round(readerScale*100)+'%');
+}
+function adjustFont(delta){
+  readerScale=Math.max(.76,Math.min(1.56,readerScale+delta));
+  localStorage.setItem('osmReaderScale',readerScale);
+  applyPreferences();
+}
+function resetFont(){readerScale=1;localStorage.setItem('osmReaderScale',readerScale);applyPreferences();}
+function openMainMenu(){const o=document.getElementById('mainMenuOverlay');if(o){o.classList.add('open');o.setAttribute('aria-hidden','false');applyPreferences();if(typeof updateBackButton==='function')updateBackButton();}}
+function closeMainMenu(){const o=document.getElementById('mainMenuOverlay');if(o){o.classList.remove('open');o.setAttribute('aria-hidden','true');if(typeof updateBackButton==='function')updateBackButton();}}
+function toggleTheme(){ lightMode=!lightMode; localStorage.setItem('osmTheme', lightMode?'light':'dark'); applyPreferences(); }
+
+
+function setTab(tab){
+  if(tab==='vida') tab='hoje';
+  const allowed=['hoje','calendario','santoral','liturgia','oracoes','biblioteca','sobre'];
+  if(!allowed.includes(tab)) return;
+  state.tab=tab;
+  localStorage.setItem('osmLastTab',tab);
+  state.detailId=null;state.devo=null;state.devoSub=null;
+  state.prayerSection='praticas';state.prayerCategory=null;memoriaSelectedDate=null;
+  render();window.scrollTo(0,0);
+}
+
+function openDetail(id){
+  const saint=SANTORAL.find(x=>x._id===id||x.id===id);
+  if(!saint) return;
+  if(state.detailId===null||state.detailId===undefined){
+    state.detailOriginTab=state.tab==='vida'?'hoje':(state.tab||'hoje');
+    state.detailOriginScroll=window.scrollY||0;
+  }
+  state.detailId=saint._id;state.devo=null;state.devoSub=null;
+  render();window.scrollTo(0,0);
+}
+
+function closeDevo(){
+  if(state.devoSub !== null){ state.devoSub = null; }
+  else { state.devo = null; }
+  render();
+  window.scrollTo(0,0);
+}
+
+
+function formatLiturgicalDate(date=new Date()){
+  return date.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+function dailyOSMInfo(date=new Date()){
+  const matches=SANTORAL.filter(x=>x.day===date.getDate() && x.month===date.getMonth()+1);
+  return {date, matches, prayer:dailyPrayerSuggestion(date)};
+}
+function dailyOSMCard(){
+  const d=dailyOSMInfo();
+  const feast=d.matches[0];
+  if(feast){
+    return `<div class="daily-panel fade-in">
+      <div class="daily-kicker">Liturgia OSM do dia</div>
+      <h3>${escapeHtml(feast.title)}</h3>
+      <div class="daily-meta">${escapeHtml(feast.date)} · ${escapeHtml(feast.rank||'Celebração própria')}</div>
+      <div class="daily-actions">
+        <button onclick="openDetail(${feast._id})">Abrir celebração</button>
+        <button onclick="shareSaint(${feast._id})">Partilhar</button>
+      </div>
+    </div>`;
+  }
+  const next=findNextSaint();
+  return `<div class="daily-panel fade-in">
+    <div class="daily-kicker">Liturgia OSM do dia</div>
+    <h3>Dia sem celebração própria OSM</h3>
+    <div class="daily-meta">Consulte o calendário litúrgico local para a celebração universal do dia. A próxima memória própria cadastrada é ${escapeHtml(next.title)}, em ${escapeHtml(next.date)}.</div>
+    <div class="daily-actions"><button onclick="setTab('calendario')">Abrir calendário OSM</button></div>
+  </div>`;
+}
+
+// ===================== views =====================
+function viewHoje(){
+  const today=todayInfo();
+  const saint=findSaintForToday();
+  const next=saint?null:findNextSaint();
+  const celebration=saint||next;
+  const online=navigator.onLine!==false;
+  let celebrationCard='<div class="empty-state">Não há celebração servita cadastrada para hoje.</div>';
+  if(celebration){
+    const label=saint?'Celebração de hoje':'Próxima celebração OSM';
+    celebrationCard='<button class="home-celebration card fade-in" onclick="openDetail('+celebration._id+')" aria-label="Abrir '+escapeHtml(celebration.title)+'">'+
+      saintImageHtml(celebration,false)+
+      '<span class="home-celebration-text"><span class="rank">'+label+'</span><b>'+escapeHtml(celebration.title)+'</b><span class="date-line">'+escapeHtml(celebration.date)+'</span></span><span class="chev">›</span></button>'+
+      '<div class="hub-shortcuts" aria-label="Atalhos da celebração">'+
+      '<button onclick="openSaintSection('+celebration._id+',\'vida\')">Vida</button>'+
+      '<button onclick="openSaintSection('+celebration._id+',\'liturgia\')">Liturgia</button>'+
+      '<button onclick="openSaintSection('+celebration._id+',\'oracao\')">Oração</button></div>';
+  }
+  const prayer=dailyPrayerSuggestion();
+  return '<div class="connection-strip '+(online?'':'offline')+'"><span class="connection-dot"></span><strong>'+(online?'Aplicativo disponível':'Modo offline ativo')+'</strong><span>Conteúdo salvo no aparelho</span></div>'+
+    '<section class="liturgical-hero home-hero fade-in"><div class="liturgical-kicker">Ordem dos Servos de Maria</div><div class="home-date-line"><strong>'+today.day+'</strong><span>'+escapeHtml(MONTHS[today.month-1])+'</span></div><div class="liturgical-title">Ao lado da Mãe, aos pés da Cruz</div><div class="liturgical-sub">'+escapeHtml(today.weekday)+'</div></section>'+
+    '<div class="section-title home-heading">Celebração Servita</div>'+celebrationCard+
+    '<div class="section-title home-heading">Encontrar uma celebração</div><div class="home-actions fade-in">'+
+      '<button class="home-action" onclick="setTab(\'calendario\')"><span class="home-action-icon">▦</span><b>Calendário</b><small>Escolha qualquer data</small></button>'+
+      '<button class="home-action" onclick="setTab(\'santoral\')"><span class="home-action-icon">✦</span><b>Santoral</b><small>Todos os santos e beatos OSM</small></button></div>'+
+    '<div class="section-title home-heading">Liturgia de hoje</div><div class="presidency-grid fade-in">'+
+      '<button class="presidency-card" onclick="openLiturgiaSection(\'missa\')"><span class="presidency-icon">✠</span><b>Missa do dia</b><small>Consulta online com cópia offline</small></button>'+
+      '<button class="presidency-card" onclick="openLiturgiaSection(\'horas\')"><span class="presidency-icon">☷</span><b>Liturgia das Horas</b><small>Ofício do dia e textos próprios OSM</small></button></div>'+
+    '<div class="section-title home-heading">Oração diária</div><div class="home-prayer-card card fade-in"><div><span class="rank">'+escapeHtml(prayer.label)+'</span><h3>'+(state.angelus==='rainha'?'Rainha do Céu':'O Anjo do Senhor')+'</h3><p>'+escapeHtml(prayer.note)+'</p></div><button class="action-btn" onclick="openDailyPrayer480(\''+escapeHtml(state.angelus)+'\')">Rezar</button></div>'+
+    '<p class="offline-note"><b>Observação:</b> textos já baixados ficam disponíveis sem internet; a primeira consulta da Missa exige conexão.</p>';
+}
+
+function officeDateKey(s){return String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0');}
+function officeRecordForSaint(s){
+  if(!s||!OFICIOS_OSM?.celebracoes)return null;
+  const key=officeDateKey(s),record=OFICIOS_OSM.celebracoes[key];
+  return record&&Number(record.id)===Number(s.id)?record:null;
+}
+function saintHasOffice(s){
+  const record=officeRecordForSaint(s);
+  return !!record&&record.tipo_material!=='sem_material_proprio'&&!!record.material;
+}
+function officeClassificationForSaint(s){
+  const record=officeRecordForSaint(s);
+  if(!record)return '';
+  if(record.tipo_material==='oficio_proprio')return 'Ofício próprio';
+  if(record.tipo_material==='textos_proprios'){
+    const hours=record.material?.horas||{};
+    const keys=Object.entries(hours).filter(([,value])=>value&&(typeof value==='string'?value:value.texto||value.text)).map(([key])=>key);
+    if(keys.length===1&&keys[0]==='oficio_leituras')return 'Ofício das Leituras próprio';
+    if(keys.length===2&&keys.includes('laudes')&&keys.includes('vesperas'))return 'Laudes e Vésperas próprias + Comum';
+    return 'Elementos próprios + Comum';
+  }
+  return 'Sem material próprio';
+}
+const OFFICE_HOURS=[
+  ['invitatorio','Invitatório'],
+  ['oficio','Ofício das Leituras'],
+  ['laudes','Laudes'],
+  ['horaMedia','Hora Média'],
+  ['vesperas','Vésperas']
+];
+function officeHoursForSaint(s){
+  const record=officeRecordForSaint(s),hours=record?.material?.horas||{};
+  const sourceKeys={invitatorio:'invitatorio',oficio:'oficio_leituras',laudes:'laudes',horaMedia:'hora_media',vesperas:'vesperas'};
+  const present=OFFICE_HOURS.filter(([key])=>{
+    const item=hours[sourceKeys[key]];
+    return !!(item&&(typeof item==='string'?item:item.texto||item.text));
+  });
+  if(present.length)return present;
+  const material=record?.material||{};
+  return material.secoes?.length||material.oficio_leituras||material.oracao?[['oficio','Textos próprios']]:[];
+}
+function openSantoralOfficeHour(saintId,hour){
+  const saint=SANTORAL.find(x=>x._id===saintId);
+  const record=officeRecordForSaint(saint);
+  if(!record||!saintHasOffice(saint)) return;
+  const available=officeHoursForSaint(saint);
+  const actual=available.some(([key])=>key===hour)?hour:(available[0]?.[0]||'oficio');
+  openServite('oficio:'+record.id+':'+actual);
+  const label=(available.find(x=>x[0]===actual)||OFFICE_HOURS.find(x=>x[0]===actual)||[])[1]||'Ofício';
+  const title=document.getElementById('serviteTitle');
+  if(title) title.textContent=(saint?saint.title+' — ':'')+label;
+}
+function calendarCelebrationRow(s){
+  const hasOffice=saintHasOffice(s);
+  return `<article class="calendar-celebration-row">
+    ${saintImageHtml(s,false)}
+    <div class="daynum">${s.day}</div>
+    <div class="rowtext">
+      <div class="rowtitle">${escapeHtml(s.title)}</div>
+      <div class="rowrank">${escapeHtml(s.rank||'Celebração OSM')}${hasOffice?' · '+escapeHtml(officeClassificationForSaint(s)):oficiosReady?' · Sem material próprio':' · Ofício indisponível'}</div>
+    </div>
+    <div class="calendar-entry-actions">
+      <button onclick="openSaint(${s._id})">Santoral</button>
+      ${hasOffice?`<button class="office" onclick="openSantoralOfficeHour(${s._id},'${officeHoursForSaint(s)[0]?.[0]||'oficio'}')">Ofício</button>`:''}
+    </div>
+  </article>`;
+}
+
+function viewSantoral(){
+  if(state.detailId !== null){
+    return viewDetail(state.detailId);
+  }
+  const q = state.search.trim().toLowerCase();
+  const filtered = q ? SANTORAL.filter(s => s.title.toLowerCase().includes(q) || s.date.toLowerCase().includes(q)) : SANTORAL;
+
+  let listHtml = '';
+  if(!filtered.length){
+    listHtml = `<div class="no-results">Nenhum santo encontrado para "${escapeHtml(state.search)}".</div>`;
+  } else if(q){
+    listHtml = filtered.map(rowHtml).join('');
+  } else {
+    // group by month
+    for(let m=1; m<=12; m++){
+      const items = filtered.filter(s=>s.month===m);
+      if(!items.length) continue;
+      listHtml += `<div class="month-group"><div class="month-label">${MONTHS[m-1]}</div>${items.map(rowHtml).join('')}</div>`;
+    }
+  }
+
+  return `
+    <div class="section-title">Calendário dos Santos</div>
+    <p style="color:var(--text-muted); font-size:15.5px; line-height:1.6; margin:-4px 0 18px;">
+      Memórias e solenidades próprias da Ordem dos Servos de Maria, com hino, biografia e oração de cada santo, beato e beata.
+    </p>
+    <div class="search-wrap">
+      <input class="search-input" type="text" data-live-search="santoral" placeholder="Buscar por nome ou data..." value="${escapeHtml(state.search)}" oninput="liveSearchRender('santoral',this)">
+    </div>
+    ${listHtml}
+  `;
+}
+
+function rowHtml(s){
+  const hasOffice=saintHasOffice(s);
+  return `
+    <div class="saint-row" onclick="openDetail(${s._id})">
+      ${saintImageHtml(s,false)}
+      <div class="daynum">${s.day}</div>
+      <div class="rowtext">
+        <div class="rowtitle">${escapeHtml(s.title)}</div>
+        <div class="rowrank">${escapeHtml(s.rank||'')}${hasOffice ? ' · Ofício próprio' : ''}</div>
+      </div>
+      ${hasOffice ? `<span class="office-list-badge">Ofício</span>` : ''}
+      <div class="chev">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+    </div>`;
+}
+
+
+function liveSearchRender(kind, el){
+  const start=el.selectionStart, end=el.selectionEnd;
+  if(kind==='santoral'){ state.search=el.value; state.alpha=''; }
+  else { globalQuery=el.value; }
+  render();
+  requestAnimationFrame(function(){
+    const n=document.querySelector('input[data-live-search="'+kind+'"]');
+    if(n){
+      n.focus({preventScroll:true});
+      try{ n.setSelectionRange(start,end); }catch(e){}
+    }
+  });
+}
+
+function onSearch(val){ state.search=val; render(); }
+
+function viewDetail(id){
+  const s = SANTORAL.find(x=>x._id===id);
+  if(!s) return `<div class="no-results">Não encontrado.</div>`;
+  return `
+    <button class="back-btn" onclick="closeDetail()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
+      Voltar
+    </button>
+    ${saintImageHtml(s,true)}
+    <div class="detail-header fade-in">
+      <div class="rank">${escapeHtml(s.rank||'')}</div>
+      <h2>${escapeHtml(s.title)}</h2>
+      <div class="date-line">${escapeHtml(s.date)}</div>
+      <div class="action-row"><button class="action-btn" onclick="shareSaint(${s._id})">Partilhar celebração</button></div>
+      <div class="detail-divider"></div>
+    </div>
+    <div class="bio-text fade-in">${escapeHtml(s.bio)}</div>
+    ${s.prayer ? `
+    <div class="prayer-card fade-in">
+      <div class="label">Oração</div>
+      <div class="text">${escapeHtml(s.prayer)}</div>
+    </div>` : ''}
+    ${saintHasOffice(s) ? `
+    <div class="section-title" style="margin-top:28px;">Liturgia das Horas</div>
+    <div class="card office-hours-card fade-in">
+      <div class="office-hours-intro">${officeClassificationForSaint(s)}</div>
+      <div class="office-hours-grid">
+        ${officeHoursForSaint(s).map(([key,label])=>`<button class="office-hour-btn" onclick="openSantoralOfficeHour(${s._id},'${key}')">${label}<span>›</span></button>`).join('')}
+      </div>
+    </div>` : ''}
+  `;
+}
+
+function closeDetail(){
+  if(state.detailId===null||state.detailId===undefined) return;
+  const origin=['hoje','calendario','santoral','liturgia','oracoes'].includes(state.detailOriginTab)?state.detailOriginTab:'santoral';
+  state.detailId=null;state.devo=null;state.devoSub=null;
+  state.tab=origin;state.prayerSection='praticas';
+  localStorage.setItem('osmLastTab',origin);
+  render();requestAnimationFrame(function(){window.scrollTo(0,state.detailOriginScroll||0);});
+}
+function viewOracoesBase480(){
+  if(state.devo) return viewDevoDetail(state.devo);
+
+  return `
+    
+    <div class="section-title">Práticas marianas diárias</div>
+    <div class="card fade-in">
+      <div class="toggle-row">
+        <button class="toggle-btn ${state.angelus==='anjo'?'active':''}" onclick="openDailyPrayer480('anjo')">O Anjo do Senhor</button>
+        <button class="toggle-btn ${state.angelus==='rainha'?'active':''}" onclick="openDailyPrayer480('rainha')">Rainha do Céu</button>
+      </div>
+      <div class="prayer-block">${renderPrayer(state.angelus==='anjo' ? PRAYERS.daily.anjo : PRAYERS.daily.rainha)}</div>
+    </div>
+
+    <div class="section-title">Homenagens marianas</div>
+    <div class="card fade-in" style="padding:6px 16px;">
+      ${DEVO_LIST.map(devoRowHtml).join('')}
+    </div>
+
+    <div class="section-title">Recursos de oração servita</div>
+    <div class="quick-grid fade-in">
+      <button class="quick-card" onclick="openServite('rosario')"><b>Rosário</b><span>Rosário guiado</span></button>
+      <button class="quick-card" onclick="openServite('regra')"><b>Regra OSSM</b><span>Espiritualidade da Ordem Secular</span></button>
+    </div>
+
+    <div class="section-title">Orações várias</div>
+    <div class="card fade-in" style="padding:6px 16px;">
+      ${VARIAS_LIST.map(devoRowHtml).join('')}
+    </div>
+  `;
+}
+
+let dailyPrayerOpen480 = null;
+
+function openDailyPrayer480(which){
+  dailyPrayerOpen480 = which;
+  state.tab = 'oracoes';
+  state.devo = null;
+  state.devoSub = null;
+  state.angelus = which;
+  localStorage.setItem('osmLastTab','oracoes');
+  render();
+  window.scrollTo(0,0);
+}
+function closeDailyPrayer480(){
+  dailyPrayerOpen480 = null;
+  render();
+  window.scrollTo(0,0);
+}
+function viewDailyPrayer480(which){
+  const isRegina = which === 'rainha';
+  const title = isRegina ? 'Rainha do Céu (Regina Caeli)' : 'O Anjo do Senhor';
+  const text = isRegina ? PRAYERS.daily.rainha : PRAYERS.daily.anjo;
+  return `
+    <div class="detail-header fade-in">
+      <button class="back-btn" onclick="closeDailyPrayer480()">←</button>
+      <div><div class="detail-title">${title}</div><div class="detail-date">${isRegina?'Tempo Pascal':'Prática mariana diária'}</div></div>
+    </div>
+    <div class="card fade-in">
+      <div class="prayer-block">${renderPrayer(text)}</div>
+    </div>`;
+}
+function viewOracoes(){
+  if(dailyPrayerOpen480) return viewDailyPrayer480(dailyPrayerOpen480);
+  return viewOracoesBase480();
+}
+
+
+function setAngelus(which){ state.angelus = which; render(); }
+
+// ---- devotion detail router ----
+function viewDevoDetail(key){
+  if(key.startsWith('varias')){
+    const idx = parseInt(key.slice('varias'.length));
+    const item = PRAYERS.devotions.variasHome[idx];
+    return simpleTextDetail(item.title, '', item.text);
+  }
+  if(key === 'coroa') return simpleTextDetail('Coroa de Nossa Senhora das Dores', 'Sete dores de Maria', PRAYERS.devotions.coroa);
+  if(key === 'stabat') return simpleTextDetail('Stabat Mater', 'Hino da Mãe dolorosa', PRAYERS.devotions.stabat);
+  if(key === 'vigilia') return viewVigilia();
+  if(key === 'via_matris') return viewViaMatris();
+  if(key === 'ladainhas') return viewLadainhas();
+  return `<div class="no-results">Não encontrado.</div>`;
+}
+
+function backToOracoes(){ state.devo=null; state.devoSub=null; render(); window.scrollTo(0,0); }
+
+function simpleTextDetail(title, sub, text, backFn){
+  pendingSharePrayer={title,text};
+  const back = backFn || 'backToOracoes()';
+  return `
+    <button class="back-btn" onclick="${back}">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
+      Voltar
+    </button>
+    <div class="detail-header fade-in">
+      <h2 style="font-size:26px;">${escapeHtml(title)}</h2>
+      ${sub ? `<div class="date-line">${escapeHtml(sub)}</div>` : ''}
+      <div class="action-row"><button class="action-btn" id="sharePrayerBtn">Partilhar oração</button></div>
+      <div class="detail-divider"></div>
+    </div>
+    <div class="card fade-in">
+      <div class="prayer-block">${renderPrayer(text)}</div>
+    </div>
+  `;
+}
+
+// ---- Vigília (2 formulas) ----
+function viewVigilia(){
+  if(state.devoSub){
+    const f = PRAYERS.devotions.vigilia[state.devoSub];
+    const title = state.devoSub === 'formula1' ? 'Primeira Fórmula' : 'Segunda Fórmula';
+    return simpleTextDetail(title, 'Vigília de Nossa Senhora', f, "openDevo('vigilia')");
+  }
+  return `
+    <button class="back-btn" onclick="backToOracoes()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
+      Voltar
+    </button>
+    <div class="detail-header fade-in">
+      <h2 style="font-size:26px;">Vigília de Nossa Senhora</h2>
+      <div class="date-line">Uma das homenagens mais antigas dos Servos a Santa Maria</div>
+      <div class="detail-divider"></div>
+    </div>
+    <div class="card fade-in" style="padding:6px 16px;">
+      <div class="saint-row" onclick="openDevo('vigilia','formula1')">
+        <div class="rowtext"><div class="rowtitle">Primeira Fórmula</div><div class="rowrank">Santa Maria, Senhora dos seus Servos</div></div>
+        <div class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+      </div>
+      <div class="saint-row" onclick="openDevo('vigilia','formula2')">
+        <div class="rowtext"><div class="rowtitle">Segunda Fórmula</div><div class="rowrank">Santa Maria, Serva do Senhor</div></div>
+        <div class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+      </div>
+    </div>
+  `;
+}
+
+// ---- Via Matris (intro + 7 stations) ----
+function viewViaMatris(){
+  const vm = PRAYERS.devotions.via_matris;
+  if(state.devoSub !== null){
+    const st = vm.stations[state.devoSub];
+    return simpleTextDetail(st.title, 'Via Matris — Novena das Dores', st.text, "openDevo('via_matris')");
+  }
+  const rows = vm.stations.map((s,i)=>`
+    <div class="saint-row" onclick="openDevo('via_matris', ${i})">
+      <div class="daynum" style="font-size:16px;">${i+1}</div>
+      <div class="rowtext"><div class="rowtitle">${escapeHtml(s.title.split('—')[1]||s.title)}</div></div>
+      <div class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+    </div>`).join('');
+  return `
+    <button class="back-btn" onclick="backToOracoes()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
+      Voltar
+    </button>
+    <div class="detail-header fade-in">
+      <h2 style="font-size:26px;">Via Matris</h2>
+      <div class="date-line">Novena perpétua de Nossa Senhora das Dores</div>
+      <div class="detail-divider"></div>
+    </div>
+    <div class="card fade-in" style="margin-bottom:14px;">
+      <div class="bio-text" style="font-size:16px;">${escapeHtml(vm.intro.slice(0,420))}…</div>
+    </div>
+    <div class="section-title">As sete dores</div>
+    <div class="card fade-in" style="padding:6px 16px;">${rows}</div>
+  `;
+}
+
+// ---- Ladainhas (3 items) ----
+function viewLadainhas(){
+  const list = PRAYERS.devotions.ladainhas;
+  if(state.devoSub !== null){
+    const l = list[state.devoSub];
+    return simpleTextDetail(l.title, 'Ladainha mariana', l.text, "openDevo('ladainhas')");
+  }
+  const rows = list.map((l,i)=>`
+    <div class="saint-row" onclick="openDevo('ladainhas', ${i})">
+      <div class="rowtext"><div class="rowtitle">${escapeHtml(l.title)}</div></div>
+      <div class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+    </div>`).join('');
+  return `
+    <button class="back-btn" onclick="backToOracoes()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
+      Voltar
+    </button>
+    <div class="detail-header fade-in">
+      <h2 style="font-size:26px;">Ladainhas Marianas</h2>
+      <div class="date-line">Três ladainhas próprias da espiritualidade servita</div>
+      <div class="detail-divider"></div>
+    </div>
+    <div class="card fade-in" style="padding:6px 16px;">${rows}</div>
+  `;
+}
+
+function viewSobre(){
+  return `
+    <div class="section-title">Sobre o aplicativo</div>
+    <div class="card fade-in about-text">
+      <p><b>Liturgia OSM</b> reúne conteúdos próprios da Ordem dos Servos de Maria, favorecendo a oração, a memória litúrgica, a espiritualidade mariana e o acesso aos principais recursos servitas.</p>
+    </div>
+
+    <div class="section-title">Criação do aplicativo</div>
+    <div class="card fade-in credit-list app-creator-card">
+      <div><b>Criação:</b> WENDEL MASSAYUKI SANTOS OKUYAMA</div>
+      <div><b>Aplicativo:</b> Liturgia OSM</div>
+      <div><b>Versão:</b> ${APP_VERSION}</div>
+    </div>
+
+    <div class="section-title">Redes sociais da Ordem</div>
+    <div class="social-links fade-in">
+      <a class="social-link" href="https://youtube.com/@savosmbrasil?si=Pcn71bJ212PwwLuY" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event, this.href)">
+        <span class="social-icon">▶</span>
+        <span><div class="social-label">YouTube — Servos de Maria Brasil</div><div class="social-sub">@savosmbrasil</div></span>
+      </a>
+      <a class="social-link" href="https://www.instagram.com/ordem.servitas?igsh=OHI4cGg3c3l2NGIx&igsi=OHI4cGg3c3l2NGIx" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event, this.href)">
+        <span class="social-icon">◎</span>
+        <span><div class="social-label">Instagram — Ordem dos Servitas</div><div class="social-sub">@ordem.servitas</div></span>
+      </a>
+    </div>
+
+    <div class="section-title">Ficha da edição</div>
+    <div class="card fade-in credit-list">
+      <div><b>Título original:</b> "Preghiere"</div>
+      <div><b>Organização:</b> Consiglio Nazionale OSSM, Roma, 1988</div>
+      <div><b>Tradução:</b> frei José M. Milanez, osm (in memoriam)</div>
+      <div><b>Edição:</b> 3ª edição revisada, 2024</div>
+      <div><b>Publicação:</b> Ordem dos Servos de Maria — Província São Peregrino do Brasil</div>
+      <div><b>Sede:</b> Cúria Provincial dos Servos de Maria, São José dos Campos - SP</div>
+      <div><b>Site:</b> servitasbra.org</div>
+    </div>
+  `;
+}
+
+// ===================== router =====================
+function openExternalLink(event, url){
+  if(event) event.preventDefault();
+  if(!navigator.onLine){
+    showToast('Este link precisa de conexão com a internet.');
+    return false;
+  }
+  try{
+    const browser = window.Capacitor?.Plugins?.Browser;
+    if(browser?.open){
+      browser.open({url});
+      return false;
+    }
+  }catch(error){
+    console.warn("Não foi possível usar o navegador nativo.", error);
+  }
+  window.open(url, "_blank", "noopener,noreferrer");
+  return false;
+}
+
+let MEMORIA_LITURGICA={};
+let memoriaSelectedDate=null;
+function setPrayerSection(section){
+  state.prayerSection=section;
+  state.devo=null; state.devoSub=null; memoriaSelectedDate=null;
+  render(); window.scrollTo(0,0);
+}
+function openMemoriaLiturgica(date){
+  state.prayerSection='memoria'; state.devo=null; state.devoSub=null;
+  memoriaSelectedDate=date; render(); window.scrollTo(0,0);
+}
+function closeMemoriaLiturgica(){
+  memoriaSelectedDate=null; render(); window.scrollTo(0,0);
+}
+function viewMemoriaLiturgica(){
+  const data=MEMORIA_LITURGICA;
+  if(!Array.isArray(data.memory_dates)) return '<div class="empty-state">Carregando a Memória Litúrgica…</div>'; 
+  if(memoriaSelectedDate){
+    const item=data.celebrations.find(x=>x.date===memoriaSelectedDate);
+    const saint=SANTORAL.find(s=>String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')===memoriaSelectedDate);
+    if(!data.memory_dates.includes(memoriaSelectedDate)||!saint) return '<div class="empty-state">Não há Memória Litúrgica cadastrada para esta celebração.</div>';
+    const heading=saint.title,life=item?.breve_vida||item?.apresentacao||'',prayer=item?.oracao_propria||saint.prayer||'';
+    const textBlock=(title,text)=>text?`<div class="section-title">${title}</div><div class="card fade-in"><div class="prayer-block" style="white-space:pre-wrap;">${escapeHtml(text)}</div></div>`:'';
+    const commonSource=`<p class="reader-note">Fonte dos textos comuns: ${escapeHtml(data.source)}.</p>`;
+    const prayerSource=item?.oracao_propria?'Livro de Oração dos Servos de Maria, seção Memória Litúrgica.':'Santoral da Ordem.';
+    return `<button class="back-btn" onclick="closeMemoriaLiturgica()">← Voltar à Memória Litúrgica</button>
+      <div class="detail-header fade-in"><h2>${escapeHtml(heading)}</h2><div class="date-line">${escapeHtml(saint.date)}</div></div>
+      ${textBlock('Hino',data.common.hino)}${textBlock('Antífona',data.common.antifona)}${textBlock('Salmo 111',data.common.salmo)}
+      ${commonSource}${(item?.source_note||data.editorial_notes?.[memoriaSelectedDate])?`<p class="reader-note">Nota da fonte: ${escapeHtml(item?.source_note||data.editorial_notes[memoriaSelectedDate])}</p>`:''}${textBlock(item?.breve_vida?'Breve vida':'Apresentação',life)}
+      ${textBlock('Oração própria',prayer)}<p class="reader-note">Fonte da oração: ${escapeHtml(prayerSource)}</p>`;
+  }
+  const rows=data.memory_dates.map(date=>{
+    const saint=SANTORAL.find(s=>String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')===date);
+    return saint?`<div class="saint-row" onclick="openMemoriaLiturgica('${date}')"><div class="daynum">${saint.day}</div><div class="rowtext"><div class="rowtitle">${escapeHtml(saint.title)}</div><div class="rowrank">${escapeHtml(saint.date)} · Livro de Oração</div></div><div class="chev">›</div></div>`:'';
+  }).join('');
+  return `<div class="section-title">Memória Litúrgica</div>
+    <p class="reader-note">Roteiro próprio do Livro de Oração dos Servos de Maria: hino, antífona, salmo, breve vida e oração própria.</p>
+    <div class="card fade-in" style="padding:6px 16px;">${rows}</div>`;
+}
+function viewVida(){
+  if(state.detailId!==null) return viewSantoral();
+  const current=state.tab==='calendario'?'calendario':state.tab==='santoral'?'santoral':'hoje';
+  const tabs=`<div class="toggle-row" aria-label="Seções de Vida">
+    <button class="toggle-btn ${current==='hoje'?'active':''}" onclick="setTab('hoje')">Hoje</button>
+    <button class="toggle-btn ${current==='calendario'?'active':''}" onclick="setTab('calendario')">Calendário</button>
+    <button class="toggle-btn ${current==='santoral'?'active':''}" onclick="setTab('santoral')">Santoral</button>
+  </div>`;
+  return tabs+(current==='calendario'?viewCalendario():current==='santoral'?viewSantoral():viewHoje());
+}
+function setLiturgiaSection(section){state.liturgiaSection=section;render();window.scrollTo(0,0);}
+function viewLiturgia(){
+  const section=state.liturgiaSection||'missa';
+  const switcher=`<div class="toggle-row" aria-label="Seções de Liturgia">
+    <button class="toggle-btn ${section==='missa'?'active':''}" onclick="setLiturgiaSection('missa')">Missa</button>
+    <button class="toggle-btn ${section==='horas'?'active':''}" onclick="setLiturgiaSection('horas')">Liturgia das Horas</button>
+  </div>`;
+  if(section==='horas'){
+    const saints=SANTORAL.filter(s=>saintHasOffice(s));
+    const todayBlock='<div class="card fade-in"><div class="rowtitle">Liturgia das Horas de hoje</div><p class="reader-note">'+escapeHtml(formatLiturgicalDate())+'</p><button class="action-btn" onclick="openServite(\'oficio\')">Abrir Ofício de hoje</button></div>';
+    const officeWarning=!oficiosReady?'<div class="card" role="alert"><p>O cadastro local dos Ofícios está indisponível. A Vida e as orações continuam acessíveis.</p><button class="action-btn" onclick="loadCanonicalOffices()">Tentar carregar os Ofícios</button></div>':'';
+    const ownBlocks='<div class="section-title">Ofícios e textos próprios OSM</div><p class="reader-note">A celebração do santo abre somente as horas disponíveis no texto.</p>'+
+      '<div class="card fade-in" style="padding:6px 16px;">'+saints.map(function(s){return '<div class="saint-row"><div class="daynum">'+s.day+'</div><div class="rowtext"><div class="rowtitle">'+escapeHtml(s.title)+'</div><div class="rowrank">'+escapeHtml(s.date)+'</div></div><div class="office-hours-grid">'+officeHoursForSaint(s).map(function(pair){return '<button class="office-hour-btn" onclick="openSantoralOfficeHour('+s._id+',\''+pair[0]+'\')">'+escapeHtml(pair[1])+' ›</button>';}).join('')+'</div></div>';}).join('')+'</div>';
+    return switcher+'<div class="section-title">Liturgia das Horas</div>'+officeWarning+todayBlock+(oficiosReady?ownBlocks:'');
+  }
+  const d=new Date(), value=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+  return switcher+`<div class="section-title">Missa</div><p class="reader-note">Liturgia da Missa do dia, com consulta por data e cópia offline quando disponível.</p>
+    <div class="card fade-in"><button class="action-btn" onclick="openDailyLiturgy('${value}')">Abrir Missa do dia</button></div>`;
+}
+
+function render(){
+  const view=document.getElementById('view');
+  if(!view) return;
+  if(!santoralReady){
+    view.innerHTML=santoralLoadError
+      ? '<div class="card" role="alert"><h2>Santoral indisponível</h2><p>Não foi possível carregar os dados canônicos. Verifique a conexão e tente novamente.</p><button class="action-btn" onclick="loadCanonicalSantoral();loadCanonicalOffices()">Tentar novamente</button></div>'
+      : '<div class="card" role="status">Carregando os dados litúrgicos canônicos…</div>';
+    return;
+  }
+  let html='';
+  if(state.detailId!==null&&state.detailId!==undefined){
+    html=window.renderCelebrationHub?window.renderCelebrationHub(state.detailId):'<div class="empty-state">Carregando a celebração…</div>';
+  }else if(['vida','hoje','calendario','santoral'].includes(state.tab)) html=viewVida();
+  else if(state.tab==='liturgia') html=viewLiturgia();
+  else if(state.tab==='oracoes') html=viewOracoes();
+  else if(state.tab==='biblioteca') html=viewBiblioteca();
+  else html=viewSobre();
+  view.innerHTML=html;
+  const activeTab=['vida','hoje','calendario','santoral'].includes(state.tab)?'vida':state.tab;
+  document.querySelectorAll('#tabbar .tab-btn').forEach(function(button){
+    const active=button.dataset.tab===activeTab;
+    button.classList.toggle('active',active);
+    button.setAttribute('aria-current',active?'page':'false');
+  });
+  const share=document.getElementById('sharePrayerBtn');
+  if(share&&pendingSharePrayer) share.onclick=function(){sharePrayer(pendingSharePrayer.title,pendingSharePrayer.text);};
+  if(typeof applyMainLanguage==='function') applyMainLanguage();
+  if(typeof updateBackButton==='function') updateBackButton();
+  if(typeof window.updateCelebrationButton==='function') window.updateCelebrationButton();
+}
+document.querySelectorAll('.tab-btn').forEach(b=>{
+  b.addEventListener('click', ()=> setTab(b.dataset.tab));
+});
+
+
+// ===================== Liturgia OSM 4.2 =====================
+let calDate = new Date();
+let selectedCalDate = null;
+let globalQuery = '';
+let libraryMode = 'todos';
+let prayerCategory = null;
+const FAV_KEY='osmFavoritesV4', RECENT_KEY='osmRecentV4';
+function loadJSON(k,d){try{return JSON.parse(localStorage.getItem(k)||'')||d}catch(e){return d}}
+function saveJSON(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function favs(){return loadJSON(FAV_KEY,[])}
+function recents(){return loadJSON(RECENT_KEY,[])}
+function itemKey(type,key){return type+':'+key}
+function isFav(type,key){return favs().includes(itemKey(type,key))}
+function toggleFav(type,key){let a=favs(),k=itemKey(type,key);a=a.includes(k)?a.filter(x=>x!==k):[k,...a];saveJSON(FAV_KEY,a);render()}
+function addRecent(type,key,title,sub=''){let a=recents().filter(x=>x.k!==itemKey(type,key));a.unshift({k:itemKey(type,key),type,key,title,sub,ts:Date.now()});saveJSON(RECENT_KEY,a.slice(0,12))}
+function favButton(type,key){return `<button class="favorite-btn ${isFav(type,key)?'active':''}" onclick="event.stopPropagation();toggleFav('${type}','${String(key).replace(/'/g,"\\'")}')" aria-label="Favorito">${isFav(type,key)?'★':'☆'}</button>`}
+function openSaint(id){
+  const saint=SANTORAL.find(x=>x._id===id||x.id===id);
+  if(!saint)return;
+  addRecent('saint',saint._id,saint.title,saint.date);
+  openDetail(saint._id);
+}function openDevo(key, sub){ state.tab='oracoes'; localStorage.setItem('osmLastTab','oracoes'); state.detailId=null; state.devo=key; state.devoSub=(sub===undefined?null:sub); let title=key; try{ if(key.startsWith('varias')) title=PRAYERS.devotions.variasHome[parseInt(key.slice(6))].title; else title=(DEVO_LIST.find(x=>x.key===key)||{}).title||key; }catch(e){} addRecent('prayer',key,title,'Oração'); render(); window.scrollTo(0,0); }
+function celebrationOrder(){
+  return [...SANTORAL].sort((a,b)=>(a.month-b.month)||(a.day-b.day)||String(a.title).localeCompare(String(b.title),'pt-BR'));
+}
+function adjacentCelebration(id,delta){
+  const ordered=celebrationOrder();
+  const i=ordered.findIndex(x=>x._id===id);
+  if(i<0) return null;
+  const j=i+delta;
+  return (j>=0&&j<ordered.length)?ordered[j]:null;
+}
+function viewSaintDetail(id){
+  let h=viewDetail(id);
+  h=h.replace('<div class="detail-header fade-in">',`<div class="detail-header fade-in" style="position:relative;">${favButton('saint',id)}`);
+  return h;
+}
+const _oldSimple=simpleTextDetail;
+simpleTextDetail=function(title,sub,text,backFn){let h=_oldSimple(title,sub,text,backFn);let key=state.devo||title;return h.replace('<div class="detail-header fade-in">',`<div class="detail-header fade-in" style="position:relative;">${favButton('prayer',key)}`)}
+function allPrayerEntries(){
+ const a=[
+  {key:'daily-anjo',title:'O Anjo do Senhor',sub:'Prática mariana diária',text:PRAYERS.daily.anjo,open:"openDailyPrayer480('anjo')"},
+  {key:'daily-rainha',title:'Rainha do Céu',sub:'Tempo Pascal',text:PRAYERS.daily.rainha,open:"openDailyPrayer480('rainha')"},
+  ...DEVO_LIST.map(x=>({key:x.key,title:x.title,sub:x.sub||'Devoção mariana',text:'',open:`openDevo('${x.key}')`})),
+  ...PRAYERS.devotions.variasHome.map((x,i)=>({key:'varias'+i,title:x.title,sub:'Orações diversas',text:x.text,open:`openDevo('varias${i}')`}))
+ ]; return a;
+}
+function categoryOf(p){let t=(p.title+' '+p.sub).toLowerCase();if(/dor|matris|stabat|coroa/.test(t))return 'dores';if(/voca|miss|apost/.test(t))return 'missao';if(/defunt|doent|alegr|visita|refei|necess/.test(t))return 'comunidade';if(/ladain/.test(t))return 'ladainhas';if(/vigília|vigilia|anjo|rainha/.test(t))return 'diarias';return 'marianas'}
+function globalResults(q){q=q.trim().toLowerCase();if(!q)return [];let rs=[];SANTORAL.forEach(s=>{let hay=(s.title+' '+s.date+' '+s.bio+' '+(s.prayer||'')).toLowerCase();if(hay.includes(q))rs.push({kind:'Santo / Beato',title:s.title,sub:s.date,action:`openSaint(${s._id})`})});allPrayerEntries().forEach(p=>{let hay=(p.title+' '+p.sub+' '+(p.text||'')).toLowerCase();if(hay.includes(q))rs.push({kind:'Oração',title:p.title,sub:p.sub,action:p.open})});return rs.slice(0,40)}
+function resultRows(rs){if(!rs.length)return '<div class="empty-state">Nenhum resultado encontrado.</div>';return `<div class="card fade-in" style="padding:6px 16px;">${rs.map(r=>`<div class="saint-row" onclick="${r.action}"><div class="rowtext"><div class="result-kind">${escapeHtml(r.kind)}</div><div class="rowtitle">${escapeHtml(r.title)}</div><div class="rowrank">${escapeHtml(r.sub||'')}</div></div><div class="chev">›</div></div>`).join('')}</div>`}
+function goCalendarToday(){
+  const n=new Date(); calDate=new Date(n.getFullYear(),n.getMonth(),1); selectedCalDate=new Date(n.getFullYear(),n.getMonth(),n.getDate()); render();
+}
+function selectCalendarDay(y,m,d){ selectedCalDate=new Date(y,m,d); render(); }
+function viewCalendario(){
+  let y=calDate.getFullYear(),m=calDate.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),today=new Date();
+  let cells='';
+  for(let i=0;i<first;i++) cells+='<div class="cal-day empty"></div>';
+  for(let d=1;d<=days;d++){
+    let ss=SANTORAL.filter(s=>s.month===m+1&&s.day===d),isT=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;
+    let isSel=selectedCalDate&&selectedCalDate.getFullYear()===y&&selectedCalDate.getMonth()===m&&selectedCalDate.getDate()===d;
+    cells+=`<button class="cal-day ${ss.length?'has-feast':''} ${isT?'today':''} ${isSel?'selected':''}" onclick="selectCalendarDay(${y},${m},${d})" aria-label="${d} de ${MONTHS[m]}${ss.length?', com celebração OSM':''}">${d}${ss.length?'<span class="cal-dot"></span>':''}</button>`;
+  }
+  let monthFeasts=SANTORAL.filter(s=>s.month===m+1);
+  let dayBlock='';
+  if(selectedCalDate&&selectedCalDate.getFullYear()===y&&selectedCalDate.getMonth()===m){
+    const d=selectedCalDate.getDate(), selected=SANTORAL.filter(s=>s.month===m+1&&s.day===d);
+    dayBlock=`<div class="section-title">${d} de ${MONTHS[m]}</div>${selected.length?`<div class="card fade-in" style="padding:6px 16px;">${selected.map(s=>`<div class="saint-row" onclick="openSaint(${s._id})">${saintImageHtml(s,false)}<div class="daynum">${s.day}</div><div class="rowtext"><div class="rowtitle">${escapeHtml(s.title)}</div><div class="rowrank">${escapeHtml(s.rank||'Celebração OSM')}</div></div><div class="chev">›</div></div>`).join('')}</div>`:'<div class="empty-state">Não há celebração própria OSM cadastrada para este dia.</div>'}`;
+  }
+  return `<div class="section-title">Calendário OSM</div><div class="card fade-in"><div class="calendar-toolbar"><button class="cal-nav" onclick="calDate=new Date(${y},${m-1},1);selectedCalDate=null;render()" aria-label="Mês anterior">‹</button><div class="calendar-title">${MONTHS[m]} ${y}</div><button class="cal-nav" onclick="calDate=new Date(${y},${m+1},1);selectedCalDate=null;render()" aria-label="Próximo mês">›</button></div><button class="today-chip" onclick="goCalendarToday()">Ir para hoje</button><div class="calendar-grid">${['D','S','T','Q','Q','S','S'].map(x=>`<div class="cal-head">${x}</div>`).join('')}${cells}</div></div>${dayBlock}<div class="section-title">Celebrações do mês</div>${monthFeasts.length?`<div class="card fade-in" style="padding:6px 16px;">${monthFeasts.map(s=>`<div class="saint-row" onclick="openSaint(${s._id})">${saintImageHtml(s,false)}<div class="daynum">${s.day}</div><div class="rowtext"><div class="rowtitle">${escapeHtml(s.title)}</div><div class="rowrank">${escapeHtml(s.rank||'')}</div></div><div class="chev">›</div></div>`).join('')}</div>`:'<div class="empty-state">Não há celebrações cadastradas neste mês.</div>'}`;
+}
+const _oldSantoral=viewSantoral;
+viewSantoral=function(){if(state.detailId!==null)return viewSaintDetail(state.detailId);let letters=[...new Set(SANTORAL.map(s=>s.title.replace(/^(SANTO|SANTA|B\.|BEATO|BEATA)\s+/i,'').trim()[0].toUpperCase()))].sort();let alpha=state.alpha||'';let q=state.search.trim().toLowerCase();let list=SANTORAL.filter(s=>(!q||(s.title+' '+s.date).toLowerCase().includes(q))&&(!alpha||s.title.replace(/^(SANTO|SANTA|B\.|BEATO|BEATA)\s+/i,'').trim().toUpperCase().startsWith(alpha)));let rows=list.map(s=>`<div class="saint-row" onclick="openSaint(${s._id})">${saintImageHtml(s,false)}<div class="daynum">${s.day}</div><div class="rowtext"><div class="rowtitle">${escapeHtml(s.title)}</div><div class="rowrank">${escapeHtml(s.date)} · ${escapeHtml(s.rank||'')}</div></div><div class="chev">›</div></div>`).join('');return `<div class="section-title">Índice do Santoral</div><div class="search-wrap"><input class="search-input" data-live-search="santoral" placeholder="Buscar santo, beato ou data…" value="${escapeHtml(state.search)}" oninput="liveSearchRender('santoral',this)"></div><div class="alpha-index"><button class="alpha-btn ${!alpha?'active':''}" onclick="state.alpha='';render()">•</button>${letters.map(l=>`<button class="alpha-btn ${alpha===l?'active':''}" onclick="state.alpha='${l}';render()">${l}</button>`).join('')}</div><div class="card fade-in" style="padding:6px 16px;">${rows||'<div class="empty-state">Nenhum nome encontrado.</div>'}</div>`}
+function viewOSMPlus(){return `<div class="section-title">Mais recursos OSM</div><div class="quick-grid fade-in"><button class="quick-card" onclick="openServite('regra')"><b>Regra OSSM</b><span>Regra e textos próprios da Ordem</span></button><button class="quick-card" onclick="openServite('rosario')"><b>Rosário</b><span>Rosário completo e modo guiado</span></button><button class="quick-card" onclick="openServite('coroa')"><b>Coroa das Sete Dores</b><span>Fórmulas e oração guiada</span></button><button class="quick-card" onclick="openServite('oficio')"><b>Ofício</b><span>Horas e textos litúrgicos próprios</span></button><button class="quick-card" onclick="openServite('sabado')"><b>Sábado Mariano</b><span>Textos e devoções marianas</span></button><button class="quick-card" onclick="openLanguagePanel()"><b>Idiomas</b><span>Recursos linguísticos do conteúdo servita</span></button></div>`}
+function resolveStored(k){let [type,key]=k.split(':');if(type==='saint'){let s=SANTORAL.find(x=>String(x._id)===key);if(s)return {kind:'Santoral',title:s.title,sub:s.date,action:`openSaint(${s._id})`}}else{let p=allPrayerEntries().find(x=>x.key===key);if(p)return {kind:'Oração',title:p.title,sub:p.sub,action:prayerActionForKey(key)}}return null}
+function prayerActionForKey(key){
+ if(key==='daily-anjo') return "openDailyPrayer480('anjo')";
+ if(key==='daily-rainha') return "openDailyPrayer480('rainha')";
+ return `openDevo('${String(key).replace(/'/g,"\\'")}')`;
+}
+function viewBiblioteca(){let f=favs().map(resolveStored).filter(Boolean),r=recents().map(x=>({kind:x.type==='saint'?'Santoral':'Oração',title:x.title,sub:x.sub,action:x.type==='saint'?`openSaint(${x.key})`:prayerActionForKey(x.key)}));let search=globalQuery?globalResults(globalQuery):[];return `<div class="section-title">Biblioteca pessoal</div><div class="global-search"><input data-live-search="global" value="${escapeHtml(globalQuery)}" placeholder="Pesquisar santos e orações…" oninput="liveSearchRender('global',this)"><span class="glass">⌕</span></div><div class="library-pills"><button class="library-pill ${libraryMode==='todos'?'active':''}" onclick="libraryMode='todos';render()">Visão geral</button><button class="library-pill ${libraryMode==='favoritos'?'active':''}" onclick="libraryMode='favoritos';render()">Favoritos</button><button class="library-pill ${libraryMode==='recentes'?'active':''}" onclick="libraryMode='recentes';render()">Últimos acessados</button></div>${globalQuery?`<div class="section-title">Resultados</div>${resultRows(search)}`:`${libraryMode!=='recentes'?`<div class="section-title">Favoritos</div>${f.length?resultRows(f):'<div class="empty-state">Toque na estrela de uma oração ou celebração para guardá-la aqui.</div>'}`:''}${libraryMode!=='favoritos'?`<div class="section-title">Últimos acessados</div>${r.length?resultRows(r):'<div class="empty-state">Os conteúdos consultados aparecerão aqui.</div>'}`:''}`}`}
+const MAIN_I18N={
+ pt:{today:'Hoje',calendar:'Calendário',sanctoral:'Santoral',prayers:'Orações',library:'Biblioteca',resources:'Recursos Servitas',languages:'Idiomas',title:'Idioma',close:'Fechar'},
+ la:{today:'Hodie',calendar:'Calendarium',sanctoral:'Sanctorale',prayers:'Preces',library:'Bibliotheca',resources:'Instrumenta Servorum Mariae',languages:'Lingua',title:'Lingua',close:'Claudere'},
+ it:{today:'Oggi',calendar:'Calendario',sanctoral:'Santorale',prayers:'Preghiere',library:'Biblioteca',resources:'Risorse dei Servi di Maria',languages:'Lingue',title:'Lingua',close:'Chiudi'},
+ en:{today:'Today',calendar:'Calendar',sanctoral:'Sanctoral',prayers:'Prayers',library:'Library',resources:'Servite Resources',languages:'Languages',title:'Language',close:'Close'}
+};
+let MAIN_LANG=localStorage.getItem('santoral-osm-lang')||'pt';
+if(!MAIN_I18N[MAIN_LANG]) MAIN_LANG='pt';
+function applyMainLanguage(){
+  const d=MAIN_I18N[MAIN_LANG];
+  const labels={pt:['Vida','Liturgia','Oração'],la:['Vita','Liturgia','Oratio'],it:['Vita','Liturgia','Preghiera'],en:['Life','Liturgy','Prayer']};
+  const selected=labels[MAIN_LANG]||labels.pt;
+  document.querySelectorAll('#tabbar .tab-btn span').forEach((el,i)=>{if(selected[i])el.textContent=selected[i]});
+  document.querySelectorAll('.language-option').forEach(b=>b.classList.toggle('active',b.dataset.mainLang===MAIN_LANG));
+  const a=document.getElementById('languageTitle'); if(a)a.textContent=d.title;
+  const c=document.querySelector('.language-close'); if(c)c.textContent=d.close;
+  document.querySelectorAll('.section-title').forEach(el=>{
+    if(['Recursos Servitas','Instrumenta Servorum Mariae','Risorse dei Servi di Maria','Servite Resources'].includes(el.textContent.trim())) el.textContent=d.resources;
+  });
+  document.querySelectorAll('.quick-card b').forEach(el=>{
+    if(['Idiomas','Lingua','Lingue','Languages'].includes(el.textContent.trim())) el.textContent=d.languages;
+  });
+}
+function openLanguagePanel(){
+  const o=document.getElementById('languageOverlay'); if(!o)return;
+  applyMainLanguage(); o.classList.add('open'); o.setAttribute('aria-hidden','false');
+}
+function closeLanguagePanel(){
+  const o=document.getElementById('languageOverlay'); if(!o)return;
+  o.classList.remove('open'); o.setAttribute('aria-hidden','true');
+}
+function setMainLanguage(lang){
+  if(!MAIN_I18N[lang])return;
+  MAIN_LANG=lang;
+  localStorage.setItem('santoral-osm-lang',lang);
+  applyMainLanguage();
+}
+
+
+let APP_NAV_STACK=[];
+let APP_LAST_TAB=state && state.tab ? state.tab : 'hoje';
+function updateBackButton(){
+  const button=document.getElementById('floatingBack');
+  if(!button) return;
+  const hasDetail=state.detailId!==null&&state.detailId!==undefined;
+  const overlay=['serviteOverlay','languageOverlay','mainMenuOverlay','dailyLiturgyOverlay'].some(id=>document.getElementById(id)?.classList.contains('open'));
+  const visible=hasDetail||!!state.devo||state.devoSub!==null&&state.devoSub!==undefined||!!dailyPrayerOpen480||overlay||state.tab!=='hoje';
+  button.classList.toggle('show',visible);
+  button.setAttribute('aria-label',hasDetail?'Voltar à origem':'Voltar para Hoje');
+  button.title=hasDetail?'Voltar à origem':'Voltar para Hoje';
+}
+
+function smartBack(){
+  const menu=document.getElementById('mainMenuOverlay');
+  const language=document.getElementById('languageOverlay');
+  const servite=document.getElementById('serviteOverlay');
+  const mass=document.getElementById('dailyLiturgyOverlay');
+  if(menu&&menu.classList.contains('open')){closeMainMenu();return;}
+  if(language&&language.classList.contains('open')){closeLanguagePanel();return;}
+  if(servite&&servite.classList.contains('open')){if(typeof closeServite==='function')closeServite();else servite.classList.remove('open');updateBackButton();return;}
+  if(mass&&mass.classList.contains('open')&&typeof window.closeDailyLiturgy==='function'){window.closeDailyLiturgy();updateBackButton();return;}
+  if(dailyPrayerOpen480){closeDailyPrayer480();return;}
+  if(memoriaSelectedDate){closeMemoriaLiturgica();return;}
+  if(state.devoSub!==null&&state.devoSub!==undefined){closeDevo();return;}
+  if(state.devo){closeDevo();return;}
+  if(state.detailId!==null&&state.detailId!==undefined){closeDetail();return;}
+  if(state.tab==='liturgia'&&state.liturgiaSection==='horas'){setLiturgiaSection('missa');return;}
+  if(state.tab!=='hoje'){setTab('vida');return;}
+}
+
+
+// init: assign ids, set active tab
+SANTORAL.forEach((s,i)=> s._id = i);
+document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===state.tab));
+applyPreferences();
+render();
+/* END SCRIPT BLOCK: legacy-block-3 */
+
+/* BEGIN SCRIPT BLOCK: legacy-block-4 */
+// Service Worker é usado apenas no navegador/PWA. No app Android, os arquivos já são empacotados pelo Capacitor.
+if ("serviceWorker" in navigator && !window.Capacitor?.isNativePlatform?.()) {
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+}
+/* END SCRIPT BLOCK: legacy-block-4 */
+
+/* BEGIN SCRIPT BLOCK: serviteIntegrationScript */
+let currentServiteView='';
+const serviteNames={regra:'Regra OSSM',rosario:'Rosário',coroa:'Coroa das Sete Dores',oficio:'Ofício',sabado:'Sábado Mariano',idioma:'Idiomas',completo:'Recursos OSM'};
+function serviteUrl(view){return 'servite.html?view='+encodeURIComponent(view||'completo');}
+function serviteAdjustFont(delta){try{const frame=document.getElementById('serviteFrame');const change=frame?.contentWindow?.changeFontSize;if(typeof change==='function')change(delta);}catch(error){console.warn('[Liturgia OSM] Controle de fonte do recurso indisponível.',error);}} function openServite(view){
+  currentServiteView=view||'completo';
+  const ov=document.getElementById('serviteOverlay'),fr=document.getElementById('serviteFrame');
+  document.getElementById('serviteTitle').textContent=serviteNames[currentServiteView]||'Recursos OSM';
+  fr.src=serviteUrl(currentServiteView);
+  ov.classList.add('open');ov.setAttribute('aria-hidden','false');document.body.classList.add('servite-open');
+  if(!history.state?.serviteOverlay) history.pushState({...history.state,serviteOverlay:true},'');
+}
+function closeServite(fromHistory=false){const ov=document.getElementById('serviteOverlay'),fr=document.getElementById('serviteFrame');const wasOpen=ov?.classList.contains('open');ov.classList.remove('open');ov.setAttribute('aria-hidden','true');document.body.classList.remove('servite-open');fr.src='about:blank';if(wasOpen&&!fromHistory&&history.state?.serviteOverlay)history.back();}
+function serviteReload(){if(currentServiteView)document.getElementById('serviteFrame').src=serviteUrl(currentServiteView)+'&reload='+Date.now();}
+window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverlay')?.classList.contains('open'))closeServite(true);});
+/* END SCRIPT BLOCK: serviteIntegrationScript */
+
+/* BEGIN SCRIPT BLOCK: interface490Script */
+(function(){
+  const crest=document.querySelector('.crest');
+  if(crest) crest.innerHTML='<img src="icon-192.png" alt="Emblema dos Servos de Maria">';
+
+  function recentCard(){
+    const item=recents()[0];
+    if(!item) return '';
+    const action=item.type==='saint'?`openSaint(${item.key})`:prayerActionForKey(String(item.key));
+    return `<div class="section-title home-heading">Continuar</div>
+      <div class="card continue-card fade-in" onclick="${action}">
+        <div class="continue-mark">↻</div><div class="continue-text"><small>Último conteúdo consultado</small><b>${escapeHtml(item.title)}</b><span>${escapeHtml(item.sub||'Liturgia OSM')}</span></div><div class="chev">›</div>
+      </div>`;
+  }
+
+  
+
+  const menu=document.querySelector('.main-menu');
+  if(menu) menu.innerHTML=`<div class="main-menu-head"><h3>Menu</h3><button class="tool-btn" onclick="closeMainMenu()" aria-label="Fechar menu">✕</button></div>
+    <div class="menu-section"><div class="menu-label">Navegação</div><div class="menu-nav-grid"><button class="menu-action" onclick="closeMainMenu();setTab('hoje')">Hoje</button><button class="menu-action" onclick="closeMainMenu();setTab('calendario')">Calendário</button><button class="menu-action" onclick="closeMainMenu();setTab('santoral')">Santoral</button><button class="menu-action" onclick="closeMainMenu();setTab('oracoes')">Orações</button><button class="menu-action" onclick="closeMainMenu();openServite('oficio')">Ofício</button><button class="menu-action" onclick="closeMainMenu();setTab('biblioteca')">Biblioteca</button></div></div>
+    <div class="menu-section"><div class="menu-label">Leitura</div><div class="menu-row"><button class="menu-action" onclick="adjustFont(-0.08)">A−</button><span class="reader-scale-value">100%</span><button class="menu-action" onclick="adjustFont(0.08)">A+</button><button class="menu-action" onclick="resetFont()">Padrão</button></div><button class="menu-action menu-wide" onclick="toggleTheme()">☼ / ☾ Alternar tema claro ou escuro</button></div>
+    <div class="menu-section"><div class="menu-label">Recursos Servitas</div><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('regra')">Regra OSSM</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('rosario')">Rosário</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('coroa')">Coroa das Sete Dores</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('sabado')">Sábado Mariano</button></div>
+    <div class="menu-section"><div class="menu-label">Aplicativo</div><button class="menu-action menu-wide" onclick="closeMainMenu();openLanguagePanel()">Idioma da interface</button><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('sobre')">Sobre, créditos e redes sociais</button></div>
+    <div class="menu-section"><div class="menu-status"><span class="connection-dot"></span><span>Versão ${APP_VERSION} · textos OSM offline; Missa do dia exige internet ou cópia salva</span></div></div>`;
+
+  window.addEventListener('online',()=>{if(state.tab==='hoje')render();});
+  window.addEventListener('offline',()=>{if(state.tab==='hoje')render();});
+  applyPreferences(); render();
+})();
+/* END SCRIPT BLOCK: interface490Script */
+
+/* BEGIN SCRIPT BLOCK: quality491Script */
+(function(){
+  function normalizeExtractedProse(text){
+    return String(text||'').replace(/\r/g,'').replace(/\u00a0/g,' ')
+      .replace(/([A-Za-zÀ-ÿ])-\n\s*([a-zà-ÿ])/g,'$1$2')
+      .split(/\n\s*\n/).map(p=>p.replace(/\n\s*/g,' ').replace(/\s{2,}/g,' ').trim()).filter(Boolean).join('\n\n');
+  }
+  SANTORAL.forEach(s=>{s.bio=normalizeExtractedProse(s.bio);});
+
+  window.calendarRankFilter='todos';
+  function rankClass(s){const r=(s?.rank||'').toLowerCase();if(r.includes('solenidade'))return 'solemnity';if(r.includes('beato'))return 'blessed';if(r.includes('servo'))return 'servant';return 'saint';}
+  function rankAllowed(s){return calendarRankFilter==='todos'||rankClass(s)===calendarRankFilter;}
+  window.setCalendarMonth=function(month){calDate=new Date(calDate.getFullYear(),Number(month),1);selectedCalDate=null;render();};
+  window.setCalendarFilter=function(filter){calendarRankFilter=filter;selectedCalDate=null;render();};
+  viewCalendario=function(){
+    let y=calDate.getFullYear(),m=calDate.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),today=new Date(),cells='';
+    for(let i=0;i<first;i++)cells+='<div class="cal-day empty"></div>';
+    for(let d=1;d<=days;d++){
+      const all=SANTORAL.filter(s=>s.month===m+1&&s.day===d),ss=all.filter(rankAllowed),lead=ss[0],isT=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d,isSel=selectedCalDate&&selectedCalDate.getFullYear()===y&&selectedCalDate.getMonth()===m&&selectedCalDate.getDate()===d;
+      cells+=`<button class="cal-day ${ss.length?'has-feast rank-'+rankClass(lead):''} ${isT?'today':''} ${isSel?'selected':''}" onclick="selectCalendarDay(${y},${m},${d})" aria-label="${d} de ${MONTHS[m]}${ss.length?', com celebração OSM':''}">${d}${ss.length?'<span class="cal-dot"></span>':''}</button>`;
+    }
+    const monthFeasts=SANTORAL.filter(s=>s.month===m+1&&rankAllowed(s));let dayBlock='';
+    if(selectedCalDate&&selectedCalDate.getFullYear()===y&&selectedCalDate.getMonth()===m){const d=selectedCalDate.getDate(),selected=SANTORAL.filter(s=>s.month===m+1&&s.day===d&&rankAllowed(s));dayBlock=`<div class="section-title">${d} de ${MONTHS[m]}</div>${selected.length?`<div class="card fade-in" style="padding:6px 16px;">${selected.map(calendarCelebrationRow).join('')}</div>`:'<div class="empty-state">Não há celebração desta categoria neste dia.</div>'}`;}
+    const filters=[['todos','Todas'],['solemnity','Solenidades'],['saint','Santos'],['blessed','Beatos'],['servant','Servos de Deus']];
+    return `<div class="section-title">Calendário OSM</div><select class="calendar-month-select" aria-label="Selecionar mês" onchange="setCalendarMonth(this.value)">${MONTHS.map((n,i)=>`<option value="${i}" ${i===m?'selected':''}>${n[0].toUpperCase()+n.slice(1)} ${y}</option>`).join('')}</select><div class="calendar-filters">${filters.map(f=>`<button class="calendar-filter ${calendarRankFilter===f[0]?'active':''}" onclick="setCalendarFilter('${f[0]}')">${f[1]}</button>`).join('')}</div><div class="calendar-legend"><span><i class="sol"></i>Solenidade</span><span><i class="san"></i>Santo</span><span><i class="bea"></i>Beato</span><span><i class="ser"></i>Servo de Deus</span></div><div class="card fade-in"><div class="calendar-toolbar"><button class="cal-nav" onclick="calDate=new Date(${y},${m-1},1);selectedCalDate=null;render()" aria-label="Mês anterior">‹</button><div class="calendar-title">${MONTHS[m]} ${y}</div><button class="cal-nav" onclick="calDate=new Date(${y},${m+1},1);selectedCalDate=null;render()" aria-label="Próximo mês">›</button></div><button class="today-chip" onclick="goCalendarToday()">Ir para hoje</button><div class="calendar-grid">${['D','S','T','Q','Q','S','S'].map(x=>`<div class="cal-head">${x}</div>`).join('')}${cells}</div></div>${dayBlock}<div class="section-title">Celebrações do mês</div>${monthFeasts.length?`<div class="card fade-in" style="padding:6px 16px;">${monthFeasts.map(calendarCelebrationRow).join('')}</div>`:'<div class="empty-state">Não há celebrações desta categoria no mês.</div>'}`;
+  };
+
+  const priorSaintDetail=viewSaintDetail;
+  viewSaintDetail=function(id){
+    const ordered=[...SANTORAL].sort((a,b)=>(a.month*100+a.day)-(b.month*100+b.day)),idx=ordered.findIndex(s=>s._id===id),prev=ordered[(idx-1+ordered.length)%ordered.length],next=ordered[(idx+1)%ordered.length];
+    return priorSaintDetail(id)+`<div class="detail-navigation"><button onclick="openSaint(${prev._id})"><small>‹ Celebração anterior</small><b>${escapeHtml(prev.title)}</b></button><button onclick="openSaint(${next._id})"><small>Próxima celebração ›</small><b>${escapeHtml(next.title)}</b></button></div>`;
+  };
+
+  let wakeLock=null;
+  window.toggleCelebrationMode=async function(){
+    const active=document.body.classList.toggle('celebration-mode'),button=document.getElementById('celebrationToggle');button.textContent=active?'Sair do modo celebração':'Modo celebração';
+    try{if(active&&navigator.wakeLock)wakeLock=await navigator.wakeLock.request('screen');else if(wakeLock){await wakeLock.release();wakeLock=null;}}catch(e){}
+    showToast(active?'Modo celebração ativado.':'Modo celebração encerrado.');
+  };
+  function updateCelebrationButton(){const b=document.getElementById('celebrationToggle');if(!b)return;const dailyOpen=typeof dailyPrayerOpen480!=='undefined'&&!!dailyPrayerOpen480;const reading=state.detailId!==null||!!state.devo||!!state.devoSub||dailyOpen;b.classList.toggle('show',reading||document.body.classList.contains('celebration-mode'));}
+  window.updateCelebrationButton=updateCelebrationButton;
+  render();
+})();
+/* END SCRIPT BLOCK: quality491Script */
+
+/* BEGIN SCRIPT BLOCK: dailyLiturgy492Script */
+(function(){
+  const API='https://liturgia.up.railway.app/v2/';
+  const CACHE_PREFIX='osmDailyMassV2:';
+  let selectedDate='';
+  const two=n=>String(n).padStart(2,'0');
+  const localISO=(date=new Date())=>`${date.getFullYear()}-${two(date.getMonth()+1)}-${two(date.getDate())}`;
+  const cacheKey=date=>CACHE_PREFIX+date;
+  const CACHE_MAX_AGE=30*24*60*60*1000;
+  const readCache=date=>{try{const key=cacheKey(date),cached=JSON.parse(localStorage.getItem(key)||'null'),saved=Date.parse(cached?.savedAt||'');if(!cached||!Number.isFinite(saved)||Date.now()-saved>CACHE_MAX_AGE){localStorage.removeItem(key);return null;}return cached;}catch(e){return null}};
+  const saveCache=(date,data)=>{try{localStorage.setItem(cacheKey(date),JSON.stringify({savedAt:new Date().toISOString(),data}))}catch(e){}};
+  const safe=value=>escapeHtml(String(value||''));
+  function readingCards(group,label){
+    const items=(Array.isArray(group)?group:(group?[group]:[])).filter(item=>item&&(item.texto||item.referencia||item.refrao));
+    return items.map((item,index)=>`<article class="daily-reading"><b>${safe(item.titulo||label+(items.length>1?' '+(index+1):''))}</b>${item.referencia?`<em>${safe(item.referencia)}</em>`:''}${item.refrao?`<em>${safe(item.refrao)}</em>`:''}<p>${safe(item.texto)}</p></article>`).join('');
+  }
+  function section(title,body){return body?`<section class="daily-section"><h3>${safe(title)}</h3>${body}</section>`:''}
+  function renderMass(payload,offline){
+    const data=payload.data||payload,prayers=data.oracoes||{},readings=data.leituras||{},antiphons=data.antifonas||{};
+    const saved=payload.savedAt?new Date(payload.savedAt).toLocaleString('pt-BR'):'';
+    const extras=[...(Array.isArray(prayers.extras)?prayers.extras:[]),...(Array.isArray(readings.extras)?readings.extras:[])];
+    return `<div class="daily-source"><b>${offline?'Cópia offline':'Conteúdo atualizado online'}</b>${saved?` · salva em ${safe(saved)}`:''}<br>Liturgia diária recebida pela API comunitária Liturgia Diária v2. Confira orientações e celebrações próprias no calendário litúrgico local.</div>
+      <div class="card daily-title-card"><span class="daily-color">${safe(data.cor||'Cor litúrgica')}</span><h2>${safe(data.liturgia||'Liturgia do dia')}</h2><small>${safe(data.data||'')}</small></div>
+      ${section('Antífona de entrada',readingCards({texto:antiphons.entrada},'Antífona de entrada'))}
+      ${section('Oração coleta',readingCards({texto:prayers.coleta},'Oração coleta'))}
+      ${section('Primeira leitura',readingCards(readings.primeiraLeitura,'Primeira leitura'))}
+      ${section('Salmo responsorial',readingCards(readings.salmo,'Salmo responsorial'))}
+      ${section('Segunda leitura',readingCards(readings.segundaLeitura,'Segunda leitura'))}
+      ${section('Evangelho',readingCards(readings.evangelho,'Evangelho'))}
+      ${section('Textos próprios e complementares',readingCards(extras,'Texto complementar'))}
+      ${section('Oração sobre as oferendas',readingCards({texto:prayers.oferendas},'Oração sobre as oferendas'))}
+      ${section('Antífona da comunhão',readingCards({texto:antiphons.comunhao},'Antífona da comunhão'))}
+      ${section('Oração depois da comunhão',readingCards({texto:prayers.comunhao},'Oração depois da comunhão'))}`;
+  }
+  window.loadDailyLiturgy=async function(date){
+    selectedDate=date||localISO(); const input=document.getElementById('dailyLiturgyDate');if(input)input.value=selectedDate;
+    const target=document.getElementById('dailyLiturgyContent'),cached=readCache(selectedDate);
+    if(!target)return;
+    if(cached)target.innerHTML=renderMass(cached,true);else target.innerHTML='<div class="daily-loading">Carregando a liturgia…</div>';
+    if(!navigator.onLine){if(!cached)target.innerHTML='<div class="daily-error">Esta data ainda não foi salva. Conecte-se à internet uma vez para baixar a liturgia.</div>';return;}
+    try{
+      const [year,month,day]=selectedDate.split('-');
+      const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),12000);let response;try{response=await fetch(`${API}?dia=${day}&mes=${month}&ano=${year}`,{headers:{Accept:'application/json'},signal:controller.signal});}finally{clearTimeout(timeout);}
+      if(!response.ok)throw new Error('Liturgia não encontrada');
+      const data=await response.json();saveCache(selectedDate,data);target.innerHTML=renderMass({savedAt:new Date().toISOString(),data},false);
+    }catch(error){if(!cached){const message=error?.name==='AbortError'?'A consulta demorou mais que o esperado. Verifique a conexão e tente novamente.':'Não foi possível acessar o serviço da Missa. Verifique a conexão e tente novamente.';target.innerHTML=`<div class="daily-error">${safe(message)}<br><button class="daily-retry" onclick="loadDailyLiturgy('${safe(selectedDate)}')">Tentar novamente</button></div>`;}}
+  };
+  window.openDailyLiturgy=function(date){document.getElementById('dailyLiturgyOverlay').classList.add('open');document.getElementById('dailyLiturgyOverlay').setAttribute('aria-hidden','false');loadDailyLiturgy(date||localISO());};
+  window.closeDailyLiturgy=function(){document.getElementById('dailyLiturgyOverlay').classList.remove('open');document.getElementById('dailyLiturgyOverlay').setAttribute('aria-hidden','true');if(document.body.classList.contains('celebration-mode'))toggleCelebrationMode();};
+  window.moveDailyDate=function(amount){const date=new Date(selectedDate+'T12:00:00');date.setDate(date.getDate()+amount);loadDailyLiturgy(localISO(date));};
+  
+  const menu=document.querySelector('.main-menu');
+  if(menu){const nav=menu.querySelector('.menu-nav-grid');if(nav)nav.insertAdjacentHTML('beforeend','<button class="menu-action" onclick="closeMainMenu();openDailyLiturgy()">Missa do dia</button>');const status=menu.querySelector('.menu-status span:last-child');if(status)status.textContent=`Versão ${APP_VERSION} · Missa do dia online; cópias locais por até 30 dias`;}
+  window.addEventListener('online',()=>{if(document.getElementById('dailyLiturgyOverlay').classList.contains('open'))loadDailyLiturgy(selectedDate);});
+  render();
+})();
+/* END SCRIPT BLOCK: dailyLiturgy492Script */
+
+/* BEGIN SCRIPT BLOCK: canonicalSantoral495 */
+async function loadCanonicalSantoral(){
+  santoralLoading=true;
+  santoralLoadError=false;
+  render();
+  try{
+    const response=await fetch('./data/santoral.json',{cache:'no-store'});
+    if(!response.ok)throw new Error('Santoral indisponível');
+    const canonical=await response.json();
+    if(!Array.isArray(canonical)||canonical.length===0)throw new Error('O Santoral precisa ser uma lista não vazia.');
+    const ids=new Set(),dates=new Set();
+    for(const item of canonical){
+      if(!item||!Number.isInteger(item.id)||item.id<0||!Number.isInteger(item.month)||item.month<1||item.month>12||!Number.isInteger(item.day)||item.day<1||item.day>new Date(2024,item.month,0).getDate()||typeof item.date!=='string'||!item.date.trim()||typeof item.title!=='string'||!item.title.trim()||typeof item.rank!=='string'||!item.rank.trim()||typeof item.bio!=='string')throw new Error('Registro inválido no Santoral.');
+      const dateKey=String(item.month).padStart(2,'0')+'-'+String(item.day).padStart(2,'0');
+      if(ids.has(item.id)||dates.has(dateKey))throw new Error('ID ou data duplicada no Santoral.');
+      ids.add(item.id);dates.add(dateKey);
+    }
+    SANTORAL=canonical.map(item=>({...item,_id:Number(item.id),special:item.special??''}));
+    santoralReady=true;
+  }catch(error){
+    santoralReady=false;
+    santoralLoadError=true;
+    console.warn('[Liturgia OSM] Não foi possível carregar o Santoral canônico.',error);
+  }finally{
+    santoralLoading=false;
+    if(santoralReady)await loadCanonicalOffices();
+    render();
+  }
+}
+window.loadCanonicalSantoral=loadCanonicalSantoral;
+async function loadCanonicalOffices(){
+  oficiosLoadError=false;
+  try{
+    const response=await fetch('./data/oficios-osm.json',{cache:'no-store'});
+    if(!response.ok)throw new Error('Ofícios indisponíveis');
+    const source=await response.json();
+    const dates=source?.celebracoes;
+    if(source.schema_version!==2||!dates||Object.keys(dates).length!==32)throw new Error('Base de Ofícios incompleta.');
+    for(const saint of SANTORAL){
+      const key=officeDateKey(saint),record=dates[key];
+      if(!record||Number(record.id)!==Number(saint.id)||!['oficio_proprio','textos_proprios','sem_material_proprio'].includes(record.tipo_material))throw new Error('Ofício divergente em '+key);
+    }
+    OFICIOS_OSM=source;oficiosReady=true;
+  }catch(error){oficiosReady=false;oficiosLoadError=true;console.warn('[Liturgia OSM] Não foi possível carregar os Ofícios canônicos.',error);}
+  render();
+}
+window.loadCanonicalOffices=loadCanonicalOffices;
+loadCanonicalSantoral();
+/* END SCRIPT BLOCK: canonicalSantoral495 */
+
+/* BEGIN SCRIPT BLOCK: canonicalMemoriaLiturgica */
+(async function(){
+  try{
+    const response=await fetch('./data/memoria-liturgica.json',{cache:'no-store'});
+    if(!response.ok)throw new Error('Memória Litúrgica indisponível');
+    const source=await response.json();
+    if(source.schema_version!==2||!source.common||!Array.isArray(source.memory_dates)||source.memory_dates.length!==25||!Array.isArray(source.celebrations)||source.celebrations.length>source.memory_dates.length)throw new Error('Fonte incompleta');
+    MEMORIA_LITURGICA=source;
+    render();
+  }catch(error){console.warn('[Liturgia OSM] Não foi possível carregar a Memória Litúrgica.',error);}
+})();
+/* END SCRIPT BLOCK: canonicalMemoriaLiturgica */
+
+/* BEGIN SCRIPT BLOCK: canonicalNavigation4926 */
+(function(){
+  const fallbackMasses={schema_version:1,celebrations:[]};
+  window.MISSAS_OSM=fallbackMasses;
+
+  function dateKey(s){return String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0');}
+  function massDate(s){
+    let year=new Date().getFullYear();
+    let date=new Date(year,Number(s.month)-1,Number(s.day),12);
+    if(date.getMonth()+1!==Number(s.month)||date.getDate()!==Number(s.day)){
+      year+=1;date=new Date(year,Number(s.month)-1,Number(s.day),12);
+    }
+    return year+'-'+String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0');
+  }
+  function hubEmpty(text){return '<div class="hub-empty">'+escapeHtml(text)+'</div>';}
+  function hubText(title,text){
+    if(!text)return '';
+    return '<div class="section-title">'+escapeHtml(title)+'</div><div class="hub-card hub-text">'+escapeHtml(text)+'</div>';
+  }
+  function properMassFor(s){
+    const records=window.MISSAS_OSM&&Array.isArray(window.MISSAS_OSM.celebrations)?window.MISSAS_OSM.celebrations:[];
+    return records.find(item=>item.date===dateKey(s)||String(item.santoral_id)===String(s.id));
+  }
+  function properMassBlock(item){
+    const readings=Array.isArray(item.readings)?item.readings:[];
+    const readingHtml=readings.map(function(reading){
+      const title=reading.title||reading.label||'Leitura';
+      const reference=reading.reference||reading.referencia||'';
+      return '<div class="section-title">'+escapeHtml(title)+'</div><div class="hub-card hub-text">'+
+        (reference?'<b>'+escapeHtml(reference)+'</b><br>':'')+escapeHtml(reading.text||'')+'</div>';
+    }).join('');
+    const content=hubText('Coleta',item.collect||item.coleta)+readingHtml+
+      hubText('Prefácio',item.preface||item.prefacio);
+    if(!content)return hubEmpty('O cadastro da Missa própria ainda não contém textos conferidos.');
+    return '<div class="hub-card"><div class="hub-card-title">Missa própria</div>'+content+
+      '<p class="hub-source">Fonte: '+escapeHtml(item.source||'fonte não informada')+'</p></div>';
+  }
+  function liturgyBlock(s){
+    const ownMass=properMassFor(s);
+    const date=massDate(s);
+    const mass=ownMass?properMassBlock(ownMass):
+      '<div class="hub-card"><div class="hub-card-title">Missa do dia</div>'+
+      '<p class="hub-card-note">Não há Missa própria cadastrada. A consulta da data de '+escapeHtml(s.date)+' exige internet; a cópia consultada fica disponível offline por até 30 dias.</p>'+
+      '<button class="hub-action" onclick="openDailyLiturgy(\''+date+'\')">Consultar Missa desta data <span>›</span></button></div>';
+    let office='';
+    const hours=saintHasOffice(s)?officeHoursForSaint(s):[];
+    if(!oficiosReady){
+      office='<div class="hub-card" role="alert"><div class="hub-card-title">Ofício indisponível</div>'+
+        '<p class="hub-card-note">O cadastro local dos Ofícios não foi carregado. Vida e Oração permanecem disponíveis.</p>'+
+        '<button class="hub-action" onclick="loadCanonicalOffices()">Tentar novamente <span>↻</span></button></div>';
+    }else if(hours.length){
+      const classification=officeClassificationForSaint(s);
+      const officeTitle=classification==='Ofício próprio'?'Liturgia das Horas':'Textos próprios do Ofício';
+      office='<div class="hub-card"><div class="hub-card-title">'+officeTitle+'</div>'+
+        '<p class="hub-card-note">'+escapeHtml(classification)+'</p><div class="hub-actions">'+
+        hours.map(function(pair){return '<button class="hub-action" onclick="openSantoralOfficeHour('+s._id+',\''+pair[0]+'\')">'+escapeHtml(pair[1])+'<span>›</span></button>';}).join('')+
+        '</div></div>';
+    }else if(officeRecordForSaint(s)?.tipo_material==='sem_material_proprio'){
+      office='<div class="hub-card"><div class="hub-card-title">Liturgia das Horas</div>'+ 
+        hubEmpty('Sem material próprio: usar o Comum.')+
+        '<button class="hub-action" style="margin-top:10px" onclick="openServite(\'oficio\')">Abrir Ofício Comum <span>›</span></button></div>';
+    }else{
+      office='<div class="hub-card"><div class="hub-card-title">Textos próprios do Ofício</div>'+hubEmpty('Não há horas próprias cadastradas; usar o Comum.')+
+        '<button class="hub-action" style="margin-top:10px" onclick="openServite(\'oficio\')">Abrir Ofício Comum <span>›</span></button></div>';
+    }
+    return mass+office;
+  }
+  function prayerBlock(s){
+    const data=MEMORIA_LITURGICA||{},date=dateKey(s);
+    const item=Array.isArray(data.celebrations)?data.celebrations.find(entry=>entry.date===date):null;
+    const covered=(Array.isArray(data.memory_dates)&&data.memory_dates.includes(date))||!!item;
+    if(!covered)return (s.prayer?hubText('Oração própria do Santoral',s.prayer)+'<p class="hub-source">Fonte da oração: Santoral da Ordem.</p>':hubEmpty('O Santoral não traz oração própria cadastrada.'))+hubEmpty('O Livro de Oração não traz Memória Litúrgica cadastrada para esta celebração.');
+    const common=data.common||{};
+    const life=item?.breve_vida||item?.apresentacao||'';
+    const compact=value=>String(value||'').replace(/\s+/g,' ').trim();
+    const distinctLife=life&&compact(life)!==compact(s.bio||'')?life:'';
+    const prayer=item?.oracao_propria||s.prayer||'',sourceNote=item?.source_note||data.editorial_notes?.[date]||'';
+    const prayerSource=item?.oracao_propria?'Livro de Oração dos Servos de Maria, 3ª edição revisada (2024), seção Memória Litúrgica.':'Santoral da Ordem.';
+    const lifeSource=distinctLife?'Livro de Oração dos Servos de Maria, 3ª edição revisada (2024), seção Memória Litúrgica.':'Santoral da Ordem.';
+    return hubText('Hino',common.hino)+hubText('Antífona',common.antifona)+
+      hubText('Salmo 111',common.salmo)+
+      hubText(item?.breve_vida?'Breve vida':'Apresentação',distinctLife)+
+      '<p class="hub-source">Fonte dos textos comuns: '+escapeHtml(data.source||'Livro de Oração dos Servos de Maria, seção Memória Litúrgica.')+'</p>'+ 
+      hubText('Oração própria',prayer)+
+      (prayer?'<p class="hub-source">Fonte da oração: '+escapeHtml(prayerSource)+'</p>':'')+
+      (distinctLife?'<p class="hub-source">Fonte da vida breve: '+escapeHtml(lifeSource)+'</p>':'')+
+      (sourceNote?'<p class="hub-source">Nota da fonte: '+escapeHtml(sourceNote)+'</p>':'')+
+      '<p class="hub-source">Memória Litúrgica do Livro de Oração; distinta da Liturgia das Horas.</p>';
+  }
+  function orderedCelebrations(){
+    return SANTORAL.slice().sort(function(a,b){
+      return Number(a.month)-Number(b.month)||Number(a.day)-Number(b.day)||String(a.title).localeCompare(String(b.title),'pt-BR');
+    });
+  }
+  function navigationBlock(s){
+    const ordered=orderedCelebrations();
+    const index=ordered.findIndex(item=>item._id===s._id);
+    if(index<0||!ordered.length)return hubEmpty('Navegação entre celebrações indisponível.');
+    const previous=ordered[(index+ordered.length-1)%ordered.length];
+    const next=ordered[(index+1)%ordered.length];
+    return '<div class="hub-navigation-grid">'+
+      '<button class="hub-action" onclick="openSaint('+previous._id+')">‹ Anterior <span>'+escapeHtml(previous.title)+'</span></button>'+
+      '<button class="hub-action" onclick="openSaint('+next._id+')">Próxima <span>'+escapeHtml(next.title)+' ›</span></button>'+
+      '<button class="hub-action hub-share" onclick="shareSaint('+s._id+')">Compartilhar celebração <span>↗</span></button></div>';
+  }
+  window.renderCelebrationHub=function(id){
+    const saint=SANTORAL.find(item=>item._id===id||item.id===id);
+    if(!saint)return '<div class="empty-state">Celebração não encontrada.</div>';
+    const origin=state.detailOriginTab||'santoral';
+    const backLabel=origin==='calendario'?'Voltar ao Calendário':origin==='hoje'?'Voltar a Hoje':origin==='liturgia'?'Voltar à Liturgia':origin==='oracoes'?'Voltar a Oração':'Voltar ao Santoral';
+    const life='<div class="hub-life">'+saintImageHtml(saint,true)+
+      '<div class="rank">'+escapeHtml(saint.rank||'Celebração OSM')+'</div>'+
+      '<h1 class="hub-life-title">'+escapeHtml(saint.title)+'</h1>'+
+      '<div class="hub-life-meta">'+escapeHtml(saint.date)+'</div>'+
+      '<div class="hub-life-bio">'+escapeHtml(saint.bio||'Biografia não cadastrada.')+'</div></div>';
+    return '<button class="hub-back" onclick="closeDetail()">‹ '+backLabel+'</button>'+
+      '<div class="saint-hub">'+
+      '<section class="hub-block" id="hub-vida"><div class="hub-block-title">Vida</div>'+life+'</section>'+
+      '<section class="hub-block" id="hub-liturgia"><div class="hub-block-title">Liturgia</div>'+liturgyBlock(saint)+'</section>'+
+      '<section class="hub-block" id="hub-oracao"><div class="hub-block-title">Oração</div>'+prayerBlock(saint)+'</section>'+
+      '<section class="hub-block" id="hub-navegacao"><div class="hub-block-title">Navegação</div>'+navigationBlock(saint)+'</section>'+
+      '</div>';
+  };
+  window.openSaintSection=function(id,section){
+    openDetail(id);
+    requestAnimationFrame(function(){
+      const target=document.getElementById('hub-'+section);
+      if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+  };
+  window.openLiturgiaSection=function(section){
+    state.liturgiaSection=section==='horas'?'horas':'missa';
+    setTab('liturgia');
+  };
+
+  document.addEventListener('backbutton',function(event){event.preventDefault();smartBack();},false);
+  window.addEventListener('keydown',function(event){if(event.key==='Escape')smartBack();});
+  window.addEventListener('popstate',function(){
+    const mass=document.getElementById('dailyLiturgyOverlay');
+    if(mass&&mass.classList.contains('open')&&typeof window.closeDailyLiturgy==='function'){window.closeDailyLiturgy();updateBackButton();return;}
+    if(state.detailId!==null&&state.detailId!==undefined)closeDetail();
+  });
+
+  fetch('./data/missas-osm.json',{cache:'no-store'}).then(function(response){
+    if(!response.ok)throw new Error('Arquivo de Missas próprias indisponível');
+    return response.json();
+  }).then(function(data){
+    if(data.schema_version!==1||!Array.isArray(data.celebrations))throw new Error('Cadastro de Missas próprias inválido');
+    window.MISSAS_OSM=data;
+    if(state.detailId!==null&&state.detailId!==undefined)render();
+  }).catch(function(error){console.info('[Liturgia OSM] Missas próprias ainda sem registros conferidos.',error);});
+  render();
+})();
+/* END SCRIPT BLOCK: canonicalNavigation4926 */
