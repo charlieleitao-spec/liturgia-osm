@@ -15,7 +15,27 @@ const memoriasPorData=new Map(memoria.celebrations.map(item=>[item.date,item]));
 if(datasMemoria.size!==25 || memoriasPorData.size!==memoria.celebrations.length)
   throw new Error('Cobertura ou textos exclusivos da Memória Litúrgica inválidos');
 const outPath=process.argv[2]||'derived/servita.json';
-if(oficios.schema_version!==2 || !oficios.celebracoes) throw new Error('oficios-osm.json fora do schema canônico v2');
+if(![2,3].includes(oficios.schema_version) || !oficios.celebracoes) throw new Error('oficios-osm.json fora dos schemas canônicos v2/v3');
+
+const nomeHora={invitatorio:'Invitatório',oficio_leituras:'Ofício das Leituras',laudes:'Laudes',hora_media:'Hora Média',vesperas:'Vésperas',textos_proprios:'Textos próprios'};
+function materialParaHoje(registro){
+  const material=registro.material||{};
+  if(oficios.schema_version!==3 || registro.tipo_material!=='textos_proprios') return material;
+  const secoes=[];
+  for(const [key,value] of Object.entries(material.horas||{})){
+    if(!value)continue;
+    const entries=typeof value==='string'?[{texto:value}]:[
+      value,...(Array.isArray(value.alternativas)?value.alternativas:[])
+    ];
+    for(const entry of entries){
+      const texto=entry&&typeof entry==='object'?(entry.texto||entry.text):typeof entry==='string'?entry:'';
+      if(texto)secoes.push({titulo:entry.titulo||entry.title||value.titulo||nomeHora[key]||key,texto});
+    }
+    if(typeof value.oracao==='string'&&value.oracao.trim())secoes.push({titulo:'Oração',texto:value.oracao});
+  }
+  if(!secoes.length)throw new Error('Textos próprios sem seção legível em '+registro.id);
+  return {secoes};
+}
 
 const result={};
 const keyOf=s=>String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0');
@@ -57,7 +77,7 @@ for(const s of santoral){
     prayer_source:santoralFonte,
     image:s.image||null,
     tipo_material:lit.tipo_material,
-    material:lit.material||{},
+    material:materialParaHoje(lit),
     memoria_liturgica:memoriaLiturgica
   };
 }

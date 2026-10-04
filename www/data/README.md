@@ -29,8 +29,8 @@ Normalização estabelecida em 3 de outubro de 2026.
 
 O script `scripts/gerar-servita.js` gera integralmente o arquivo consumido pelo Hoje na Família Servita a partir das fontes canônicas: santoral, ofícios e Memória Litúrgica.
 
-### Schema v2 dos Ofícios
-`oficios-osm.json` possui `schema_version: 2` e uma coleção `celebracoes` indexada por `MM-DD`. Cada celebração declara `tipo_material` e `material`. Quando há Ofício próprio, `material.horas` organiza Invitatório, Ofício das Leituras, Laudes, Hora Média e Vésperas. Quando há apenas textos próprios, `material.secoes` mantém as seções editoriais. Celebrações sem material próprio são declaradas explicitamente.
+### Schemas v2 e v3 dos Ofícios
+`oficios-osm.json` mantém a coleção `celebracoes` indexada por `MM-DD`, com `tipo_material` e `material`. No schema v3, todo conteúdo reside em `material.horas`; `textos_proprios` representa trechos que não são uma hora canônica. O gerador aceita schemas 2 e 3. Para o leitor atual do Hoje, converte somente os registros `textos_proprios` do v3 para `material.secoes` no JSON derivado, preservando integralmente títulos e textos (inclusive alternativas e oração); Ofícios completos conservam `material.horas`. A fonte canônica continua sendo o arquivo de Ofícios do Liturgia OSM.
 
 O workflow `.github/workflows/gerar-base-derivada.yml` é disparado quando `santoral.json`, `oficios-osm.json`, `memoria-liturgica.json` ou o gerador mudam. Ele não depende de nenhuma cópia anterior de `servita.json`: reconstrói a base do zero, valida-a e a publica no outro repositório quando o secret `HOJE_FAMILIA_SERVITA_TOKEN` estiver configurado com permissão de escrita.
 

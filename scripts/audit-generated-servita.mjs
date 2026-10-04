@@ -5,6 +5,7 @@ if(!file)throw new Error('Informe o caminho de servita.json gerado.');
 const result=JSON.parse(fs.readFileSync(file,'utf8'));
 const santoral=JSON.parse(fs.readFileSync('www/data/santoral.json','utf8'));
 const memoria=JSON.parse(fs.readFileSync('www/data/memoria-liturgica.json','utf8'));
+const oficios=JSON.parse(fs.readFileSync('www/data/oficios-osm.json','utf8'));
 const keys=Object.keys(result);
 if(keys.length!==32)throw new Error('Santoral derivado incompleto: '+keys.length);
 const byDate=new Map(santoral.map(s=>[String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0'),s]));
@@ -16,6 +17,22 @@ for(const [key,item] of Object.entries(result)){
   if(!saint||item.id!==saint.id||!item.data||!item.titulo||!item.nome_original)throw new Error('Registro derivado incompleto: '+key);
   if(item.prayer!==(saint.prayer||''))throw new Error('Oração do Santoral divergente em '+key);
   if(item.image!==(saint.image||null))throw new Error('Imagem do Santoral divergente em '+key);
+  const canonical=oficios.celebracoes[key];
+  if(!canonical||item.tipo_material!==canonical.tipo_material)throw new Error('Tipo de Ofício divergente em '+key);
+  let expectedMaterial=canonical.material||{};
+  if(oficios.schema_version===3&&canonical.tipo_material==='textos_proprios'){
+    const names={invitatorio:'Invitatório',oficio_leituras:'Ofício das Leituras',laudes:'Laudes',hora_media:'Hora Média',vesperas:'Vésperas',textos_proprios:'Textos próprios'};
+    const secoes=[];
+    for(const [hour,value] of Object.entries(canonical.material?.horas||{})){
+      if(!value)continue;
+      const entries=typeof value==='string'?[{texto:value}]:[value,...(Array.isArray(value.alternativas)?value.alternativas:[])];
+      for(const entry of entries){const texto=entry&&typeof entry==='object'?(entry.texto||entry.text):typeof entry==='string'?entry:'';if(texto)secoes.push({titulo:entry.titulo||entry.title||value.titulo||names[hour]||hour,texto});}
+      if(typeof value.oracao==='string'&&value.oracao.trim())secoes.push({titulo:'Oração',texto:value.oracao});
+    }
+    expectedMaterial={secoes};
+    if(!secoes.length)throw new Error('Texto próprio não convertido em '+key);
+  }
+  if(JSON.stringify(item.material)!==JSON.stringify(expectedMaterial))throw new Error('Material derivado divergente da fonte em '+key);
   if(Boolean(item.memoria_liturgica)!==memoryDates.has(key))throw new Error('Cobertura da Memória divergente em '+key);
   if(!item.memoria_liturgica)continue;
   const m=item.memoria_liturgica;
