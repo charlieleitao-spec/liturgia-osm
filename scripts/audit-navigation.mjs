@@ -7,7 +7,7 @@ import vm from 'node:vm';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const html=readFileSync(resolve(root,'www/index.html'),'utf8');
 const version=JSON.parse(readFileSync(resolve(root,'package.json'),'utf8')).version;
-assert.equal(version,'4.9.31','A experiência de navegação deve ter versão própria.');
+assert.equal(version,'4.9.32','A experiência de navegação deve ter versão própria.');
 
 const nav=html.match(/<nav class="tabbar" id="tabbar"[\s\S]*?<\/nav>/)?.[0]||'';
 const tabIds=[...nav.matchAll(/data-tab="([^"]+)"/g)].map(match=>match[1]);

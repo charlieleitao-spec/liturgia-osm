@@ -83,22 +83,8 @@ let oficiosReady = false;
 let oficiosLoadError = false;
 let santoralLoading = true;
 let santoralLoadError = false;
-const SANTORAL_IMAGES = {
-  'Santo Antônio Maria Pucci': 'media/servite-12.jpg',
-  'Sete Santos Fundadores': 'media/servite-11.jpg',
-  'São Peregrino de Forlì': 'media/servite-10.webp',
-  'B. Tomás de Orvieto': 'media/servite-09.jpg',
-  'São Filipe Benizi': 'media/servite-08.jpg',
-  'B. Cecília Eusepi': 'media/servite-07.jpg',
-  'Santa Juliana de Florença': 'media/servite-06.jpg',
-  'B. Joana de Florença': 'media/servite-05.jpg',
-  'B. Maria Madalena da Paixão': 'media/servite-04.jpg',
-  'B. Maria Guadalupe Ricart Olmos': 'media/servite-03.jpg',
-  'Todos os Santos e Santas da Ordem': 'media/servite-02.webp'
-};
-
 function saintImageHtml(s, detail=false){
-  const src=SANTORAL_IMAGES[s.title];
+  const src=s.image;
   if(!src) return '';
   return detail ? `<div class="saint-image-detail fade-in"><img src="${src}" alt="Imagem de ${escapeHtml(s.title)}"></div>` : `<div class="saint-thumb"><img src="${src}" alt="Imagem de ${escapeHtml(s.title)}"></div>`;
 }
@@ -185,7 +171,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.31';
+const APP_VERSION = '4.9.32';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();

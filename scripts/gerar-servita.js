@@ -55,6 +55,7 @@ for(const s of santoral){
     bio:s.bio||'',
     prayer:s.prayer||'',
     prayer_source:santoralFonte,
+    image:s.image||null,
     tipo_material:lit.tipo_material,
     material:lit.material||{},
     memoria_liturgica:memoriaLiturgica

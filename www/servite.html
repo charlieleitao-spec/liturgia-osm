@@ -879,21 +879,8 @@ body.direct-office-view .hour-tab-content{padding:0!important;border:0!important
 <script>
 let SANTORAL = [];
 
-const SANTORAL_IMAGES = {
-  'Santo Antônio Maria Pucci': 'media/servite-12.jpg',
-  'Sete Santos Fundadores': 'media/servite-11.jpg',
-  'São Peregrino de Forlì': 'media/servite-10.webp',
-  'B. Tomás de Orvieto': 'media/servite-09.jpg',
-  'São Filipe Benizi': 'media/servite-08.jpg',
-  'B. Cecília Eusepi': 'media/servite-07.jpg',
-  'Santa Juliana de Florença': 'media/servite-06.jpg',
-  'B. Joana de Florença': 'media/servite-05.jpg',
-  'B. Maria Madalena da Paixão': 'media/servite-04.jpg',
-  'B. Maria Guadalupe Ricart Olmos': 'media/servite-03.jpg',
-  'Todos os Santos e Santas da Ordem': 'media/servite-02.webp'
-};
 function saintImageHtml(s, detail=false){
-  const src = SANTORAL_IMAGES[s.title];
+  const src = s.image;
   if(!src) return '';
   return detail
     ? `<div class="saint-image-detail fade-in"><img src="${src}" alt="Imagem de ${escapeHtml(s.title)}"><div class="saint-image-caption">Imagem original com aprimoramento de nitidez.</div></div>`

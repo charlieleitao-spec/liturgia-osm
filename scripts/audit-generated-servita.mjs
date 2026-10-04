@@ -15,6 +15,7 @@ for(const [key,item] of Object.entries(result)){
   const saint=byDate.get(key);
   if(!saint||item.id!==saint.id||!item.data||!item.titulo||!item.nome_original)throw new Error('Registro derivado incompleto: '+key);
   if(item.prayer!==(saint.prayer||''))throw new Error('Oração do Santoral divergente em '+key);
+  if(item.image!==(saint.image||null))throw new Error('Imagem do Santoral divergente em '+key);
   if(Boolean(item.memoria_liturgica)!==memoryDates.has(key))throw new Error('Cobertura da Memória divergente em '+key);
   if(!item.memoria_liturgica)continue;
   const m=item.memoria_liturgica;

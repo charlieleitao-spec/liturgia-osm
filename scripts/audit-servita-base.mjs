@@ -44,6 +44,11 @@ if (sw.includes('./data/hoje-familia-servita.json')) fail('Cache referencia arqu
 if (!derivedWorkflow.includes("if: github.event_name == 'workflow_dispatch' && inputs.publish == true") || !derivedWorkflow.includes('default: false')) fail('A publicação no Hoje deve exigir acionamento manual explícito após validar o APK.');
 
 if (!Array.isArray(santoral) || santoral.length !== 32) fail('Santoral canônico inesperado.');
+if (html.includes('SANTORAL_IMAGES')||servite.includes('SANTORAL_IMAGES')) fail('A imagem do santo deve vir do campo canônico image no Santoral.');
+for (const saint of santoral) if (saint.image) {
+  if (!fs.existsSync(path.join(www,saint.image))) fail(`Imagem ausente para ${saint.title}: ${saint.image}`);
+  if (!sw.includes(`./${saint.image}`)) fail(`Imagem fora do cache offline: ${saint.image}`);
+}
 const byDate = new Map();
 for (const [index, item] of santoral.entries()) {
   const key = String(item.month).padStart(2, '0') + '-' + String(item.day).padStart(2, '0');
