@@ -54,18 +54,26 @@ for (const [date, item] of Object.entries(offices.celebracoes || {})) {
   if (!saint) fail('Ofício sem celebração no Santoral: ' + date);
   else if (Number(item.id) !== Number(saint.id)) fail('ID de Ofício divergente em ' + date);
   if (!item.material || typeof item.material !== 'object') fail('Material de Ofício ausente em ' + date);
+  if (!['oficio_proprio','textos_proprios','sem_material_proprio'].includes(item.tipo_material)) fail('Tipo de material inválido em ' + date);
 }
 if (byDate.get('09-22')?.title !== 'Dedicação da Basílica de Monte Senário') fail('Monte Senário deve permanecer em 22/09.');
 if (byDate.get('12-15')?.title !== 'B. Boaventura de Pistoia' || byDate.has('12-14')) fail('Boaventura de Pistoia deve permanecer em 15/12.');
 if (byDate.get('08-23')?.title !== 'São Filipe Benizi') fail('A forma canônica do nome deve ser Benizi.');
+for (const date of ['02-19','05-12','05-30','09-06','09-22','10-25','12-15']) if (offices.celebracoes[date]?.tipo_material !== 'textos_proprios') fail('Ofício incompleto deve ser classificado como textos próprios em ' + date);
+for (const saint of santoral) if (typeof saint.prayer === 'string' && /[^\n]\n[^\n]/.test(saint.prayer)) fail('Quebra dura de oração não normalizada: ' + saint.date);
 
-if (memoria.schema_version !== 1 || !memoria.common || !Array.isArray(memoria.celebrations) || memoria.celebrations.length !== 25) fail('Base da Memória Litúrgica incompleta.');
+if (memoria.schema_version !== 2 || !memoria.common || !Array.isArray(memoria.memory_dates) || memoria.memory_dates.length !== 25 || !Array.isArray(memoria.celebrations)) fail('Base da Memória Litúrgica incompleta.');
 for (const part of ['hino', 'antifona', 'salmo']) if (!memoria.common?.[part]?.trim()) fail('Parte comum ausente na Memória Litúrgica: ' + part);
-const memoryDates = new Set();
+if (!memoria.editorial_notes?.['12-15']?.includes('imprime 14 de dezembro')) fail('A divergência de data de Boaventura deve ser registrada, sem alterar o texto fonte.');
+const memoryDates = new Set(memoria.memory_dates || []);
+if (memoryDates.size !== 25) fail('Datas de cobertura da Memória Litúrgica devem ser únicas.');
+for (const date of memoryDates) if (!byDate.has(date)) fail('Cobertura da Memória sem celebração correspondente: ' + date);
+const uniqueMemoryDates = new Set();
 for (const item of memoria.celebrations || []) {
   if (!byDate.has(item.date)) fail('Memória sem celebração correspondente: ' + item.date);
-  if (memoryDates.has(item.date)) fail('Data duplicada na Memória Litúrgica: ' + item.date);
-  memoryDates.add(item.date);
+  if (!memoryDates.has(item.date)) fail('Texto próprio fora da cobertura da Memória Litúrgica: ' + item.date);
+  if (uniqueMemoryDates.has(item.date)) fail('Data duplicada na Memória Litúrgica: ' + item.date);
+  uniqueMemoryDates.add(item.date);
   const saint=byDate.get(item.date);
   const compact=value=>String(value||'').replace(/\s+/g,' ').trim();
   if (!item.title?.trim()) fail(`Título ausente em ${item.date}.`);
@@ -75,6 +83,8 @@ for (const item of memoria.celebrations || []) {
   if (item.oracao_propria?.trim()&&compact(item.oracao_propria)===compact(saint?.prayer)) fail(`Oração duplicada na Memória Litúrgica em ${item.date}; use o Santoral canônico.`);
 }
 if (!memoria.source?.includes('Livro de Oração dos Servos de Maria')) fail('Fonte da Memória Litúrgica não identificada.');
+if (memoria.celebrations.length >= memoria.memory_dates.length) fail('Entradas da Memória que só repetem o Santoral devem ser removidas.');
+for (const item of memoria.celebrations) if (!item.breve_vida && !item.apresentacao && !item.oracao_propria) fail('Entrada vazia na Memória Litúrgica: ' + item.date);
 
 const devotionalDataKeys = {
   vigilia: '"vigilia": {',
@@ -105,7 +115,8 @@ console.log(JSON.stringify({
   version,
   santoral: santoral.length,
   oficios: Object.keys(offices.celebracoes).length,
-  memoriasLiturgicas: memoria.celebrations.length,
+  memoriasLiturgicas: memoria.memory_dates.length,
+  textosMemoriaExclusivos: memoria.celebrations.length,
   devotions: ['vigilia', 'coroa', 'via_matris'],
   offlineMemory: true
 }, null, 2));

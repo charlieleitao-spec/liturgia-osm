@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "source": "Livro de Oração dos Servos de Maria, 3ª edição revisada, 2024, seção Memória Litúrgica",
   "common": {
     "hino": "Como cantar-vos felizes, ó santos,\nnossa alegria de pios caminhantes?\nVossa memória aqui nos conforta,\ne nossa espera no reino confirma.\nSomos ditosos por ser-vos amigos\ne como irmãos ter convosco vivido:\njuntos cantamos os salmos das Horas,\njuntos sentamos à mesa fraterna.\nSaindo das celas parece-nos ver\nos Pais queridos que nos precederam\na nós dirigindo cordial saudação,\nconosco falando, rezando, cantando.\nFoi nestes coros que outrora cantastes,\nsim, vós chorastes sobre estes altares\nonde se acende a nossa esperança,\nembora nos custe manter-nos fiéis.\nIsto que agora nos torna felizes\né vossa memória, Gloriosa Senhora:\nviver convosco o mandato do amor,\nmanter aberto ao mundo o Cenáculo!\nCom Santa Maria, felizes cantamos,\nunidos aos santos, fiéis irmãos nossos,\npor toda a Igreja ao Senhor entoamos\num canto novo de graça e louvor.",
@@ -8,47 +8,16 @@
   },
   "celebrations": [
     {
-      "date": "01-12",
-      "source_date": "12 de janeiro",
-      "title": "SANTO ANTÔNIO MARIA PUCCI"
-    },
-    {
-      "date": "01-15",
-      "source_date": "15 de janeiro",
-      "title": "B. TIAGO DE \"CITTÀ DELLE PIEVE\"",
-      "oracao_propria": "Ó Deus, impelido por vosso amor, o bem-aventurado Tiago não hesitou enfrentar a morte para defender os direitos dos pobres. Concedei que nada nos intimide na defesa da justiça e da caridade. Por Cristo nosso Senhor. Amém!"
-    },
-    {
-      "date": "02-03",
-      "source_date": "3 de fevereiro",
-      "title": "B. JOAQUIM DE SENA"
-    },
-    {
       "date": "02-17",
       "source_date": "17 de fevereiro",
       "title": "SETE SANTOS FUNDADORES",
       "breve_vida": "Bonfilho, Bonajunta, Maneto, Amadeu, Hugo, Sóstenes, Aleixo: estes são os nomes com os quais Leão XIII canonizou os sete homens que, por volta da metade do século XIII, deram início à Ordem dos Frades Servos de Santa Maria, na cidade de Florença, Itália.\n\nA Igreja e a Ordem veneram-nos sob o nome coletivo de Sete Santos Fundadores. Eram leigos. De profissão, comerciantes. Alguns casados, outros solteiros ou viúvos, todos animados por uma vontade firme de alcançar a perfeição cristã. Pertenciam à \"Associação-Mor de Santa Maria\" e, como membros dessa associação, postos a serviço de Deus e da Virgem Maria, dedicavam-se às obras de caridade e de penitência.\n\nSegundo a tradição, dia 15 de agosto de 1233, deixaram suas famílias e atividades comerciais e retiraram-se para uma localidade chamada \"Cafaggio\", na periferia da cidade de Florença, para ali levarem vida de oração e de penitência.\n\nPor volta de 1245, mudaram-se para Monte Senário, cerca de dezoito quilômetros fora de Florença, onde construíram uma igreja e uma pequena casa. Logo, se juntaram a eles outros homens que também aspiravam à vida de solidão e contemplação.\n\nPor sua vida santa, pela seriedade do seu compromisso religioso e pela estima de que gozavam junto ao povo, obtiveram a aprovação Sé Apostólica e o apoio do bispo de Florença.\n\nDe Monte Senário, os Sete e seus companheiros desceram à cidade de Florença para dedicar-se às obras do apostolado. Em \"Cafaggio\", construíram uma igreja no local onde hoje se encontra a basílica de Santíssima Anunciada.\n\nPoucos são os dados históricos referentes aos Sete Santos Fundadores. Com exceção de dois (São Bonfilho e Santo Aleixo), até seus nomes são historicamente incertos. Mas certo e seguro é seu perfil espiritual, descrito na \"Legenda sobre as origens da Ordem\", o documento mais antigo sobre a vida dos Sete Santos. Na \"Legenda\", seu perfil espiritual confunde-se com o próprio carisma da Ordem e chegou até nós através de uma tradição fidedigna e ininterrupta.\n\nOs Sete distinguiram-se no ardente amor a Deus e a Virgem Maria, na humildade, no espírito de serviço, na abertura à concórdia e ao perdão e na vontade firme de promover a paz. Por isso são definidos pela liturgia como “ministros da unidade e da paz” (cf. Prefácio da missa).\n\nForam canonizados juntos, como se fossem um só, pelo papa Leão XIII, em 1888. Seus restos mortais são venerados na basílica de Monte Senário."
     },
     {
-      "date": "02-19",
-      "source_date": "19 de fevereiro",
-      "title": "B. ISABEL PICENARDI"
-    },
-    {
       "date": "05-04",
       "source_date": "4 de maio",
       "title": "SÃO PEREGRINO DE FORLI",
       "breve_vida": "Peregrino nasceu em 1265, em Forlì, cidade da região italiana da Romanha. Na época, Forlì estava sob a jurisdição do Estado Pontifício, embora nela predominassem os Gibelinos, opositores do papa. Estes, em 1282, levaram a população a rebelar-se contra a autoridade papal. Por isso, o papa lançou o interdito contra a cidade, fechando as igrejas e proibindo a celebração do culto.\n\nSão Filipe Benizi, então prior geral da Ordem, em visita a os frades do convento de Forlì, tentou reconduzir os habitantes da cidade à obediência papal, mas foi mal recebido. Um grupo de fanáticos exaltados, entre os quais o jovem Peregrino, investiram contra São Filipe, bateram nele e o expulsaram da cidade. Mas Peregrino logo se arrependeu do mal feito e pediu perdão ao Santo.\n\nAnos depois, ingressou na Ordem e foi o próprio São Filipe que o recebeu no convento de Sena, onde Peregrino conviveu com dois frades de insigne santidade: os bem-aventurados Joaquim e Francisco de Sena. Depois voltou para Forlì e aí ficou até a morte, ocorrida em 1345.\n\nPeregrino, como frade, distinguiu-se no amor à oração, na devoção a Virgem Maria e na prática da penitência e da caridade. Acudia aos irmãos mais pobres, em favor dos quais Deus lhe concedeu o dom dos milagres.\n\nAcometido por uma ferida cancerosa numa perna, foi milagrosamente curado enquanto se encontrava em oração diante da imagem do Crucificado. Por isso, é invocado como protetor dos doentes, principalmente dos que sofrem de câncer. Peregrino foi canonizado em 1726. Seu corpo é venerado na igreja do convento dos Servos de Maria, em Forlì.\n\nNós, Servos de Maria, vemos concretizado  o nosso ideal de vida, ou seja: serviço, oração, piedade mariana, amor ao próximo."
-    },
-    {
-      "date": "05-11",
-      "source_date": "11 de maio",
-      "title": "B. BENINCASA DE MONTEPULCIANO"
-    },
-    {
-      "date": "05-12",
-      "source_date": "12 de maio",
-      "title": "B. FRANCISCO DE SENA"
     },
     {
       "date": "05-30",
@@ -61,21 +30,6 @@
       "source_date": "19 de junho",
       "title": "SANTA JULIANA DE FLORENÇA",
       "breve_vida": "Juliana nasceu em Florença na segunda metade do século XIII. Segundo a tradição, era da mesma família \"Falconieri\", à qual pertencia Santo Aleixo, um dos Sete Fundadores dos Servos de Maria.\n\nO acontecimento mais importante de sua vida - por sinal, pouco conhecido - foi sua conversão quando tinha 15 anos de idade, depois de ouvir uma pregação de Santo Aleixo sobre o Juízo Final. A partir daí, Juliana orientou o coração e a mente unicamente para o Senhor e, embora residindo com a família, levou vida de penitência e contemplação, seguindo o exemplo dos primeiros frades da nossa Ordem. Frequentava a igreja de Santa Maria de Cafaggio, futura basílica da Santíssima Anunciada. Junto com os frades, participava dos ofícios litúrgicos e cantava os louvores da Mãe do Senhor.\n\nDepois de muito insistir com os pais e de implorar a Virgem Maria, obteve a graça de receber o hábito da Ordem. Logo, outras jovens juntaram-se a ela na vida de penitência e de piedade e na partilha do ideal de vida dos Servos de Maria.\n\nA espiritualidade de Santa Juliana caracteriza-se por um ardente amor à Eucaristia. No leito de morte, não podendo receber o Corpo do Senhor devido ao seu estado de saúde, pediu que a santa Hóstia lhe fosse colocada sobre o peito. Diz uma piedosa tradição que a santa Hóstia penetrou milagrosamente no seu peito e não foi mais encontrada.\n\nPresume-se que Santa Juliana tenha morrido em 1341. Venerada na Ordem como \"bem-aventurada\" pelo menos desde o século XV, foi canonizada pelo papa Clemente XII em 1737.\n\nJuliana, a bem da verdade, não fundou nenhuma congregação religiosa. Apesar disso, as mulheres - leigas, religiosas e monjas - que ao longo dos séculos dedicaram-se ao serviço da Virgem Maria no âmbito da Família Servita, sempre a reconheceram como mãe e mestra. Seu mais antigo biógrafo, frei Paulo Attavanti, a definiu como \"magnum caput\", isto é, como grande inspiradora das congregações femininas da Ordem.\n\nOs membros da Ordem Secular Servita colocam Santa Juliana em primeiro lugar na longa lista de leigos que viveram como amigos dos Servos de Maria e compartilharam o seu ideal de serviço a Deus, a Virgem Maria e aos irmãos."
-    },
-    {
-      "date": "06-27",
-      "source_date": "27 de junho",
-      "title": "B. TOMÁS DE ORVIETO"
-    },
-    {
-      "date": "07-01",
-      "source_date": "1 de julho",
-      "title": "B. FERNANDO MARIA BACCILIERI"
-    },
-    {
-      "date": "07-04",
-      "source_date": "4 de julho",
-      "title": "B. UBALDO DE SANSEPOLCRO"
     },
     {
       "date": "07-13",
@@ -96,27 +50,6 @@
       "breve_vida": "Atraído pelas palavras e pelo exemplo de São Filipe, em 1278 André ingressou no convento dos Servos de Maria de Sansepolcro (Toscana, Itália), onde recebeu o hábito da Ordem.\n\nAmante da vida penitente e contemplativa, retirou-se num eremitério situado nos arredores da sua cidade natal, atraindo para lá outros eremitas, que se puseram sob a sua orientação e se agregaram à Ordem.\n\nMorreu em 1315 e seu corpo foi levado pelos eremitas para a igreja dos Servos de Maria da cidade. Em 1806, o papa Pio VII aprovou seu culto."
     },
     {
-      "date": "09-01",
-      "source_date": "1 de setembro",
-      "title": "B. JOANA DE FLORENÇA"
-    },
-    {
-      "date": "09-05",
-      "source_date": "5 de setembro",
-      "title": "B. Maria Madalena da paixão"
-    },
-    {
-      "date": "09-06",
-      "source_date": "6 de setembro",
-      "title": "B. BOAVENTURA DE FORLI"
-    },
-    {
-      "date": "09-17",
-      "source_date": "17 de setembro",
-      "title": "B. CECÍLIA EUSEPI",
-      "oracao_propria": "Pai Santo, que revelastes os mistérios do vosso Filho à Bem-aventurada Cecília, vossa humilde serva, e lhe concedestes a graça de vivê-los fielmente, dai-nos, por sua intercessão, a sabedoria do coração para crescermos cada dia no amor a Cristo e segui-lo, a exemplo da Virgem Maria, até a cruz. Ele que convosco vive reina na unidade do Espírito Santo. Amém"
-    },
-    {
       "date": "10-03",
       "source_date": "3 de outubro",
       "title": "B. MARIA GUADALUPE RICART OLMOS",
@@ -129,21 +62,41 @@
       "breve_vida": "João Ângelo nasceu em Milão em 1451. Ingressou jovem no convento milanês de Santa Maria e depois mudou-se para o convento da Santíssima Anunciada, em Florença, onde foi ordenado presbítero.\n\nAtraído pelo ideal de vida penitente e contemplativa, viveu quase vinte anos no eremitério de Monte Senário. Voltou em seguida para Milão, onde dedicou-se inteiramente na educação cristã das crianças.\n\nMorreu aos 23 de outubro de 1505. Seu corpo é venerado na basílica de São Carlos,  beatificado por Clemente XII em 1737."
     },
     {
-      "date": "12-10",
-      "source_date": "10 de dezembro",
-      "title": "B. JERÔNIMO DE SANT'ANGELO IN VADO"
-    },
-    {
-      "date": "12-15",
-      "source_date": "14 de dezembro",
-      "title": "B. BOAVENTURA DE PISTOIA"
-    },
-    {
       "date": "11-16",
       "source_date": "16 de novembro",
       "title": "TODOS OS SANTOS E SANTAS DA ORDEM",
       "breve_vida": "",
       "apresentacao": "[Como a Igreja universal celebra todos os Santos, também a Família Servita recorda anualmente todos os santos frades, monjas, freiras, irmãos e irmãs da Ordem Secular que, em seu tempo, tornaram agradável ao Senhor e a Virgem Maria a nossa Ordem e que são um estímulo de serviço perene]."
     }
-  ]
+  ],
+  "memory_dates": [
+    "01-12",
+    "01-15",
+    "02-03",
+    "02-17",
+    "02-19",
+    "05-04",
+    "05-11",
+    "05-12",
+    "05-30",
+    "06-19",
+    "06-27",
+    "07-01",
+    "07-04",
+    "07-13",
+    "08-23",
+    "08-31",
+    "09-01",
+    "09-05",
+    "09-06",
+    "09-17",
+    "10-03",
+    "10-25",
+    "11-16",
+    "12-10",
+    "12-15"
+  ],
+  "editorial_notes": {
+    "12-15": "O corpo da seção no Livro de Oração imprime 14 de dezembro; o índice do livro e o calendário OSM indicam 15 de dezembro."
+  }
 }
