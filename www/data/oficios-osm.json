@@ -1,6 +1,6 @@
 {
-  "schema_version": 2,
-  "description": "Ofícios e textos próprios OSM estruturados por data. Fonte canônica de material litúrgico compartilhado.",
+  "schema_version": 3,
+  "description": "Ofícios e textos próprios OSM estruturados por data (MM-DD). Esquema 3: todo material fica em material.horas; cada hora é {titulo, texto, alternativas?}; 'textos_proprios' reúne trechos próprios fora das horas canônicas. Fonte canônica de material litúrgico compartilhado.",
   "celebracoes": {
     "01-12": {
       "id": 0,
@@ -34,18 +34,12 @@
       "id": 1,
       "tipo_material": "textos_proprios",
       "material": {
-        "secoes": [
-          {
-            "tipo": "texto_proprio",
-            "titulo": "Textos próprios",
-            "texto": "Do Comum dos Santos e Bem-aventurados da nossa Ordem, p. 489. Salmos do dia da semana corrente.\n\nRESPONSÓRIO Mt 5,10; cf. 1Pd 4,14a\nR. Bem-aventurados os que são perseguidos por causa da justiça, * porque deles é o reino dos céus.\nV. Bem-aventurados os que sofrem injúrias por causa do nome de Cristo.\nR. Porque deles é o reino dos céus."
-          },
-          {
-            "tipo": "oracao",
-            "titulo": "Oração",
-            "texto": "Ó Deus, nosso Pai, impelido por vosso amor, o Bem-aventurado Tiago não hesitou enfrentar a própria morte para defender os direitos dos pobres: fazei que nada nos intimide na defesa da justiça e da caridade. Por nosso Senhor."
+        "horas": {
+          "textos_proprios": {
+            "texto": "Textos próprios\nDo Comum dos Santos e Bem-aventurados da nossa Ordem, p. 489. Salmos do dia da semana corrente.\n\nRESPONSÓRIO Mt 5,10; cf. 1Pd 4,14a\nR. Bem-aventurados os que são perseguidos por causa da justiça, * porque deles é o reino dos céus.\nV. Bem-aventurados os que sofrem injúrias por causa do nome de Cristo.\nR. Porque deles é o reino dos céus.\n\n",
+            "oracao": "\nÓ Deus, nosso Pai, impelido por vosso amor, o Bem-aventurado Tiago não hesitou enfrentar a própria morte para defender os direitos dos pobres: fazei que nada nos intimide na defesa da justiça e da caridade. Por nosso Senhor."
           }
-        ]
+        }
       }
     },
     "02-03": {
@@ -94,7 +88,7 @@
     },
     "02-19": {
       "id": 4,
-      "tipo_material": "oficio_proprio",
+      "tipo_material": "textos_proprios",
       "material": {
         "horas": {
           "laudes": {
@@ -165,23 +159,17 @@
       "id": 8,
       "tipo_material": "textos_proprios",
       "material": {
-        "secoes": [
-          {
-            "tipo": "texto_proprio",
-            "titulo": "Textos próprios",
-            "texto": "Do Comum dos Santos e Bem-aventurados da nossa Ordem, p. 489. Salmos e antífonas do dia da semana corrente.\n\nRESPONSÓRIO Mt 26,41; Cl 4,2\nR. Vigiai e orai para não cairdes em tentação: * o espírito está pronto, mas a carne é fraca.\nV. Sede perseverantes e vigilantes na oração, rendendo graças ao Senhor.\nR. O espírito está pronto, mas a carne é fraca."
-          },
-          {
-            "tipo": "oracao",
-            "titulo": "Oração",
-            "texto": "Ó Deus, fizestes do Bem-aventurado Benincasa, com sua vida de solidão operante, uma testemunha viva do vosso Filho; concedei que, mediante a contemplação e a conversão interior, vivamos com maior liberdade o compromisso evangélico. Por nosso Senhor."
+        "horas": {
+          "textos_proprios": {
+            "texto": "Textos próprios\nDo Comum dos Santos e Bem-aventurados da nossa Ordem, p. 489. Salmos e antífonas do dia da semana corrente.\n\nRESPONSÓRIO Mt 26,41; Cl 4,2\nR. Vigiai e orai para não cairdes em tentação: * o espírito está pronto, mas a carne é fraca.\nV. Sede perseverantes e vigilantes na oração, rendendo graças ao Senhor.\nR. O espírito está pronto, mas a carne é fraca.\n\n",
+            "oracao": "\nÓ Deus, fizestes do Bem-aventurado Benincasa, com sua vida de solidão operante, uma testemunha viva do vosso Filho; concedei que, mediante a contemplação e a conversão interior, vivamos com maior liberdade o compromisso evangélico. Por nosso Senhor."
           }
-        ]
+        }
       }
     },
     "05-12": {
       "id": 9,
-      "tipo_material": "oficio_proprio",
+      "tipo_material": "textos_proprios",
       "material": {
         "horas": {
           "laudes": {
@@ -197,7 +185,7 @@
     },
     "05-30": {
       "id": 10,
-      "tipo_material": "oficio_proprio",
+      "tipo_material": "textos_proprios",
       "material": {
         "horas": {
           "laudes": {
@@ -239,18 +227,12 @@
       "id": 12,
       "tipo_material": "textos_proprios",
       "material": {
-        "secoes": [
-          {
-            "tipo": "texto_proprio",
-            "titulo": "Textos próprios",
-            "texto": "Do Comum dos Santos e Bem-aventurados da nossa Ordem, p. 489. Antífonas e salmos do dia da semana corrente.\n\nRESPONSÓRIO\nR. Sede humildes e sinceros entre vós: * Deus resiste aos soberbos, mas dá a graça aos humildes.\nV. Vós, como eleitos de Deus, santos e amados, revesti-vos de sentimentos de compaixão, de bondade, humildade e mansidão.\nR. Deus resiste aos soberbos, mas dá a graça aos humildes."
-          },
-          {
-            "tipo": "oracao",
-            "titulo": "Oração",
-            "texto": "Ó Deus, que inclinais benignamente vossos ouvidos às preces dos humildes, concedei, pela intercessão do Bem-aventurado Tomás, que vossa família alcance serenidade na vida presente e felicidade eterna na vida futura. Por nosso Senhor."
+        "horas": {
+          "textos_proprios": {
+            "texto": "Textos próprios\nDo Comum dos Santos e Bem-aventurados da nossa Ordem, p. 489. Antífonas e salmos do dia da semana corrente.\n\nRESPONSÓRIO\nR. Sede humildes e sinceros entre vós: * Deus resiste aos soberbos, mas dá a graça aos humildes.\nV. Vós, como eleitos de Deus, santos e amados, revesti-vos de sentimentos de compaixão, de bondade, humildade e mansidão.\nR. Deus resiste aos soberbos, mas dá a graça aos humildes.\n\n",
+            "oracao": "\nÓ Deus, que inclinais benignamente vossos ouvidos às preces dos humildes, concedei, pela intercessão do Bem-aventurado Tomás, que vossa família alcance serenidade na vida presente e felicidade eterna na vida futura. Por nosso Senhor."
           }
-        ]
+        }
       }
     },
     "07-01": {
@@ -262,36 +244,24 @@
       "id": 14,
       "tipo_material": "textos_proprios",
       "material": {
-        "secoes": [
-          {
-            "tipo": "texto_proprio",
-            "titulo": "Textos próprios",
-            "texto": "Do Comum dos Santos e Bem-aventurados da nossa Ordem, p. 489. Antífonas e salmos do dia da semana corrente.\n\nRESPONSÓRIO 2Cor 7,6; 1,3-4; Tt 1,4\nR. Deus, consolador dos aflitos, * consola-nos com a chegada de um filho e irmão na fé.\nV. Bendito seja Deus que nos consola em nossas tribulações.\nR. Consola-nos com a chegada de um filho e irmão na fé."
-          },
-          {
-            "tipo": "oracao",
-            "titulo": "Oração",
-            "texto": "Ó Deus, fonte da castidade e do puro amor, pelas preces e exemplos do Bem-aventurado Ubaldo, concedei que vossos servos vos glorifiquem com a santidade de suas vidas e o testemunho de sua unidade. Por nosso Senhor."
+        "horas": {
+          "textos_proprios": {
+            "texto": "Textos próprios\nDo Comum dos Santos e Bem-aventurados da nossa Ordem, p. 489. Antífonas e salmos do dia da semana corrente.\n\nRESPONSÓRIO 2Cor 7,6; 1,3-4; Tt 1,4\nR. Deus, consolador dos aflitos, * consola-nos com a chegada de um filho e irmão na fé.\nV. Bendito seja Deus que nos consola em nossas tribulações.\nR. Consola-nos com a chegada de um filho e irmão na fé.\n\n",
+            "oracao": "\nÓ Deus, fonte da castidade e do puro amor, pelas preces e exemplos do Bem-aventurado Ubaldo, concedei que vossos servos vos glorifiquem com a santidade de suas vidas e o testemunho de sua unidade. Por nosso Senhor."
           }
-        ]
+        }
       }
     },
     "07-13": {
       "id": 15,
       "tipo_material": "textos_proprios",
       "material": {
-        "secoes": [
-          {
-            "tipo": "texto_proprio",
-            "titulo": "Textos próprios",
-            "texto": "Do Comum das Virgens ou do Comum dos Santos e Bem-aventurados da nossa Ordem, p. 489. Antífonas e salmos do dia da semana corrente.\n\nRESPONSÓRIO 1Pd 5,5; Mt 11,29\nR. Sede humildes e sinceros entre vós: * Deus resiste aos soberbos, mas dá a sua graça aos humildes.\nV. Aprendei de mim que sou manso e humilde de coração e encontrareis repouso para as vossas almas.\nR. Deus resiste aos soberbos, mas dá a sua graça aos humildes."
-          },
-          {
-            "tipo": "oracao",
-            "titulo": "Oração",
-            "texto": "Ó Deus, que nos destes em Santa Clélia um exemplo de vida evangélica e de disponibilidade em servir os irmãos, concedei que nós também saibamos imitar a Cristo, manso e humilde de coração, para alcançarmos a herança no vosso reino. Por nosso Senhor."
+        "horas": {
+          "textos_proprios": {
+            "texto": "Textos próprios\nDo Comum das Virgens ou do Comum dos Santos e Bem-aventurados da nossa Ordem, p. 489. Antífonas e salmos do dia da semana corrente.\n\nRESPONSÓRIO 1Pd 5,5; Mt 11,29\nR. Sede humildes e sinceros entre vós: * Deus resiste aos soberbos, mas dá a sua graça aos humildes.\nV. Aprendei de mim que sou manso e humilde de coração e encontrareis repouso para as vossas almas.\nR. Deus resiste aos soberbos, mas dá a sua graça aos humildes.\n\n",
+            "oracao": "\nÓ Deus, que nos destes em Santa Clélia um exemplo de vida evangélica e de disponibilidade em servir os irmãos, concedei que nós também saibamos imitar a Cristo, manso e humilde de coração, para alcançarmos a herança no vosso reino. Por nosso Senhor."
           }
-        ]
+        }
       }
     },
     "08-23": {
@@ -347,36 +317,24 @@
       "id": 19,
       "tipo_material": "textos_proprios",
       "material": {
-        "secoes": [
-          {
-            "tipo": "texto_proprio",
-            "titulo": "Textos próprios",
-            "texto": "Do Comum dos Santos e Bem-aventurados da nossa Ordem, p. 489. Antífonas e salmos do dia da semana corrente.\n\nRESPONSÓRIO 1Cor 16,11; Cl 3,3\nR. Buscai o Senhor, revesti-vos de sua força, * buscai sempre a sua face.\nV. Morrestes ao pecado e a vossa vida está escondida com Cristo em Deus.\nR. Buscai sempre a sua face."
-          },
-          {
-            "tipo": "oracao",
-            "titulo": "Oração",
-            "texto": "Senhor Deus, por intermédio do Bem-aventurado André, atraístes outros eremitas à Ordem dos Servos de Maria e os unistes na devoção à Virgem Maria e no amor fraterno. Concedei que nós também, servindo fielmente a Nossa Senhora, possamos pensar e agir concordemente. Por nosso Senhor."
+        "horas": {
+          "textos_proprios": {
+            "texto": "Textos próprios\nDo Comum dos Santos e Bem-aventurados da nossa Ordem, p. 489. Antífonas e salmos do dia da semana corrente.\n\nRESPONSÓRIO 1Cor 16,11; Cl 3,3\nR. Buscai o Senhor, revesti-vos de sua força, * buscai sempre a sua face.\nV. Morrestes ao pecado e a vossa vida está escondida com Cristo em Deus.\nR. Buscai sempre a sua face.\n\n",
+            "oracao": "\nSenhor Deus, por intermédio do Bem-aventurado André, atraístes outros eremitas à Ordem dos Servos de Maria e os unistes na devoção à Virgem Maria e no amor fraterno. Concedei que nós também, servindo fielmente a Nossa Senhora, possamos pensar e agir concordemente. Por nosso Senhor."
           }
-        ]
+        }
       }
     },
     "09-01": {
       "id": 20,
       "tipo_material": "textos_proprios",
       "material": {
-        "secoes": [
-          {
-            "tipo": "texto_proprio",
-            "titulo": "Textos próprios",
-            "texto": "Do Comum das Virgens, ou do Comum dos Santos e Bem-aventurados da nossa Ordem, p. 489. Antífonas, salmos e cântico do dia da semana corrente.\n\nRESPONSÓRIO\nR. A virgem seja casta, * e a verdade permaneça intacta em seu coração.\nV. Consagre-se a Deus com jejuns, leituras, oração e obras.\nR. E a verdade permaneça intacta em seu coração."
-          },
-          {
-            "tipo": "oracao",
-            "titulo": "Oração",
-            "texto": "Ó Deus, concedestes à Bem-aventurada virgem Joana guardar a inocência mediante uma vida austera. Dai-nos, por sua intercessão, produzir frutos de penitência e servir-vos de coração puro. Por nosso Senhor."
+        "horas": {
+          "textos_proprios": {
+            "texto": "Textos próprios\nDo Comum das Virgens, ou do Comum dos Santos e Bem-aventurados da nossa Ordem, p. 489. Antífonas, salmos e cântico do dia da semana corrente.\n\nRESPONSÓRIO\nR. A virgem seja casta, * e a verdade permaneça intacta em seu coração.\nV. Consagre-se a Deus com jejuns, leituras, oração e obras.\nR. E a verdade permaneça intacta em seu coração.\n\n",
+            "oracao": "\nÓ Deus, concedestes à Bem-aventurada virgem Joana guardar a inocência mediante uma vida austera. Dai-nos, por sua intercessão, produzir frutos de penitência e servir-vos de coração puro. Por nosso Senhor."
           }
-        ]
+        }
       }
     },
     "09-05": {
@@ -386,7 +344,7 @@
     },
     "09-06": {
       "id": 22,
-      "tipo_material": "oficio_proprio",
+      "tipo_material": "textos_proprios",
       "material": {
         "horas": {
           "laudes": {
@@ -427,7 +385,7 @@
     },
     "09-22": {
       "id": 25,
-      "tipo_material": "oficio_proprio",
+      "tipo_material": "textos_proprios",
       "material": {
         "horas": {
           "laudes": {
@@ -445,24 +403,26 @@
       "id": 26,
       "tipo_material": "textos_proprios",
       "material": {
-        "oficio_leituras": {
-          "titulo": "Ofício das Leituras",
-          "estado": "parcial",
-          "rubrica": "O próprio oficial prevê leituras alternativas. Mantém-se nesta base somente o texto português já verificado; as demais alternativas e seus responsórios aguardam transcrição portuguesa conferida da fonte oficial.",
-          "alternativas": [
-            {
-              "titulo": "Leitura hagiográfica",
-              "fonte": "Próprio OSM — texto português já presente na base",
-              "texto": "Maria Guadalupe Ricart Olmos nasceu em Albal (Valência, Espanha) aos 23 de fevereiro de 1881, filha de Francisco Ricart e de Maria Olmos, modestos agricultores. No batismo recebeu o nome de Maria Francisca. Aos 4 anos, ficou órfã de pai.\n\nDesejosa de consagrar-se ao Senhor, aos 11 de junho de 1896, ingressou no mosteiro “Pie de la Cruz” de Valência, das monjas Servas de Maria, onde emitiu os votos perpétuos em 19 de junho de 1900. Ocupou no mosteiro vários cargos: desde roupeira até mestra de noviças e priora. Distinguiu-se por uma vida simples, fiel aos compromissos, solícita com as coirmãs, principalmente com as mais jovens, e ciosamente apegada à espiritualidade da Ordem.\n\nEm 1936, em plena guerra civil espanhola, um grupo de milicianos invadiu o mosteiro. Ela e suas coirmãs foram obrigadas a refugiar-se em casa de parentes. Na noite de 2 de outubro de 1936, quatro milicianos armados invadiram a casa onde ela se encontrava e lhe perguntaram se era religiosa. “Sim - respondeu ela - sou monja e, se tivesse que nascer mil vezes, voltaria a sê-lo no mosteiro de «Pie de la Cruz»”.\n\nFoi então presa pelos milicianos e arrastada para um lugar deserto, onde a trucidaram sem piedade. Seu corpo, totalmente desfigurado pelos algozes, foi sepultado numa fossa comum do cemitério de Silla, em Valência. Em fevereiro de 1940, foi trasladado para o cemitério de “Pie de la Cruz”. Finalmente, em 1959, com a transferência do mosteiro de Valência para Mislata, seus restos mortais foram solenemente sepultados ao lado do altar-mor da igreja deste mosteiro.\n\nO processo de beatificação e canonização foi iniciado em 20 de junho de 1959 e seu martírio foi oficialmente reconhecido pela Sé Apostólica em 1999. Dia 11 de março de 2000 foi beatificada pelo papa João Paulo II."
-            }
-          ]
-        },
-        "oracao": "Ó Pai, em cujas mãos está nossa vida, por um\ninsondável desígnio do vosso amor, a bem-aventurada\nMaria Guadalupe, discípula fiel e monja Serva de Santa\nMaria, associou-se à paixão de Cristo. Dai-nos\ncompreender o mistério do Filho do Homem e\npercorrer o caminho estreito que conduz à vida. Por\nCristo nosso Senhor. Amém!"
+        "horas": {
+          "textos_proprios": {
+            "titulo": "Ofício das Leituras",
+            "estado": "parcial",
+            "rubrica": "O próprio oficial prevê leituras alternativas. Mantém-se nesta base somente o texto português já verificado; as demais alternativas e seus responsórios aguardam transcrição portuguesa conferida da fonte oficial.",
+            "alternativas": [
+              {
+                "titulo": "Leitura hagiográfica",
+                "fonte": "Próprio OSM — texto português já presente na base",
+                "texto": "Maria Guadalupe Ricart Olmos nasceu em Albal (Valência, Espanha) aos 23 de fevereiro de 1881, filha de Francisco Ricart e de Maria Olmos, modestos agricultores. No batismo recebeu o nome de Maria Francisca. Aos 4 anos, ficou órfã de pai.\n\nDesejosa de consagrar-se ao Senhor, aos 11 de junho de 1896, ingressou no mosteiro “Pie de la Cruz” de Valência, das monjas Servas de Maria, onde emitiu os votos perpétuos em 19 de junho de 1900. Ocupou no mosteiro vários cargos: desde roupeira até mestra de noviças e priora. Distinguiu-se por uma vida simples, fiel aos compromissos, solícita com as coirmãs, principalmente com as mais jovens, e ciosamente apegada à espiritualidade da Ordem.\n\nEm 1936, em plena guerra civil espanhola, um grupo de milicianos invadiu o mosteiro. Ela e suas coirmãs foram obrigadas a refugiar-se em casa de parentes. Na noite de 2 de outubro de 1936, quatro milicianos armados invadiram a casa onde ela se encontrava e lhe perguntaram se era religiosa. “Sim - respondeu ela - sou monja e, se tivesse que nascer mil vezes, voltaria a sê-lo no mosteiro de «Pie de la Cruz»”.\n\nFoi então presa pelos milicianos e arrastada para um lugar deserto, onde a trucidaram sem piedade. Seu corpo, totalmente desfigurado pelos algozes, foi sepultado numa fossa comum do cemitério de Silla, em Valência. Em fevereiro de 1940, foi trasladado para o cemitério de “Pie de la Cruz”. Finalmente, em 1959, com a transferência do mosteiro de Valência para Mislata, seus restos mortais foram solenemente sepultados ao lado do altar-mor da igreja deste mosteiro.\n\nO processo de beatificação e canonização foi iniciado em 20 de junho de 1959 e seu martírio foi oficialmente reconhecido pela Sé Apostólica em 1999. Dia 11 de março de 2000 foi beatificada pelo papa João Paulo II."
+              }
+            ],
+            "oracao": "Ó Pai, em cujas mãos está nossa vida, por um\ninsondável desígnio do vosso amor, a bem-aventurada\nMaria Guadalupe, discípula fiel e monja Serva de Santa\nMaria, associou-se à paixão de Cristo. Dai-nos\ncompreender o mistério do Filho do Homem e\npercorrer o caminho estreito que conduz à vida. Por\nCristo nosso Senhor. Amém!"
+          }
+        }
       }
     },
     "10-25": {
       "id": 27,
-      "tipo_material": "oficio_proprio",
+      "tipo_material": "textos_proprios",
       "material": {
         "horas": {
           "laudes": {
@@ -528,23 +488,17 @@
       "id": 30,
       "tipo_material": "textos_proprios",
       "material": {
-        "secoes": [
-          {
-            "tipo": "texto_proprio",
-            "titulo": "Textos próprios",
-            "texto": "Do Comum dos Santos e Bem-aventurados da nossa Ordem, p. 489. Salmos e antífonas do dia da semana corrente.\n\nRESPONSÓRIO Pr 2,10-11; Tb 4,19; Pr 2,2\nR. Quando a sabedoria entrar no teu coração e o discernimento deleitar a tua alma, * a reflexão te guardará e a inteligência velará sobre ti.\nV. Busca sempre o conselho dos sábios e inclina o teu coração à prudência.\nR. A reflexão te guardará e a inteligência velará sobre ti."
-          },
-          {
-            "tipo": "oracao",
-            "titulo": "Oração",
-            "texto": "Senhor, interceda por nós o Bem-aventurado Jerônimo, que vós ornastes com os dons do Espírito Santo, a fim de que, repletos da sabedoria de Cristo, possamos agir em tudo com maturidade e prudência. Por nosso Senhor."
+        "horas": {
+          "textos_proprios": {
+            "texto": "Textos próprios\nDo Comum dos Santos e Bem-aventurados da nossa Ordem, p. 489. Salmos e antífonas do dia da semana corrente.\n\nRESPONSÓRIO Pr 2,10-11; Tb 4,19; Pr 2,2\nR. Quando a sabedoria entrar no teu coração e o discernimento deleitar a tua alma, * a reflexão te guardará e a inteligência velará sobre ti.\nV. Busca sempre o conselho dos sábios e inclina o teu coração à prudência.\nR. A reflexão te guardará e a inteligência velará sobre ti.\n\n",
+            "oracao": "\nSenhor, interceda por nós o Bem-aventurado Jerônimo, que vós ornastes com os dons do Espírito Santo, a fim de que, repletos da sabedoria de Cristo, possamos agir em tudo com maturidade e prudência. Por nosso Senhor."
           }
-        ]
+        }
       }
     },
     "12-15": {
       "id": 31,
-      "tipo_material": "oficio_proprio",
+      "tipo_material": "textos_proprios",
       "material": {
         "horas": {
           "oficio_leituras": {
