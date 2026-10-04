@@ -1,6 +1,6 @@
 {
   "name": "liturgia-osm",
-  "version": "4.9.23",
+  "version": "4.9.36",
   "private": true,
   "scripts": {
     "android:add": "npx cap add android",
@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@capacitor/android": "8.5.1",
+    "@capacitor/app": "8.1.2",
     "@capacitor/browser": "8.0.2",
     "@capacitor/core": "8.5.1"
   },
