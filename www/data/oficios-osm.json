@@ -94,7 +94,7 @@
     },
     "02-19": {
       "id": 4,
-      "tipo_material": "oficio_proprio",
+      "tipo_material": "textos_proprios",
       "material": {
         "horas": {
           "laudes": {
@@ -181,7 +181,7 @@
     },
     "05-12": {
       "id": 9,
-      "tipo_material": "oficio_proprio",
+      "tipo_material": "textos_proprios",
       "material": {
         "horas": {
           "laudes": {
@@ -197,7 +197,7 @@
     },
     "05-30": {
       "id": 10,
-      "tipo_material": "oficio_proprio",
+      "tipo_material": "textos_proprios",
       "material": {
         "horas": {
           "laudes": {
@@ -386,7 +386,7 @@
     },
     "09-06": {
       "id": 22,
-      "tipo_material": "oficio_proprio",
+      "tipo_material": "textos_proprios",
       "material": {
         "horas": {
           "laudes": {
@@ -427,7 +427,7 @@
     },
     "09-22": {
       "id": 25,
-      "tipo_material": "oficio_proprio",
+      "tipo_material": "textos_proprios",
       "material": {
         "horas": {
           "laudes": {
@@ -462,7 +462,7 @@
     },
     "10-25": {
       "id": 27,
-      "tipo_material": "oficio_proprio",
+      "tipo_material": "textos_proprios",
       "material": {
         "horas": {
           "laudes": {
@@ -544,7 +544,7 @@
     },
     "12-15": {
       "id": 31,
-      "tipo_material": "oficio_proprio",
+      "tipo_material": "textos_proprios",
       "material": {
         "horas": {
           "oficio_leituras": {

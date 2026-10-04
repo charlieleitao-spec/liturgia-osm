@@ -884,7 +884,7 @@ const SANTORAL_IMAGES = {
   'Sete Santos Fundadores': 'media/servite-11.jpg',
   'São Peregrino de Forlì': 'media/servite-10.webp',
   'B. Tomás de Orvieto': 'media/servite-09.jpg',
-  'São Filipe Benício': 'media/servite-08.jpg',
+  'São Filipe Benizi': 'media/servite-08.jpg',
   'B. Cecília Eusepi': 'media/servite-07.jpg',
   'Santa Juliana de Florença': 'media/servite-06.jpg',
   'B. Joana de Florença': 'media/servite-05.jpg',
@@ -1471,6 +1471,11 @@ function renderOficioTabs(oficioData){
   }else if(oficioData && typeof oficioData==='object' && Array.isArray(oficioData.secoes)){
     const text=oficioData.secoes.map(s=>[s.titulo||'',s.texto||s.text||''].filter(Boolean).join('\n')).join('\n\n');
     buckets={invitatorio:[],oficio:wrapSection(text),laudes:[],horaMedia:[],vesperas:[]};
+  }else if(oficioData && typeof oficioData==='object' && (oficioData.oficio_leituras||oficioData.oracao)){
+    const reading=oficioData.oficio_leituras||{},alternatives=Array.isArray(reading.alternativas)?reading.alternativas:[];
+    const sections=alternatives.filter(item=>item&&item.texto).map(item=>({label:item.titulo||'Leitura',text:item.texto}));
+    if(typeof oficioData.oracao==='string'&&oficioData.oracao.trim())sections.push({label:'Oração',text:oficioData.oracao});
+    buckets={invitatorio:[],oficio:sections,laudes:[],horaMedia:[],vesperas:[]};
   }else{
     buckets = splitOficioByHour(String(oficioData||''));
   }
@@ -2204,7 +2209,7 @@ function viewSobre(){
     </div>
     <div class="about-quote fade-in">
       "Somos servos da Virgem Gloriosa, de cuja viuvez trazemos o hábito. Procuramos modelar a nossa vida segundo o exemplo dos Santos Apóstolos e viver segundo a regra do santo doutor Agostinho."
-      <div style="font-size:0.875rem; margin-top:8px; color:var(--text-muted);">— São Filipe Benício</div>
+      <div style="font-size:0.875rem; margin-top:8px; color:var(--text-muted);">— São Filipe Benizi</div>
     </div>
     <div class="section-title">${escapeHtml(t('editionSection'))}</div>
     <div class="card fade-in credit-list">
@@ -2375,3 +2380,4 @@ if(window.parent!==window) document.body.classList.add('embedded-resource-mode')
 </script>
 </body>
 </html>
+
