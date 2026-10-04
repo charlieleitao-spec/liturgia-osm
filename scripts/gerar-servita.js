@@ -48,14 +48,25 @@ for (const s of santoral) {
   if (Number(lit.id) !== Number(s.id)) throw new Error('ID divergente em ' + key);
 
   const detalheMemoria = memoriasPorData.get(key) || {};
+  const breveVida = detalheMemoria.breve_vida || s.bio || '';
+  const apresentacao = detalheMemoria.apresentacao || '';
   const memoriaLiturgica = datasMemoria.has(key) ? {
     date: key,
     source_date: s.date,
     title: s.name,
-    breve_vida: detalheMemoria.breve_vida || s.bio || '',
-    ...(detalheMemoria.apresentacao ? { apresentacao: detalheMemoria.apresentacao } : {}),
+    breve_vida: breveVida,
+    ...(apresentacao ? { apresentacao } : {}),
     oracao_propria: s.prayer || '',
     source: memoria.source || '',
+    fontes: {
+      biografia: detalheMemoria.breve_vida
+        ? 'Livro de Oração dos Servos de Maria, 3ª edição revisada, seção Memória Litúrgica'
+        : 'Santoral do app Liturgia OSM (santoral.json)',
+      ...(apresentacao ? {
+        apresentacao: 'Livro de Oração dos Servos de Maria, 3ª edição revisada, seção Memória Litúrgica'
+      } : {}),
+      oracao: 'Santoral do app Liturgia OSM (santoral.json)'
+    },
     common: memoria.common,
     editorial_note: memoria.editorial_notes[key] || null
   } : null;
