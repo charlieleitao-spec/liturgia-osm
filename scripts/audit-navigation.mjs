@@ -9,6 +9,9 @@ const css = read('www/app.css');
 const serviteHtml = read('www/servite.html');
 const serviteCss = read('www/servite.css');
 const serviteScript = read('www/servite-3.js');
+const pkg = JSON.parse(read('package.json'));
+const workflow = read('.github/workflows/build-apk.yml');
+const loader = read('www/data/load-devotions.js');
 
 for (const file of ['www/app.js', 'www/servite-1.js', 'www/servite-2.js', 'www/servite-3.js']) {
   const result = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });

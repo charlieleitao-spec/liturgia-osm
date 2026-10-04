@@ -14,8 +14,9 @@ const offices = json('www/data/oficios-osm.json');
 const memory = json('www/data/memoria-liturgica.json');
 
 assert.equal(pkg.version, '4.9.36', 'package.json deve identificar a versão 4.9.36');
+assert.equal(pkg.dependencies['@capacitor/app'], '8.1.2', 'Plugin nativo do botão Voltar deve fazer parte do app.');
 assert.match(appJs, /const APP_VERSION = ['"]4\.9\.36['"]/);
-assert.match(sw, /liturgia-osm-v4\.9\.36-ui1/);
+assert.match(sw, /liturgia-osm-v4.9.36-ui2/);
 assert.match(html, /app\.js/);
 assert.match(html, /app\.css/);
 assert.equal(santoral.length, 32);
@@ -25,6 +26,8 @@ assert.equal(memory.schema_version, 2);
 assert.equal(memory.memory_dates?.length, 25);
 assert.ok(memory.celebrations?.length > 0 && memory.celebrations.length <= memory.memory_dates.length);
 assert.ok(offices.celebracoes['10-03']?.material?.horas?.textos_proprios?.oracao, 'oração deve permanecer como campo separado no esquema 3');
+const devotionalFiles = ['load-devotions.js','devocoes/oracoes-diarias.json','devocoes/regra.json','devocoes/rosario.json','devocoes/vigilia.json','devocoes/coroa.json','devocoes/stabat-mater.json','devocoes/via-matris.json','devocoes/ladainhas.json','devocoes/sabado-mariano.json','devocoes/adoracao.json','devocoes/antifonas.json','devocoes/oracoes-varias.json'];
+for (const file of devotionalFiles) assert.ok(fs.existsSync(path.join(root, 'www/data', file)), 'Arquivo de oração ausente: ' + file);
 
 const core = [...sw.matchAll(/["']\.\/(.*?)["']/g)].map(match => match[1]);
 assert.ok(core.length > 0, 'Service worker deve declarar recursos CORE');

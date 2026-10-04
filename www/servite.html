@@ -105,9 +105,8 @@
 
 </div>
 
-<script src="servite-1.js"></script>
-<script src="servite-2.js"></script>
-<script src="servite-3.js"></script>
+<script src="data/load-devotions.js"></script>
+<script>loadOSMDevotionalData().then(function(){return ['servite-1.js','servite-2.js','servite-3.js'].reduce(function(chain,src){return chain.then(function(){return new Promise(function(resolve,reject){var script=document.createElement('script');script.onload=resolve;script.onerror=reject;script.src=src;document.body.appendChild(script);});});},Promise.resolve());}).catch(function(error){console.error('[Liturgia OSM] Falha ao carregar orações.',error);document.getElementById('view').innerHTML='<div class="empty-state">Não foi possível carregar as orações.</div>';});</script>
 
 
 <script>

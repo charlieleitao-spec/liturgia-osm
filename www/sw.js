@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.36-ui1';
+const CACHE = 'liturgia-osm-v4.9.36-ui2';
 const CORE = [
   "./",
   "./index.html",
@@ -16,6 +16,19 @@ const CORE = [
   "./data/oficios-osm.json",
   "./data/memoria-liturgica.json",
   "./data/missas-osm.json",
+  "./data/load-devotions.js",
+  "./data/devocoes/adoracao.json",
+  "./data/devocoes/antifonas.json",
+  "./data/devocoes/coroa.json",
+  "./data/devocoes/ladainhas.json",
+  "./data/devocoes/oracoes-diarias.json",
+  "./data/devocoes/oracoes-varias.json",
+  "./data/devocoes/regra.json",
+  "./data/devocoes/rosario.json",
+  "./data/devocoes/sabado-mariano.json",
+  "./data/devocoes/stabat-mater.json",
+  "./data/devocoes/via-matris.json",
+  "./data/devocoes/vigilia.json",
   "./media/servite-01.webp",
   "./media/servite-02.webp",
   "./media/servite-03.webp",

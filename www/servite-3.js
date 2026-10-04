@@ -621,52 +621,7 @@ function viewOficioIndex(){
     <div class="card fade-in" style="padding:6px 16px;">${items.length?items.map(s=>`<div class="saint-row" onclick="openSaintOffice(${s._id})"><div class="daynum">${s.day}</div><div class="rowtext"><div class="rowtitle">${escapeHtml(s.title)}</div><div class="rowrank">${escapeHtml(s.date||'')}</div></div><div class="chev">›</div></div>`).join(''):'<div class="no-results">Nenhum Ofício próprio cadastrado.</div>'}</div>`;
 }
 
-const ROSARIO_MISTERIOS = {
-  gozosos: {
-    label:'Mistérios Gozosos',
-    days:'Segundas-feiras e sábados',
-    mysteries:[
-      ['A Anunciação do Anjo a Maria','Contemplemos a humildade da Virgem que acolhe a Palavra de Deus e se oferece inteiramente à sua vontade.'],
-      ['A Visitação de Maria a Isabel','Contemplemos a caridade de Maria, que se põe a caminho para servir e levar Cristo à casa de Isabel.'],
-      ['O Nascimento de Jesus','Contemplemos a pobreza e a alegria do presépio: o Filho de Deus vem ao mundo por amor e faz-se próximo dos pequenos.'],
-      ['A Apresentação de Jesus no Templo','Contemplemos a obediência de Maria e José e a oferta de Jesus ao Pai, luz para todos os povos.'],
-      ['A Perda e o Encontro de Jesus no Templo','Contemplemos a busca perseverante de Maria e José e a alegria de reencontrar Jesus na casa do Pai.']
-    ]
-  },
-  luminosos: {
-    label:'Mistérios Luminosos',
-    days:'Quintas-feiras',
-    mysteries:[
-      ['O Batismo de Jesus no Jordão','Contemplemos Jesus que se manifesta como Filho amado do Pai e nos abre o caminho de uma vida nova.'],
-      ['A Autorrevelação de Jesus nas Bodas de Caná','Contemplemos o primeiro sinal de Jesus e a confiança de Maria, que nos ensina: “Fazei tudo o que ele vos disser”.'],
-      ['O Anúncio do Reino de Deus e o convite à conversão','Contemplemos Cristo que proclama o Reino, chama à conversão e oferece a misericórdia que transforma o coração.'],
-      ['A Transfiguração de Jesus','Contemplemos o rosto glorioso de Cristo no monte e peçamos a graça de escutar o Filho amado.'],
-      ['A Instituição da Eucaristia','Contemplemos Jesus que se entrega como alimento e permanece conosco no Sacramento do seu Corpo e Sangue.']
-    ]
-  },
-  dolorosos: {
-    label:'Mistérios Dolorosos',
-    days:'Terças e sextas-feiras',
-    mysteries:[
-      ['A Agonia de Jesus no Horto','Contemplemos Jesus em oração e abandono confiante ao Pai: “Não se faça a minha vontade, mas a vossa”.'],
-      ['A Flagelação de Jesus','Contemplemos o sofrimento de Cristo, que assume nossas dores e nos ensina a permanecer firmes no amor.'],
-      ['A Coroação de Espinhos','Contemplemos o Rei humilde, coroado de humilhação, e peçamos a graça de vencer o orgulho.'],
-      ['Jesus Carrega a Cruz','Contemplemos Cristo que caminha para o Calvário e aprendamos, com Maria, a carregar a cruz com perseverança.'],
-      ['A Crucifixão e Morte de Jesus','Contemplemos o amor levado até o fim e o dom de Maria, Mãe da Igreja, aos pés da cruz.']
-    ]
-  },
-  gloriosos: {
-    label:'Mistérios Gloriosos',
-    days:'Quartas-feiras e domingos',
-    mysteries:[
-      ['A Ressurreição de Jesus','Contemplemos Cristo vencedor da morte e peçamos a alegria e a esperança da vida nova.'],
-      ['A Ascensão de Jesus ao Céu','Contemplemos o Senhor glorificado, que nos chama a buscar as coisas do alto e a testemunhar o Evangelho.'],
-      ['A Vinda do Espírito Santo','Contemplemos o Espírito Santo que desce sobre Maria e os Apóstolos e renova a Igreja para a missão.'],
-      ['A Assunção de Maria ao Céu','Contemplemos Maria elevada à glória e peçamos a graça de caminhar para a plena comunhão com Deus.'],
-      ['A Coroação de Maria como Rainha do Céu e da Terra','Contemplemos Maria coroada junto de seu Filho, sinal de esperança e Mãe que intercede por todos.']
-    ]
-  }
-};
+const ROSARIO_MISTERIOS = window.OSM_ROSARIO_MISTERIOS;
 function rosarioCurrent(){ return ROSARIO_MISTERIOS[state.rosarioSet] || ROSARIO_MISTERIOS.gozosos; }
 function setRosarioSet(key){ state.rosarioSet = ROSARIO_MISTERIOS[key] ? key : 'gozosos'; state.rosarioGuidedStep = 0; state.devoSub = 'rosario'; render(); window.scrollTo(0,0); }
 function setRosarioGuided(key){ state.devo='rosario'; state.devoSub='guided'; state.rosarioSet=ROSARIO_MISTERIOS[key] ? key : 'gozosos'; state.rosarioGuidedStep=0; render(); window.scrollTo(0,0); }

@@ -124,6 +124,7 @@
   <div class="daily-liturgy-body"><div class="daily-date-nav"><button onclick="moveDailyDate(-1)" aria-label="Dia anterior">‹</button><input id="dailyLiturgyDate" type="date" onchange="loadDailyLiturgy(this.value)"><button onclick="moveDailyDate(1)" aria-label="Dia seguinte">›</button></div><div id="dailyLiturgyContent"></div></div>
 </div>
 
-<script src="./app.js"></script>
+<script src="./data/load-devotions.js"></script>
+<script>loadOSMDevotionalData().then(function(){var script=document.createElement('script');script.src='./app.js';document.body.appendChild(script);}).catch(function(error){console.error('[Liturgia OSM] Falha ao carregar orações.',error);document.getElementById('view').innerHTML='<div class="empty-state">Não foi possível carregar as orações. Verifique o armazenamento do aplicativo.</div>';});</script>
 </body>
 </html>
