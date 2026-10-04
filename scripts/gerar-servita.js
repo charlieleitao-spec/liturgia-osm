@@ -91,3 +91,4 @@ if(!result['12-15']) throw new Error('Boaventura (15/12) ausente');
 fs.mkdirSync(path.dirname(outPath),{recursive:true});
 fs.writeFileSync(outPath,JSON.stringify(result,null,2)+'\n');
 console.log('Base derivada gerada integralmente das fontes mestras:',Object.keys(result).length,'celebrações; Memória Litúrgica:',datasMemoria.size,'datas.');
+

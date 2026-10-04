@@ -23,3 +23,4 @@ if (failures.length) {
   process.exit(1);
 }
 console.log('Tamanho das imagens dentro do limite de 256 KiB.');
+

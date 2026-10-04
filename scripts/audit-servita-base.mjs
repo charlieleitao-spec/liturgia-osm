@@ -13,6 +13,8 @@ const appJs = read('www/app.js');
 const code = html + '\n' + appJs;
 const appCss = read('www/app.css');
 const servite = read('www/servite.html');
+const serviteScripts = ['www/servite-1.js','www/servite-2.js','www/servite-3.js'].map(read);
+const serviteReader = serviteScripts[2];
 const sw = read('www/sw.js');
 const app = parse('package.json');
 const manifest = parse('www/manifest.webmanifest');
@@ -22,7 +24,7 @@ const memoria = parse('www/data/memoria-liturgica.json');
 const workflow = read('.github/workflows/build-apk.yml');
 const derivedWorkflow = read('.github/workflows/gerar-base-derivada.yml');
 const requiredFiles = [
-  'www/index.html', 'www/app.css', 'www/app.js', 'www/servite.html', 'www/data/santoral.json',
+  'www/index.html', 'www/app.css', 'www/app.js', 'www/servite.html', 'www/servite.css', 'www/servite-1.js', 'www/servite-2.js', 'www/servite-3.js', 'www/data/santoral.json',
   'www/data/oficios-osm.json', 'www/data/memoria-liturgica.json',
   'www/sw.js', 'www/manifest.webmanifest', 'www/icon-192.png', 'www/icon-512.png'
 ];
@@ -58,12 +60,12 @@ for (const [index, item] of santoral.entries()) {
   if (byDate.has(key)) fail('Data duplicada no Santoral: ' + key);
   byDate.set(key, item);
 }
-if (offices.schema_version !== 2 || !offices.celebracoes || Object.keys(offices.celebracoes).length !== 32) fail('Base de Ofícios fora do schema v2 ou incompleta.');
+if (offices.schema_version !== 3 || !offices.celebracoes || Object.keys(offices.celebracoes).length !== 32) fail('Base de Ofícios fora do schema v3 ou incompleta.');
 for (const [date, item] of Object.entries(offices.celebracoes || {})) {
   const saint = byDate.get(date);
   if (!saint) fail('Ofício sem celebração no Santoral: ' + date);
   else if (Number(item.id) !== Number(saint.id)) fail('ID de Ofício divergente em ' + date);
-  if (!item.material || typeof item.material !== 'object') fail('Material de Ofício ausente em ' + date);
+  if (!item.material || typeof item.material !== 'object' || (item.tipo_material !== 'sem_material_proprio' && (!item.material.horas || typeof item.material.horas !== 'object'))) fail('Material de Ofício ausente ou fora do schema v3 em ' + date);
   if (!['oficio_proprio','textos_proprios','sem_material_proprio'].includes(item.tipo_material)) fail('Tipo de material inválido em ' + date);
 }
 if (byDate.get('09-22')?.title !== 'Dedicação da Basílica de Monte Senário') fail('Monte Senário deve permanecer em 22/09.');
@@ -111,15 +113,15 @@ for (const key of Object.keys(devotionalDataKeys)) {
     fail('Prática devocional ou rota ausente: ' + key);
   }
 }
-for (const script of [appJs, html, servite].flatMap(source => [...source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(match => match[1]).filter(Boolean))) {
+for (const script of [appJs, ...serviteScripts, ...[html, servite].flatMap(source => [...source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(match => match[1]).filter(Boolean))]) {
   try { new Function(script); } catch (error) { fail('Erro de sintaxe JavaScript: ' + error.message); }
 }
-const readerStart=servite.indexOf('function renderOficioTabs(');
-const readerEnd=servite.indexOf('\n// note shown under non-Portuguese',readerStart);
+const readerStart=serviteReader.indexOf('function renderOficioTabs(');
+const readerEnd=serviteReader.indexOf('\n// note shown under non-Portuguese',readerStart);
 if(readerStart<0||readerEnd<0) fail('Leitor canônico do Ofício não encontrado.');
 else {
   try {
-    const makeReader=new Function('t','state','escapeHtml','renderLiturgicalHourContent','BENEDICTUS_TEXT','MAGNIFICAT_TEXT','INVITATORIO_SALMO','renderFinalAntifonaBlock',servite.slice(readerStart,readerEnd)+';return renderOficioTabs;');
+    const makeReader=new Function('t','state','escapeHtml','renderLiturgicalHourContent','BENEDICTUS_TEXT','MAGNIFICAT_TEXT','INVITATORIO_SALMO','renderFinalAntifonaBlock',serviteReader.slice(readerStart,readerEnd)+';return renderOficioTabs;');
     const renderReader=makeReader(key=>key,{oficioTab:'oficio'},value=>String(value??''),value=>String(value??''),'','','',()=> '');
     const pistoia=renderReader(offices.celebracoes['12-15'].material);
     if(!pistoia.includes('Deveres eclesiásticos')||!pistoia.includes('Boaventura nasceu em Pistóia')) fail('O leitor do servite.html não exibe o Ofício das Leituras de Boaventura de Pistoia.');

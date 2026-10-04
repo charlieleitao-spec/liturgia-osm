@@ -11,26 +11,6 @@
 <title>Liturgia OSM — Servos de Maria</title>
 <link rel="stylesheet" href="./app.css">
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </head>
 <body>
 <a class="skip-link" href="#view">Ir para o conteúdo</a>
@@ -74,12 +54,6 @@
   </nav>
 
 </div>
-
-
-
-
-
-
 
 <div id="mainMenuOverlay" class="main-menu-overlay" aria-hidden="true" onclick="if(event.target===this)closeMainMenu()">
  <aside class="main-menu">
@@ -143,27 +117,12 @@
   <iframe id="serviteFrame" class="servite-frame" title="Conteúdo OSM"></iframe>
 </div>
 
-
-
-
-
-
-
-
 <button id="celebrationToggle" class="celebration-toggle" onclick="toggleCelebrationMode()">Modo celebração</button>
-
 
 <div id="dailyLiturgyOverlay" class="daily-liturgy-overlay" aria-hidden="true">
   <div class="daily-liturgy-head"><button onclick="closeDailyLiturgy()" aria-label="Voltar">‹</button><div><b>Missa do dia</b><small>Consulta online; cópias locais por até 30 dias</small></div><button onclick="toggleCelebrationMode()" aria-label="Modo celebração">◉</button></div>
   <div class="daily-liturgy-body"><div class="daily-date-nav"><button onclick="moveDailyDate(-1)" aria-label="Dia anterior">‹</button><input id="dailyLiturgyDate" type="date" onchange="loadDailyLiturgy(this.value)"><button onclick="moveDailyDate(1)" aria-label="Dia seguinte">›</button></div><div id="dailyLiturgyContent"></div></div>
 </div>
-
-
-
-
-
-
-
 
 <script src="./app.js"></script>
 </body>

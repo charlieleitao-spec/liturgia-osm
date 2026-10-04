@@ -1,10 +1,14 @@
-const CACHE = 'liturgia-osm-v4.9.33';
+const CACHE = 'liturgia-osm-v4.9.35';
 const CORE = [
   "./",
   "./index.html",
   "./app.css",
   "./app.js",
   "./servite.html",
+  "./servite.css",
+  "./servite-1.js",
+  "./servite-2.js",
+  "./servite-3.js",
   "./manifest.webmanifest",
   "./icon-192.png",
   "./icon-512.png",
@@ -12,7 +16,7 @@ const CORE = [
   "./data/oficios-osm.json",
   "./data/memoria-liturgica.json",
   "./data/missas-osm.json",
-  "./media/servite-01.jpg",
+  "./media/servite-01.webp",
   "./media/servite-02.webp",
   "./media/servite-03.webp",
   "./media/servite-04.webp",
@@ -35,7 +39,7 @@ const CORE = [
   "./media/fonts/eb-garamond-italic-latin.woff2",
   "./media/fonts/eb-garamond-normal-latin-ext.woff2",
   "./media/fonts/eb-garamond-normal-latin.woff2",
-  "./media/servite-13.png"
+  "./media/servite-13.webp"
 ];
 
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));});

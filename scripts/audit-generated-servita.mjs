@@ -46,3 +46,4 @@ for(const [key,item] of Object.entries(result)){
 if(result['12-14']||!result['12-15'])throw new Error('Calendário de Boaventura inválido');
 if(!result['12-15'].memoria_liturgica.nota_editorial.includes('14 de dezembro'))throw new Error('Nota editorial de Boaventura ausente');
 console.log('Base derivada validada:',keys.length,'celebrações,',derivedMemory.length,'Memórias Litúrgicas.');
+
