@@ -8,6 +8,7 @@ const app = read('www/app.js');
 const css = read('www/app.css');
 const serviteHtml = read('www/servite.html');
 const serviteCss = read('www/servite.css');
+const serviteScript = read('www/servite-3.js');
 
 for (const file of ['www/app.js', 'www/servite-1.js', 'www/servite-2.js', 'www/servite-3.js']) {
   const result = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
@@ -22,5 +23,5 @@ assert.match(app, /addListener\(['"]backButton['"]/);
 assert.match(css, /text-align:\s*center/);
 assert.match(serviteHtml, /servite-3\.js/);
 assert.match(serviteCss, /text-align:\s*center/);
-assert.match(serviteHtml, /hour-tab-btn/);
+assert.match(serviteScript, /hour-tab-btn/);
 console.log('Auditoria aprovada: navegação principal, recursos modulares, retorno Android, botões de Ofícios e centralização litúrgica.');
