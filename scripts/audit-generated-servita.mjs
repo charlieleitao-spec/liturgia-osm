@@ -19,6 +19,7 @@ for(const [key,item] of Object.entries(result)){
   if(!item.memoria_liturgica)continue;
   const m=item.memoria_liturgica;
   if(!m.date||!m.hino||!m.antifona||!m.salmo||!m.breve_vida||!m.oracao_propria)throw new Error('Memória derivada incompleta: '+key);
+  if(m.source_date!==saint.date||m.title!==saint.title)throw new Error('Data ou título da Memória derivada não veio do Santoral canônico: '+key);
   if(!m.fonte_textos_comuns||!m.fonte_breve_vida||!m.fonte_oracao)throw new Error('Fonte não identificada na Memória derivada: '+key);
   const specific=memoria.celebrations.find(entry=>entry.date===key);
   if(m.oracao_propria===(saint.prayer||'')&&m.fonte_oracao!=='Santoral da Ordem.')throw new Error('Fonte da oração derivada incorreta: '+key);

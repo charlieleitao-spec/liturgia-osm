@@ -9,6 +9,7 @@ const errors = [];
 const fail = message => errors.push(message);
 
 const html = read('www/index.html');
+const appCss = read('www/app.css');
 const servite = read('www/servite.html');
 const sw = read('www/sw.js');
 const app = parse('package.json');
@@ -19,7 +20,7 @@ const memoria = parse('www/data/memoria-liturgica.json');
 const workflow = read('.github/workflows/build-apk.yml');
 const derivedWorkflow = read('.github/workflows/gerar-base-derivada.yml');
 const requiredFiles = [
-  'www/index.html', 'www/servite.html', 'www/data/santoral.json',
+  'www/index.html', 'www/app.css', 'www/servite.html', 'www/data/santoral.json',
   'www/data/oficios-osm.json', 'www/data/memoria-liturgica.json',
   'www/sw.js', 'www/manifest.webmanifest', 'www/icon-192.png', 'www/icon-512.png'
 ];
@@ -38,7 +39,7 @@ for (const marker of ['function viewLiturgia()', 'Liturgia das Horas', '>Missa<'
   if (!html.includes(marker)) fail('Interface ausente: ' + marker);
 }
 if (!html.includes('fetch(\'./data/memoria-liturgica.json\'')) fail('A interface não carrega a fonte da Memória Litúrgica.');
-if (!sw.includes('./data/memoria-liturgica.json')) fail('Memória Litúrgica não está no cache offline.');
+if (!sw.includes('./data/memoria-liturgica.json')||!sw.includes('./app.css')) fail('Memória Litúrgica ou CSS não está no cache offline.');
 if (sw.includes('./data/hoje-familia-servita.json')) fail('Cache referencia arquivo derivado ausente da base canônica.');
 if (!derivedWorkflow.includes("if: github.event_name == 'workflow_dispatch' && inputs.publish == true") || !derivedWorkflow.includes('default: false')) fail('A publicação no Hoje deve exigir acionamento manual explícito após validar o APK.');
 
@@ -78,47 +79,10 @@ for (const item of memoria.celebrations || []) {
   uniqueMemoryDates.add(item.date);
   const saint=byDate.get(item.date);
   const compact=value=>String(value||'').replace(/\s+/g,' ').trim();
-  if (!item.title?.trim()) fail(`Título ausente em ${item.date}.`);
+  if ('source_date' in item || 'title' in item) fail(`Metadado redundante na Memória Litúrgica em ${item.date}; use data e título do Santoral.`);
   if (!item.breve_vida?.trim()&&!item.apresentacao?.trim()&&!saint?.bio?.trim()) fail(`Texto de vida ausente em ${item.date}.`);
   if (!item.oracao_propria?.trim()&&!saint?.prayer?.trim()) fail(`Oração ausente em ${item.date}.`);
   if (item.breve_vida?.trim()&&compact(item.breve_vida)===compact(saint?.bio)) fail(`Vida duplicada na Memória Litúrgica em ${item.date}; use o Santoral canônico.`);
   if (item.oracao_propria?.trim()&&compact(item.oracao_propria)===compact(saint?.prayer)) fail(`Oração duplicada na Memória Litúrgica em ${item.date}; use o Santoral canônico.`);
 }
-if (!memoria.source?.includes('Livro de Oração dos Servos de Maria')) fail('Fonte da Memória Litúrgica não identificada.');
-if (memoria.celebrations.length >= memoria.memory_dates.length) fail('Entradas da Memória que só repetem o Santoral devem ser removidas.');
-for (const item of memoria.celebrations) if (!item.breve_vida && !item.apresentacao && !item.oracao_propria) fail('Entrada vazia na Memória Litúrgica: ' + item.date);
-
-const devotionalDataKeys = {
-  vigilia: '"vigilia": {',
-  coroa: '"coroa": "',
-  via_matris: '"via_matris": {'
-};
-const devotionalRoutes = {
-  vigilia: ["function viewVigilia()", "openDevo('vigilia'"],
-  coroa: ["PRAYERS.devotions.coroa", "key === 'coroa'"],
-  via_matris: ["function viewViaMatris()", "openDevo('via_matris'"]
-};
-for (const key of Object.keys(devotionalDataKeys)) {
-  if (!html.includes(devotionalDataKeys[key]) || !devotionalRoutes[key].every(marker => html.includes(marker))) {
-    fail('Prática devocional ou rota ausente: ' + key);
-  }
-}
-for (const script of [html, servite].flatMap(source => [...source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(match => match[1]).filter(Boolean))) {
-  try { new Function(script); } catch (error) { fail('Erro de sintaxe JavaScript: ' + error.message); }
-}
-if (html.includes('�') || servite.includes('�')) fail('Caractere de substituição encontrado em texto.');
-
-if (errors.length) {
-  console.error(['AUDITORIA DA BASE SERVITA: FALHA', ...errors].join('\n'));
-  process.exit(1);
-}
-console.log(JSON.stringify({
-  status: 'ok',
-  version,
-  santoral: santoral.length,
-  oficios: Object.keys(offices.celebracoes).length,
-  memoriasLiturgicas: memoria.memory_dates.length,
-  textosMemoriaExclusivos: memoria.celebrations.length,
-  devotions: ['vigilia', 'coroa', 'via_matris'],
-  offlineMemory: true
-}, null, 2));
+if (!memoria.source?.includes('Livro de Oração dos Servos de Maria')) fail('Fo

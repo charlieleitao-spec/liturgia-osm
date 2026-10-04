@@ -33,8 +33,8 @@ for(const s of santoral){
   if(coberta){
     memoriaLiturgica={
       date:key,
-      source_date:item?.source_date||s.date,
-      title:item?.title||s.title,
+      source_date:s.date,
+      title:s.title,
       hino:memoria.common.hino,
       antifona:memoria.common.antifona,
       salmo:memoria.common.salmo,
@@ -70,4 +70,3 @@ if(!result['12-15']) throw new Error('Boaventura (15/12) ausente');
 fs.mkdirSync(path.dirname(outPath),{recursive:true});
 fs.writeFileSync(outPath,JSON.stringify(result,null,2)+'\n');
 console.log('Base derivada gerada integralmente das fontes mestras:',Object.keys(result).length,'celebrações; Memória Litúrgica:',datasMemoria.size,'datas.');
-
