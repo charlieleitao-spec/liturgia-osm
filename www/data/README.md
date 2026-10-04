@@ -35,3 +35,12 @@ O script `scripts/gerar-servita.js` gera integralmente o arquivo consumido pelo 
 O workflow `.github/workflows/gerar-base-derivada.yml` é disparado quando `santoral.json`, `oficios-osm.json`, `memoria-liturgica.json` ou o gerador mudam. Ele não depende de nenhuma cópia anterior de `servita.json`: reconstrói a base do zero, valida-a e a publica no outro repositório quando o secret `HOJE_FAMILIA_SERVITA_TOKEN` estiver configurado com permissão de escrita.
 
 A base derivada mantém `material.horas` para a Liturgia das Horas e `memoria_liturgica` para o roteiro do Livro de Oração em campos distintos. Assim, os três arquivos canônicos constituem a fonte única para os dados compartilhados.
+
+
+## Esquema de `oficios-osm.json` (versão 3, 4.9.35)
+
+Todo o material de cada celebração (chave `MM-DD`) fica em `material.horas`. Cada hora é `{titulo, texto, alternativas?}`:
+`invitatorio`, `oficio_leituras`, `laudes`, `hora_media`, `vesperas`.
+A chave `textos_proprios` reúne trechos próprios que não pertencem a uma hora canônica (por exemplo responsório e oração do Comum); pode ter `alternativas` e `oracao`.
+Os formatos antigos `secoes` e `oficio_leituras`+`oracao` (esquema 2) foram convertidos sem alterar o texto exibido.
+`app.js` e `servite-3.js` exigem `schema_version` 3. O gerador `scripts/gerar-servita.js` (repositório Hoje na Família Servita) deve ser conferido antes de usar esta versão da base.

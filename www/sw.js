@@ -1,26 +1,33 @@
-const CACHE = 'liturgia-osm-v4.9.23';
+const CACHE = 'liturgia-osm-v4.9.36';
 const CORE = [
   "./",
   "./index.html",
+  "./app.css",
+  "./app.js",
   "./servite.html",
+  "./servite.css",
+  "./servite-1.js",
+  "./servite-2.js",
+  "./servite-3.js",
   "./manifest.webmanifest",
   "./icon-192.png",
   "./icon-512.png",
   "./data/santoral.json",
   "./data/oficios-osm.json",
   "./data/memoria-liturgica.json",
-  "./media/servite-01.jpg",
+  "./data/missas-osm.json",
+  "./media/servite-01.webp",
   "./media/servite-02.webp",
-  "./media/servite-03.jpg",
-  "./media/servite-04.jpg",
-  "./media/servite-05.jpg",
-  "./media/servite-06.jpg",
-  "./media/servite-07.jpg",
-  "./media/servite-08.jpg",
-  "./media/servite-09.jpg",
+  "./media/servite-03.webp",
+  "./media/servite-04.webp",
+  "./media/servite-05.webp",
+  "./media/servite-06.webp",
+  "./media/servite-07.webp",
+  "./media/servite-08.webp",
+  "./media/servite-09.webp",
   "./media/servite-10.webp",
-  "./media/servite-11.jpg",
-  "./media/servite-12.jpg",
+  "./media/servite-11.webp",
+  "./media/servite-12.webp",
   "./media/fonts/fonts.css",
   "./media/fonts/cinzel-normal-latin-ext.woff2",
   "./media/fonts/cinzel-normal-latin.woff2",
@@ -32,7 +39,7 @@ const CORE = [
   "./media/fonts/eb-garamond-italic-latin.woff2",
   "./media/fonts/eb-garamond-normal-latin-ext.woff2",
   "./media/fonts/eb-garamond-normal-latin.woff2",
-  "./media/servite-13.png"
+  "./media/servite-13.webp"
 ];
 
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));});
