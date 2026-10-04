@@ -557,7 +557,7 @@ const SANTORAL_IMAGES = {
   'Sete Santos Fundadores': 'media/servite-11.jpg',
   'São Peregrino de Forlì': 'media/servite-10.webp',
   'B. Tomás de Orvieto': 'media/servite-09.jpg',
-  'São Filipe Benício': 'media/servite-08.jpg',
+  'São Filipe Benizi': 'media/servite-08.jpg',
   'B. Cecília Eusepi': 'media/servite-07.jpg',
   'Santa Juliana de Florença': 'media/servite-06.jpg',
   'B. Joana de Florença': 'media/servite-05.jpg',
@@ -654,7 +654,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.27';
+const APP_VERSION = '4.9.28';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -771,7 +771,7 @@ function viewHoje(){
     '<p class="offline-note"><b>Observação:</b> textos já baixados ficam disponíveis sem internet; a primeira consulta da Missa exige conexão.</p>';
 }
 
-const SANTORAL_OFFICE_MAP = {"santo antonio maria pucci": 0, "12/1": 0, "b. tiago de \"citta della pieve\"": 1, "15/1": 1, "b. joaquim de sena": 2, "3/2": 2, "sete santos fundadores": 3, "17/2": 3, "b. isabel picenardi": 4, "19/2": 4, "sao peregrino de forli": 6, "4/5": 6, "b.a. virgem maria, mae e medianeira": 7, "8/5": 7, "b. benincasa de montepulciano": 8, "11/5": 8, "b. francisco de sena": 9, "12/5": 9, "b. tiago filipe de faenza": 10, "30/5": 10, "santa juliana de florenca": 11, "19/6": 11, "b. tomas de orvieto": 12, "27/6": 12, "b. ubaldo de sansepolcro": 14, "4/7": 14, "santa clelia barbieri": 15, "13/7": 15, "sao filipe benicio": 16, "23/8": 16, "santo agostinho": 18, "28/8": 18, "b. andre de sansepolcro": 19, "31/8": 19, "b. joana de florenca": 20, "1/9": 20, "b. boaventura de forli": 22, "6/9": 22, "nossa senhora das dores": 23, "15/9": 23, "dedicacao da basilica de monte senario": 25, "22/9": 25, "b. joao angelo de milao": 27, "25/10": 27, "todos os santos e santas da ordem": 28, "16/11": 28, "comemoracao dos defuntos da ordem": 29, "17/11": 29, "b. jeronimo de sant'angelo in vado": 30, "10/12": 30, "b. boaventura de pistoia": 31, "15/12": 31};
+const SANTORAL_OFFICE_MAP = {"santo antonio maria pucci": 0, "12/1": 0, "b. tiago de \"citta della pieve\"": 1, "15/1": 1, "b. joaquim de sena": 2, "3/2": 2, "sete santos fundadores": 3, "17/2": 3, "b. isabel picenardi": 4, "19/2": 4, "sao peregrino de forli": 6, "4/5": 6, "b.a. virgem maria, mae e medianeira": 7, "8/5": 7, "b. benincasa de montepulciano": 8, "11/5": 8, "b. francisco de sena": 9, "12/5": 9, "b. tiago filipe de faenza": 10, "30/5": 10, "santa juliana de florenca": 11, "19/6": 11, "b. tomas de orvieto": 12, "27/6": 12, "b. ubaldo de sansepolcro": 14, "4/7": 14, "santa clelia barbieri": 15, "13/7": 15, "sao filipe benizi": 16, "23/8": 16, "santo agostinho": 18, "28/8": 18, "b. andre de sansepolcro": 19, "31/8": 19, "b. joana de florenca": 20, "1/9": 20, "b. boaventura de forli": 22, "6/9": 22, "nossa senhora das dores": 23, "15/9": 23, "dedicacao da basilica de monte senario": 25, "22/9": 25, "b. joao angelo de milao": 27, "25/10": 27, "todos os santos e santas da ordem": 28, "16/11": 28, "comemoracao dos defuntos da ordem": 29, "17/11": 29, "b. jeronimo de sant'angelo in vado": 30, "10/12": 30, "b. boaventura de pistoia": 31, "15/12": 31};
 function normalizeSaintKey(v){
   return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 }
@@ -1603,7 +1603,7 @@ main#view{padding-top:14px}
     <div class="menu-section"><div class="menu-label">Leitura</div><div class="menu-row"><button class="menu-action" onclick="adjustFont(-0.08)">A−</button><span class="reader-scale-value" id="readerScaleValue">100%</span><button class="menu-action" onclick="adjustFont(0.08)">A+</button><button class="menu-action" onclick="resetFont()">Padrão</button></div><button class="menu-action menu-wide" onclick="toggleTheme()">☼ / ☾ Alternar tema claro ou escuro</button></div>
     <div class="menu-section"><div class="menu-label">Recursos Servitas</div><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('regra')">Regra OSSM</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('rosario')">Rosário</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('coroa')">Coroa das Sete Dores</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('sabado')">Sábado Mariano</button></div>
     <div class="menu-section"><div class="menu-label">Aplicativo</div><button class="menu-action menu-wide" onclick="closeMainMenu();openLanguagePanel()">Idioma da interface</button><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('sobre')">Sobre, créditos e redes sociais</button></div>
-    <div class="menu-section"><div class="menu-status"><span class="connection-dot"></span><span>Versão ${APP_VERSION} · conteúdo disponível offline</span></div></div>`;
+    <div class="menu-section"><div class="menu-status"><span class="connection-dot"></span><span>Versão ${APP_VERSION} · textos OSM offline; Missa do dia depende da internet ou cópia salva por até 30 dias</span></div></div>`;
 
   window.addEventListener('online',()=>{if(state.tab==='hoje')render();});
   window.addEventListener('offline',()=>{if(state.tab==='hoje')render();});
@@ -1678,7 +1678,7 @@ body.celebration-mode .prayer-block,body.celebration-mode .bio-text,body.celebra
 @media(max-width:380px){.presidency-grid{grid-template-columns:1fr}.presidency-card{min-height:92px}}
 </style>
 <div id="dailyLiturgyOverlay" class="daily-liturgy-overlay" aria-hidden="true">
-  <div class="daily-liturgy-head"><button onclick="closeDailyLiturgy()" aria-label="Voltar">‹</button><div><b>Missa do dia</b><small>Consulta online; datas baixadas ficam salvas</small></div><button onclick="toggleCelebrationMode()" aria-label="Modo celebração">◉</button></div>
+  <div class="daily-liturgy-head"><button onclick="closeDailyLiturgy()" aria-label="Voltar">‹</button><div><b>Missa do dia</b><small>Consulta online; cópias locais por até 30 dias</small></div><button onclick="toggleCelebrationMode()" aria-label="Modo celebração">◉</button></div>
   <div class="daily-liturgy-body"><div class="daily-date-nav"><button onclick="moveDailyDate(-1)" aria-label="Dia anterior">‹</button><input id="dailyLiturgyDate" type="date" onchange="loadDailyLiturgy(this.value)"><button onclick="moveDailyDate(1)" aria-label="Dia seguinte">›</button></div><div id="dailyLiturgyContent"></div></div>
 </div>
 <script id="dailyLiturgy492Script">
@@ -1689,7 +1689,8 @@ body.celebration-mode .prayer-block,body.celebration-mode .bio-text,body.celebra
   const two=n=>String(n).padStart(2,'0');
   const localISO=(date=new Date())=>`${date.getFullYear()}-${two(date.getMonth()+1)}-${two(date.getDate())}`;
   const cacheKey=date=>CACHE_PREFIX+date;
-  const readCache=date=>{try{return JSON.parse(localStorage.getItem(cacheKey(date))||'null')}catch(e){return null}};
+  const CACHE_MAX_AGE=30*24*60*60*1000;
+  const readCache=date=>{try{const key=cacheKey(date),cached=JSON.parse(localStorage.getItem(key)||'null'),saved=Date.parse(cached?.savedAt||'');if(!cached||!Number.isFinite(saved)||Date.now()-saved>CACHE_MAX_AGE){localStorage.removeItem(key);return null;}return cached;}catch(e){return null}};
   const saveCache=(date,data)=>{try{localStorage.setItem(cacheKey(date),JSON.stringify({savedAt:new Date().toISOString(),data}))}catch(e){}};
   const safe=value=>escapeHtml(String(value||''));
   function readingCards(group,label){
@@ -1732,7 +1733,7 @@ body.celebration-mode .prayer-block,body.celebration-mode .bio-text,body.celebra
   window.moveDailyDate=function(amount){const date=new Date(selectedDate+'T12:00:00');date.setDate(date.getDate()+amount);loadDailyLiturgy(localISO(date));};
   
   const menu=document.querySelector('.main-menu');
-  if(menu){const nav=menu.querySelector('.menu-nav-grid');if(nav)nav.insertAdjacentHTML('beforeend','<button class="menu-action" onclick="closeMainMenu();openDailyLiturgy()">Missa do dia</button>');const status=menu.querySelector('.menu-status span:last-child');if(status)status.textContent=`Versão ${APP_VERSION} · fonte online com cópia offline`;}
+  if(menu){const nav=menu.querySelector('.menu-nav-grid');if(nav)nav.insertAdjacentHTML('beforeend','<button class="menu-action" onclick="closeMainMenu();openDailyLiturgy()">Missa do dia</button>');const status=menu.querySelector('.menu-status span:last-child');if(status)status.textContent=`Versão ${APP_VERSION} · Missa do dia online; cópias locais por até 30 dias`;}
   window.addEventListener('online',()=>{if(document.getElementById('dailyLiturgyOverlay').classList.contains('open'))loadDailyLiturgy(selectedDate);});
   render();
 })();
@@ -1768,17 +1769,7 @@ async function loadCanonicalSantoral(){
 window.loadCanonicalSantoral=loadCanonicalSantoral;
 loadCanonicalSantoral();
 </script>
-<script id="startupMetric493">
-window.addEventListener('DOMContentLoaded',()=>{
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    const nav=performance.getEntriesByType('navigation')[0];
-    const paint=performance.getEntriesByName('first-contentful-paint')[0]||performance.getEntriesByName('first-paint')[0];
-    const metric={version:APP_VERSION,domContentLoadedMs:Math.round(nav?.domContentLoadedEventEnd||performance.now()),firstPaintMs:paint?Math.round(paint.startTime):null};
-    try{localStorage.setItem('osmStartupMetric',JSON.stringify(metric));}catch(e){}
-    console.info('[Liturgia OSM startup]',JSON.stringify(metric));
-  }));
-});
-</script>
+
 <script id="canonicalMemoriaLiturgica">
 (async function(){
   try{
@@ -1809,6 +1800,20 @@ window.addEventListener('DOMContentLoaded',()=>{
     return year+'-'+String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0');
   }
   function hubEmpty(text){return '<div class="hub-empty">'+escapeHtml(text)+'</div>';}
+  function flowPrayerText(value){
+    const lines=String(value||'').split('\n');
+    let output='',blankLines=0;
+    for(const raw of lines){
+      const line=raw.trim();
+      if(!line){blankLines++;continue;}
+      if(!output){output=line;blankLines=0;continue;}
+      const previous=output.trimEnd();
+      const paragraphBreak=blankLines>0&&/[.!?…][”’"')\]]?$/.test(previous);
+      output+=(paragraphBreak?'\n\n':(/[-‐‑]$/.test(previous)?'':' '))+line;
+      blankLines=0;
+    }
+    return output.replace(/[ \t]{2,}/g,' ').trim();
+  }
   function hubText(title,text){
     if(!text)return '';
     return '<div class="section-title">'+escapeHtml(title)+'</div><div class="hub-card hub-text">'+escapeHtml(text)+'</div>';
@@ -1836,13 +1841,15 @@ window.addEventListener('DOMContentLoaded',()=>{
     const date=massDate(s);
     const mass=ownMass?properMassBlock(ownMass):
       '<div class="hub-card"><div class="hub-card-title">Missa do dia</div>'+
-      '<p class="hub-card-note">Não há Missa própria cadastrada para esta celebração. Esta consulta abre a liturgia da data de '+escapeHtml(s.date)+'.</p>'+
+      '<p class="hub-card-note">Não há Missa própria cadastrada. A consulta da data de '+escapeHtml(s.date)+' exige internet; a cópia consultada fica disponível offline por até 30 dias.</p>'+
       '<button class="hub-action" onclick="openDailyLiturgy(\''+date+'\')">Consultar Missa desta data <span>›</span></button></div>';
     let office='';
     const hours=saintHasOffice(s)?officeHoursForSaint(s):[];
     if(hours.length){
-      office='<div class="hub-card"><div class="hub-card-title">Liturgia das Horas</div>'+
-        '<p class="hub-card-note">'+escapeHtml(officeClassificationForSaint(s))+'</p><div class="hub-actions">'+
+      const classification=officeClassificationForSaint(s);
+      const officeTitle=classification==='Ofício próprio'?'Liturgia das Horas':'Textos próprios do Ofício';
+      office='<div class="hub-card"><div class="hub-card-title">'+officeTitle+'</div>'+
+        '<p class="hub-card-note">'+escapeHtml(classification)+'</p><div class="hub-actions>'+
         hours.map(function(pair){return '<button class="hub-action" onclick="openSantoralOfficeHour('+s._id+',\''+pair[0]+'\')">'+escapeHtml(pair[1])+'<span>›</span></button>';}).join('')+
         '</div></div>';
     }else{
@@ -1855,12 +1862,15 @@ window.addEventListener('DOMContentLoaded',()=>{
   function prayerBlock(s){
     const data=MEMORIA_LITURGICA||{};
     const item=Array.isArray(data.celebrations)?data.celebrations.find(entry=>entry.date===dateKey(s)):null;
-    if(!item)return hubEmpty('O Livro de Oração não traz Memória Litúrgica cadastrada para esta celebração.');
+    if(!item)return (s.prayer?hubText('Oração própria do Santoral',flowPrayerText(s.prayer)):hubEmpty('O Santoral não traz oração própria cadastrada.'))+hubEmpty('O Livro de Oração não traz Memória Litúrgica cadastrada para esta celebração.');
     const common=data.common||{};
+    const life=item.breve_vida||item.apresentacao||'';
+    const compact=value=>String(value||'').replace(/\s+/g,' ').trim();
+    const distinctLife=life&&compact(life)!==compact(s.bio||'')?life:'';
     return hubText('Hino',common.hino)+hubText('Antífona',common.antifona)+
       hubText('Salmo 111',common.salmo)+
-      hubText(item.breve_vida?'Breve vida':'Apresentação',item.breve_vida||item.apresentacao)+
-      hubText('Oração própria',item.oracao_propria)+
+      hubText(item.breve_vida?'Breve vida':'Apresentação',distinctLife)+
+      hubText('Oração própria',flowPrayerText(item.oracao_propria||s.prayer||''))+
       '<p class="hub-source">Fonte: Livro de Oração dos Servos de Maria, 3ª edição revisada, 2024, seção Memória Litúrgica. Distinta da Liturgia das Horas.</p>';
   }
   function orderedCelebrations(){

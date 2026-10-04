@@ -1,4 +1,4 @@
-name: Build APK Liturgia OSM 4.9.27
+name: Build APK Liturgia OSM 4.9.28
 
 on:
   workflow_dispatch:
@@ -75,8 +75,8 @@ jobs:
 
       - name: Definir versão e segurança
         run: |
-          sed -i 's/versionCode [0-9][0-9]*/versionCode 40927/' android/app/build.gradle
-          sed -i 's/versionName "[^"]*"/versionName "4.9.27"/' android/app/build.gradle
+          sed -i 's/versionCode [0-9][0-9]*/versionCode 40928/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "4.9.28"/' android/app/build.gradle
           sed -i 's/buildTypes {/buildTypes {\n        debug { debuggable false; signingConfig signingConfigs.stable }/' android/app/build.gradle
           sed -i 's/<application /<application android:allowBackup="false" /' android/app/src/main/AndroidManifest.xml
 
@@ -98,28 +98,28 @@ jobs:
           ./gradlew assembleDebug
 
       - name: Nomear APK
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk Liturgia-OSM-4.9.27.apk
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk Liturgia-OSM-4.9.28.apk
 
       - name: Verificar APK
         run: |
           APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
-          "${APKSIGNER}" verify --verbose --print-certs Liturgia-OSM-4.9.27.apk
+          "${APKSIGNER}" verify --verbose --print-certs Liturgia-OSM-4.9.28.apk
 
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.9.27
-          path: Liturgia-OSM-4.9.27.apk
+          name: Liturgia-OSM-4.9.28
+          path: Liturgia-OSM-4.9.28.apk
           if-no-files-found: error
 
-      - name: Publicar versão 4.9.27
+      - name: Publicar versão 4.9.28
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v4.9.27
-          name: Liturgia OSM 4.9.27
+          tag_name: v4.9.28
+          name: Liturgia OSM 4.9.28
           generate_release_notes: true
           overwrite_files: true
-          files: Liturgia-OSM-4.9.27.apk
+          files: Liturgia-OSM-4.9.28.apk
 
 

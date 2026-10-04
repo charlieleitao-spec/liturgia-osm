@@ -7,7 +7,7 @@ import vm from 'node:vm';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const html=readFileSync(resolve(root,'www/index.html'),'utf8');
 const version=JSON.parse(readFileSync(resolve(root,'package.json'),'utf8')).version;
-assert.equal(version,'4.9.27','A experiência de navegação deve ter versão própria.');
+assert.equal(version,'4.9.28','A experiência de navegação deve ter versão própria.');
 
 const nav=html.match(/<nav class="tabbar" id="tabbar"[\s\S]*?<\/nav>/)?.[0]||'';
 const tabIds=[...nav.matchAll(/data-tab="([^"]+)"/g)].map(match=>match[1]);
@@ -68,10 +68,12 @@ assert.deepEqual(masses.celebrations,[],'Nenhum texto de Missa pode ser criado s
 const saintButtons=['vida','liturgia','oracoes'].map(id=>({dataset:{tab:id},active:false,attrs:{},classList:{toggle(){}} ,setAttribute(name,value){this.attrs[name]=value;}}));
 const scrollTargets={};
 const testSaints=[
-  {_id:0,id:0,title:'Santo de teste',date:'15 de janeiro',day:15,month:1,rank:'Santo',bio:'Vida do Santoral',hasOffice:true},
-  {_id:1,id:1,title:'Celebração sem material',date:'16 de janeiro',day:16,month:1,rank:'Memória',bio:'Biografia',hasOffice:false}
+  {_id:0,id:0,title:'Santo de teste',date:'15 de janeiro',day:15,month:1,rank:'Santo',bio:'Vida do Santoral',prayer:'Oração\ncom linha\nbem-\naventurada.\n\nNova frase.',hasOffice:true},
+  {_id:1,id:1,title:'Celebração sem material',date:'16 de janeiro',day:16,month:1,rank:'Memória',bio:'Biografia',prayer:'Oração\ndo Santoral.\n\nNova frase.',hasOffice:false},
+  {_id:2,id:2,title:'Celebração com textos parciais',date:'17 de janeiro',day:17,month:1,rank:'Memória',bio:'Biografia parcial',hasOffice:true,partial:true},
+  {_id:3,id:3,title:'Celebração sem oração',date:'18 de janeiro',day:18,month:1,rank:'Memória',bio:'Biografia sem oração',hasOffice:false}
 ];
-const memoryData={common:{hino:'Hino de fonte',antifona:'Antífona de fonte',salmo:'Salmo de fonte'},celebrations:[{date:'01-15',title:'Santo de teste',breve_vida:'Breve vida de fonte',oracao_propria:'Oração de fonte'}]};
+const memoryData={common:{hino:'Hino de fonte',antifona:'Antífona de fonte',salmo:'Salmo de fonte'},celebrations:[{date:'01-15',title:'Santo de teste',breve_vida:'Vida do\nSantoral'}]};
 let openedId=null,scrolledId=null,selectedTab=null;
 const context={
   state:{tab:'hoje',detailId:null,detailOriginTab:'hoje',liturgiaSection:'missa',devo:null,devoSub:null},
@@ -83,7 +85,7 @@ const context={
   render(){},setTab(tab){selectedTab=tab;},openDetail(id){openedId=id;},smartBack(){},
   escapeHtml(value){return String(value??'');},saintImageHtml(){return '<span class="photo"></span>';},
   saintHasOffice(s){return s.hasOffice;},officeHoursForSaint(s){return s.hasOffice?[['laudes','Laudes']]:[];},
-  officeClassificationForSaint(){return 'Ofício próprio';}
+  officeClassificationForSaint(s){return s.partial?'Elementos próprios + Comum':'Ofício próprio';}
 };
 scrollTargets['hub-liturgia']={scrollIntoView(){scrolledId='hub-liturgia';}};
 vm.runInNewContext(hubScript,context);
@@ -92,13 +94,21 @@ const order=['id="hub-vida"','id="hub-liturgia"','id="hub-oracao"','id="hub-nave
 assert.ok(order.every((value,index)=>value>=0&&(index===0||value>order[index-1])),'Os quatro blocos devem aparecer na ordem proposta.');
 assert.match(hub,/openDailyLiturgy\('\d{4}-01-15'\)/,'Sem Missa própria, a ação deve abrir a Missa da data.');
 assert.match(hub,/openSantoralOfficeHour\(0,'laudes'\)/,'A hora disponível deve abrir o Ofício do Santo.');
-for(const text of ['Hino de fonte','Antífona de fonte','Salmo de fonte','Breve vida de fonte','Oração de fonte']) assert.ok(hub.includes(text),'Texto-fonte ausente: '+text);
+for(const text of ['Hino de fonte','Antífona de fonte','Salmo de fonte','Oração com linha bem-aventurada.\n\nNova frase.']) assert.ok(hub.includes(text),'Texto-fonte ausente: '+text);
+assert.equal((hub.match(/Vida do Santoral/g)||[]).length,1,'A vida idêntica do Livro de Oração não deve ser repetida no bloco Oração.');
+assert.ok(html.includes('CACHE_MAX_AGE=30*24*60*60*1000'),'O cache da Missa precisa de validade explícita.');
+assert.ok(html.includes('offline por até 30 dias'),'A cópia da Missa precisa informar seu prazo local.');
+assert.ok(!html.includes('startupMetric493')&&!html.includes('osmStartupMetric'),'A métrica de inicialização persistente foi removida.');
 assert.match(hub,/Anterior/);
 assert.match(hub,/Próxima/);
 assert.match(hub,/shareSaint\(0\)/);
 const emptyHub=context.window.renderCelebrationHub(1);
 assert.match(emptyHub,/Sem Ofício próprio: usar o Comum/,'A falta de Ofício deve ter estado vazio e caminho para o Comum.');
 assert.match(emptyHub,/O Livro de Oração não traz Memória Litúrgica cadastrada/,'A falta de Memória deve ser explícita.');
+const noPrayerHub=context.window.renderCelebrationHub(3);
+assert.match(noPrayerHub,/O Santoral não traz oração própria cadastrada/,'A ausência de oração do Santoral deve ser explícita.');
+const partialHub=context.window.renderCelebrationHub(2);
+assert.match(partialHub,/Textos próprios do Ofício/,'Material incompleto não deve ser apresentado como Liturgia das Horas completa.');
 context.window.openSaintSection(0,'liturgia');
 assert.equal(openedId,0,'Atalho deve abrir o Santo, inclusive id 0.');
 assert.equal(scrolledId,'hub-liturgia','Atalho deve ir ao bloco selecionado.');

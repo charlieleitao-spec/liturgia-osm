@@ -57,6 +57,7 @@ for (const [date, item] of Object.entries(offices.celebracoes || {})) {
 }
 if (byDate.get('09-22')?.title !== 'Dedicação da Basílica de Monte Senário') fail('Monte Senário deve permanecer em 22/09.');
 if (byDate.get('12-15')?.title !== 'B. Boaventura de Pistoia' || byDate.has('12-14')) fail('Boaventura de Pistoia deve permanecer em 15/12.');
+if (byDate.get('08-23')?.title !== 'São Filipe Benizi') fail('A forma canônica do nome deve ser Benizi.');
 
 if (memoria.schema_version !== 1 || !memoria.common || !Array.isArray(memoria.celebrations) || memoria.celebrations.length !== 25) fail('Base da Memória Litúrgica incompleta.');
 for (const part of ['hino', 'antifona', 'salmo']) if (!memoria.common?.[part]?.trim()) fail('Parte comum ausente na Memória Litúrgica: ' + part);
@@ -65,7 +66,13 @@ for (const item of memoria.celebrations || []) {
   if (!byDate.has(item.date)) fail('Memória sem celebração correspondente: ' + item.date);
   if (memoryDates.has(item.date)) fail('Data duplicada na Memória Litúrgica: ' + item.date);
   memoryDates.add(item.date);
-  for (const field of ['title', 'breve_vida', 'oracao_propria']) if (field==='breve_vida' ? (!item.breve_vida?.trim()&&!item.apresentacao?.trim()) : (!item[field]?.trim())) fail(`Texto ${field} ausente em ${item.date}.`);
+  const saint=byDate.get(item.date);
+  const compact=value=>String(value||'').replace(/\s+/g,' ').trim();
+  if (!item.title?.trim()) fail(`Título ausente em ${item.date}.`);
+  if (!item.breve_vida?.trim()&&!item.apresentacao?.trim()&&!saint?.bio?.trim()) fail(`Texto de vida ausente em ${item.date}.`);
+  if (!item.oracao_propria?.trim()&&!saint?.prayer?.trim()) fail(`Oração ausente em ${item.date}.`);
+  if (item.breve_vida?.trim()&&compact(item.breve_vida)===compact(saint?.bio)) fail(`Vida duplicada na Memória Litúrgica em ${item.date}; use o Santoral canônico.`);
+  if (item.oracao_propria?.trim()&&compact(item.oracao_propria)===compact(saint?.prayer)) fail(`Oração duplicada na Memória Litúrgica em ${item.date}; use o Santoral canônico.`);
 }
 if (!memoria.source?.includes('Livro de Oração dos Servos de Maria')) fail('Fonte da Memória Litúrgica não identificada.');
 
@@ -102,3 +109,4 @@ console.log(JSON.stringify({
   devotions: ['vigilia', 'coroa', 'via_matris'],
   offlineMemory: true
 }, null, 2));
+
