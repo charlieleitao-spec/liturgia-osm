@@ -85,4 +85,52 @@ for (const item of memoria.celebrations || []) {
   if (item.breve_vida?.trim()&&compact(item.breve_vida)===compact(saint?.bio)) fail(`Vida duplicada na Memória Litúrgica em ${item.date}; use o Santoral canônico.`);
   if (item.oracao_propria?.trim()&&compact(item.oracao_propria)===compact(saint?.prayer)) fail(`Oração duplicada na Memória Litúrgica em ${item.date}; use o Santoral canônico.`);
 }
-if (!memoria.source?.includes('Livro de Oração dos Servos de Maria')) fail('Fo
+if (!memoria.source?.includes('Livro de Oração dos Servos de Maria')) fail('Fonte da Memória Litúrgica não identificada.');
+if (memoria.celebrations.length >= memoria.memory_dates.length) fail('Entradas da Memória que só repetem o Santoral devem ser removidas.');
+for (const item of memoria.celebrations) if (!item.breve_vida && !item.apresentacao && !item.oracao_propria) fail('Entrada vazia na Memória Litúrgica: ' + item.date);
+
+const devotionalDataKeys = {
+  vigilia: '"vigilia": {',
+  coroa: '"coroa": "',
+  via_matris: '"via_matris": {'
+};
+const devotionalRoutes = {
+  vigilia: ["function viewVigilia()", "openDevo('vigilia'"],
+  coroa: ["PRAYERS.devotions.coroa", "key === 'coroa'"],
+  via_matris: ["function viewViaMatris()", "openDevo('via_matris'"]
+};
+for (const key of Object.keys(devotionalDataKeys)) {
+  if (!html.includes(devotionalDataKeys[key]) || !devotionalRoutes[key].every(marker => html.includes(marker))) {
+    fail('Prática devocional ou rota ausente: ' + key);
+  }
+}
+for (const script of [html, servite].flatMap(source => [...source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(match => match[1]).filter(Boolean))) {
+  try { new Function(script); } catch (error) { fail('Erro de sintaxe JavaScript: ' + error.message); }
+}
+const readerStart=servite.indexOf('function renderOficioTabs(');
+const readerEnd=servite.indexOf('\n// note shown under non-Portuguese',readerStart);
+if(readerStart<0||readerEnd<0) fail('Leitor canônico do Ofício não encontrado.');
+else {
+  try {
+    const makeReader=new Function('t','state','escapeHtml','renderLiturgicalHourContent','BENEDICTUS_TEXT','MAGNIFICAT_TEXT','INVITATORIO_SALMO','renderFinalAntifonaBlock',servite.slice(readerStart,readerEnd)+';return renderOficioTabs;');
+    const renderReader=makeReader(key=>key,{oficioTab:'oficio'},value=>String(value??''),value=>String(value??''),'','','',()=> '');
+    const pistoia=renderReader(offices.celebracoes['12-15'].material);
+    if(!pistoia.includes('Deveres eclesiásticos')||!pistoia.includes('Boaventura nasceu em Pistóia')) fail('O leitor do servite.html não exibe o Ofício das Leituras de Boaventura de Pistoia.');
+  } catch(error) { fail('Falha ao testar o leitor do Ofício de Boaventura: '+error.message); }
+}
+if (html.includes('�') || servite.includes('�')) fail('Caractere de substituição encontrado em texto.');
+
+if (errors.length) {
+  console.error(['AUDITORIA DA BASE SERVITA: FALHA', ...errors].join('\n'));
+  process.exit(1);
+}
+console.log(JSON.stringify({
+  status: 'ok',
+  version,
+  santoral: santoral.length,
+  oficios: Object.keys(offices.celebracoes).length,
+  memoriasLiturgicas: memoria.memory_dates.length,
+  textosMemoriaExclusivos: memoria.celebrations.length,
+  devotions: ['vigilia', 'coroa', 'via_matris'],
+  offlineMemory: true
+}, null, 2));
