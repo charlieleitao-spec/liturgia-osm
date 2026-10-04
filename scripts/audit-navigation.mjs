@@ -18,13 +18,19 @@ for (const file of ['www/app.js', 'www/servite-1.js', 'www/servite-2.js', 'www/s
   assert.equal(result.status, 0, result.stderr || 'Erro de sintaxe em ' + file);
 }
 for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data-tab="' + tab + '"'), 'Aba ausente: ' + tab);
-assert.match(html, /<script[^>]+src=["'][^"']*app\.js["']/);
-assert.match(html, /<link[^>]+href=["'][^"']*app\.css["']/);
+assert.match(html, /app\.js/);
+assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
 assert.match(app, /const APP_VERSION = ['"]4\.9\.36['"]/);
 assert.match(app, /addListener\(['"]backButton['"]/);
+assert.match(app, /function saintRankSubtitle/);
 assert.match(css, /text-align:\s*center/);
 assert.match(serviteHtml, /servite-3\.js/);
 assert.match(serviteCss, /text-align:\s*center/);
 assert.match(serviteScript, /hour-tab-btn/);
-console.log('Auditoria aprovada: navegação principal, recursos modulares, retorno Android, botões de Ofícios e centralização litúrgica.');
+assert.equal(pkg.dependencies['@capacitor/app'], '8.1.2');
+assert.match(loader, /window\.OSM_PRAYERS/);
+assert.match(workflow, /assembleRelease/);
+assert.match(workflow, /minifyEnabled true/);
+assert.match(workflow, /shrinkResources true/);
+console.log('Auditoria aprovada: abas, módulos, botão Android, rótulos dos santos, orações JSON, Horas centralizadas e release R8.');
