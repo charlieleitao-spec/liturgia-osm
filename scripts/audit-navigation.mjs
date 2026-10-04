@@ -9,7 +9,18 @@ const html=readFileSync(resolve(root,'www/index.html'),'utf8');
 const appJs=readFileSync(resolve(root,'www/app.js'),'utf8');
 const source=html+'\n'+appJs;
 const version=JSON.parse(readFileSync(resolve(root,'package.json'),'utf8')).version;
-assert.equal(version,'4.9.35','A experiência de navegação deve ter versão própria.');
+assert.equal(version,'4.9.36','A experiência de navegação deve ter versão própria.');
+const css=readFileSync(resolve(root,'www/app.css'),'utf8');
+const embeddedCss=readFileSync(resolve(root,'www/servite.css'),'utf8');
+const pkg=JSON.parse(readFileSync(resolve(root,'package.json'),'utf8'));
+assert.equal(pkg.dependencies['@capacitor/app'],'8.1.2','O plugin Android oficial deve estar instalado.');
+assert.match(css,/width:min\(calc\(100% - 28px\), 380px\)/,'O rodapé deve ficar centralizado e compacto.');
+assert.match(css,/body\.light-mode\{[\s\S]*?--bg-deep:#f7f4ed/,'O tema claro deve seguir a paleta do Hoje na Família Servita.');
+assert.match(css,/--bg-deep:#0c1827/,'O tema escuro deve manter a identidade azul-marinho.');
+assert.match(css,/\.office-hour-btn\{[^}]*min-height:50px/,'Os botões de Horas devem ter área de toque confortável.');
+assert.match(embeddedCss,/\.hour-tab-btn\{[\s\S]*?min-height:42px/,'Os botões do leitor de Ofício devem ser legíveis e fáceis de tocar.');
+assert.match(appJs,/localStorage\.getItem\('osmTheme'\) !== 'dark'/,'A primeira abertura usa o tema claro; a escolha escura salva permanece.');
+assert.match(appJs,/installAndroidBackHandler\(\)/,'O app deve registrar o botão Voltar nativo.');
 
 const nav=html.match(/<nav class="tabbar" id="tabbar"[\s\S]*?<\/nav>/)?.[0]||'';
 const tabIds=[...nav.matchAll(/data-tab="([^"]+)"/g)].map(match=>match[1]);
@@ -106,7 +117,7 @@ const context={
   document:{addEventListener(){},querySelectorAll(){return [];},getElementById(id){return scrollTargets[id]||null;}},
   fetch(){return Promise.resolve({ok:true,json(){return Promise.resolve({schema_version:1,celebrations:[]});}});},
   requestAnimationFrame(fn){fn();},
-  render(){},setTab(tab){selectedTab=tab;},openDetail(id){openedId=id;},smartBack(){},
+  render(){},setTab(tab){selectedTab=tab;},openDetail(id){openedId=id;},smartBack(){},installAndroidBackHandler(){},
   escapeHtml(value){return String(value??'');},saintImageHtml(){return '<span class="photo"></span>';},
   saintHasOffice(s){return s.hasOffice;},officeHoursForSaint(s){return s.hasOffice?[['laudes','Laudes']]:[];},officeRecordForSaint(s){return s.hasOffice?{tipo_material:s.partial?'textos_proprios':'oficio_proprio'}:{tipo_material:'sem_material_proprio'};},
   officeClassificationForSaint(s){return s.partial?'Elementos próprios + Comum':'Ofício próprio';}
@@ -189,8 +200,21 @@ assert.ok(smartBackFunction,'Retorno global deve existir.');
 vm.runInNewContext(smartBackFunction,backContext);
 backContext.smartBack();
 assert.equal(detailClosed,true,'Voltar deve fechar o detalhe mesmo para o santo id 0.');
+assert.equal(backContext.smartBack(),true,'Retornar de uma tela interna deve informar que o evento foi tratado.');
 backContext.state.detailId=null;massNode.open=true;backContext.smartBack();
 assert.equal(massClosed,true,'Voltar deve fechar a Missa aberta antes de trocar de tela.');
+assert.equal(backContext.smartBack(),true,'Fechar a Missa deve consumir o evento de retorno.');
+backContext.state={detailId:null,devo:null,devoSub:null,tab:'hoje',liturgiaSection:'missa'};
+assert.equal(backContext.smartBack(),false,'Na raiz, o retorno deve permitir sair ou voltar no histórico.');
+const nativeBack=source.match(/function handleAndroidBack\(event\)\{[\s\S]*?\n\}/)?.[0];
+assert.ok(nativeBack,'O retorno Android precisa tratar telas internas e saída do app.');
+let exited=false,historyReturned=false;
+const nativeBackContext={smartBack(){return false;},window:{history:{back(){historyReturned=true;}},Capacitor:{Plugins:{App:{exitApp(){exited=true;}}}}}};
+vm.runInNewContext(nativeBack,nativeBackContext);
+assert.equal(nativeBackContext.handleAndroidBack({canGoBack:true}),true);
+assert.equal(historyReturned,true,'Se houver histórico WebView, o voltar deve navegar nele.');
+assert.equal(nativeBackContext.handleAndroidBack({canGoBack:false}),true);
+assert.equal(exited,true,'Na raiz do app, o voltar Android deve sair pelo plugin nativo.');
 
 const homeFunction=source.match(/function viewHoje\(\)\{[\s\S]*?\n\}/)?.[0];
 assert.ok(homeFunction,'Hoje deve ter uma única tela de entrada.');

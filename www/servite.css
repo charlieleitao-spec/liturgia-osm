@@ -1,29 +1,29 @@
 :root{
-  --bg-deep:#EFE4BC;
-  --bg-panel:#F8F1D9;
-  --bg-panel-2:#FCF8E9;
-  --line:#D9C68F;
-  --gold:#8A6A1E;
-  --gold-soft:#6E5416;
-  --wine:#9A2620;
-  --wine-soft:#9A2620;
-  --paper:#211A10;
-  --paper-dim:#211A10;
-  --text:#211A10;
-  --text-muted:#7A6A46;
-  --text-faint:#93815A;
-  --shadow: 0 10px 22px -14px rgba(110,84,22,.35);
-  --topbar-bg1: rgba(248,241,217,.92);
-  --topbar-bg2: rgba(248,241,217,.55);
-  --tabbar-bg: rgba(248,241,217,.92);
-  --card-corner: rgba(138,106,30,.35);
-  --prayer-card-bg1: rgba(154,38,32,.09);
-  --prayer-card-bg2: rgba(154,38,32,.03);
-  --prayer-card-border: rgba(154,38,32,.30);
-  --ambient-1: rgba(154,38,32,.05);
-  --ambient-2: rgba(138,106,30,.10);
-  --ambient-3: rgba(154,38,32,.04);
-  --ambient-bg: linear-gradient(180deg, #F1E6C1 0%, #EFE3BA 45%, #EADBA9 100%);
+  --bg-deep:#f7f4ed;
+  --bg-panel:#fff;
+  --bg-panel-2:#fff;
+  --line:#e1d9ca;
+  --gold:#b89448;
+  --gold-soft:#9a7837;
+  --wine:#8b2635;
+  --wine-soft:#8b2635;
+  --paper:#2f2b27;
+  --paper-dim:#3b3631;
+  --text:#2f2b27;
+  --text-muted:#6c655b;
+  --text-faint:#8a8379;
+  --shadow: 0 10px 22px -14px rgba(47,43,39,.22);
+  --topbar-bg1: rgba(247,244,237,.96);
+  --topbar-bg2: rgba(247,244,237,.72);
+  --tabbar-bg: rgba(247,244,237,.96);
+  --card-corner: rgba(184,148,72,.28);
+  --prayer-card-bg1: rgba(139,38,53,.09);
+  --prayer-card-bg2: rgba(139,38,53,.03);
+  --prayer-card-border: rgba(139,38,53,.25);
+  --ambient-1: rgba(139,38,53,.04);
+  --ambient-2: rgba(184,148,72,.08);
+  --ambient-3: rgba(139,38,53,.03);
+  --ambient-bg: linear-gradient(180deg, #f7f4ed 0%, #f7f4ed 45%, #f2eee6 100%);
   --noise-color:0.36, 0.29, 0.13;
   --noise-opacity:.5;
   --noise-blend:multiply;
@@ -112,7 +112,7 @@ body{
 .topbar-text{ min-width:0; flex:1 1 auto; }
 .topbar-text .eyebrow, .topbar-text h1{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .crest{flex:none; width:38px; height:38px; display:flex; align-items:center; justify-content:center;}
-.crest img{width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 1px 2px rgba(110,84,22,.35));}
+.crest img{width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 1px 2px rgba(47,43,39,.22));}
 .eyebrow{
   margin:0 0 2px; font-family:'Cinzel',serif; font-size:10px; letter-spacing:.14em;
   text-transform:uppercase; color:var(--wine-soft); font-weight:600;
@@ -252,7 +252,7 @@ main#view{
   color:var(--gold-soft); background:none; border:1px solid var(--line); border-radius:20px;
   padding:9px 16px; cursor:pointer; transition:.2s;
 }
-.btn-link:active{ background:rgba(138,106,30,.10); }
+.btn-link:active{ background:rgba(184,148,72,.08); }
 
 /* ---- angelus toggle card ---- */
 .toggle-row{ display:flex; gap:8px; margin-bottom:14px; }
@@ -297,15 +297,15 @@ main#view{
   border-bottom:1px solid var(--line); padding-bottom:14px;
 }
 .hour-tab-btn{
-  font-family:'Cinzel',serif; font-size:0.6875rem; letter-spacing:.08em; text-transform:uppercase;
-  color:var(--text-faint); background:transparent; border:1px solid var(--line);
-  border-radius:16px; padding:7px 14px; cursor:pointer; transition:all .2s ease;
+  min-height:42px; font-family:'Cinzel',serif; font-size:0.75rem; letter-spacing:.04em; text-transform:none;
+  color:var(--text-muted); background:var(--bg-panel); border:1px solid var(--line);
+  border-radius:12px; padding:9px 13px; cursor:pointer; transition:all .2s ease;
 }
-.hour-tab-btn:hover{ color:var(--wine-soft); border-color:var(--wine-soft); }
+.hour-tab-btn:hover,.hour-tab-btn:focus-visible{ color:var(--wine); border-color:var(--gold); outline:none; }
 .hour-tab-btn.active{
-  color:#fff; background:var(--wine); border-color:var(--wine); font-weight:600;
+  color:#fff; background:#173b67; border-color:#173b67; font-weight:600;
 }
-.hour-tab-btn.small{ font-size:0.5625rem; padding:5px 10px; }
+.hour-tab-btn.small{ min-height:38px; font-size:0.7rem; padding:7px 10px; }
 .hour-tab-content{}
 .hour-sublabel{
   font-family:'Cinzel',serif; font-size:0.6875rem; letter-spacing:.08em; text-transform:uppercase;
@@ -442,28 +442,28 @@ main#view{
 
 /* ===== Harmonização visual com Liturgia OSM ===== */
 :root{
-  --bg-deep:#15121c;--bg-panel:#1c1826;--bg-panel-2:#221d30;--line:#33293f;
-  --gold:#c49a4a;--gold-soft:#e3c988;--wine:#8a2f3d;--wine-soft:#b85566;
-  --paper:#f4eee0;--paper-dim:#e7ddc6;--text:#ece4d3;--text-muted:#a89a86;--text-faint:#786a5c;
-  --shadow:0 18px 40px -18px rgba(0,0,0,.65);--topbar-bg1:rgba(28,24,38,.96);--topbar-bg2:rgba(28,24,38,.72);
-  --tabbar-bg:rgba(28,24,38,.96);--card-corner:rgba(196,154,74,.35);--rank-text:#15121c;
-  --ambient-bg:linear-gradient(180deg,#15121c 0%,#120f18 55%,#100d15 100%);
-  --ambient-1:rgba(196,154,74,.13);--ambient-2:rgba(138,47,61,.16);--ambient-3:rgba(196,154,74,.05);
+  --bg-deep:#0c1827;--bg-panel:#13263b;--bg-panel-2:#19334d;--line:#304660;
+  --gold:#b89448;--gold-soft:#e1c47b;--wine:#8b2635;--wine-soft:#c25a69;
+  --paper:#f1eee3;--paper-dim:#d5deea;--text:#f1eee3;--text-muted:#a8b5c5;--text-faint:#8493a5;
+  --shadow:0 14px 32px -20px rgba(0,0,0,.62);--topbar-bg1:rgba(19,38,59,.96);--topbar-bg2:rgba(19,38,59,.78);
+  --tabbar-bg:rgba(19,38,59,.96);--card-corner:rgba(184,148,72,.28);--rank-text:#0c1827;
+  --ambient-bg:linear-gradient(180deg,#102238 0%,#0c1827 55%,#091522 100%);
+  --ambient-1:rgba(184,148,72,.13);--ambient-2:rgba(44,75,110,.16);--ambient-3:rgba(184,148,72,.05);
 }
 [data-theme="light"]{
-  --bg-deep:#f5f0e6;--bg-panel:#fffaf1;--bg-panel-2:#fffdf8;--line:#d9ccb5;
-  --gold:#9a6e25;--gold-soft:#765019;--wine:#8a2f3d;--wine-soft:#9b4050;
-  --paper:#2e271f;--paper-dim:#453c31;--text:#2e271f;--text-muted:#6e6254;--text-faint:#8b7d6b;
-  --shadow:0 12px 30px -20px rgba(58,42,22,.35);--topbar-bg1:rgba(255,250,241,.96);--topbar-bg2:rgba(255,250,241,.84);
-  --tabbar-bg:rgba(255,250,241,.96);--card-corner:rgba(154,110,37,.24);--rank-text:#fffaf1;
-  --ambient-bg:linear-gradient(180deg,#f7f2e9,#efe6d8);--ambient-1:rgba(196,154,74,.13);--ambient-2:rgba(138,47,61,.07);--ambient-3:rgba(196,154,74,.05);
+  --bg-deep:#f7f4ed;--bg-panel:#fff;--bg-panel-2:#fff;--line:#e1d9ca;
+  --gold:#b89448;--gold-soft:#9a7837;--wine:#8b2635;--wine-soft:#8b2635;
+  --paper:#2f2b27;--paper-dim:#3b3631;--text:#2f2b27;--text-muted:#6c655b;--text-faint:#8a8379;
+  --shadow:0 12px 28px -22px rgba(47,43,39,.32);--topbar-bg1:rgba(247,244,237,.96);--topbar-bg2:rgba(247,244,237,.84);
+  --tabbar-bg:rgba(255,255,255,.96);--card-corner:rgba(184,148,72,.24);--rank-text:#2f2b27;
+  --ambient-bg:linear-gradient(180deg,#f7f4ed,#f2eee6);--ambient-1:rgba(184,148,72,.10);--ambient-2:rgba(23,59,103,.06);--ambient-3:rgba(184,148,72,.05);
 }
 body{font-family:Georgia,'Times New Roman',serif;}
 .eyebrow,.topbar h1,.section-title,.settings-label,.font-btn,.tab-btn,.chip{font-family:Georgia,'Times New Roman',serif;}
 .topbar{position:sticky;top:0;padding:14px 16px 12px;}
 .topbar h1{font-size:17px}.eyebrow{font-size:9px}.topbar-inner{gap:11px}.crest{width:30px;height:30px}.crest img{width:30px;height:30px}
 main#view{padding:14px 18px 100px}.card{border-radius:14px}.section-title{font-size:.72rem;color:var(--text-faint)}
-.tabbar{background:var(--tabbar-bg);padding-left:2px;padding-right:2px}.tab-btn{font-size:8.8px}.tab-btn svg{width:19px;height:19px}.tab-btn.active{color:var(--gold-soft)}
+.tabbar{background:var(--tabbar-bg);padding-left:2px;padding-right:2px}.tab-btn{font-size:9.5px}.tab-btn svg{width:19px;height:19px}.tab-btn.active{color:var(--gold-soft)}
 .theme-toggle,.settings-btn,.home-return{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--bg-panel);color:var(--gold-soft);display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:Georgia,'Times New Roman',serif;font-size:15px}
 .home-return:active,.theme-toggle:active,.settings-btn:active{transform:scale(.96);background:rgba(196,154,74,.12)}
 .font-toggle{border-radius:9px}.font-btn{padding:8px 8px}.header-controls{gap:6px}
@@ -498,7 +498,7 @@ html,body,#app,#view,.card,.hour-tab-content,.today-servita-reader,.litblock{min
 .card{width:100%;overflow-x:clip!important}
 .hour-tab-content{width:100%!important;margin-left:0!important;margin-right:0!important;overflow-x:clip!important}
 .hour-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;max-width:100%;overflow:hidden}
-.hour-tab-btn{min-width:0;width:100%;max-width:100%;padding:8px 7px;white-space:normal;overflow-wrap:anywhere;line-height:1.2}
+.hour-tab-btn{min-width:0;width:100%;max-width:100%;min-height:44px;padding:8px 7px;white-space:normal;overflow-wrap:anywhere;line-height:1.2}
 .today-servita-reader{width:100%;max-width:100%;overflow-x:clip!important;contain:inline-size;font-family:Georgia,'Times New Roman',serif;color:var(--text);font-size:1.02rem;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .today-servita-reader *{min-width:0;max-width:100%;box-sizing:border-box;word-break:normal;overflow-wrap:break-word}
 .today-servita-reader .litblock{padding:18px 0;border-top:1px solid var(--line)}

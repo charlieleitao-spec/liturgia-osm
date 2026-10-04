@@ -108,18 +108,20 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.35';
+const APP_VERSION = '4.9.36';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
 let pendingSharePrayer = null;
 let state = { tab: 'hoje', angelus:dailySuggestion.key, detailId:null, search:'', devo:null, devoSub:null };
 let readerScale = parseFloat(localStorage.getItem('osmReaderScale') || '1');
-let lightMode = localStorage.getItem('osmTheme') === 'light';
+let lightMode = localStorage.getItem('osmTheme') !== 'dark';
 function applyPreferences(){
   readerScale = Math.max(.76, Math.min(1.56, readerScale));
   document.documentElement.style.setProperty('--reader-scale', readerScale.toFixed(2));
   document.body.classList.toggle('light-mode', lightMode);
+  document.documentElement.style.colorScheme = lightMode ? 'light' : 'dark';
+  const themeMeta=document.querySelector('meta[name=theme-color]'); if(themeMeta) themeMeta.content=lightMode?'#f7f4ed':'#0c1827';
   const b=document.getElementById('themeBtn'); if(b) b.textContent = lightMode ? '☾' : '☼'; document.querySelectorAll('.reader-scale-value').forEach(rv=>rv.textContent=Math.round(readerScale*100)+'%');
 }
 function adjustFont(delta){
@@ -130,7 +132,7 @@ function adjustFont(delta){
 function resetFont(){readerScale=1;localStorage.setItem('osmReaderScale',readerScale);applyPreferences();}
 function openMainMenu(){const o=document.getElementById('mainMenuOverlay');if(o){o.classList.add('open');o.setAttribute('aria-hidden','false');applyPreferences();if(typeof updateBackButton==='function')updateBackButton();}}
 function closeMainMenu(){const o=document.getElementById('mainMenuOverlay');if(o){o.classList.remove('open');o.setAttribute('aria-hidden','true');if(typeof updateBackButton==='function')updateBackButton();}}
-function toggleTheme(){ lightMode=!lightMode; localStorage.setItem('osmTheme', lightMode?'light':'dark'); applyPreferences(); }
+function toggleTheme(){ lightMode=!lightMode; localStorage.setItem('osmTheme', lightMode?'light':'dark'); applyPreferences(); const frame=document.getElementById('serviteFrame'); try{frame?.contentDocument?.documentElement?.setAttribute('data-theme',lightMode?'light':'dark');}catch(e){} }
 
 
 function setTab(tab){
@@ -895,17 +897,36 @@ function smartBack(){
   const language=document.getElementById('languageOverlay');
   const servite=document.getElementById('serviteOverlay');
   const mass=document.getElementById('dailyLiturgyOverlay');
-  if(menu&&menu.classList.contains('open')){closeMainMenu();return;}
-  if(language&&language.classList.contains('open')){closeLanguagePanel();return;}
-  if(servite&&servite.classList.contains('open')){if(typeof closeServite==='function')closeServite();else servite.classList.remove('open');updateBackButton();return;}
-  if(mass&&mass.classList.contains('open')&&typeof window.closeDailyLiturgy==='function'){window.closeDailyLiturgy();updateBackButton();return;}
-  if(dailyPrayerOpen480){closeDailyPrayer480();return;}
-  if(memoriaSelectedDate){closeMemoriaLiturgica();return;}
-  if(state.devoSub!==null&&state.devoSub!==undefined){closeDevo();return;}
-  if(state.devo){closeDevo();return;}
-  if(state.detailId!==null&&state.detailId!==undefined){closeDetail();return;}
-  if(state.tab==='liturgia'&&state.liturgiaSection==='horas'){setLiturgiaSection('missa');return;}
-  if(state.tab!=='hoje'){setTab('vida');return;}
+  if(menu&&menu.classList.contains('open')){closeMainMenu();return true;}
+  if(language&&language.classList.contains('open')){closeLanguagePanel();return true;}
+  if(servite&&servite.classList.contains('open')){if(typeof closeServite==='function')closeServite();else servite.classList.remove('open');updateBackButton();return true;}
+  if(mass&&mass.classList.contains('open')&&typeof window.closeDailyLiturgy==='function'){window.closeDailyLiturgy();updateBackButton();return true;}
+  if(dailyPrayerOpen480){closeDailyPrayer480();return true;}
+  if(memoriaSelectedDate){closeMemoriaLiturgica();return true;}
+  if(state.devoSub!==null&&state.devoSub!==undefined){closeDevo();return true;}
+  if(state.devo){closeDevo();return true;}
+  if(state.detailId!==null&&state.detailId!==undefined){closeDetail();return true;}
+  if(state.tab==='liturgia'&&state.liturgiaSection==='horas'){setLiturgiaSection('missa');return true;}
+  if(state.tab!=='hoje'){setTab('vida');return true;}
+  return false;
+}
+
+function handleAndroidBack(event){
+  if(smartBack()) return true;
+  if(event&&event.canGoBack){window.history.back();return true;}
+  const appPlugin=window.Capacitor?.Plugins?.App;
+  if(appPlugin&&typeof appPlugin.exitApp==='function'){appPlugin.exitApp();return true;}
+  return false;
+}
+
+function installAndroidBackHandler(){
+  const capacitor=window.Capacitor;
+  const appPlugin=capacitor?.Plugins?.App;
+  if(!capacitor?.isNativePlatform?.()||!appPlugin||typeof appPlugin.addListener!=='function') return;
+  try{
+    const listener=appPlugin.addListener('backButton',handleAndroidBack);
+    listener?.catch?.(error=>console.warn('[Liturgia OSM] Não foi possível ligar o botão Voltar do Android.',error));
+  }catch(error){console.warn('[Liturgia OSM] Plugin do botão Voltar indisponível.',error);}
 }
 
 
@@ -1272,7 +1293,7 @@ loadCanonicalSantoral();
     setTab('liturgia');
   };
 
-  document.addEventListener('backbutton',function(event){event.preventDefault();smartBack();},false);
+  installAndroidBackHandler();
   window.addEventListener('keydown',function(event){if(event.key==='Escape')smartBack();});
   window.addEventListener('popstate',function(){
     const mass=document.getElementById('dailyLiturgyOverlay');

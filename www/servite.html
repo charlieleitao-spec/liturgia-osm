@@ -5,7 +5,7 @@
 <script>
 (function(){
   try{
-    var t = localStorage.getItem('osmTheme') || localStorage.getItem('santoral-osm-theme') || 'dark';
+    var t = localStorage.getItem('osmTheme') || localStorage.getItem('santoral-osm-theme') || 'light';
     document.documentElement.setAttribute('data-theme', t);
     var scale = parseFloat(localStorage.getItem('osmReaderScale') || '1');
     if(isFinite(scale)){ document.documentElement.style.fontSize = (16*scale) + 'px'; }
