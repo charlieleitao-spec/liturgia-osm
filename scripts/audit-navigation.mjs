@@ -7,7 +7,7 @@ import vm from 'node:vm';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const html=readFileSync(resolve(root,'www/index.html'),'utf8');
 const version=JSON.parse(readFileSync(resolve(root,'package.json'),'utf8')).version;
-assert.equal(version,'4.9.26','A experiência de navegação deve ter versão própria.');
+assert.equal(version,'4.9.27','A experiência de navegação deve ter versão própria.');
 
 const nav=html.match(/<nav class="tabbar" id="tabbar"[\s\S]*?<\/nav>/)?.[0]||'';
 const tabIds=[...nav.matchAll(/data-tab="([^"]+)"/g)].map(match=>match[1]);
@@ -17,6 +17,15 @@ for(const name of ['viewHoje','setTab','render']){
   assert.equal([...html.matchAll(expression)].length,1,name+' deve ter uma única implementação.');
 }
 for(const obsolete of ['canonicalSaintNavigation4925','canonicalPrimaryNavigation4923','canonicalUsability4923']) assert.ok(!html.includes(obsolete),'A camada antiga deve ser removida: '+obsolete);
+assert.doesNotMatch(html,/const\s+SANTORAL\s*=\s*\[/,'O Santoral não pode ser embutido em uma cópia antiga no HTML.');
+assert.match(html,/let SANTORAL\s*=\s*\[\]/,'A lista começa vazia e aguarda o JSON canônico.');
+assert.ok(html.includes("typeof item.title!=='string'")&&html.includes("typeof item.bio!=='string'"),'O loader deve validar os campos do schema do Santoral.');
+assert.ok(!/canonical\.length\s*<\s*32/.test(html),'A carga não pode usar um limite de quantidade como validação de schema.');
+assert.equal([...html.matchAll(/function\s+openDevo\s*\(/g)].length,1,'openDevo deve ter uma única implementação.');
+const staticIds=[...html.matchAll(/\bid="([^"]+)"/g)].map(match=>match[1]);
+assert.equal(new Set(staticIds).size,staticIds.length,'IDs HTML devem ser únicos.');
+assert.ok(!html.includes('duplicateNavigation'),'O menu não deve remover sua seção Navegação depois de montá-la.');
+assert.ok(html.includes('menu-label\">Navegação</div><div class=\"menu-nav-grid\"'),'A seção Navegação do menu precisa permanecer no HTML gerado.');
 
 const hubScript=html.match(/<script id="canonicalNavigation4926">([\s\S]*?)<\/script>/)?.[1]||'';
 assert.ok(hubScript,'O controlador central de navegação deve estar presente.');
@@ -36,6 +45,19 @@ const offices=JSON.parse(readFileSync(resolve(root,'www/data/oficios-osm.json'),
 const memory=JSON.parse(readFileSync(resolve(root,'www/data/memoria-liturgica.json'),'utf8'));
 const masses=JSON.parse(readFileSync(resolve(root,'www/data/missas-osm.json'),'utf8'));
 assert.equal(santoral.length,32);
+const santoralLoader=html.match(/<script id="canonicalSantoral495">([\s\S]*?)<\/script>/)?.[1]||'';
+assert.ok(santoralLoader,'O loader do Santoral canônico deve estar presente.');
+const loaderContext={SANTORAL:[],santoralReady:false,santoralLoading:true,santoralLoadError:false,window:{},render(){},console:{warn(){}},fetch(){return Promise.resolve({ok:true,json(){return Promise.resolve(santoral);}});}};
+vm.runInNewContext(santoralLoader,loaderContext);
+await new Promise(resolve=>setImmediate(resolve));
+assert.equal(loaderContext.santoralReady,true,'O loader deve aceitar o schema canônico.');
+assert.equal(loaderContext.SANTORAL.length,32);
+assert.equal(loaderContext.SANTORAL.find(item=>item.title==='B. Boaventura de Pistoia')?.date,'15 de dezembro','O loader deve usar a data corrigida do JSON canônico.');
+const invalidLoaderContext={SANTORAL:[],santoralReady:false,santoralLoading:true,santoralLoadError:false,window:{},render(){},console:{warn(){}},fetch(){return Promise.resolve({ok:true,json(){return Promise.resolve({});}});}};
+vm.runInNewContext(santoralLoader,invalidLoaderContext);
+await new Promise(resolve=>setImmediate(resolve));
+assert.equal(invalidLoaderContext.santoralReady,false,'Dados inválidos não podem marcar o Santoral como carregado.');
+assert.equal(invalidLoaderContext.santoralLoadError,true,'Dados inválidos devem produzir estado de erro explícito.');
 const coverage=Object.values(offices.celebracoes).reduce((result,item)=>{result[item.tipo_material]=(result[item.tipo_material]||0)+1;return result;},{});
 assert.deepEqual(coverage,{oficio_proprio:18,textos_proprios:9,sem_material_proprio:5},'A classificação das 32 celebrações deve permanecer íntegra.');
 assert.equal(memory.celebrations.length,25,'A cobertura da Memória Litúrgica deve permanecer em 25 celebrações.');
@@ -88,7 +110,7 @@ const viewNode={innerHTML:''};
 const mainButtons=tabIds.map(id=>({dataset:{tab:id},active:false,attrs:{},classList:{toggle(name,value){if(name==='active')this.owner.active=value;},owner:null},setAttribute(name,value){this.attrs[name]=value;}}));
 mainButtons.forEach(button=>{button.classList.owner=button;});
 const routingContext={
-  state:{tab:'hoje',detailId:null,devo:null,devoSub:null,prayerSection:'memoria',liturgiaSection:'missa'},
+  state:{tab:'hoje',detailId:null,devo:null,devoSub:null,prayerSection:'memoria',liturgiaSection:'missa'},santoralReady:true,santoralLoadError:false,
   document:{getElementById(id){return id==='view'?viewNode:null;},querySelectorAll(){return mainButtons;}},
   window:{scrollTo(){}},localStorage:{setItem(){}},pendingSharePrayer:null,
   viewVida(){return 'VIDA_HOME';},viewLiturgia(){return 'LITURGIA_HOME';},viewOracoes(){return 'PRATICAS_HOME';},viewBiblioteca(){return 'BIBLIOTECA';},viewSobre(){return 'SOBRE';},
@@ -152,3 +174,4 @@ liturgiaContext.state.liturgiaSection='missa';
 assert.match(liturgiaContext.viewLiturgia(),/openDailyLiturgy\('/,'A Missa do dia deve abrir a consulta da data.');
 
 console.log(JSON.stringify({status:'ok',version,santoral:santoral.length,oficioProprio:coverage.oficio_proprio,textosProprios:coverage.textos_proprios,semMaterial:coverage.sem_material_proprio,memorias:memory.celebrations.length,missaPropriaConferida:masses.celebrations.length,hubBlocks:4},null,2));
+
