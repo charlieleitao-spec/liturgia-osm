@@ -32,5 +32,5 @@ assert.equal(pkg.dependencies['@capacitor/app'], '8.1.2');
 assert.match(loader, /window\.OSM_PRAYERS/);
 assert.match(workflow, /assembleRelease/);
 assert.match(workflow, /minifyEnabled true/);
-assert.match(workflow, /shrinkResources true/);
+assert.match(workflow, /\('shrinkResources', 'true'\)/);
 console.log('Auditoria aprovada: abas, módulos, botão Android, rótulos dos santos, orações JSON, Horas centralizadas e release R8.');
