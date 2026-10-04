@@ -21,6 +21,8 @@ assert.match(css,/\.office-hour-btn\{[^}]*min-height:50px/,'Os botões de Horas 
 assert.match(embeddedCss,/\.hour-tab-btn\{[\s\S]*?min-height:42px/,'Os botões do leitor de Ofício devem ser legíveis e fáceis de tocar.');
 assert.match(appJs,/localStorage\.getItem\('osmTheme'\) !== 'dark'/,'A primeira abertura usa o tema claro; a escolha escura salva permanece.');
 assert.match(appJs,/installAndroidBackHandler\(\)/,'O app deve registrar o botão Voltar nativo.');
+assert.match(appJs,/capacitor\.registerPlugin\(name\)/,'Plugins nativos precisam registrar seu proxy JavaScript no runtime Capacitor.');
+assert.match(appJs,/getCapacitorPlugin\('Browser'\)/,'Links externos devem registrar e usar o plugin Browser.');
 
 const nav=html.match(/<nav class="tabbar" id="tabbar"[\s\S]*?<\/nav>/)?.[0]||'';
 const tabIds=[...nav.matchAll(/data-tab="([^"]+)"/g)].map(match=>match[1]);
@@ -209,7 +211,8 @@ assert.equal(backContext.smartBack(),false,'Na raiz, o retorno deve permitir sai
 const nativeBack=source.match(/function handleAndroidBack\(event\)\{[\s\S]*?\n\}/)?.[0];
 assert.ok(nativeBack,'O retorno Android precisa tratar telas internas e saída do app.');
 let exited=false,historyReturned=false;
-const nativeBackContext={smartBack(){return false;},window:{history:{back(){historyReturned=true;}},Capacitor:{Plugins:{App:{exitApp(){exited=true;}}}}}};
+const appProxy={exitApp(){exited=true;}};
+const nativeBackContext={smartBack(){return false;},getCapacitorPlugin(){return appProxy;},window:{history:{back(){historyReturned=true;}},Capacitor:{Plugins:{App:appProxy}}}};
 vm.runInNewContext(nativeBack,nativeBackContext);
 assert.equal(nativeBackContext.handleAndroidBack({canGoBack:true}),true);
 assert.equal(historyReturned,true,'Se houver histórico WebView, o voltar deve navegar nele.');

@@ -133,6 +133,13 @@ function resetFont(){readerScale=1;localStorage.setItem('osmReaderScale',readerS
 function openMainMenu(){const o=document.getElementById('mainMenuOverlay');if(o){o.classList.add('open');o.setAttribute('aria-hidden','false');applyPreferences();if(typeof updateBackButton==='function')updateBackButton();}}
 function closeMainMenu(){const o=document.getElementById('mainMenuOverlay');if(o){o.classList.remove('open');o.setAttribute('aria-hidden','true');if(typeof updateBackButton==='function')updateBackButton();}}
 function toggleTheme(){ lightMode=!lightMode; localStorage.setItem('osmTheme', lightMode?'light':'dark'); applyPreferences(); const frame=document.getElementById('serviteFrame'); try{frame?.contentDocument?.documentElement?.setAttribute('data-theme',lightMode?'light':'dark');}catch(e){} }
+function getCapacitorPlugin(name){
+  const capacitor=window.Capacitor;
+  if(!capacitor)return null;
+  if(capacitor.Plugins?.[name])return capacitor.Plugins[name];
+  if(typeof capacitor.registerPlugin==='function'){try{return capacitor.registerPlugin(name);}catch(error){console.warn('[Liturgia OSM] Plugin indisponível: '+name,error);}}
+  return null;
+}
 
 
 function setTab(tab){
@@ -643,7 +650,7 @@ function openExternalLink(event, url){
     return false;
   }
   try{
-    const browser = window.Capacitor?.Plugins?.Browser;
+    const browser = getCapacitorPlugin('Browser');
     if(browser?.open){
       browser.open({url});
       return false;
@@ -914,14 +921,14 @@ function smartBack(){
 function handleAndroidBack(event){
   if(smartBack()) return true;
   if(event&&event.canGoBack){window.history.back();return true;}
-  const appPlugin=window.Capacitor?.Plugins?.App;
+  const appPlugin=getCapacitorPlugin('App');
   if(appPlugin&&typeof appPlugin.exitApp==='function'){appPlugin.exitApp();return true;}
   return false;
 }
 
 function installAndroidBackHandler(){
   const capacitor=window.Capacitor;
-  const appPlugin=capacitor?.Plugins?.App;
+  const appPlugin=getCapacitorPlugin('App');
   if(!capacitor?.isNativePlatform?.()||!appPlugin||typeof appPlugin.addListener!=='function') return;
   try{
     const listener=appPlugin.addListener('backButton',handleAndroidBack);
