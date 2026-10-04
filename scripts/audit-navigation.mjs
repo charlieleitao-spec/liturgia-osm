@@ -156,4 +156,71 @@ const routingContext={
   state:{tab:'hoje',detailId:null,devo:null,devoSub:null,prayerSection:'memoria',liturgiaSection:'missa'},santoralReady:true,oficiosReady:true,santoralLoadError:false,
   document:{getElementById(id){return id==='view'?viewNode:null;},querySelectorAll(){return mainButtons;}},
   window:{scrollTo(){}},localStorage:{setItem(){}},pendingSharePrayer:null,
-  viewVida(){return 'VIDA_HOME';},viewLiturgia(){return 'LITURGIA_HOME';},viewOracoes(){return 'PRATICAS_HOME';},viewBiblioteca
+  viewVida(){return 'VIDA_HOME';},viewLiturgia(){return 'LITURGIA_HOME';},viewOracoes(){return 'PRATICAS_HOME';},viewBiblioteca(){return 'BIBLIOTECA';},viewSobre(){return 'SOBRE';},
+  applyMainLanguage(){},updateBackButton(){}
+};
+const rootFunctions=[source.match(/function setTab\(tab\)\{[\s\S]*?\n\}/)?.[0],source.match(/function render\(\)\{[\s\S]*?\n\}/)?.[0]];
+assert.ok(rootFunctions.every(Boolean),'O roteador principal deve ter as funções canônicas.');
+vm.runInNewContext(rootFunctions.join('\n'),routingContext);
+routingContext.oficiosReady=false;
+routingContext.render();
+assert.equal(viewNode.innerHTML,'VIDA_HOME','Falha na carga de Ofícios não deve bloquear o Santoral e o hub.');
+routingContext.oficiosReady=true;
+routingContext.setTab('vida');
+assert.equal(routingContext.state.tab,'hoje','Vida deve abrir Hoje.');
+assert.equal(viewNode.innerHTML,'VIDA_HOME','Hoje deve ter destino ativo.');
+routingContext.setTab('liturgia');
+assert.equal(viewNode.innerHTML,'LITURGIA_HOME','A aba Liturgia deve abrir sua rota diária.');
+routingContext.setTab('oracoes');
+assert.equal(viewNode.innerHTML,'PRATICAS_HOME','A aba Oração deve abrir as práticas.');
+assert.equal(routingContext.state.prayerSection,'praticas','Oração não deve ficar presa na Memória Litúrgica.');
+
+let detailClosed=false,massClosed=false;
+const massNode={open:false,classList:{contains(name){return name==='open'&&massNode.open;}}};
+const backContext={
+  state:{detailId:0,devo:null,devoSub:null,tab:'santoral',liturgiaSection:'missa'},
+  document:{getElementById(id){return id==='dailyLiturgyOverlay'?massNode:null;}},
+  window:{closeDailyLiturgy(){massClosed=true;massNode.open=false;}},
+  closeMainMenu(){},closeLanguagePanel(){},closeServite(){},closeDailyPrayer480(){},closeMemoriaLiturgica(){},closeDevo(){},closeDetail(){detailClosed=true;},setLiturgiaSection(){},setTab(){},
+  dailyPrayerOpen480:null,memoriaSelectedDate:null,updateBackButton(){}
+};
+const smartBackFunction=source.match(/function smartBack\(\)\{[\s\S]*?\n\}/)?.[0];
+assert.ok(smartBackFunction,'Retorno global deve existir.');
+vm.runInNewContext(smartBackFunction,backContext);
+backContext.smartBack();
+assert.equal(detailClosed,true,'Voltar deve fechar o detalhe mesmo para o santo id 0.');
+backContext.state.detailId=null;massNode.open=true;backContext.smartBack();
+assert.equal(massClosed,true,'Voltar deve fechar a Missa aberta antes de trocar de tela.');
+
+const homeFunction=source.match(/function viewHoje\(\)\{[\s\S]*?\n\}/)?.[0];
+assert.ok(homeFunction,'Hoje deve ter uma única tela de entrada.');
+const homeContext={
+  state:{angelus:'anjo'},navigator:{onLine:true},MONTHS:['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'],
+  todayInfo(){return {day:3,month:10,weekday:'sábado'};},findSaintForToday(){return null;},findNextSaint(){return {_id:0,id:0,title:'Santo de teste',date:'3 de outubro',day:3,month:10,rank:'Santo'};},
+  escapeHtml(value){return String(value);},saintImageHtml(){return '<span></span>';},dailyPrayerSuggestion(){return {label:'Prática',note:'Texto cadastrado'};},
+  openDailyPrayer480(){},recentCard(){return '';},setTab(){},openLiturgiaSection(){}
+};
+vm.runInNewContext(homeFunction,homeContext);
+const home=homeContext.viewHoje();
+for(const action of ['Vida','Liturgia','Oração','Calendário','Santoral'])assert.ok(home.includes(action),'Atalho ausente na tela Hoje: '+action);
+
+
+const liturgiaFunction=source.match(/function viewLiturgia\(\)\{[\s\S]*?\n\}/)?.[0];
+assert.ok(liturgiaFunction,'A aba Liturgia precisa de um único destino.');
+const liturgiaContext={
+  state:{liturgiaSection:'horas'},oficiosReady:true,SANTORAL:[{_id:0,id:0,day:15,title:'Santo de teste',date:'15 de janeiro'}],
+  saintHasOffice(){return true;},officeHoursForSaint(){return [['laudes','Laudes']];},formatLiturgicalDate(){return 'hoje';},
+  escapeHtml(value){return String(value);},setLiturgiaSection(){},openServite(){},openDailyLiturgy(){}
+};
+vm.runInNewContext(liturgiaFunction,liturgiaContext);
+const hoursPage=liturgiaContext.viewLiturgia();
+assert.match(hoursPage,/Liturgia das Horas de hoje/);
+assert.match(hoursPage,/openServite\('oficio'\)/,'A Hora diária precisa de destino funcional.');
+assert.match(hoursPage,/openSantoralOfficeHour\(0,'laudes'\)/,'A lista de Horas próprias também precisa abrir o conteúdo.');
+liturgiaContext.oficiosReady=false;
+assert.match(liturgiaContext.viewLiturgia(),/cadastro local dos Ofícios está indisponível[\s\S]*loadCanonicalOffices\(\)/,'A aba Liturgia deve explicar a falha do Ofício e permitir nova tentativa.');
+liturgiaContext.oficiosReady=true;
+liturgiaContext.state.liturgiaSection='missa';
+assert.match(liturgiaContext.viewLiturgia(),/openDailyLiturgy\('/,'A Missa do dia deve abrir a consulta da data.');
+
+console.log(JSON.stringify({status:'ok',version,santoral:santoral.length,oficioProprio:coverage.oficio_proprio,textosProprios:coverage.textos_proprios,semMaterial:coverage.sem_material_proprio,memorias:memory.memory_dates.length,textosMemoriaExclusivos:memory.celebrations.length,missaPropriaConferida:masses.celebrations.length,hubBlocks:4},null,2));
