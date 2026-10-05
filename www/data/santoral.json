@@ -66,7 +66,10 @@
     "prayer": "ORAÇÃO PELA BEATIFICAÇÃO E CANONIZAÇÃO Pai de misericórdia, te agradecemos porque doastes à Santa Igreja no Acre e ao mundo, o Servo de Deus padre Paolino M. Baldassari. Ele, com sua vida apaixonada, nos inspirou para o anseio missionário, para o cuidado com a floresta, e para a cura dos corpos e das almas do povo de Deus. Ó Pai, concedei-nos, através da intercessão de padre Paolino, e segundo a Tua vontade, a graça que imploramos (dizer a graça), na esperança que ele seja o quanto antes reconhecido entre Teus santos. Santa Maria interceda por nós. Por Jesus Cristo, Nosso Senhor. Amém",
     "special": true,
     "title": "Servo de Deus Frei Paolino Maria Baldassari",
-    "rank": "Servo de Deus"
+    "rank": "Servo de Deus",
+    "situacao_causa": "",
+    "fonte_situacao": "",
+    "data_fonte": ""
   },
   {
     "id": 6,
@@ -203,7 +206,10 @@
     "prayer": "ORAÇÃO PELA BEATIFICAÇÃO E CANONIZAÇÃO Pai de misericórdia, nós vos damos graças porque destes à vossa igreja no Brasil, especialmente em Santa Catarina, o Servo de Maria e agora também de Deus, frei Egídio Maria Moscini. Com sua vida santa ele nos ensinou: a persistência na oração, a humildade no serviço aos irmãos e a paciência nos sofrimentos concedei-nos, ó Pai, por intercessão de frei Egídio, a graça que imploramos (dizer a graça). Pedimos e esperamos, ó Pai, que frei Egídio seja o quanto antes colocado no número dos vossos santos. Por Cristo Nosso Senhor. Amém!",
     "special": true,
     "title": "Servo de Deus Frei Egídio Maria Moscini",
-    "rank": "Servo de Deus"
+    "rank": "Servo de Deus",
+    "situacao_causa": "",
+    "fonte_situacao": "",
+    "data_fonte": ""
   },
   {
     "id": 18,
