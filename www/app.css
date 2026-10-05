@@ -536,3 +536,7 @@ body.celebration-mode .prayer-block,body.celebration-mode .bio-text,body.celebra
 :is(.detail-navigation) small{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px}
 :is(.detail-navigation) b{display:block;width:100%;max-width:100%;font-size:12px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:380px){.detail-navigation{grid-template-columns:minmax(0,1fr)}.detail-navigation button:last-child{align-items:flex-start;text-align:left}}
+
+/* Botões de navegação do Santo: rótulo separado e título sem colunas estreitas. */
+.hub-navigation-grid>.hub-action:not(.hub-share){min-width:0;min-height:82px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;overflow:hidden}
+.hub-navigation-grid>.hub-action:not(.hub-share) span{display:-webkit-box;width:100%;min-width:0;overflow:hidden;color:var(--gold-soft);font-weight:700;line-height:1.25;white-space:normal;overflow-wrap:normal;word-break:normal;-webkit-box-orient:vertical;-webkit-line-clamp:2}
