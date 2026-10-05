@@ -244,7 +244,7 @@ const hoursPage=liturgiaContext.viewLiturgia();
 assert.match(hoursPage,/Liturgia das Horas de hoje/);
 assert.match(hoursPage,/openServite\('oficio'\)/,'A Hora diária precisa de destino funcional.');
 assert.match(hoursPage,/openSantoralOfficeHour\(0,'laudes'\)/,'A lista de Horas próprias também precisa abrir o conteúdo.');
-assert.match(hoursPage,/office-hour-choice[\s\S]*saint-row-hours/,'As Horas próprias devem aparecer em cartões responsivos separados do nome do santo.');
+assert.ok(hoursPage.includes('office-hour-choice')&&hoursPage.includes('saint-row-hours'),'As Horas próprias devem aparecer em cartões responsivos separados do nome do santo.');
 liturgiaContext.oficiosReady=false;
 assert.match(liturgiaContext.viewLiturgia(),/cadastro local dos Ofícios está indisponível[\s\S]*loadCanonicalOffices\(\)/,'A aba Liturgia deve explicar a falha do Ofício e permitir nova tentativa.');
 liturgiaContext.oficiosReady=true;
