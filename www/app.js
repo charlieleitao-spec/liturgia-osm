@@ -274,6 +274,28 @@ function officeHoursForSaint(s){
   if(present.length)return present;
   return hours.textos_proprios?[['oficio','Textos próprios']]:[];
 }
+function officeHourTextForSaint(s,key){
+  const hours=officeRecordForSaint(s)?.material?.horas||{};
+  const sourceKeys={invitatorio:'invitatorio',oficio:'oficio_leituras',laudes:'laudes',horaMedia:'hora_media',vesperas:'vesperas'};
+  const value=hours[sourceKeys[key]]||hours.textos_proprios;
+  return typeof value==='string'?value:String(value?.texto||value?.text||'');
+}
+function officeHourIsAntiphonOnly(s,key){
+  if(!['laudes','vesperas'].includes(key))return false;
+  const text=officeHourTextForSaint(s,key);
+  if(!text||!/^[\s]*Ant\./im.test(text))return false;
+  const remaining=text.split(/\r?\n/).map(line=>line.trim()).filter(Boolean).filter(line=>
+    !/^(?:C[âa]ntico evang[eé]lico(?:\s*\([^)]*\))?|Ant\.?\s*\d*|Antífona(?:\s*\d*)?)\s*.*$/i.test(line)
+  );
+  return remaining.length===0;
+}
+function officeHourButtonHtml(s,pair){
+  const [key,label]=pair,saintId=Number(s?._id),short=officeHourIsAntiphonOnly(s,key);
+  const symbols={invitatorio:'✦',oficio:'▤',laudes:'☀',horaMedia:'◷',vesperas:'☾'};
+  const canticle=key==='laudes'?'Benedictus':'Magnificat';
+  const note=short?`<em class="office-hour-note">Próprio: antífona · inclui ${canticle}</em>`:'';
+  return `<button class="office-hour-btn office-hour-choice" aria-label="Abrir ${escapeHtml(label)}${short?' — antífona própria; '+canticle+' incluído':''}" onclick="openSantoralOfficeHour(${saintId},'${key}')"><span class="office-hour-icon" aria-hidden="true">${symbols[key]||'✦'}</span><span class="office-hour-copy"><small>Hora litúrgica própria</small><strong>${escapeHtml(label)}</strong>${note}</span><span class="office-hour-arrow" aria-hidden="true">›</span></button>`;
+}
 function openSantoralOfficeHour(saintId,hour){
   const saint=SANTORAL.find(x=>x._id===saintId);
   const record=officeRecordForSaint(saint);
@@ -723,7 +745,7 @@ function viewLiturgia(){
     const todayBlock='<div class="card fade-in"><div class="rowtitle">Liturgia das Horas de hoje</div><p class="reader-note">'+escapeHtml(formatLiturgicalDate())+'</p><button class="action-btn" onclick="openServite(\'oficio\')">Abrir Ofício de hoje</button></div>';
     const officeWarning=!oficiosReady?'<div class="card" role="alert"><p>O cadastro local dos Ofícios está indisponível. A Vida e as orações continuam acessíveis.</p><button class="action-btn" onclick="loadCanonicalOffices()">Tentar carregar os Ofícios</button></div>':'';
     const ownBlocks='<div class="section-title">Ofícios e textos próprios OSM</div><p class="reader-note">A celebração do santo abre somente as horas disponíveis no texto.</p>'+
-      '<div class="card fade-in" style="padding:6px 16px;">'+saints.map(function(s){return '<div class="saint-row"><div class="daynum">'+s.day+'</div><div class="rowtext"><div class="rowtitle">'+escapeHtml(s.title)+'</div><div class="rowrank">'+escapeHtml(s.date)+'</div></div><div class="office-hours-grid">'+officeHoursForSaint(s).map(function(pair){return '<button class="office-hour-btn" onclick="openSantoralOfficeHour('+s._id+',\''+pair[0]+'\')">'+escapeHtml(pair[1])+' ›</button>';}).join('')+'</div></div>';}).join('')+'</div>';
+      '<div class="card fade-in saint-offices-card">'+saints.map(function(s){return `<article class="saint-row saint-row-hours"><div class="daynum">${s.day}</div><div class="rowtext"><div class="rowtitle">${escapeHtml(s.title)}</div><div class="rowrank">${escapeHtml(s.date)} · ${escapeHtml(s.rank||'Celebração OSM')}</div></div><div class="office-hours-grid">${officeHoursForSaint(s).map(function(pair){return officeHourButtonHtml(s,pair);}).join('')}</div></article>`;}).join('')+'</div>';
     return switcher+'<div class="section-title">Liturgia das Horas</div>'+officeWarning+todayBlock+(oficiosReady?ownBlocks:'');
   }
   const d=new Date(), value=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
