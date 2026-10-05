@@ -237,13 +237,14 @@ assert.ok(liturgiaFunction,'A aba Liturgia precisa de um único destino.');
 const liturgiaContext={
   state:{liturgiaSection:'horas'},oficiosReady:true,SANTORAL:[{_id:0,id:0,day:15,title:'Santo de teste',date:'15 de janeiro'}],
   saintHasOffice(){return true;},officeHoursForSaint(){return [['laudes','Laudes']];},formatLiturgicalDate(){return 'hoje';},
-  escapeHtml(value){return String(value);},setLiturgiaSection(){},openServite(){},openDailyLiturgy(){}
+  escapeHtml(value){return String(value);},officeHourButtonHtml(s,pair){return `<button class="office-hour-btn office-hour-choice" onclick="openSantoralOfficeHour(${s._id},'${pair[0]}')">${pair[1]}</button>`;},setLiturgiaSection(){},openServite(){},openDailyLiturgy(){}
 };
 vm.runInNewContext(liturgiaFunction,liturgiaContext);
 const hoursPage=liturgiaContext.viewLiturgia();
 assert.match(hoursPage,/Liturgia das Horas de hoje/);
 assert.match(hoursPage,/openServite\('oficio'\)/,'A Hora diária precisa de destino funcional.');
 assert.match(hoursPage,/openSantoralOfficeHour\(0,'laudes'\)/,'A lista de Horas próprias também precisa abrir o conteúdo.');
+assert.match(hoursPage,/office-hour-choice[\s\S]*saint-row-hours/,'As Horas próprias devem aparecer em cartões responsivos separados do nome do santo.');
 liturgiaContext.oficiosReady=false;
 assert.match(liturgiaContext.viewLiturgia(),/cadastro local dos Ofícios está indisponível[\s\S]*loadCanonicalOffices\(\)/,'A aba Liturgia deve explicar a falha do Ofício e permitir nova tentativa.');
 liturgiaContext.oficiosReady=true;
