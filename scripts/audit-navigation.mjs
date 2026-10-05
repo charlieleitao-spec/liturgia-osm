@@ -18,6 +18,8 @@ assert.match(css,/width:min\(calc\(100% - 28px\), 380px\)/,'O rodapé deve ficar
 assert.match(css,/body\.light-mode\{[\s\S]*?--bg-deep:#f7f4ed/,'O tema claro deve seguir a paleta do Hoje na Família Servita.');
 assert.match(css,/--bg-deep:#0c1827/,'O tema escuro deve manter a identidade azul-marinho.');
 assert.match(css,/\.office-hour-btn\{[^}]*min-height:50px/,'Os botões de Horas devem ter área de toque confortável.');
+assert.match(css,/\.hub-navigation-grid>\.hub-action:not\(\.hub-share\)\{[^}]*flex-direction:column/,'Os botões Anterior e Próxima devem separar o rótulo do título do santo.');
+assert.match(css,/\.hub-navigation-grid>\.hub-action:not\(\.hub-share\) span\{[^}]*-webkit-line-clamp:2/,'Os títulos de navegação devem truncar após duas linhas sem quebrar palavras.');
 assert.match(embeddedCss,/\.hour-tab-btn\{[\s\S]*?min-height:42px/,'Os botões do leitor de Ofício devem ser legíveis e fáceis de tocar.');
 assert.match(appJs,/localStorage\.getItem\('osmTheme'\) !== 'dark'/,'A primeira abertura usa o tema claro; a escolha escura salva permanece.');
 assert.match(appJs,/installAndroidBackHandler\(\)/,'O app deve registrar o botão Voltar nativo.');
