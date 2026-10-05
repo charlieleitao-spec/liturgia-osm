@@ -1084,6 +1084,8 @@ async function loadCanonicalSantoral(){
       ids.add(item.id);dates.add(dateKey);
     }
     SANTORAL=canonical.map(item=>({...item,_id:Number(item.id),special:item.special??''}));
+    const requestedCelebration=new URLSearchParams(window.location.search).get('celebracao');
+    if(requestedCelebration!==null&&SANTORAL.some(item=>Number(item.id)===Number(requestedCelebration))){state.tab='santoral';state.detailOriginTab='santoral';state.detailId=Number(requestedCelebration);}
     santoralReady=true;
   }catch(error){
     santoralReady=false;
