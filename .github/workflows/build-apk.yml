@@ -112,6 +112,40 @@ jobs:
           path: Liturgia-OSM-4.9.36.apk
           if-no-files-found: error
 
+      - name: Empacotar projeto Android Gradle sem credenciais
+        run: |
+          mkdir -p artifacts/gradle-project
+          cp package.json package-lock.json capacitor.config.json BUILD-ANDROID.md .gitignore artifacts/gradle-project/
+          cp -R www scripts android artifacts/gradle-project/
+          cat > artifacts/gradle-project/ANDROID-GRADLE.md <<'EOF'
+          # Projeto Android Gradle — Liturgia OSM 4.9.36
+
+          Este pacote contém o projeto Android gerado pelo Capacitor, os arquivos Gradle e o código web.
+
+          ## Requisitos
+          - Node.js 22 e npm
+          - JDK 21
+          - Android Studio e Android SDK
+
+          ## Preparar e compilar
+          Na pasta raiz do pacote, execute `npm ci` e `npx cap sync android`.
+          Abra a pasta `android/` no Android Studio ou compile com `cd android && ./gradlew assembleDebug`.
+
+          A chave de assinatura foi removida do pacote. Para gerar um APK de distribuição, configure uma chave própria e permanente no Gradle.
+          EOF
+          rm -f artifacts/gradle-project/android/app/liturgia-osm-release.jks
+          rm -f artifacts/gradle-project/android/local.properties
+          find artifacts/gradle-project/android -type d \( -name build -o -name .gradle \) -prune -exec rm -rf {} +
+          find artifacts/gradle-project/android -type f \( -name '*.jks' -o -name '*.keystore' \) -delete
+          (cd artifacts/gradle-project && zip -qr ../Liturgia-OSM-4.9.36-projeto-Gradle.zip .)
+
+      - name: Disponibilizar projeto Android Gradle
+        uses: actions/upload-artifact@v5
+        with:
+          name: Liturgia-OSM-4.9.36-projeto-Gradle
+          path: artifacts/Liturgia-OSM-4.9.36-projeto-Gradle.zip
+          if-no-files-found: error
+
       - name: Publicar versão 4.9.36
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
