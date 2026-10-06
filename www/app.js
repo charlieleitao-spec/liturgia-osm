@@ -1048,7 +1048,7 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
       ${section('Oração depois da comunhão',readingCards({texto:prayers.comunhao},'Oração depois da comunhão'))}`;
   }
   window.loadDailyLiturgy=async function(date){
-    selectedDate=date||localISO(); const input=document.getElementById('dailyLiturgyDate');if(input)input.value=selectedDate;
+    selectedDate=date||localISO(); const input=document.getElementById('dailyLiturgyDate');if(input)input.value=selectedDate;const dateDisplay=document.getElementById('dailyLiturgyDateDisplay');if(dateDisplay)dateDisplay.textContent=selectedDate.split('-').reverse().join('/');
     const target=document.getElementById('dailyLiturgyContent'),cached=readCache(selectedDate);
     if(!target)return;
     if(cached)target.innerHTML=renderMass(cached,true);else target.innerHTML='<div class="daily-loading">Carregando a liturgia…</div>';
