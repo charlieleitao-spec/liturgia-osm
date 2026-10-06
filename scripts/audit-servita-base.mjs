@@ -16,7 +16,7 @@ const memory = json('www/data/memoria-liturgica.json');
 assert.equal(pkg.version, '4.9.36', 'package.json deve identificar a versão 4.9.36');
 assert.equal(pkg.dependencies['@capacitor/app'], '8.1.2', 'Plugin nativo do botão Voltar deve fazer parte do app.');
 assert.match(appJs, /const APP_VERSION = ['"]4\.9\.36['"]/);
-assert.match(sw, /liturgia-osm-v4.9.36-(?:ui3|causas1|identidade-horas1|identidade-horas2|identidade-horas3|identidade-horas4|identidade-horas5|identidade-horas6|identidade-horas7|identidade-horas8)/);
+assert.match(sw, /liturgia-osm-v4.9.36-(?:ui3|causas1|identidade-horas1|identidade-horas2|identidade-horas3|identidade-horas4|identidade-horas5|identidade-horas6|identidade-horas7|identidade-horas8|identidade-oracoes1)/);
 assert.match(html, /app\.js/);
 assert.match(html, /app\.css/);
 assert.equal(santoral.length, 32);
