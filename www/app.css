@@ -512,3 +512,44 @@ body.celebration-mode .prayer-block,body.celebration-mode .bio-text,body.celebra
 body.celebration-mode .daily-liturgy-head{display:none}
 body.celebration-mode .daily-liturgy-body{font-size:1.18em;line-height:1.75;padding-top:24px}
 @media(max-width:380px){.presidency-grid{grid-template-columns:1fr}.presidency-card{min-height:92px}}
+
+
+/* Leitura estruturada das orações: escala A+/A−, estrofes e títulos. */
+#view .prayer-block{
+  font-size:calc(18px * var(--reader-scale, 1))!important;
+  line-height:1.65!important;
+  white-space:normal!important;
+  hyphens:none!important;
+  overflow-wrap:break-word!important;
+  word-break:normal!important;
+}
+#view .prayer-block .prayer-stanza{
+  margin:0 0 1.05em!important;
+  padding:0!important;
+  white-space:normal!important;
+}
+#view .prayer-block .prayer-stanza:last-child{margin-bottom:0!important;}
+#view .prayer-block .prayer-context-heading{
+  margin:1.35em 0 .62em!important;
+  padding:.58em .72em!important;
+  border-left:3px solid var(--gold)!important;
+  border-radius:6px!important;
+  background:rgba(196,154,74,.10)!important;
+  color:var(--gold-soft)!important;
+  font:600 calc(14px * var(--reader-scale, 1))/1.35 Georgia,'Times New Roman',serif!important;
+  letter-spacing:.035em!important;
+  text-align:left!important;
+  overflow-wrap:break-word!important;
+}
+#view .prayer-block .prayer-context-heading:first-child{margin-top:0!important;}
+#view .prayer-block .prayer-text-heading{
+  margin:1.15em 0 .45em!important;
+  padding:0!important;
+  border:0!important;
+  color:var(--text-muted)!important;
+  font:600 calc(13px * var(--reader-scale, 1))/1.35 Georgia,'Times New Roman',serif!important;
+  letter-spacing:.08em!important;
+  text-align:left!important;
+  text-transform:uppercase!important;
+}
+#view .prayer-block .rubric{white-space:normal!important;}
