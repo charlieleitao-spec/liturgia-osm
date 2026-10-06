@@ -854,3 +854,17 @@ body.light-mode .crest{border-color:#b89a5b}
 
 /* Hierarquia discreta para seções de orações e ofícios longos. */
 .prayer-section-heading{display:block;margin:1.15em 0 .35em;color:var(--gold-soft);font-size:.84em;font-weight:600;letter-spacing:.035em;line-height:1.35;text-align:center}
+/* Georgia for prayer and Marian reading: device-safe fallbacks and calm measure. */
+:root{--osm-reading-serif:Georgia,'Noto Serif','Times New Roman',serif;}
+#view .prayer-block,#view .prayer-card .text,#view .bio-text,#view .about-quote,#view .prayer-section-heading{
+  font-family:var(--osm-reading-serif)!important;
+}
+#view .prayer-block,#view .prayer-card .text{
+  font-size:clamp(17px,4.6vw,19px)!important;
+  line-height:1.65!important;
+  font-weight:400;
+  text-align:center;
+  overflow-wrap:break-word;
+}
+#view .prayer-section-heading{font-size:.84em!important;font-weight:600!important;line-height:1.35!important;}
+@media(min-width:560px){#view .prayer-block,#view .prayer-card .text{font-size:19px!important;}}
