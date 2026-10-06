@@ -31,7 +31,7 @@ const DEVO_LIST = [
   {key:'via_matris',title:'Via Matris',sub:'Novena das Dores'},
   {key:'ladainhas',title:'Ladainhas Marianas',sub:'Três ladainhas'}
 ];
-const VARIAS_LIST = PRAYERS.devotions.variasHome.map((x,i)=>({key:'varias'+i,title:x.title,sub:'Orações diversas'}));
+const VARIAS_LIST = PRAYERS.devotions.variasHome.map((x,i)=>({key:'varias'+i,title:x.title,sub:x.sub||'Orações diversas'}));
 function devoRowHtml(x){
   return `<div class="saint-row" onclick="openDevo('${x.key}')"><div class="rowtext"><div class="rowtitle">${escapeHtml(x.title)}</div><div class="rowrank">${escapeHtml(x.sub||'')}</div></div><div class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div></div>`;
 }
@@ -93,7 +93,8 @@ function sharePrayer(title,text){ shareText(title,`${title}\n\n${text}\n\nLiturg
 // render a prayer block, coloring "D." / "T." rubrics
 function renderPrayer(text){
   const esc = escapeHtml(text);
-  return esc.replace(/^(D\.|T\.|C\.|L\.\d?|L\.)/gm, '<span class="rubric">$1</span>');
+  const withHeadings = esc.replace(/^(Festa|Invitatório|Ofício das Leituras|Hino|Hinos|Salmodia|Ant\.\s*\d+|Antífonas?|Laudes|Hora Média|Vésperas|Completas|Leitura breve|Leitura|Responsório breve|Responsório|Cântico evangélico|Preces|Oração|Oremos|Reflexão|Invocações|Canto|Primeira Fórmula|Segunda Fórmula)\s*$/gim, '<span class="prayer-section-heading">$1</span>');
+  return withHeadings.replace(/^(D\.|T\.|C\.|L\.\d?|L\.)/gm, '<span class="rubric">$1</span>');
 }
 
 // ===================== calendário litúrgico básico =====================
