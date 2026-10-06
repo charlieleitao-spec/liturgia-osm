@@ -367,7 +367,7 @@ body.servite-open .celebration-toggle,body.servite-open .floating-back,body.serv
 .office-hour-icon{display:grid;place-items:center;width:36px;height:36px;border:1px solid rgba(184,148,72,.48);border-radius:50%;background:rgba(184,148,72,.11);color:var(--gold-soft);font-size:17px;line-height:1}
 .office-hour-copy{display:grid;gap:3px;min-width:0}
 .office-hour-copy small{color:var(--text-faint);font:600 9px Georgia,'Times New Roman',serif;letter-spacing:.09em;text-transform:uppercase}
-.office-hour-copy strong{color:var(--paper);font:600 15px/1.25 Georgia,'Times New Roman',serif;overflow-wrap:anywhere}
+.office-hour-copy strong{color:var(--paper);font:400 15px/1.25 Georgia,'Times New Roman',serif;overflow-wrap:anywhere}
 .office-hour-note{color:var(--text-muted);font:italic 11px/1.35 Georgia,'Times New Roman',serif;overflow-wrap:anywhere}
 .office-hour-arrow{color:var(--gold-soft);font-size:22px;line-height:1;text-align:center}
 .saint-row.saint-row-hours{display:grid;grid-template-columns:28px minmax(0,1fr);align-items:start;gap:9px 12px}
