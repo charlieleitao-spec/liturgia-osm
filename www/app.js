@@ -510,9 +510,14 @@ function viewDevoDetail(key){
 
 function backToOracoes(){ state.devo=null; state.devoSub=null; render(); window.scrollTo(0,0); }
 
-function simpleTextDetail(title, sub, text, backFn){
+function normalizeVigiliaLineWraps(text){
+  return String(text ?? '').replace(/([A-Za-zÀ-ÿ])-\n[ \t]*([a-zà-ÿ])/g, '$1-$2');
+}
+function simpleTextDetail(title, sub, text, backFn, readingClass){
   pendingSharePrayer={title,text};
   const back = backFn || 'backToOracoes()';
+  const readerClass = readingClass === 'vigilia-reader' ? ' vigilia-reader' : '';
+  const renderedText = readingClass === 'vigilia-reader' ? normalizeVigiliaLineWraps(text) : text;
   return `
     <button class="back-btn" onclick="${back}">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
@@ -524,8 +529,8 @@ function simpleTextDetail(title, sub, text, backFn){
       <div class="action-row"><button class="action-btn" id="sharePrayerBtn">Partilhar oração</button></div>
       <div class="detail-divider"></div>
     </div>
-    <div class="card fade-in">
-      <div class="prayer-block">${renderPrayer(text)}</div>
+    <div class="card fade-in${readerClass}">
+      <div class="prayer-block">${renderPrayer(renderedText)}</div>
     </div>
   `;
 }
@@ -535,7 +540,7 @@ function viewVigilia(){
   if(state.devoSub){
     const f = PRAYERS.devotions.vigilia[state.devoSub];
     const title = state.devoSub === 'formula1' ? 'Primeira Fórmula' : 'Segunda Fórmula';
-    return simpleTextDetail(title, 'Vigília de Nossa Senhora', f, "openDevo('vigilia')");
+    return simpleTextDetail(title, 'Vigília de Nossa Senhora', f, "openDevo('vigilia')", 'vigilia-reader');
   }
   return `
     <button class="back-btn" onclick="backToOracoes()">

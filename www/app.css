@@ -983,3 +983,27 @@ body.scroll-controls-hidden .celebration-toggle{
   opacity:0;
   pointer-events:none;
 }
+
+/* Vigília: preservar o ritmo dos versos sem afastar demais as estrofes. */
+#view .vigilia-reader .prayer-block{
+  line-height:1.5!important;
+  text-align:center!important;
+}
+#view .vigilia-reader .prayer-stanza{
+  margin:0 auto .72em!important;
+  line-height:1.48!important;
+  text-align:center!important;
+}
+#view .vigilia-reader .prayer-stanza:last-child{margin-bottom:0!important}
+#view .vigilia-reader .prayer-context-heading{
+  margin:1.05em auto .42em!important;
+  padding:.25em 0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  text-align:center!important;
+}
+#view .vigilia-reader .prayer-text-heading{
+  margin:.9em auto .35em!important;
+  text-align:center!important;
+}
