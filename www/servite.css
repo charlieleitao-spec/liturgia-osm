@@ -576,3 +576,11 @@ body.embedded-resource-mode #app{min-height:100vh}
 /* A Regra é prosa: refluímos as linhas de origem e mantemos parágrafos legíveis. */
 .prayer-block.regra-prose{text-align:left}
 .regra-prose .prayer-paragraph{white-space:normal;text-align:justify;overflow-wrap:break-word}
+
+
+/* Regra de Vida em prosa contínua, com leitura clara dos artigos. */
+.regra-card{padding:clamp(18px,4vw,28px)!important}
+.rule-prose{width:100%;min-width:0;color:var(--text);font-family:Georgia,'Times New Roman',serif;font-size:calc(1rem * var(--reader-scale,1));line-height:1.68;text-align:left;overflow-wrap:break-word;hyphens:auto}
+.rule-paragraph{margin:0 0 1.05em;text-align:left;white-space:normal;word-break:normal}
+.rule-paragraph:last-child{margin-bottom:0}
+.rule-number{color:var(--gold-soft);font-weight:700;font-variant-numeric:tabular-nums;margin-right:.18em}
