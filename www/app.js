@@ -306,7 +306,7 @@ function officeHourButtonHtml(s,pair,className='office-hour-btn'){
   const symbols={invitatorio:'✦',oficio:'▤',laudes:'☀',horaMedia:'◷',vesperas:'☾'};
   const canticle=key==='laudes'?'Benedictus':'Magnificat';
   const note=short?`<em class="office-hour-note">Próprio: antífona · inclui ${canticle}</em>`:'';
-  return `<button class="${className} office-hour-choice" aria-label="Abrir ${escapeHtml(label)}${short?' — antífona própria; '+canticle+' incluído':''}" onclick="openSantoralOfficeHour(${saintId},'${key}')"><span class="office-hour-icon" aria-hidden="true">${symbols[key]||'✦'}</span><span class="office-hour-copy"><small>Hora litúrgica própria</small><strong>${escapeHtml(label)}</strong>${note}</span><span class="office-hour-arrow" aria-hidden="true">›</span></button>`;
+  return `<button class="${className} office-hour-choice" aria-label="Abrir ${escapeHtml(label)}${short?' — antífona própria; '+canticle+' incluído':''}" onclick="openSantoralOfficeHour(${saintId},'${key}')"><span class="office-hour-icon" aria-hidden="true">${symbols[key]||'✦'}</span><span class="office-hour-copy"><strong>${escapeHtml(label)}</strong>${note}</span><span class="office-hour-arrow" aria-hidden="true">›</span></button>`;
 }
 function openSantoralOfficeHour(saintId,hour){
   const saint=SANTORAL.find(x=>x._id===saintId);
