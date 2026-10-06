@@ -963,7 +963,7 @@ function renderRuleArticles(text){
     const next=starts[index+1];
     const contentEnd=next?next.index:source.length;
     const body=source.slice(contentStart,contentEnd).split('\n').map(line=>line.trim()).filter(Boolean).join(' ');
-    parts.push('<article class="rule-article"><span class="rule-article-number" aria-label="Artigo '+match[2]+'">'+match[2]+'.</span><p>'+escapeHtml(body)+'</p></article>');
+    parts.push('<article class="rule-article"><span class="rule-article-number" aria-label="Artigo '+match[2]+'">'+match[2]+'.&nbsp;</span><p>'+escapeHtml(body)+'</p></article>');
   });
   return parts.join('');
 }
