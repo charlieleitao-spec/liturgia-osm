@@ -33,6 +33,6 @@ const core = [...sw.matchAll(/["']\.\/(.*?)["']/g)].map(match => match[1]);
 assert.ok(core.length > 0, 'Service worker deve declarar recursos CORE');
 for (const file of core) assert.ok(fs.existsSync(path.join(root, 'www', file)), 'Recurso CORE ausente: ' + file);
 for (const item of santoral) {
-  if (item.image) assert.ok(fs.existsSync(path.join(root, item.image)), 'Imagem ausente: ' + item.image);
+  if (item.image) assert.ok(fs.existsSync(path.join(root, 'www', item.image)), 'Imagem ausente: ' + item.image);
 }
 console.log(JSON.stringify({ status: 'ok', version: pkg.version, santoral: santoral.length, oficios: Object.keys(offices.celebracoes).length, memoria: memory.memory_dates.length, memoriaComTexto: memory.celebrations.length, core: core.length }, null, 2));
