@@ -813,3 +813,9 @@ body.light-mode .crest{border-color:#b89a5b}
 .hub-navigation-grid>.hub-share .hub-action-direction{width:auto!important;white-space:normal!important;font-size:16px!important;font-weight:700!important}
 .hub-navigation-grid .hub-share-icon{flex:none!important;color:var(--gold-soft)!important;font-size:20px!important}
 @media(max-width:380px){.hub-navigation-grid{grid-template-columns:1fr!important}.hub-navigation-grid>.hub-action:nth-child(2){align-items:flex-start!important;text-align:left!important}}
+
+
+/* Navegação textual sem nomes truncados: rótulos curtos e centralizados. */
+.hub-navigation-grid>.hub-action:not(.hub-share){align-items:center!important;justify-content:center!important;min-height:64px!important;text-align:center!important}
+.hub-navigation-grid>.hub-action:nth-child(2){align-items:center!important;text-align:center!important}
+.hub-navigation-grid .hub-action-direction{display:block!important;width:100%!important;text-align:center!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;color:var(--paper)!important;font:700 16px/1.3 Georgia,'Times New Roman',serif!important}
