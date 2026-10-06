@@ -731,3 +731,47 @@ body.light-mode .offline-note{background:rgba(154,120,55,.06)}
 @media(prefers-reduced-motion:reduce){
   .home-celebration,.home-action,.presidency-card{transition:none}
 }
+\n
+/* Assinatura gráfica OSM no cabeçalho */
+.topbar{
+  background:linear-gradient(180deg,rgba(23,39,57,.98),rgba(16,34,54,.96));
+  border-bottom-color:rgba(196,154,74,.32);
+}
+.topbar-inner{gap:11px;min-height:52px}
+.crest{
+  width:44px;height:44px;flex:0 0 44px;
+  border:1px solid rgba(225,196,123,.62);
+  border-radius:14px;background:#171620;
+  box-shadow:0 3px 10px rgba(0,0,0,.18);
+}
+.crest img{width:38px;height:38px;object-fit:contain;border-radius:10px;padding:1px}
+.topbar-text{min-width:0;flex:1}
+.eyebrow{
+  max-width:126px;
+  margin:0 0 3px;
+  font-size:8px;
+  line-height:1.2;
+  letter-spacing:.15em;
+  color:#d7b8bd;
+  white-space:normal;
+}
+.topbar h1{
+  font-size:19px;
+  letter-spacing:-.025em;
+  color:#e1c47b;
+  white-space:nowrap;
+}
+body.light-mode .topbar{
+  background:linear-gradient(180deg,#fffdf8,#f7f4ed);
+  border-bottom-color:#d7c59c;
+}
+body.light-mode .eyebrow{color:#84283b}
+body.light-mode .topbar h1{color:#173b67}
+body.light-mode .crest{border-color:#b89a5b}
+@media(max-width:380px){
+  .topbar-inner{gap:8px}
+  .crest{width:40px;height:40px;flex-basis:40px}
+  .crest img{width:35px;height:35px}
+  .eyebrow{max-width:112px;font-size:7.5px;letter-spacing:.13em}
+  .topbar h1{font-size:17px}
+}
