@@ -62,6 +62,13 @@ assert.ok(html.includes('<h1>Liturgia OSM</h1>'), 'Cabeçalho deve manter a marc
 assert.ok(css.includes('#view .calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))'), 'Calendário deve manter as sete colunas dentro da largura móvel.');
 assert.ok(css.includes('#view .saint-row-hours>.office-hours-grid{grid-column:1/-1}'), 'Botões de Ofícios devem usar toda a largura disponível.');
 assert.ok(css.includes('#view .hub-navigation-grid{grid-template-columns:repeat(2,minmax(0,1fr))'), 'Navegação anterior/próxima deve manter colunas equilibradas.');
+const massScriptStart = app.indexOf("window.loadDailyLiturgy=async function(date){");
+const massScriptEnd = app.indexOf("window.openDailyLiturgy=", massScriptStart);
+assert.ok(app.slice(massScriptStart, massScriptEnd).includes("dailyLiturgyDateDisplay") && app.slice(massScriptStart, massScriptEnd).includes("dateDisplay.textContent=day+'/'+month+'/'+year"), 'A data escolhida deve aparecer no campo da Missa.');
+assert.ok(!app.includes("||state.tab!=='hoje'"), 'O botão Voltar flutuante não deve cobrir as telas principais.');
+assert.ok(app.includes('hub-mode-button') && app.includes("inlineBack&&!overlay"), 'Controles do santo devem ter retorno e modo celebração sem sobreposição.');
+assert.ok(css.includes('body.light-mode #view .office-hour-choice{background:#f7f4ec!important'), 'Botões de Ofício precisam de contraste no tema claro.');
+
 
 assert.match(workflow, /\('shrinkResources', 'true'\)/);
 console.log('Auditoria aprovada: abas, módulos, botão Android, rótulos dos santos, orações JSON, Horas centralizadas e release R8.');
