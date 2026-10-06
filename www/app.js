@@ -1332,86 +1332,65 @@ loadCanonicalSantoral();
 /* END SCRIPT BLOCK: canonicalNavigation4926 */
 
 
-/* Auto-recolhimento dos controles fixos durante a leitura */
+/* Recolhe a navegação durante a leitura e a mostra ao tocar ou rolar para cima. */
 (function(){
   var lastTarget = window;
-  var lastY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
-  var pendingY = lastY;
-  var framePending = false;
-  var lastTouchY = null;
-  var touchTarget = window;
-
-  function scrollTarget(node){
-    while(node && node !== document.body && node !== document.documentElement){
-      if(node.nodeType === 1 && node.scrollHeight > node.clientHeight + 2){
-        var overflow = window.getComputedStyle(node).overflowY;
-        if(overflow === 'auto' || overflow === 'scroll') return node;
-      }
-      node = node.parentElement;
-    }
-    return window;
-  }
+  var lastY = readY(window);
+  var touchStartY = null;
+  var touchLastY = null;
+  var touchMoved = false;
   function readY(target){
     if(!target || target === window || target === document || target === document.documentElement || target === document.body){
       return Math.max(0, window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0);
     }
     return Math.max(0, Number(target.scrollTop) || 0);
   }
-  function revealControls(){
-    document.body.classList.remove('scroll-controls-hidden');
+  function normalizeTarget(target){
+    return !target || target === document || target === document.documentElement || target === document.body ? window : target;
   }
-  function hideControls(){
-    document.body.classList.add('scroll-controls-hidden');
-  }
-  function applyPosition(target, y){
+  function show(){ document.body.classList.remove('scroll-controls-hidden'); }
+  function hide(){ document.body.classList.add('scroll-controls-hidden'); }
+  function onScroll(event){
+    var target = normalizeTarget(event.target);
+    var y = readY(target);
     if(target !== lastTarget){
       lastTarget = target;
       lastY = y;
-      if(y < 100) document.body.classList.remove('scroll-controls-hidden');
+      if(y > 140) hide(); else show();
       return;
     }
-    var delta = y - lastY;
-    if(y < 100 || delta < -3) document.body.classList.remove('scroll-controls-hidden');
-    else if(y > 140 && delta > 3) document.body.classList.add('scroll-controls-hidden');
+    if(y < 100 || y < lastY - 1) show();
+    else if(y > 140 && y > lastY + 1) hide();
     lastY = y;
-    framePending = false;
   }
-  function onScroll(event){
-    var target = event.target === document ? window : event.target;
-    var y = readY(target);
-    pendingY = y;
-    if(framePending) return;
-    framePending = true;
-    window.requestAnimationFrame(function(){ applyPosition(target, pendingY); });
-  }
-  window.addEventListener('scroll', onScroll, {passive:true});
   document.addEventListener('scroll', onScroll, true);
-  document.addEventListener('wheel', function(event){
-    var target = scrollTarget(event.target), y = readY(target);
-    if(event.deltaY > 3 && y > 120) hideControls();
-    else if(event.deltaY < -3 || y < 100) revealControls();
-  }, {passive:true});
+  window.addEventListener('scroll', onScroll, {passive:true});
   document.addEventListener('touchstart', function(event){
     if(!event.touches || !event.touches.length) return;
-    lastTouchY = event.touches[0].clientY;
-    touchTarget = scrollTarget(event.target);
-    lastY = readY(touchTarget);
-    lastTarget = touchTarget;
-  }, {passive:true});
+    touchStartY = touchLastY = event.touches[0].clientY;
+    touchMoved = false;
+  }, {passive:true, capture:true});
   document.addEventListener('touchmove', function(event){
-    if(lastTouchY === null || !event.touches || !event.touches.length) return;
+    if(touchLastY === null || !event.touches || !event.touches.length) return;
     var y = event.touches[0].clientY;
-    var movement = lastTouchY - y;
-    var position = readY(touchTarget);
-    if(movement > 7) hideControls();
-    else if(movement < -7) revealControls();
-    lastTouchY = y;
-  }, {passive:true});
-  document.addEventListener('touchend', function(){ lastTouchY = null; }, {passive:true});
-  document.addEventListener('focusin', function(event){
-    if(event.target && event.target.closest && event.target.closest('.tabbar, #floatingBack, #celebrationToggle')) revealControls();
-  });
+    var delta = touchLastY - y;
+    if(Math.abs(y - touchStartY) > 7) touchMoved = true;
+    if(delta > 4) hide();
+    else if(delta < -4) show();
+    touchLastY = y;
+  }, {passive:true, capture:true});
+  document.addEventListener('touchend', function(){
+    if(!touchMoved) show();
+    touchStartY = touchLastY = null;
+  }, {passive:true, capture:true});
+  document.addEventListener('touchcancel', function(){
+    touchStartY = touchLastY = null;
+  }, {passive:true, capture:true});
+  document.addEventListener('wheel', function(event){
+    if(event.deltaY > 2) hide();
+    else if(event.deltaY < -2) show();
+  }, {passive:true, capture:true});
   document.addEventListener('click', function(event){
-    if(event.target && event.target.closest && event.target.closest('.tabbar')) revealControls();
+    if(event.target && event.target.closest && event.target.closest('.tabbar, #floatingBack, #celebrationToggle')) show();
   }, true);
 })();
