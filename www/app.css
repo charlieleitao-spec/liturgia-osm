@@ -514,7 +514,7 @@ body.celebration-mode .daily-liturgy-body{font-size:1.18em;line-height:1.75;padd
 @media(max-width:380px){.presidency-grid{grid-template-columns:1fr}.presidency-card{min-height:92px}}
 
 
-/* Identidade visual da página inicial — proposta 4.9.37 */
+/* Refinamento visual da página inicial */
 .home-hero{
   min-height:188px;
   display:flex;
@@ -591,7 +591,7 @@ body.celebration-mode .daily-liturgy-body{font-size:1.18em;line-height:1.75;padd
   text-transform:uppercase;
 }
 .home-hero .liturgical-title{
-  max-width:100%;
+  max-width:calc(100% - 64px);
   color:#f5f1e7;
   font-size:23px;
   line-height:1.12;
