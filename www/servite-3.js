@@ -195,9 +195,9 @@ function renderLiturgicalHourContent(text){
     if(!block) startBlock('');
 
     if(/^(?:Ant\.|Antífona)\s*\d*/i.test(line)){ stanza=null; add(line,'antiphon'); return; }
-    if(/^(Salmo|Cântico|C[âa]ntico)\s+/i.test(line)){ stanza=null; add(line,'psalm-title'); return; }
+    if(/^(Salmo|Cântico|C[âa]ntico)\s+/i.test(line)){ stanza=null; currentHead='SALMODIA'; add(line,'psalm-title'); return; }
     if(/^(V\.|R\.|℣\.|℟\.)\s*/.test(line)){ stanza=null; add(line, currentHead==='PRECES'?'preces-response':'response'); return; }
-    if(/^(Escolhe-se|Salmos? do|Salmos? e cântico|Como no (?:Comum|Ordinário|Próprio)|Do Comum|Quando esta memória|Antífona e salmos|Salmodia complementar)/i.test(line)){
+    if(/^(Escolhe-se|Série\s+[A-C]\b|Salmos? do|Salmos? e cântico|Como no (?:Comum|Ordinário|Próprio)|Do Comum|Quando esta memória|Antífona e salmos|Salmodia complementar)/i.test(line)){
       stanza=null; add(line,'rubric'); return;
     }
     if(/^(PRIMEIRA LEITURA|SEGUNDA LEITURA|LEITURA BREVE)$/.test(currentHead)){
