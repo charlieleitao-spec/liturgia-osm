@@ -33,11 +33,11 @@ const navEnd = app.indexOf('window.renderCelebrationHub=function(id){', navStart
 const navigation = app.slice(navStart, navEnd);
 assert.match(navigation, /‹ Anterior/);
 assert.match(navigation, /Próxima ›/);
-assert.doesNotMatch(navigation, /previous\\.title|next\\.title|hub-action-title/);
+assert.doesNotMatch(navigation, /previous\.title|next\.title|hub-action-title/);
 const ruleStart = serviteScript.indexOf('function renderRuleParagraphs(value){');
 const ruleEnd = serviteScript.indexOf('function viewRegra(){', ruleStart);
 const ruleRenderer = serviteScript.slice(ruleStart, ruleEnd);
-assert.ok(ruleRenderer.includes('([.!?])\\\\s+(\\\\d+\\\\.\\\\s+[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ])'), 'Artigos numerados devem iniciar novo parágrafo');
+assert.ok(ruleRenderer.includes('([.!?])\s+(\d+\.\s+[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ])'), 'Artigos numerados devem iniciar novo parágrafo');
 assert.equal(pkg.dependencies['@capacitor/app'], '8.1.2');
 assert.match(loader, /window\.OSM_PRAYERS/);
 assert.match(workflow, /assembleRelease/);
