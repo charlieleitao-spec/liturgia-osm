@@ -16,7 +16,7 @@ const memory = json('www/data/memoria-liturgica.json');
 assert.equal(pkg.version, '4.9.36', 'package.json deve identificar a versão 4.9.36');
 assert.equal(pkg.dependencies['@capacitor/app'], '8.1.2', 'Plugin nativo do botão Voltar deve fazer parte do app.');
 assert.match(appJs, /const APP_VERSION = ['"]4\.9\.36['"]/);
-assert.match(sw, /liturgia-osm-v4.9.36-(?:ui3|causas1)/);
+assert.match(sw, /liturgia-osm-v4.9.36-(?:ui3|causas1|identidade-horas1)/);
 assert.match(html, /app\.js/);
 assert.match(html, /app\.css/);
 assert.equal(santoral.length, 32);
@@ -33,6 +33,6 @@ const core = [...sw.matchAll(/["']\.\/(.*?)["']/g)].map(match => match[1]);
 assert.ok(core.length > 0, 'Service worker deve declarar recursos CORE');
 for (const file of core) assert.ok(fs.existsSync(path.join(root, 'www', file)), 'Recurso CORE ausente: ' + file);
 for (const item of santoral) {
-  if (item.image) assert.ok(fs.existsSync(path.join(root, 'www', item.image)), 'Imagem ausente: ' + item.image);
+  if (item.image) assert.ok(fs.existsSync(path.join(root, item.image)), 'Imagem ausente: ' + item.image);
 }
 console.log(JSON.stringify({ status: 'ok', version: pkg.version, santoral: santoral.length, oficios: Object.keys(offices.celebracoes).length, memoria: memory.memory_dates.length, memoriaComTexto: memory.celebrations.length, core: core.length }, null, 2));
