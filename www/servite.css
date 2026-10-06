@@ -567,6 +567,52 @@ body.direct-office-view .hour-tab-content{padding:0!important;border:0!important
  .regra-floating-back{right:14px!important;bottom:18px!important}
 }
 
+/* Regra de Vida: leitura confortável dos artigos */
+.rule-reader{
+  width:100%;
+  max-width:44rem;
+  margin:0 auto;
+  padding:2px 2px 20px;
+  color:var(--paper);
+  font-family:'EB Garamond',Georgia,serif;
+  font-size:1.1rem;
+  line-height:1.65;
+  text-align:left;
+}
+.rule-article{
+  display:grid;
+  grid-template-columns:2rem minmax(0,1fr);
+  column-gap:.55rem;
+  align-items:start;
+  margin:0 0 1.1em;
+}
+.rule-article-number{
+  padding-top:.12em;
+  color:var(--wine-soft);
+  font-family:'Cinzel',serif;
+  font-size:.82em;
+  font-weight:700;
+  line-height:1.55;
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.rule-article p,.rule-paragraph{
+  min-width:0;
+  margin:0;
+  font:inherit;
+  line-height:inherit;
+  text-align:left;
+  overflow-wrap:anywhere;
+}
+.rule-paragraph{
+  margin:0 0 1em;
+  padding-left:2.55rem;
+}
+@media(max-width:380px){
+  .rule-article{grid-template-columns:1.65rem minmax(0,1fr);column-gap:.45rem}
+  .rule-paragraph{padding-left:2.1rem}
+}
+
 /* id="embeddedResourceMode4923" */
 body.embedded-resource-mode .topbar,
 body.embedded-resource-mode .tabbar{display:none!important}
