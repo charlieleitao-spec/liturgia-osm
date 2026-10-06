@@ -39,7 +39,7 @@ const ruleEnd = serviteScript.indexOf('function viewRegra(){', ruleStart);
 const ruleRenderer = serviteScript.slice(ruleStart, ruleEnd);
 assert.ok(ruleRenderer.includes('source.matchAll') && ruleRenderer.includes('class="rule-article"'), 'Artigos numerados devem ser renderizados separadamente');
 const renderRuleArticles = new Function('escapeHtml', ruleRenderer + '; return renderRuleArticles;')(value => value);
-const renderedRule = renderRuleArticles('Introdução.\\n\\n1. Primeiro artigo.\\n\\n2. Segundo artigo.');
+const sampleRule = ['Introdução.', '1. Primeiro artigo.', '2. Segundo artigo.'].join('\\n');\nconst renderedRule = renderRuleArticles(sampleRule);
 assert.equal((renderedRule.match(/class="rule-article"/g) || []).length, 2, 'Cada número da Regra deve iniciar um artigo separado');
 assert.equal(pkg.dependencies['@capacitor/app'], '8.1.2');
 assert.match(loader, /window\.OSM_PRAYERS/);
