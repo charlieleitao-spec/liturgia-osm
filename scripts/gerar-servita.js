@@ -77,6 +77,7 @@ for (const s of santoral) {
     titulo: s.title,
     nome_original: s.name,
     bio: s.bio || '',
+    ...(/^Servo de Deus\b/i.test(s.title || '') && s.prayer ? { oracao_causa: s.prayer } : {}),
     tipo_material: lit.tipo_material,
     material: lit.material || {},
     memoria_liturgica: memoriaLiturgica
