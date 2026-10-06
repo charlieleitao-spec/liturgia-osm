@@ -24,15 +24,7 @@
   <!-- ===== Header ===== -->
   <header class="topbar">
     <div class="topbar-inner">
-      <div class="crest" aria-hidden="true">
-        <svg viewBox="0 0 100 100" width="34" height="34">
-          <circle cx="50" cy="50" r="47" fill="none" stroke="currentColor" stroke-width="1.2"/>
-          <path d="M50 12 L58 40 L88 40 L63 57 L72 86 L50 68 L28 86 L37 57 L12 40 L42 40 Z" fill="currentColor" opacity="0.92"/>
-          <circle cx="50" cy="50" r="8.5" fill="none" stroke="var(--bg-deep)" stroke-width="1"/>
-        </svg>
-      </div>
       <div class="topbar-text">
-        <p class="eyebrow">Ordem dos Servos de Maria</p>
         <h1>Liturgia OSM</h1>
       </div>
       <div class="topbar-tools" aria-label="Controles de leitura">
@@ -82,7 +74,7 @@
    <button class="menu-action menu-wide" onclick="closeMainMenu();openServite('coroa')">Coroa das Sete Dores</button>
    <button class="menu-action menu-wide" onclick="closeMainMenu();openServite('oficio')">Ofício</button>
    <button class="menu-action menu-wide" onclick="closeMainMenu();openServite('sabado')">Sábado Mariano</button>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();location.href='./causas-beatos.html'">Causas</button>
+   <button class="menu-action menu-wide" onclick="closeMainMenu();location.href='./causas-beatos.html'">Causas e Beatos servitas</button>
   </div>
   <div class="menu-section">
    <div class="menu-label">Biblioteca</div>
@@ -122,7 +114,7 @@
 
 <div id="dailyLiturgyOverlay" class="daily-liturgy-overlay" aria-hidden="true">
   <div class="daily-liturgy-head"><button onclick="closeDailyLiturgy()" aria-label="Voltar">‹</button><div><b>Missa do dia</b><small>Consulta online; cópias locais por até 30 dias</small></div><button onclick="toggleCelebrationMode()" aria-label="Modo celebração">◉</button></div>
-  <div class="daily-liturgy-body"><div class="daily-date-nav"><button onclick="moveDailyDate(-1)" aria-label="Dia anterior">‹</button><input id="dailyLiturgyDate" type="date" onchange="loadDailyLiturgy(this.value)"><button onclick="moveDailyDate(1)" aria-label="Dia seguinte">›</button></div><div id="dailyLiturgyContent"></div></div>
+  <div class="daily-liturgy-body"><div class="daily-date-nav"><button onclick="moveDailyDate(-1)" aria-label="Dia anterior">‹</button><div class="daily-date-field"><span id="dailyLiturgyDateDisplay" class="daily-date-display" aria-hidden="true"></span><span class="daily-date-chevron" aria-hidden="true">⌄</span><input id="dailyLiturgyDate" type="date" aria-label="Selecionar data da liturgia" onchange="loadDailyLiturgy(this.value)"></div><button onclick="moveDailyDate(1)" aria-label="Dia seguinte">›</button></div><div id="dailyLiturgyContent"></div></div>
 </div>
 
 <script src="./data/load-devotions.js"></script>
