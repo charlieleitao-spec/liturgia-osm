@@ -249,7 +249,7 @@ function viewHoje(){
   const online=navigator.onLine!==false;
   let celebrationCard='<div class="empty-state">Não há celebração servita cadastrada para hoje.</div>';
   if(celebration){
-    const label=saint?'Celebração de hoje':'Próxima celebração OSM';
+    const label=saint?'Celebração de hoje':'Próxima celebração';
     celebrationCard='<button class="home-celebration card fade-in" onclick="openDetail('+celebration._id+')" aria-label="Abrir '+escapeHtml(celebration.title)+'">'+
       saintImageHtml(celebration,false)+
       '<span class="home-celebration-text"><span class="rank">'+label+'</span><b>'+escapeHtml(celebration.title)+'</b><span class="date-line">'+escapeHtml(celebration.date)+'</span></span><span class="chev">›</span></button>'+
@@ -260,7 +260,7 @@ function viewHoje(){
   }
   const prayer=dailyPrayerSuggestion();
   return '<div class="connection-strip '+(online?'':'offline')+'"><span class="connection-dot"></span><strong>'+(online?'Aplicativo disponível':'Modo offline ativo')+'</strong><span>Conteúdo salvo no aparelho</span></div>'+
-    '<section class="liturgical-hero home-hero fade-in"><div class="liturgical-kicker">Ordem dos Servos de Maria</div><div class="home-date-line"><strong>'+today.day+'</strong><span>'+escapeHtml(MONTHS[today.month-1])+'</span></div><div class="liturgical-title">Ao lado da Mãe, aos pés da Cruz</div><div class="liturgical-sub">'+escapeHtml(today.weekday)+'</div></section>'+
+    '<section class="liturgical-hero home-hero fade-in"><div class="liturgical-kicker">Ordem dos Servos de Maria</div><div class="home-date-line"><strong>'+today.day+'</strong><span>'+escapeHtml(MONTHS[today.month-1])+'</span></div><div class="liturgical-sub">'+escapeHtml(today.weekday)+'</div></section>'+
     '<div class="section-title home-heading">Celebração Servita</div>'+celebrationCard+
     '<div class="section-title home-heading">Encontrar uma celebração</div><div class="home-actions fade-in">'+
       '<button class="home-action" onclick="setTab(\'calendario\')"><span class="home-action-icon">▦</span><b>Calendário</b><small>Escolha qualquer data</small></button>'+
@@ -1259,10 +1259,10 @@ loadCanonicalSantoral();
     if(index<0||!ordered.length)return hubEmpty('Navegação entre celebrações indisponível.');
     const previous=ordered[(index+ordered.length-1)%ordered.length];
     const next=ordered[(index+1)%ordered.length];
-    return '<div class="hub-navigation-grid">'+
-      '<button class="hub-action" onclick="openSaint('+previous._id+')">‹ Anterior <span>'+escapeHtml(previous.title)+'</span></button>'+
-      '<button class="hub-action" onclick="openSaint('+next._id+')">Próxima <span>'+escapeHtml(next.title)+' ›</span></button>'+
-      '<button class="hub-action hub-share" onclick="shareSaint('+s._id+')">Compartilhar celebração <span>↗</span></button></div>';
+    return '<nav class="hub-navigation-grid" aria-label="Navegação entre celebrações">'+
+      '<button class="hub-action" aria-label="Celebração anterior" onclick="openSaint('+previous._id+')"><span class="hub-action-direction">‹ Anterior</span></button>'+
+      '<button class="hub-action" aria-label="Próxima celebração" onclick="openSaint('+next._id+')"><span class="hub-action-direction">Próxima ›</span></button>'+
+      '<button class="hub-action hub-share" onclick="shareSaint('+s._id+')"><span class="hub-action-direction">Compartilhar celebração</span><span class="hub-share-icon">↗</span></button></nav>';
   }
   window.renderCelebrationHub=function(id){
     const saint=SANTORAL.find(item=>item._id===id||item.id===id);
