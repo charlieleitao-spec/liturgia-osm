@@ -904,7 +904,7 @@ function updateBackButton(){
   const overlay=['serviteOverlay','languageOverlay','mainMenuOverlay','dailyLiturgyOverlay'].some(id=>document.getElementById(id)?.classList.contains('open'));
   const inlineBack=!!document.querySelector('#view .hub-back, #view .back-btn');
   const needsBack=!!state.devo||state.devoSub!==null&&state.devoSub!==undefined||!!dailyPrayerOpen480;
-  const visible=needsBack&&!inlineBack&&!overlay;
+  const visible=needsBack&&!inlineBack&&!overlay&&!hasDetail;
   button.classList.toggle('show',visible);
   button.setAttribute('aria-label',hasDetail?'Voltar à origem':'Voltar para Hoje');
   button.title=hasDetail?'Voltar à origem':'Voltar para Hoje';
@@ -1032,7 +1032,7 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
     try{if(active&&navigator.wakeLock)wakeLock=await navigator.wakeLock.request('screen');else if(wakeLock){await wakeLock.release();wakeLock=null;}}catch(e){}
     showToast(active?'Modo celebração ativado.':'Modo celebração encerrado.');
   };
-  function updateCelebrationButton(){const b=document.getElementById('celebrationToggle');if(!b)return;const dailyOpen=typeof dailyPrayerOpen480!=='undefined'&&!!dailyPrayerOpen480;const reading=!!state.devo||!!state.devoSub||dailyOpen;b.classList.toggle('show',reading||document.body.classList.contains('celebration-mode'));}
+  function updateCelebrationButton(){const b=document.getElementById('celebrationToggle');if(!b)return;const dailyOpen=typeof dailyPrayerOpen480!=='undefined'&&!!dailyPrayerOpen480;const reading=!!state.devo||!!state.devoSub||dailyOpen;const inlineMode=!!document.querySelector('#view .hub-mode-button');b.classList.toggle('show',(reading&&!inlineMode)||document.body.classList.contains('celebration-mode'));}
   window.updateCelebrationButton=updateCelebrationButton;
   render();
 })();
@@ -1050,9 +1050,17 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
   const readCache=date=>{try{const key=cacheKey(date),cached=JSON.parse(localStorage.getItem(key)||'null'),saved=Date.parse(cached?.savedAt||'');if(!cached||!Number.isFinite(saved)||Date.now()-saved>CACHE_MAX_AGE){localStorage.removeItem(key);return null;}return cached;}catch(e){return null}};
   const saveCache=(date,data)=>{try{localStorage.setItem(cacheKey(date),JSON.stringify({savedAt:new Date().toISOString(),data}))}catch(e){}};
   const safe=value=>escapeHtml(String(value||''));
+  function readingBody(value,label){
+    const scripture=/leitura|evangelho/i.test(String(label||''));
+    return String(value||'').trim().split(/\n\s*\n/).filter(Boolean).map(paragraph=>{
+      let html=safe(paragraph.trim()).replace(/\r?\n/g,'<br>');
+      if(scripture)html=html.replace(/(^|\s)(\d{1,3})(?=[A-Za-zÀ-ÿ])/g,'$1<sup class="verse-number">$2</sup> ');
+      return `<p class="reading-paragraph">${html}</p>`;
+    }).join('');
+  }
   function readingCards(group,label){
     const items=(Array.isArray(group)?group:(group?[group]:[])).filter(item=>item&&(item.texto||item.referencia||item.refrao));
-    return items.map((item,index)=>`<article class="daily-reading"><b>${safe(item.titulo||label+(items.length>1?' '+(index+1):''))}</b>${item.referencia?`<em>${safe(item.referencia)}</em>`:''}${item.refrao?`<em>${safe(item.refrao)}</em>`:''}<p>${safe(item.texto)}</p></article>`).join('');
+    return items.map((item,index)=>`<article class="daily-reading"><b>${safe(item.titulo||label+(items.length>1?' '+(index+1):''))}</b>${item.referencia?`<em>${safe(item.referencia)}</em>`:''}${item.refrao?`<em>${safe(item.refrao)}</em>`:''}${readingBody(item.texto,label)}</article>`).join('');
   }
   function section(title,body){return body?`<section class="daily-section"><h3>${safe(title)}</h3>${body}</section>`:''}
   function renderMass(payload,offline){
@@ -1075,7 +1083,7 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
   window.loadDailyLiturgy=async function(date){
     selectedDate=date||localISO(); const input=document.getElementById('dailyLiturgyDate');if(input)input.value=selectedDate;
     const dateDisplay=document.getElementById('dailyLiturgyDateDisplay');
-    if(dateDisplay){const [year,month,day]=selectedDate.split('-');dateDisplay.textContent=day+'/'+month+'/'+year;}
+    if(dateDisplay){const [year,month,day]=selectedDate.split('-');dateDisplay.textContent=day+'/'+month+'/'+year;dateDisplay.setAttribute('aria-label','Data selecionada: '+day+'/'+month+'/'+year);}
     const target=document.getElementById('dailyLiturgyContent'),cached=readCache(selectedDate);
     if(!target)return;
     if(cached)target.innerHTML=renderMass(cached,true);else target.innerHTML='<div class="daily-loading">Carregando a liturgia…</div>';
