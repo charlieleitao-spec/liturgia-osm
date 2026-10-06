@@ -731,7 +731,8 @@ body.light-mode .offline-note{background:rgba(154,120,55,.06)}
 @media(prefers-reduced-motion:reduce){
   .home-celebration,.home-action,.presidency-card{transition:none}
 }
-\n
+
+
 /* Assinatura gráfica OSM no cabeçalho */
 .topbar{
   background:linear-gradient(180deg,rgba(23,39,57,.98),rgba(16,34,54,.96));
@@ -850,4 +851,6 @@ body.light-mode .crest{border-color:#b89a5b}
 .daily-date-field input{position:absolute;inset:0;width:100%;height:100%;min-height:0!important;margin:0;padding:0!important;border:0!important;border-radius:inherit!important;background:transparent!important;opacity:0;cursor:pointer;appearance:none;-webkit-appearance:none;color-scheme:dark}
 .daily-date-field:focus-within{outline:2px solid var(--gold-soft);outline-offset:2px}
 .daily-date-nav>.daily-date-field{grid-column:2}
-\n/* Hierarquia discreta para seções de orações e ofícios longos. */\n.prayer-section-heading{display:block;margin:1.15em 0 .35em;color:var(--gold-soft);font-size:.84em;font-weight:600;letter-spacing:.035em;line-height:1.35;text-align:center}\n.prayer-block>.prayer-section-heading:first-child{margin-top:0}\n
+
+/* Hierarquia discreta para seções de orações e ofícios longos. */
+.prayer-section-heading{display:block;margin:1.15em 0 .35em;color:var(--gold-soft);font-size:.84em;font-weight:600;letter-spacing:.035em;line-height:1.35;text-align:center}
