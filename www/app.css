@@ -948,3 +948,18 @@ body.light-mode .crest{border-color:#b89a5b}
   #view .saint-row-hours>.daynum{width:34px;height:34px}
   #view .office-hour-choice{grid-template-columns:28px minmax(0,1fr) 14px!important;gap:7px!important;padding:8px!important}
 }
+
+
+/* Ajustes conferidos nas telas do aparelho: data visível, contraste e ações sem cobrir a leitura. */
+#view .hub-top-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:9px;margin:4px 0 12px}
+#view .hub-top-actions .hub-back{margin:0}
+#view .hub-mode-button{min-height:44px;padding:9px 13px;border:1px solid var(--gold);border-radius:999px;background:var(--bg-panel);color:var(--gold-soft);font:600 13px Georgia,'Times New Roman',serif}
+#view .hub-mode-button:focus-visible{outline:2px solid var(--gold-soft);outline-offset:2px}
+body.light-mode #view .office-hour-choice{background:#f7f4ec!important;border-color:#d7cfbf!important;color:#2f2b27!important;box-shadow:0 2px 8px rgba(45,39,30,.04)!important}
+body.light-mode #view .office-hour-choice:hover,body.light-mode #view .office-hour-choice:focus-visible{background:#fffdf7!important;border-color:#b89a5b!important}
+body.light-mode #view .office-hour-icon{background:#eee7d8!important;border-color:#cbbc9c!important;color:#8b6e34!important}
+body.light-mode #view .office-hour-copy small{color:#777064!important}
+body.light-mode #view .office-hour-copy strong{color:#292623!important}
+body.light-mode #view .office-hour-note{color:#6c655b!important}
+body.light-mode #view .office-hour-arrow{color:#8b6e34!important}
+.daily-date-display{display:block;min-height:1em;font-variant-numeric:tabular-nums}
