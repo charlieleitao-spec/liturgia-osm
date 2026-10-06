@@ -221,7 +221,7 @@ function viewHoje(){
   const online=navigator.onLine!==false;
   let celebrationCard='<div class="empty-state">Não há celebração servita cadastrada para hoje.</div>';
   if(celebration){
-    const label=saint?'Celebração de hoje':'Próxima celebração OSM';
+    const label=saint?'Celebração de hoje':'Próxima celebração';
     celebrationCard='<button class="home-celebration card fade-in" onclick="openDetail('+celebration._id+')" aria-label="Abrir '+escapeHtml(celebration.title)+'">'+
       saintImageHtml(celebration,false)+
       '<span class="home-celebration-text"><span class="rank">'+label+'</span><b>'+escapeHtml(celebration.title)+'</b><span class="date-line">'+escapeHtml(celebration.date)+'</span></span><span class="chev">›</span></button>'+
