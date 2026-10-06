@@ -514,14 +514,14 @@ html,body,#app,#view,.card,.hour-tab-content,.today-servita-reader,.litblock{min
 .today-servita-reader .preces-intro,.today-servita-reader .preces-intention,.today-servita-reader .liturgical-prayer{margin:0 auto 20px;text-align:center;line-height:1.58;white-space:pre-wrap}
 .today-servita-reader .reading-ref{margin:0 0 6px;font-weight:700;line-height:1.5}
 .today-servita-reader .reading-title{margin:0 0 12px;color:var(--wine);font-style:italic;line-height:1.5}
-.today-servita-reader .reading-body{margin:0 0 18px;text-align:justify;line-height:1.7;white-space:pre-wrap}
+.today-servita-reader .reading-body{margin:0 0 18px;line-height:1.7;white-space:pre-wrap}
 .today-servita-reader .littext{margin:0 auto 16px;text-align:center;line-height:1.58;white-space:pre-wrap}
 .bio-text,.about-text{text-align:justify;hyphens:none;text-justify:inter-word}
 .prayer-card .label,.prayer-card .text{text-align:center}
 .prayer-card .text{white-space:normal!important;font-style:normal!important;font-size:1.02rem!important;line-height:1.58!important}
 .tabbar{width:100%;max-width:560px;overflow:hidden;box-sizing:border-box}.tab-btn{min-width:0;overflow:hidden}
 @media(min-width:480px){.hour-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:420px){.today-servita-reader{font-size:.96rem}.today-servita-reader .litblock{padding:16px 0}.today-servita-reader .hymn-stanza,.today-servita-reader .psalm-stanza{margin-bottom:20px}.today-servita-reader .antiphon{padding:11px 10px}.today-servita-reader .reading-body{text-align:left}.prayer-card{padding:16px}.prayer-card .text{font-size:1rem!important;line-height:1.52!important}}
+@media(max-width:420px){.today-servita-reader{font-size:.96rem}.today-servita-reader .litblock{padding:16px 0}.today-servita-reader .hymn-stanza,.today-servita-reader .psalm-stanza{margin-bottom:20px}.today-servita-reader .antiphon{padding:11px 10px}.prayer-card{padding:16px}.prayer-card .text{font-size:1rem!important;line-height:1.52!important}}
 [data-theme="dark"] .today-servita-reader .antiphon{color:#f1eee3!important;background:#17263d!important;border-color:rgba(217,182,92,.58)!important;opacity:1!important}
 [data-theme="dark"] .today-servita-reader .psalm-title{color:var(--gold-soft)}
 [data-theme="dark"] .today-servita-reader .rubric,[data-theme="dark"] .today-servita-reader .litheading{color:var(--wine-soft)}
@@ -541,7 +541,7 @@ body.direct-office-view .hour-tab-content{padding:0!important;border:0!important
 .prayer-block .prayer-paragraph{text-align:center}
 .today-servita-reader .reading-ref,.today-servita-reader .reading-title,.today-servita-reader .reading-body{text-align:center}
 @media(min-width:480px){.office-hours-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:420px){.today-servita-reader .reading-body{text-align:center}}
+
 
 /* id="regraFloatingBack486" */
 .regra-floating-back{
