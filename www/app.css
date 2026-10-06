@@ -965,3 +965,21 @@ body.light-mode #view .office-hour-copy strong{color:#292623!important}
 body.light-mode #view .office-hour-note{color:#6c655b!important}
 body.light-mode #view .office-hour-arrow{color:#8b6e34!important}
 .daily-date-display{display:block;min-height:1em;font-variant-numeric:tabular-nums}
+
+/* Os controles fixos se recolhem para não cobrir leituras longas. */
+.tabbar,
+.floating-back,
+.celebration-toggle{
+  transition:transform .22s ease, opacity .22s ease;
+}
+body.scroll-controls-hidden .tabbar{
+  transform:translate(-50%, calc(100% + 24px));
+  opacity:0;
+  pointer-events:none;
+}
+body.scroll-controls-hidden .floating-back,
+body.scroll-controls-hidden .celebration-toggle{
+  transform:translateY(calc(100% + 24px));
+  opacity:0;
+  pointer-events:none;
+}

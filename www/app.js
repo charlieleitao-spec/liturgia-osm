@@ -1325,3 +1325,36 @@ loadCanonicalSantoral();
   render();
 })();
 /* END SCRIPT BLOCK: canonicalNavigation4926 */
+
+
+/* Auto-recolhimento dos controles fixos durante a leitura */
+(function(){
+  var lastY = window.scrollY || document.documentElement.scrollTop || 0;
+  var framePending = false;
+  function revealControls(){
+    document.body.classList.remove('scroll-controls-hidden');
+    lastY = window.scrollY || document.documentElement.scrollTop || 0;
+  }
+  function updateControls(){
+    var y = Math.max(0, window.scrollY || document.documentElement.scrollTop || 0);
+    var delta = y - lastY;
+    if (y < 100 || delta < -3) {
+      document.body.classList.remove('scroll-controls-hidden');
+    } else if (y > 140 && delta > 3) {
+      document.body.classList.add('scroll-controls-hidden');
+    }
+    lastY = y;
+    framePending = false;
+  }
+  window.addEventListener('scroll', function(){
+    if (framePending) return;
+    framePending = true;
+    window.requestAnimationFrame(updateControls);
+  }, {passive:true});
+  document.addEventListener('focusin', function(event){
+    if (event.target && event.target.closest && event.target.closest('.tabbar, #floatingBack, #celebrationToggle')) revealControls();
+  });
+  document.addEventListener('click', function(event){
+    if (event.target && event.target.closest && event.target.closest('.tabbar')) revealControls();
+  }, true);
+})();
