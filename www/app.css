@@ -512,3 +512,222 @@ body.celebration-mode .prayer-block,body.celebration-mode .bio-text,body.celebra
 body.celebration-mode .daily-liturgy-head{display:none}
 body.celebration-mode .daily-liturgy-body{font-size:1.18em;line-height:1.75;padding-top:24px}
 @media(max-width:380px){.presidency-grid{grid-template-columns:1fr}.presidency-card{min-height:92px}}
+
+
+/* Identidade visual da página inicial — proposta 4.9.37 */
+.home-hero{
+  min-height:188px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:22px 20px!important;
+  border-radius:22px;
+  border-color:rgba(196,154,74,.42);
+  background:
+    radial-gradient(circle at 88% 26%,rgba(196,154,74,.15),transparent 30%),
+    linear-gradient(140deg,#1d3b57 0%,#132b43 54%,#102238 100%);
+  box-shadow:0 16px 36px -22px rgba(0,0,0,.72),inset 0 1px rgba(255,255,255,.05);
+}
+.home-hero:before{
+  content:"";
+  position:absolute;
+  right:22px;
+  top:50%;
+  width:106px;
+  height:106px;
+  transform:translateY(-50%);
+  border:1px solid rgba(225,196,123,.28);
+  border-radius:50%;
+  box-shadow:0 0 0 8px rgba(225,196,123,.035),0 0 0 16px rgba(225,196,123,.025);
+  pointer-events:none;
+}
+.home-hero:after{
+  content:"✦";
+  right:48px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:54px;
+  color:var(--gold-soft);
+  opacity:.24;
+}
+.home-hero .liturgical-kicker,
+.home-hero .home-date-line,
+.home-hero .liturgical-title,
+.home-hero .liturgical-sub{position:relative;z-index:1}
+.home-hero .liturgical-kicker{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:13px;
+  color:#e1c47b;
+  font-size:9px;
+  letter-spacing:.19em;
+}
+.home-hero .liturgical-kicker:before{
+  content:"";
+  width:19px;
+  height:1px;
+  background:currentColor;
+  opacity:.8;
+}
+.home-date-line{align-items:center;gap:12px;margin:0 0 11px}
+.home-date-line strong{
+  display:grid;
+  place-items:center;
+  width:48px;
+  height:48px;
+  border:1px solid rgba(225,196,123,.48);
+  border-radius:15px;
+  background:rgba(225,196,123,.10);
+  color:#f0d999;
+  font-size:27px;
+  line-height:1;
+}
+.home-date-line span{
+  color:#d7deea;
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:12px;
+  letter-spacing:.17em;
+  text-transform:uppercase;
+}
+.home-hero .liturgical-title{
+  max-width:100%;
+  color:#f5f1e7;
+  font-size:23px;
+  line-height:1.12;
+  text-wrap:balance;
+}
+.home-hero .liturgical-sub{
+  width:max-content;
+  max-width:100%;
+  margin-top:10px;
+  padding-top:8px;
+  border-top:1px solid rgba(225,196,123,.28);
+  color:#c6d0dc;
+  font-size:12px;
+}
+.connection-strip{
+  min-height:38px;
+  padding:8px 11px;
+  margin-bottom:14px;
+  border-radius:999px;
+  background:rgba(19,38,59,.50);
+}
+.connection-strip strong{font-size:11px}
+.connection-strip span:last-child{font-size:10px}
+.home-heading{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin-top:22px!important;
+  margin-bottom:10px!important;
+  color:var(--wine-soft);
+  font-size:10px;
+  letter-spacing:.16em;
+}
+.home-heading:before{
+  content:"";
+  width:16px;
+  height:1px;
+  background:var(--gold);
+  opacity:.8;
+}
+.home-celebration,
+.home-action,
+.presidency-card,
+.home-prayer-card{
+  border-radius:16px;
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.home-celebration:active,
+.home-action:active,
+.presidency-card:active{transform:translateY(1px)}
+.home-celebration{border-color:rgba(196,154,74,.35)}
+.home-action{min-height:92px;padding:14px}
+.home-action-icon{
+  display:grid;
+  place-items:center;
+  width:31px;
+  height:31px;
+  margin-bottom:9px;
+  border:1px solid rgba(196,154,74,.35);
+  border-radius:10px;
+  background:rgba(196,154,74,.10);
+  font-size:16px;
+}
+.presidency-card{
+  position:relative;
+  overflow:hidden;
+  min-height:118px;
+  padding:16px;
+}
+.presidency-card:after{
+  content:"";
+  position:absolute;
+  right:-17px;
+  bottom:-24px;
+  width:82px;
+  height:82px;
+  border:1px solid rgba(196,154,74,.16);
+  border-radius:50%;
+  pointer-events:none;
+}
+.presidency-icon{font-size:22px}
+.home-prayer-card{
+  border-left:3px solid var(--wine);
+}
+.home-prayer-card .action-btn{
+  min-height:42px;
+  border-radius:999px;
+  padding-inline:17px;
+}
+.offline-note{
+  margin-top:13px;
+  padding:10px 12px;
+  border-left:2px solid var(--gold);
+  border-radius:0 10px 10px 0;
+  background:rgba(196,154,74,.06);
+}
+body.light-mode .home-hero{
+  border-color:#d7c59c;
+  background:
+    radial-gradient(circle at 88% 24%,rgba(154,120,55,.13),transparent 31%),
+    linear-gradient(140deg,#fffdf8 0%,#f2ecdf 58%,#e9e1d2 100%);
+  box-shadow:0 14px 30px -23px rgba(47,43,39,.42),inset 0 1px #fff;
+}
+body.light-mode .home-hero:before{
+  border-color:rgba(154,120,55,.28);
+  box-shadow:0 0 0 8px rgba(154,120,55,.04),0 0 0 16px rgba(154,120,55,.025);
+}
+body.light-mode .home-hero:after{color:#9a7837;opacity:.30}
+body.light-mode .home-hero .liturgical-kicker{color:#8b2635}
+body.light-mode .home-date-line strong{
+  border-color:#c9b27d;
+  background:rgba(154,120,55,.10);
+  color:#173b67;
+}
+body.light-mode .home-date-line span{color:#5c554b}
+body.light-mode .home-hero .liturgical-title{color:#173b67}
+body.light-mode .home-hero .liturgical-sub{
+  border-color:#d5c8ab;
+  color:#6c655b;
+}
+body.light-mode .connection-strip{background:rgba(255,255,255,.78)}
+body.light-mode .home-heading{color:#8b2635}
+body.light-mode .home-action-icon{
+  border-color:rgba(154,120,55,.30);
+  background:rgba(154,120,55,.08);
+}
+body.light-mode .presidency-card:after{border-color:rgba(154,120,55,.20)}
+body.light-mode .offline-note{background:rgba(154,120,55,.06)}
+@media(max-width:380px){
+  .home-hero{min-height:174px;padding:19px 16px!important}
+  .home-hero:before{right:15px;width:82px;height:82px}
+  .home-hero:after{right:37px;font-size:43px}
+  .home-hero .liturgical-title{max-width:82%;font-size:21px}
+  .home-actions{gap:8px}
+  .home-action{min-height:88px;padding:11px}
+}
+@media(prefers-reduced-motion:reduce){
+  .home-celebration,.home-action,.presidency-card{transition:none}
+}
