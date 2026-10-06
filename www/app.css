@@ -516,7 +516,7 @@ body.celebration-mode .daily-liturgy-body{font-size:1.18em;line-height:1.75;padd
 
 /* Refinamento visual da página inicial */
 .home-hero{
-  min-height:188px;
+  min-height:150px;
   display:flex;
   flex-direction:column;
   justify-content:center;
@@ -721,7 +721,7 @@ body.light-mode .home-action-icon{
 body.light-mode .presidency-card:after{border-color:rgba(154,120,55,.20)}
 body.light-mode .offline-note{background:rgba(154,120,55,.06)}
 @media(max-width:380px){
-  .home-hero{min-height:174px;padding:19px 16px!important}
+  .home-hero{min-height:140px;padding:19px 16px!important}
   .home-hero:before{right:15px;width:82px;height:82px}
   .home-hero:after{right:37px;font-size:43px}
   .home-hero .liturgical-title{max-width:82%;font-size:21px}
