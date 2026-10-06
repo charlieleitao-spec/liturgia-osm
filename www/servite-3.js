@@ -955,7 +955,9 @@ function reflowRuleProse(value){
   return heading+'\n\n'+reflow(source.slice(introAt));
 }
 function renderRuleParagraphs(value){
-  return String(value||'').replace(/\r\n?/g,'\n')
+  const source=String(value||'').replace(/\r\n?/g,'\n')
+    .replace(/([.!?])\s+(\d+\.\s+[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ])/g,'$1\n\n$2');
+  return source
     .split(/\n[ \t]*\n+/)
     .map(paragraph=>paragraph.replace(/[ \t]*\n[ \t]*/g,' ').replace(/[ \t]{2,}/g,' ').trim())
     .filter(Boolean)
