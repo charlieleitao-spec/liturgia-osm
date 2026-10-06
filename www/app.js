@@ -1236,10 +1236,10 @@ loadCanonicalSantoral();
     if(index<0||!ordered.length)return hubEmpty('Navegação entre celebrações indisponível.');
     const previous=ordered[(index+ordered.length-1)%ordered.length];
     const next=ordered[(index+1)%ordered.length];
-    return '<div class="hub-navigation-grid">'+
-      '<button class="hub-action" onclick="openSaint('+previous._id+')">‹ Anterior <span>'+escapeHtml(previous.title)+'</span></button>'+
-      '<button class="hub-action" onclick="openSaint('+next._id+')">Próxima <span>'+escapeHtml(next.title)+' ›</span></button>'+
-      '<button class="hub-action hub-share" onclick="shareSaint('+s._id+')">Compartilhar celebração <span>↗</span></button></div>';
+    return '<nav class="hub-navigation-grid" aria-label="Navegação entre celebrações">'+
+      '<button class="hub-action" aria-label="Celebração anterior: '+escapeHtml(previous.title)+'" onclick="openSaint('+previous._id+')"><span class="hub-action-direction">‹ Anterior</span><strong class="hub-action-title">'+escapeHtml(previous.title)+'</strong></button>'+
+      '<button class="hub-action" aria-label="Próxima celebração: '+escapeHtml(next.title)+'" onclick="openSaint('+next._id+')"><span class="hub-action-direction">Próxima ›</span><strong class="hub-action-title">'+escapeHtml(next.title)+'</strong></button>'+
+      '<button class="hub-action hub-share" onclick="shareSaint('+s._id+')"><span class="hub-action-direction">Compartilhar celebração</span><span class="hub-share-icon">↗</span></button></nav>';
   }
   window.renderCelebrationHub=function(id){
     const saint=SANTORAL.find(item=>item._id===id||item.id===id);
