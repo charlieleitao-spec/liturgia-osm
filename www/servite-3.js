@@ -945,12 +945,36 @@ function backFromRegra485(){
   render();
   window.scrollTo(0,0);
 }
+function renderRuleArticles(text){
+  const source=String(text||'').replace(/\r\n?/g,'\n').trim();
+  const starts=[...source.matchAll(/(^|\n)(\d+)\.\s+/g)];
+  if(!starts.length){
+    return source.split(/\n[ \t]*\n+/).map(paragraph=>paragraph.split('\n').map(line=>line.trim()).filter(Boolean).join(' ')).filter(Boolean)
+      .map(paragraph=>'<p class="rule-paragraph">'+escapeHtml(paragraph)+'</p>').join('');
+  }
+  const introductory=source.slice(0,starts[0].index).trim();
+  const parts=[];
+  if(introductory){
+    parts.push(...introductory.split(/\n[ \t]*\n+/).map(paragraph=>paragraph.split('\n').map(line=>line.trim()).filter(Boolean).join(' ')).filter(Boolean)
+      .map(paragraph=>'<p class="rule-paragraph">'+escapeHtml(paragraph)+'</p>'));
+  }
+  starts.forEach((match,index)=>{
+    const contentStart=match.index+match[0].length;
+    const next=starts[index+1];
+    const contentEnd=next?next.index:source.length;
+    const body=source.slice(contentStart,contentEnd).split('\n').map(line=>line.trim()).filter(Boolean).join(' ');
+    parts.push('<article class="rule-article"><span class="rule-article-number" aria-label="Artigo '+match[2]+'">'+match[2]+'.&nbsp;</span><p>'+escapeHtml(body)+'</p></article>');
+  });
+  return parts.join('\n');
+}
+
 function viewRegra(){
   const r = PRAYERS.regra;
   if(state.regraChapter !== null){
     const isIntro = state.regraChapter === 'intro';
     const title = isIntro ? t('regraIntroLabel') : `${t('regraChapterLabel')} ${r.chapters[state.regraChapter].roman} — ${r.chapters[state.regraChapter].title}`;
     const text = isIntro ? r.intro : r.chapters[state.regraChapter].text;
+    const reader = isIntro ? `<div class="card fade-in"><div class="prayer-block">${renderPrayer(text)}</div></div>` : `<div class="rule-reader fade-in">${renderRuleArticles(text)}</div>`;
     return `
       <button class="regra-floating-back" onclick="backFromRegra485()" aria-label="Voltar">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
@@ -961,9 +985,7 @@ function viewRegra(){
         <div class="detail-divider"></div>
       </div>
       ${langNoteHtml()}
-      <div class="card fade-in">
-        <div class="prayer-block">${renderPrayer(text)}</div>
-      </div>
+      ${reader}
     `;
   }
   return `
