@@ -367,7 +367,7 @@ body.servite-open .celebration-toggle,body.servite-open .floating-back,body.serv
 .office-hour-icon{display:grid;place-items:center;width:36px;height:36px;border:1px solid rgba(184,148,72,.48);border-radius:50%;background:rgba(184,148,72,.11);color:var(--gold-soft);font-size:17px;line-height:1}
 .office-hour-copy{display:grid;gap:3px;min-width:0}
 .office-hour-copy small{color:var(--text-faint);font:600 9px Georgia,'Times New Roman',serif;letter-spacing:.09em;text-transform:uppercase}
-.office-hour-copy strong{color:var(--paper);font:600 15px/1.25 Georgia,'Times New Roman',serif;overflow-wrap:anywhere}
+.office-hour-copy strong{color:var(--paper);font:400 15px/1.25 Georgia,'Times New Roman',serif;overflow-wrap:anywhere}
 .office-hour-note{color:var(--text-muted);font:italic 11px/1.35 Georgia,'Times New Roman',serif;overflow-wrap:anywhere}
 .office-hour-arrow{color:var(--gold-soft);font-size:22px;line-height:1;text-align:center}
 .saint-row.saint-row-hours{display:grid;grid-template-columns:28px minmax(0,1fr);align-items:start;gap:9px 12px}
@@ -408,7 +408,7 @@ body.servite-open .celebration-toggle,body.servite-open .floating-back,body.serv
 .crest img{width:38px;height:38px;object-fit:contain;border-radius:9px}
 .topbar-tools{margin-left:auto;display:flex;align-items:center;gap:5px;}
 .tool-btn{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--bg-panel);color:var(--gold-soft);font-family:Georgia, 'Times New Roman', serif;font-size:11px;display:grid;place-items:center;cursor:pointer;min-width:36px;min-height:36px;}
-main#view{position:relative;z-index:1;flex:1;padding:18px 18px 100px;padding-left:max(18px, env(safe-area-inset-left));padding-right:max(18px, env(safe-area-inset-right));padding-bottom:calc(96px + env(safe-area-inset-bottom));padding-top:14px;}
+main#view{position:relative;z-index:1;flex:1;padding:18px 18px 100px;padding-left:max(18px, env(safe-area-inset-left));padding-right:max(18px, env(safe-area-inset-right));padding-bottom:calc(164px + env(safe-area-inset-bottom));padding-top:14px;}
 .connection-strip{display:flex;align-items:center;gap:9px;padding:9px 12px;margin:0 0 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg-panel);color:var(--text-muted);font-size:12px}
 .connection-dot{width:8px;height:8px;border-radius:50%;background:#69a76f;box-shadow:0 0 0 3px rgba(105,167,111,.14);flex:none}
 .connection-strip.offline .connection-dot{background:var(--gold-soft);box-shadow:0 0 0 3px rgba(196,154,74,.14)}
@@ -512,6 +512,362 @@ body.celebration-mode .prayer-block,body.celebration-mode .bio-text,body.celebra
 body.celebration-mode .daily-liturgy-head{display:none}
 body.celebration-mode .daily-liturgy-body{font-size:1.18em;line-height:1.75;padding-top:24px}
 @media(max-width:380px){.presidency-grid{grid-template-columns:1fr}.presidency-card{min-height:92px}}
+
+
+/* Refinamento visual da página inicial */
+.home-hero{
+  min-height:150px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:22px 20px!important;
+  border-radius:22px;
+  border-color:rgba(196,154,74,.42);
+  background:
+    radial-gradient(circle at 88% 26%,rgba(196,154,74,.15),transparent 30%),
+    linear-gradient(140deg,#1d3b57 0%,#132b43 54%,#102238 100%);
+  box-shadow:0 16px 36px -22px rgba(0,0,0,.72),inset 0 1px rgba(255,255,255,.05);
+}
+.home-hero:before{
+  content:"";
+  position:absolute;
+  right:22px;
+  top:50%;
+  width:106px;
+  height:106px;
+  transform:translateY(-50%);
+  border:1px solid rgba(225,196,123,.28);
+  border-radius:50%;
+  box-shadow:0 0 0 8px rgba(225,196,123,.035),0 0 0 16px rgba(225,196,123,.025);
+  pointer-events:none;
+}
+.home-hero:after{
+  content:"✦";
+  right:48px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:54px;
+  color:var(--gold-soft);
+  opacity:.24;
+}
+.home-hero .liturgical-kicker,
+.home-hero .home-date-line,
+.home-hero .liturgical-title,
+.home-hero .liturgical-sub{position:relative;z-index:1}
+.home-hero .liturgical-kicker{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:13px;
+  color:#e1c47b;
+  font-size:9px;
+  letter-spacing:.19em;
+}
+.home-hero .liturgical-kicker:before{
+  content:"";
+  width:19px;
+  height:1px;
+  background:currentColor;
+  opacity:.8;
+}
+.home-date-line{align-items:center;gap:12px;margin:0 0 11px}
+.home-date-line strong{
+  display:grid;
+  place-items:center;
+  width:48px;
+  height:48px;
+  border:1px solid rgba(225,196,123,.48);
+  border-radius:15px;
+  background:rgba(225,196,123,.10);
+  color:#f0d999;
+  font-size:27px;
+  line-height:1;
+}
+.home-date-line span{
+  color:#d7deea;
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:12px;
+  letter-spacing:.17em;
+  text-transform:uppercase;
+}
+.home-hero .liturgical-title{
+  max-width:calc(100% - 64px);
+  color:#f5f1e7;
+  font-size:23px;
+  line-height:1.12;
+  text-wrap:balance;
+}
+.home-hero .liturgical-sub{
+  width:max-content;
+  max-width:100%;
+  margin-top:10px;
+  padding-top:8px;
+  border-top:1px solid rgba(225,196,123,.28);
+  color:#c6d0dc;
+  font-size:12px;
+}
+.connection-strip{
+  min-height:38px;
+  padding:8px 11px;
+  margin-bottom:14px;
+  border-radius:999px;
+  background:rgba(19,38,59,.50);
+}
+.connection-strip strong{font-size:11px}
+.connection-strip span:last-child{font-size:10px}
+.home-heading{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin-top:22px!important;
+  margin-bottom:10px!important;
+  color:var(--wine-soft);
+  font-size:10px;
+  letter-spacing:.16em;
+}
+.home-heading:before{
+  content:"";
+  width:16px;
+  height:1px;
+  background:var(--gold);
+  opacity:.8;
+}
+.home-celebration,
+.home-action,
+.presidency-card,
+.home-prayer-card{
+  border-radius:16px;
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.home-celebration:active,
+.home-action:active,
+.presidency-card:active{transform:translateY(1px)}
+.home-celebration{border-color:rgba(196,154,74,.35)}
+.home-action{min-height:92px;padding:14px}
+.home-action-icon{
+  display:grid;
+  place-items:center;
+  width:31px;
+  height:31px;
+  margin-bottom:9px;
+  border:1px solid rgba(196,154,74,.35);
+  border-radius:10px;
+  background:rgba(196,154,74,.10);
+  font-size:16px;
+}
+.presidency-card{
+  position:relative;
+  overflow:hidden;
+  min-height:118px;
+  padding:16px;
+}
+.presidency-card:after{
+  content:"";
+  position:absolute;
+  right:-17px;
+  bottom:-24px;
+  width:82px;
+  height:82px;
+  border:1px solid rgba(196,154,74,.16);
+  border-radius:50%;
+  pointer-events:none;
+}
+.presidency-icon{font-size:22px}
+.home-prayer-card{
+  border-left:3px solid var(--wine);
+}
+.home-prayer-card .action-btn{
+  min-height:42px;
+  border-radius:999px;
+  padding-inline:17px;
+}
+.offline-note{
+  margin-top:13px;
+  padding:10px 12px;
+  border-left:2px solid var(--gold);
+  border-radius:0 10px 10px 0;
+  background:rgba(196,154,74,.06);
+}
+body.light-mode .home-hero{
+  border-color:#d7c59c;
+  background:
+    radial-gradient(circle at 88% 24%,rgba(154,120,55,.13),transparent 31%),
+    linear-gradient(140deg,#fffdf8 0%,#f2ecdf 58%,#e9e1d2 100%);
+  box-shadow:0 14px 30px -23px rgba(47,43,39,.42),inset 0 1px #fff;
+}
+body.light-mode .home-hero:before{
+  border-color:rgba(154,120,55,.28);
+  box-shadow:0 0 0 8px rgba(154,120,55,.04),0 0 0 16px rgba(154,120,55,.025);
+}
+body.light-mode .home-hero:after{color:#9a7837;opacity:.30}
+body.light-mode .home-hero .liturgical-kicker{color:#8b2635}
+body.light-mode .home-date-line strong{
+  border-color:#c9b27d;
+  background:rgba(154,120,55,.10);
+  color:#173b67;
+}
+body.light-mode .home-date-line span{color:#5c554b}
+body.light-mode .home-hero .liturgical-title{color:#173b67}
+body.light-mode .home-hero .liturgical-sub{
+  border-color:#d5c8ab;
+  color:#6c655b;
+}
+body.light-mode .connection-strip{background:rgba(255,255,255,.78)}
+body.light-mode .home-heading{color:#8b2635}
+body.light-mode .home-action-icon{
+  border-color:rgba(154,120,55,.30);
+  background:rgba(154,120,55,.08);
+}
+body.light-mode .presidency-card:after{border-color:rgba(154,120,55,.20)}
+body.light-mode .offline-note{background:rgba(154,120,55,.06)}
+@media(max-width:380px){
+  .home-hero{min-height:140px;padding:19px 16px!important}
+  .home-hero:before{right:15px;width:82px;height:82px}
+  .home-hero:after{right:37px;font-size:43px}
+  .home-hero .liturgical-title{max-width:82%;font-size:21px}
+  .home-actions{gap:8px}
+  .home-action{min-height:88px;padding:11px}
+}
+@media(prefers-reduced-motion:reduce){
+  .home-celebration,.home-action,.presidency-card{transition:none}
+}
+
+
+/* Assinatura gráfica OSM no cabeçalho */
+.topbar{
+  background:linear-gradient(180deg,rgba(23,39,57,.98),rgba(16,34,54,.96));
+  border-bottom-color:rgba(196,154,74,.32);
+}
+.topbar-inner{gap:11px;min-height:52px}
+.crest{
+  width:44px;height:44px;flex:0 0 44px;
+  border:1px solid rgba(225,196,123,.62);
+  border-radius:14px;background:#171620;
+  box-shadow:0 3px 10px rgba(0,0,0,.18);
+}
+.crest img{width:38px;height:38px;object-fit:contain;border-radius:10px;padding:1px}
+.topbar-text{min-width:0;flex:1}
+.eyebrow{
+  max-width:126px;
+  margin:0 0 3px;
+  font-size:8px;
+  line-height:1.2;
+  letter-spacing:.15em;
+  color:#d7b8bd;
+  white-space:normal;
+}
+.topbar h1{
+  font-size:19px;
+  letter-spacing:-.025em;
+  color:#e1c47b;
+  white-space:nowrap;
+}
+body.light-mode .topbar{
+  background:linear-gradient(180deg,#fffdf8,#f7f4ed);
+  border-bottom-color:#d7c59c;
+}
+body.light-mode .eyebrow{color:#84283b}
+body.light-mode .topbar h1{color:#173b67}
+body.light-mode .crest{border-color:#b89a5b}
+@media(max-width:380px){
+  .topbar-inner{gap:8px}
+  .crest{width:40px;height:40px;flex-basis:40px}
+  .crest img{width:35px;height:35px}
+  .eyebrow{max-width:112px;font-size:7.5px;letter-spacing:.13em}
+  .topbar h1{font-size:17px}
+}
+
+/* Cabeçalho OSM: título maior com acabamento tipográfico sóbrio. */
+.topbar h1{font-size:22px;font-variant:small-caps;letter-spacing:.045em;line-height:1.1;padding-bottom:4px;border-bottom:1px solid rgba(196,154,74,.42);text-shadow:0 2px 12px rgba(196,154,74,.16)}
+@media(max-width:380px){.topbar h1{font-size:19px}}
+
+/* Anúncio da próxima celebração: rótulo, nome e data em linhas legíveis. */
+.home-celebration-text{display:block;min-width:0;flex:1}
+.home-celebration-text .rank{display:block;margin:0 0 5px;color:var(--wine-soft);font:600 10px Georgia,'Times New Roman',serif;letter-spacing:.11em;text-transform:uppercase;line-height:1.35}
+.home-celebration-text>b{display:block;margin:0;color:var(--paper);font:700 1.12rem Georgia,'Times New Roman',serif;line-height:1.2;overflow-wrap:anywhere}
+.home-celebration-text .date-line{display:block;margin-top:5px;color:var(--text-muted);font-size:.92rem;line-height:1.3}
+
+/* Navegação entre celebrações: rótulo acima e títulos equilibrados nos dois cartões. */
+.detail-navigation{align-items:stretch}
+.detail-navigation button{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:4px;text-align:left}
+.detail-navigation button:last-child{align-items:flex-end;text-align:right}
+.detail-navigation small{width:100%;line-height:1.3;white-space:normal}
+.detail-navigation b{display:-webkit-box;min-height:2.5em;line-height:1.25;white-space:normal;overflow-wrap:anywhere;overflow:hidden;text-overflow:ellipsis;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+
+
+/* Largura do cartão da celebração e navegação dos santos. */
+#view > .home-celebration,#view button.home-celebration.card{display:flex!important;box-sizing:border-box!important;width:100%!important;max-width:100%!important;min-width:0!important}
+#view > .detail-navigation{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:stretch!important;gap:10px!important;width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;overflow:visible!important}
+#view > .detail-navigation > button{display:flex!important;flex:1 1 0!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;box-sizing:border-box!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:76px!important;height:auto!important;overflow:hidden!important;white-space:normal!important}
+#view > .detail-navigation > button:last-child{align-items:flex-end!important;text-align:right!important}
+#view > .detail-navigation > button > small{display:block!important;width:100%!important;min-width:0!important;overflow:hidden!important;white-space:nowrap!important;text-overflow:ellipsis!important;line-height:1.25!important}
+#view > .detail-navigation > button > b{display:-webkit-box!important;width:100%!important;min-width:0!important;max-width:100%!important;overflow:hidden!important;white-space:normal!important;overflow-wrap:anywhere!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;line-height:1.3!important;text-overflow:ellipsis!important}
+
+
+/* Navegação entre celebrações: rótulo e nome em linhas separadas. */
+.hub-navigation-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:stretch!important;gap:9px!important;width:100%!important;min-width:0!important}
+.hub-navigation-grid>.hub-action{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;box-sizing:border-box!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:88px!important;height:auto!important;overflow:hidden!important;text-align:left!important;white-space:normal!important}
+.hub-navigation-grid>.hub-action:nth-child(2){align-items:flex-end!important;text-align:right!important}
+.hub-navigation-grid .hub-action-direction{display:block!important;width:100%!important;min-width:0!important;overflow:hidden!important;white-space:nowrap!important;text-overflow:ellipsis!important;color:var(--paper)!important;font-size:13px!important;line-height:1.25!important}
+.hub-navigation-grid .hub-action-title{display:-webkit-box!important;width:100%!important;min-width:0!important;max-width:100%!important;margin-top:4px!important;overflow:hidden!important;white-space:normal!important;overflow-wrap:anywhere!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;line-height:1.3!important;text-overflow:ellipsis!important;color:var(--gold-soft)!important;font:700 14px/1.3 Georgia,'Times New Roman',serif!important}
+.hub-navigation-grid>.hub-share{grid-column:1/-1!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;min-height:50px!important;text-align:left!important}
+.hub-navigation-grid>.hub-share .hub-action-direction{width:auto!important;white-space:normal!important;font-size:16px!important;font-weight:700!important}
+.hub-navigation-grid .hub-share-icon{flex:none!important;color:var(--gold-soft)!important;font-size:20px!important}
+@media(max-width:380px){.hub-navigation-grid{grid-template-columns:1fr!important}.hub-navigation-grid>.hub-action:nth-child(2){align-items:flex-start!important;text-align:left!important}}
+
+
+/* Navegação textual sem nomes truncados: rótulos curtos e centralizados. */
+.hub-navigation-grid>.hub-action:not(.hub-share){align-items:center!important;justify-content:center!important;min-height:64px!important;text-align:center!important}
+.hub-navigation-grid>.hub-action:nth-child(2){align-items:center!important;text-align:center!important}
+.hub-navigation-grid .hub-action-direction{display:block!important;width:100%!important;text-align:center!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;color:var(--paper)!important;font:700 16px/1.3 Georgia,'Times New Roman',serif!important}
+
+
+/* Hierarquia equilibrada na lista de Ofícios próprios */
+.saint-row.saint-row-hours{align-items:center;gap:12px 14px;padding:16px 4px 18px}
+.saint-row-hours>.daynum{display:grid;place-items:center;width:40px;height:40px;border:1px solid rgba(184,148,72,.38);border-radius:12px;background:rgba(184,148,72,.08);font-size:18px;color:var(--gold-soft)}
+.saint-row-hours>.rowtext{align-self:center}
+.saint-row-hours .rowtitle{font-size:19px;line-height:1.2;font-weight:700;color:var(--paper)}
+.saint-row-hours .rowrank{margin-top:3px;font-size:13px;line-height:1.25;font-style:normal;color:var(--text-muted)}
+.office-hours-grid{gap:7px}
+.office-hour-choice{grid-template-columns:32px minmax(0,1fr) 16px!important;gap:10px!important;min-height:54px!important;padding:8px 11px!important;border-color:rgba(132,147,165,.22)!important;border-radius:12px!important;background:rgba(19,38,59,.58)!important}
+.office-hour-choice:hover,.office-hour-choice:focus-visible{border-color:rgba(184,148,72,.55)!important;background:rgba(184,148,72,.08)!important}
+.office-hour-icon{width:30px;height:30px;border-color:rgba(184,148,72,.30);background:rgba(184,148,72,.07);font-size:15px}
+.office-hour-copy{gap:2px}
+.office-hour-copy strong{font-size:15px;line-height:1.2}
+.office-hour-note{font-size:10.5px}
+.office-hour-arrow{font-size:20px}
+.daily-date-nav input{text-align:center;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+@media(max-width:380px){
+  .saint-row-hours .rowtitle{font-size:17px}
+  .office-hour-choice{grid-template-columns:30px minmax(0,1fr) 14px!important;gap:8px!important;padding:8px 9px!important}
+  .office-hour-copy strong{font-size:14px}
+}
+
+
+/* Seletor de data com rótulo visual realmente centralizado */
+.daily-date-field{position:relative;display:grid;place-items:center;min-width:0;min-height:42px;border:1px solid var(--line);border-radius:11px;background:var(--bg-panel);overflow:hidden}
+.daily-date-display{color:var(--paper);font:400 16px/1 Georgia,'Times New Roman',serif;font-variant-numeric:tabular-nums;letter-spacing:.02em;pointer-events:none}
+.daily-date-chevron{position:absolute;right:12px;top:50%;transform:translateY(-65%);color:var(--text-muted);font:20px/1 Georgia,serif;pointer-events:none}
+.daily-date-field input{position:absolute;inset:0;width:100%;height:100%;min-height:0!important;margin:0;padding:0!important;border:0!important;border-radius:inherit!important;background:transparent!important;opacity:0;cursor:pointer;appearance:none;-webkit-appearance:none;color-scheme:dark}
+.daily-date-field:focus-within{outline:2px solid var(--gold-soft);outline-offset:2px}
+.daily-date-nav>.daily-date-field{grid-column:2}
+
+/* Hierarquia discreta para seções de orações e ofícios longos. */
+.prayer-section-heading{display:block;margin:1.15em 0 .35em;color:var(--gold-soft);font-size:.84em;font-weight:600;letter-spacing:.035em;line-height:1.35;text-align:center}
+/* Georgia for prayer and Marian reading: device-safe fallbacks and calm measure. */
+:root{--osm-reading-serif:Georgia,'Noto Serif','Times New Roman',serif;}
+#view .prayer-block,#view .prayer-card .text,#view .bio-text,#view .about-quote,#view .prayer-section-heading{
+  font-family:var(--osm-reading-serif)!important;
+}
+#view .prayer-block,#view .prayer-card .text{
+  font-size:clamp(17px,4.6vw,19px)!important;
+  line-height:1.65!important;
+  font-weight:400;
+  text-align:center;
+  overflow-wrap:break-word;
+}
+#view .prayer-section-heading{font-size:.84em!important;font-weight:600!important;line-height:1.35!important;}
+@media(min-width:560px){#view .prayer-block,#view .prayer-card .text{font-size:19px!important;}}
 
 
 /* Leitura estruturada das orações: escala A+/A−, estrofes e títulos. */
