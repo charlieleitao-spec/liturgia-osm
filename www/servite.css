@@ -572,3 +572,7 @@ body.embedded-resource-mode .topbar,
 body.embedded-resource-mode .tabbar{display:none!important}
 body.embedded-resource-mode main#view{padding-top:16px!important;padding-bottom:28px!important}
 body.embedded-resource-mode #app{min-height:100vh}
+
+/* A Regra é prosa: refluímos as linhas de origem e mantemos parágrafos legíveis. */
+.prayer-block.regra-prose{text-align:left}
+.regra-prose .prayer-paragraph{white-space:normal;text-align:justify;overflow-wrap:break-word}

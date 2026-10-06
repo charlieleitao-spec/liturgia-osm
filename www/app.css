@@ -408,7 +408,7 @@ body.servite-open .celebration-toggle,body.servite-open .floating-back,body.serv
 .crest img{width:38px;height:38px;object-fit:contain;border-radius:9px}
 .topbar-tools{margin-left:auto;display:flex;align-items:center;gap:5px;}
 .tool-btn{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--bg-panel);color:var(--gold-soft);font-family:Georgia, 'Times New Roman', serif;font-size:11px;display:grid;place-items:center;cursor:pointer;min-width:36px;min-height:36px;}
-main#view{position:relative;z-index:1;flex:1;padding:18px 18px 100px;padding-left:max(18px, env(safe-area-inset-left));padding-right:max(18px, env(safe-area-inset-right));padding-bottom:calc(96px + env(safe-area-inset-bottom));padding-top:14px;}
+main#view{position:relative;z-index:1;flex:1;padding:18px 18px 100px;padding-left:max(18px, env(safe-area-inset-left));padding-right:max(18px, env(safe-area-inset-right));padding-bottom:calc(164px + env(safe-area-inset-bottom));padding-top:14px;}
 .connection-strip{display:flex;align-items:center;gap:9px;padding:9px 12px;margin:0 0 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg-panel);color:var(--text-muted);font-size:12px}
 .connection-dot{width:8px;height:8px;border-radius:50%;background:#69a76f;box-shadow:0 0 0 3px rgba(105,167,111,.14);flex:none}
 .connection-strip.offline .connection-dot{background:var(--gold-soft);box-shadow:0 0 0 3px rgba(196,154,74,.14)}
@@ -785,3 +785,10 @@ body.light-mode .crest{border-color:#b89a5b}
 .home-celebration-text .rank{display:block;margin:0 0 5px;color:var(--wine-soft);font:600 10px Georgia,'Times New Roman',serif;letter-spacing:.11em;text-transform:uppercase;line-height:1.35}
 .home-celebration-text>b{display:block;margin:0;color:var(--paper);font:700 1.12rem Georgia,'Times New Roman',serif;line-height:1.2;overflow-wrap:anywhere}
 .home-celebration-text .date-line{display:block;margin-top:5px;color:var(--text-muted);font-size:.92rem;line-height:1.3}
+
+/* Navegação entre celebrações: rótulo acima e títulos equilibrados nos dois cartões. */
+.detail-navigation{align-items:stretch}
+.detail-navigation button{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:4px;text-align:left}
+.detail-navigation button:last-child{align-items:flex-end;text-align:right}
+.detail-navigation small{width:100%;line-height:1.3;white-space:normal}
+.detail-navigation b{display:-webkit-box;min-height:2.5em;line-height:1.25;white-space:normal;overflow-wrap:anywhere;overflow:hidden;text-overflow:ellipsis;-webkit-box-orient:vertical;-webkit-line-clamp:2}

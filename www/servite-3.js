@@ -945,12 +945,21 @@ function backFromRegra485(){
   render();
   window.scrollTo(0,0);
 }
+function reflowRuleProse(value){
+  const source=String(value||'').replace(/\r\n?/g,'\n');
+  const reflow=prose=>prose.split(/\n[ \t]*\n+/).map(paragraph=>paragraph.replace(/[ \t]*\n[ \t]*/g,' ').replace(/[ \t]{2,}/g,' ').trim()).filter(Boolean).join('\n\n');
+  const introMarker='O mesmo Espírito Santo';
+  const introAt=source.indexOf(introMarker);
+  if(introAt<0)return reflow(source);
+  const heading=source.slice(0,introAt).trimEnd();
+  return heading+'\n\n'+reflow(source.slice(introAt));
+}
 function viewRegra(){
   const r = PRAYERS.regra;
   if(state.regraChapter !== null){
     const isIntro = state.regraChapter === 'intro';
     const title = isIntro ? t('regraIntroLabel') : `${t('regraChapterLabel')} ${r.chapters[state.regraChapter].roman} — ${r.chapters[state.regraChapter].title}`;
-    const text = isIntro ? r.intro : r.chapters[state.regraChapter].text;
+    const text = reflowRuleProse(isIntro ? r.intro : r.chapters[state.regraChapter].text);
     return `
       <button class="regra-floating-back" onclick="backFromRegra485()" aria-label="Voltar">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
@@ -962,7 +971,7 @@ function viewRegra(){
       </div>
       ${langNoteHtml()}
       <div class="card fade-in">
-        <div class="prayer-block">${renderPrayer(text)}</div>
+        <div class="prayer-block regra-prose">${renderPrayer(text)}</div>
       </div>
     `;
   }

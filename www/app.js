@@ -1022,7 +1022,12 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
   const safe=value=>escapeHtml(String(value||''));
   function readingCards(group,label){
     const items=(Array.isArray(group)?group:(group?[group]:[])).filter(item=>item&&(item.texto||item.referencia||item.refrao));
-    return items.map((item,index)=>`<article class="daily-reading"><b>${safe(item.titulo||label+(items.length>1?' '+(index+1):''))}</b>${item.referencia?`<em>${safe(item.referencia)}</em>`:''}${item.refrao?`<em>${safe(item.refrao)}</em>`:''}<p>${safe(item.texto)}</p></article>`).join('');
+    return items.map((item,index)=>{
+      const title=String(item.titulo||'').trim();
+      const fallback=items.length>1?`${label} ${index+1}`:'';
+      const displayTitle=title&&title.localeCompare(label,'pt-BR',{sensitivity:'base'})!==0?title:fallback;
+      return `<article class="daily-reading">${displayTitle?`<b>${safe(displayTitle)}</b>`:''}${item.referencia?`<em>${safe(item.referencia)}</em>`:''}${item.refrao?`<em>${safe(item.refrao)}</em>`:''}<p>${safe(item.texto)}</p></article>`;
+    }).join('');
   }
   function section(title,body){return body?`<section class="daily-section"><h3>${safe(title)}</h3>${body}</section>`:''}
   function renderMass(payload,offline){
@@ -1055,7 +1060,7 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
       const data=await response.json();saveCache(selectedDate,data);target.innerHTML=renderMass({savedAt:new Date().toISOString(),data},false);
     }catch(error){if(!cached){const message=error?.name==='AbortError'?'A consulta demorou mais que o esperado. Verifique a conexão e tente novamente.':'Não foi possível acessar o serviço da Missa. Verifique a conexão e tente novamente.';target.innerHTML=`<div class="daily-error">${safe(message)}<br><button class="daily-retry" onclick="loadDailyLiturgy('${safe(selectedDate)}')">Tentar novamente</button></div>`;}}
   };
-  window.openDailyLiturgy=function(date){document.getElementById('dailyLiturgyOverlay').classList.add('open');document.getElementById('dailyLiturgyOverlay').setAttribute('aria-hidden','false');loadDailyLiturgy(date||localISO());};
+  window.openDailyLiturgy=function(date){const overlay=document.getElementById('dailyLiturgyOverlay');if(!overlay)return;overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');overlay.scrollTop=0;loadDailyLiturgy(date||localISO());};
   window.closeDailyLiturgy=function(){document.getElementById('dailyLiturgyOverlay').classList.remove('open');document.getElementById('dailyLiturgyOverlay').setAttribute('aria-hidden','true');if(document.body.classList.contains('celebration-mode'))toggleCelebrationMode();};
   window.moveDailyDate=function(amount){const date=new Date(selectedDate+'T12:00:00');date.setDate(date.getDate()+amount);loadDailyLiturgy(localISO(date));};
   
