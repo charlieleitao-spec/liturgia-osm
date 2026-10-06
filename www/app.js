@@ -1334,32 +1334,84 @@ loadCanonicalSantoral();
 
 /* Auto-recolhimento dos controles fixos durante a leitura */
 (function(){
-  var lastY = window.scrollY || document.documentElement.scrollTop || 0;
+  var lastTarget = window;
+  var lastY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+  var pendingY = lastY;
   var framePending = false;
+  var lastTouchY = null;
+  var touchTarget = window;
+
+  function scrollTarget(node){
+    while(node && node !== document.body && node !== document.documentElement){
+      if(node.nodeType === 1 && node.scrollHeight > node.clientHeight + 2){
+        var overflow = window.getComputedStyle(node).overflowY;
+        if(overflow === 'auto' || overflow === 'scroll') return node;
+      }
+      node = node.parentElement;
+    }
+    return window;
+  }
+  function readY(target){
+    if(!target || target === window || target === document || target === document.documentElement || target === document.body){
+      return Math.max(0, window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0);
+    }
+    return Math.max(0, Number(target.scrollTop) || 0);
+  }
   function revealControls(){
     document.body.classList.remove('scroll-controls-hidden');
-    lastY = window.scrollY || document.documentElement.scrollTop || 0;
   }
-  function updateControls(){
-    var y = Math.max(0, window.scrollY || document.documentElement.scrollTop || 0);
-    var delta = y - lastY;
-    if (y < 100 || delta < -3) {
-      document.body.classList.remove('scroll-controls-hidden');
-    } else if (y > 140 && delta > 3) {
-      document.body.classList.add('scroll-controls-hidden');
+  function hideControls(){
+    document.body.classList.add('scroll-controls-hidden');
+  }
+  function applyPosition(target, y){
+    if(target !== lastTarget){
+      lastTarget = target;
+      lastY = y;
+      if(y < 100) document.body.classList.remove('scroll-controls-hidden');
+      return;
     }
+    var delta = y - lastY;
+    if(y < 100 || delta < -3) document.body.classList.remove('scroll-controls-hidden');
+    else if(y > 140 && delta > 3) document.body.classList.add('scroll-controls-hidden');
     lastY = y;
     framePending = false;
   }
-  window.addEventListener('scroll', function(){
-    if (framePending) return;
+  function onScroll(event){
+    var target = event.target === document ? window : event.target;
+    var y = readY(target);
+    pendingY = y;
+    if(framePending) return;
     framePending = true;
-    window.requestAnimationFrame(updateControls);
+    window.requestAnimationFrame(function(){ applyPosition(target, pendingY); });
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  document.addEventListener('scroll', onScroll, true);
+  document.addEventListener('wheel', function(event){
+    var target = scrollTarget(event.target), y = readY(target);
+    if(event.deltaY > 3 && y > 120) hideControls();
+    else if(event.deltaY < -3 || y < 100) revealControls();
   }, {passive:true});
+  document.addEventListener('touchstart', function(event){
+    if(!event.touches || !event.touches.length) return;
+    lastTouchY = event.touches[0].clientY;
+    touchTarget = scrollTarget(event.target);
+    lastY = readY(touchTarget);
+    lastTarget = touchTarget;
+  }, {passive:true});
+  document.addEventListener('touchmove', function(event){
+    if(lastTouchY === null || !event.touches || !event.touches.length) return;
+    var y = event.touches[0].clientY;
+    var movement = lastTouchY - y;
+    var position = readY(touchTarget);
+    if(movement > 7) hideControls();
+    else if(movement < -7) revealControls();
+    lastTouchY = y;
+  }, {passive:true});
+  document.addEventListener('touchend', function(){ lastTouchY = null; }, {passive:true});
   document.addEventListener('focusin', function(event){
-    if (event.target && event.target.closest && event.target.closest('.tabbar, #floatingBack, #celebrationToggle')) revealControls();
+    if(event.target && event.target.closest && event.target.closest('.tabbar, #floatingBack, #celebrationToggle')) revealControls();
   });
   document.addEventListener('click', function(event){
-    if (event.target && event.target.closest && event.target.closest('.tabbar')) revealControls();
+    if(event.target && event.target.closest && event.target.closest('.tabbar')) revealControls();
   }, true);
 })();
