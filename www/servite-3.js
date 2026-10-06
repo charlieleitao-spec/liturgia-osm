@@ -954,6 +954,17 @@ function reflowRuleProse(value){
   const heading=source.slice(0,introAt).trimEnd();
   return heading+'\n\n'+reflow(source.slice(introAt));
 }
+function renderRuleParagraphs(value){
+  return String(value||'').replace(/\r\n?/g,'\n')
+    .split(/\n[ \t]*\n+/)
+    .map(paragraph=>paragraph.replace(/[ \t]*\n[ \t]*/g,' ').replace(/[ \t]{2,}/g,' ').trim())
+    .filter(Boolean)
+    .map(paragraph=>{
+      const article=paragraph.match(/^(\d+\.)(\s+)([\s\S]*)$/);
+      const content=article?'<strong class="rule-number">'+escapeHtml(article[1])+'</strong> '+escapeHtml(article[3]):escapeHtml(paragraph);
+      return '<p class="rule-paragraph">'+content+'</p>';
+    }).join('');
+}
 function viewRegra(){
   const r = PRAYERS.regra;
   if(state.regraChapter !== null){
@@ -970,8 +981,8 @@ function viewRegra(){
         <div class="detail-divider"></div>
       </div>
       ${langNoteHtml()}
-      <div class="card fade-in">
-        <div class="prayer-block regra-prose">${renderPrayer(text)}</div>
+      <div class="card fade-in regra-card">
+        ${isIntro?'<div class="prayer-block regra-prose">'+renderPrayer(text)+'</div>':'<div class="rule-prose">'+renderRuleParagraphs(text)+'</div>'}
       </div>
     `;
   }
