@@ -909,3 +909,42 @@ body.light-mode .crest{border-color:#b89a5b}
   text-transform:uppercase!important;
 }
 #view .prayer-block .rubric{white-space:normal!important;}
+
+
+/* Revisão responsiva: calendário, cabeçalho, Ofícios e navegação. */
+#view,.topbar-inner,.topbar-text,.home-actions,.presidency-grid,.office-hours-card,.office-hours-grid,.saint-row-hours,.hub-navigation-grid{box-sizing:border-box;min-width:0}
+#view>.toggle-row{width:100%;box-sizing:border-box}
+#view .calendar-month-select{display:block;width:100%;min-height:44px;box-sizing:border-box;margin:0 0 10px}
+#view .calendar-filters{max-width:100%;overscroll-behavior-inline:contain}
+#view .calendar-legend{display:flex;flex-wrap:wrap;gap:7px 12px}
+#view .calendar-toolbar{display:grid;grid-template-columns:42px minmax(0,1fr) 42px;align-items:center;gap:8px}
+#view .calendar-title{min-width:0;text-align:center;overflow-wrap:anywhere}
+#view .calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));width:100%;gap:clamp(3px,1.4vw,6px)}
+#view .cal-day{box-sizing:border-box;min-width:0;min-height:36px;aspect-ratio:1;padding:0;display:grid;place-items:center}
+#view .cal-head{min-width:0}
+#view .calendar-celebration-row{min-width:0}
+#view .office-hours-card,#view .saint-row-hours>.office-hours-grid{width:100%;max-width:100%;min-width:0}
+#view .saint-row-hours{grid-template-columns:40px minmax(0,1fr);width:100%}
+#view .saint-row-hours>.office-hours-grid{grid-column:1/-1}
+#view .office-hour-choice{box-sizing:border-box;width:100%;max-width:100%;min-width:0}
+#view .office-hour-copy{min-width:0}
+#view .office-hour-copy strong{font-weight:400!important;overflow-wrap:break-word;word-break:normal}
+#view .home-celebration,#view .home-action,#view .presidency-card{box-sizing:border-box;width:100%;min-width:0}
+#view .home-actions,#view .presidency-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+#view .hub-navigation-grid{grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:10px}
+#view .hub-navigation-grid>.hub-action{box-sizing:border-box;width:100%;min-width:0;min-height:64px;padding:12px;overflow-wrap:anywhere}
+#view .hub-navigation-grid>.hub-action:not(.hub-share){align-items:center;text-align:center}
+#view .hub-navigation-grid>.hub-action .hub-action-direction{width:100%;white-space:normal;overflow-wrap:break-word;text-align:center}
+#view .hub-navigation-grid>.hub-share{grid-column:1/-1}
+.topbar-inner{width:100%}
+.topbar-text{flex:1 1 auto}
+.topbar h1{max-width:100%;font-size:clamp(18px,5.6vw,22px);white-space:nowrap}
+@media(max-width:360px){
+  #view .home-actions,#view .presidency-grid{grid-template-columns:1fr}
+  #view .hub-navigation-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #view .hub-navigation-grid>.hub-action{padding:10px 7px;font-size:13px}
+  #view .hub-navigation-grid .hub-action-direction{font-size:14px!important}
+  #view .saint-row-hours{grid-template-columns:34px minmax(0,1fr)}
+  #view .saint-row-hours>.daynum{width:34px;height:34px}
+  #view .office-hour-choice{grid-template-columns:28px minmax(0,1fr) 14px!important;gap:7px!important;padding:8px!important}
+}
