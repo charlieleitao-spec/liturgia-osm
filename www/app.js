@@ -91,9 +91,37 @@ function shareSaint(id){
 function sharePrayer(title,text){ shareText(title,`${title}\n\n${text}\n\nLiturgia OSM`); }
 
 // render a prayer block, coloring "D." / "T." rubrics
+const PRAYER_CONTEXT_HEADINGS = /^(?:Comum|Nas festas marianas|Nas visitas de familiares e amigos|Nos momentos de alegria)$/i;
+const PRAYER_TEXT_HEADINGS = /^(?:Antífona(?: de entrada)?|Salmo(?:\s+[\d,.\-–—]+)?|Hino|Invitatório|Salmodia|Cântico(?: evangélico)?|Oração(?: própria| sálmica| sobre o cântico| das (?:Nove|Doze|Quinze) Horas)?|Leitura breve|Primeira leitura|Segunda leitura|Responsório(?: breve)?|Preces|Festa|Laudes|Vésperas|Hora Média)$/i;
+function prayerLineHtml(line){
+  const escaped = escapeHtml(line);
+  return escaped.replace(/^(D\.|T\.|C\.|L\.\d?|L\.)/, '<span class="rubric">$1</span>');
+}
 function renderPrayer(text){
-  const esc = escapeHtml(text);
-  return esc.replace(/^(D\.|T\.|C\.|L\.\d?|L\.)/gm, '<span class="rubric">$1</span>');
+  const blocks = [];
+  let stanza = [];
+  const flushStanza = () => {
+    if(!stanza.length) return;
+    blocks.push('<p class="prayer-stanza">'+stanza.map(prayerLineHtml).join('<br>')+'</p>');
+    stanza = [];
+  };
+  for(const rawLine of String(text ?? '').replace(/\r\n?/g,'\n').split('\n')){
+    const line = rawLine.trim();
+    if(!line){ flushStanza(); continue; }
+    if(PRAYER_CONTEXT_HEADINGS.test(line)){
+      flushStanza();
+      blocks.push('<h3 class="prayer-context-heading">'+escapeHtml(line)+'</h3>');
+      continue;
+    }
+    if(PRAYER_TEXT_HEADINGS.test(line)){
+      flushStanza();
+      blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
+      continue;
+    }
+    stanza.push(line);
+  }
+  flushStanza();
+  return blocks.join('');
 }
 
 // ===================== calendário litúrgico básico =====================
