@@ -967,7 +967,7 @@ function updateBackButton(){
   const button=document.getElementById('floatingBack');
   if(!button) return;
   const hasDetail=state.detailId!==null&&state.detailId!==undefined;
-  const overlay=['serviteOverlay','languageOverlay','mainMenuOverlay','dailyLiturgyOverlay',''].some(id=>document.getElementById(id)?.classList.contains('open'));
+  const overlay=['serviteOverlay','languageOverlay','mainMenuOverlay','dailyLiturgyOverlay'].some(id=>document.getElementById(id)?.classList.contains('open'));
   const inlineBack=!!document.querySelector('#view .hub-back, #view .back-btn');
   const needsBack=!!state.devo||state.devoSub!==null&&state.devoSub!==undefined||!!dailyPrayerOpen480;
   const visible=needsBack&&!inlineBack&&!overlay&&!hasDetail;
@@ -981,8 +981,6 @@ function smartBack(){
   const language=document.getElementById('languageOverlay');
   const servite=document.getElementById('serviteOverlay');
   const mass=document.getElementById('dailyLiturgyOverlay');
-  const hoursReader=document.getElementById('');
-  if(hoursReader&&hoursReader.classList.contains('open')&&typeof window.closeHoursReader==='function'){closeHoursReader();return true;}
   if(menu&&menu.classList.contains('open')){closeMainMenu();return true;}
   if(language&&language.classList.contains('open')){closeLanguagePanel();return true;}
   if(servite&&servite.classList.contains('open')){if(typeof closeServite==='function')closeServite();else servite.classList.remove('open');updateBackButton();return true;}
