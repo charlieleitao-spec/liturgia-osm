@@ -206,7 +206,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.41';
+const APP_VERSION = '4.9.42';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -792,166 +792,6 @@ function viewVida(){
 }
 function setLiturgiaSection(section){state.liturgiaSection=section;render();window.scrollTo(0,0);}
 
-const HOURS_API_BASE='https://liturgiadashoras.online/wp-json/wp/v2/posts';
-const PAULUS_HOURS_URL='https://www.paulus.com.br/portal/liturgia-diaria-das-horas/';
-let HOURS_TODAY_POSTS=[];
-function plainHoursTitle(value){
-  return String(value||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;|&#160;/gi,' ').replace(/&amp;/gi,'&').replace(/&quot;/gi,'"').replace(/&#8211;|&#x2013;/gi,'–').replace(/&#8212;|&#x2014;/gi,'—').replace(/&#39;|&apos;|&#8217;/gi,"'").replace(/\s+/g,' ').trim();
-}
-function selectDailyHoursPosts(posts){
-  const hourTitle=/laudes|of[ií]cio (?:d[aeo]s? )?leituras?|hora (?:interm[eé]dia|m[eé]dia|ter[cç]a|sexta|nona)|v[eé]speras|completas|invitat[oó]rio/i;
-  const seen=new Set();
-  return (Array.isArray(posts)?posts:[]).filter(function(post){
-    const title=plainHoursTitle(post?.title?.rendered);
-    if(!hourTitle.test(title)||!Number.isInteger(Number(post?.id))||Number(post.id)<1)return false;
-    let url;try{url=new URL(String(post?.link||''));}catch(error){return false;}
-    if(url.protocol!=='https:'||url.hostname!=='liturgiadashoras.online')return false;
-    const path=url.pathname.replace(/\/+$/,'')+'/';
-    if(seen.has(path))return false;
-    seen.add(path);
-    return true;
-  }).map(function(post){return {...post,plainTitle:plainHoursTitle(post.title?.rendered)};})
-    .sort(function(a,b){return String(b.date||'').localeCompare(String(a.date||''));})
-    .slice(0,14);
-}
-function localRestDateBound(baseDate,dayOffset){
-  const date=new Date(baseDate.getFullYear(),baseDate.getMonth(),baseDate.getDate()+dayOffset);
-  const pad=value=>String(value).padStart(2,'0');
-  const offset=-date.getTimezoneOffset(),sign=offset>=0?'+':'-',absolute=Math.abs(offset);
-  return date.getFullYear()+'-'+pad(date.getMonth()+1)+'-'+pad(date.getDate())+'T00:00:00'+sign+pad(Math.floor(absolute/60))+':'+pad(absolute%60);
-}
-function openHoursTodayPost(index){
-  const post=HOURS_TODAY_POSTS[Number(index)];
-  if(!post)return;
-  const overlay=document.getElementById('hoursReaderOverlay'),title=document.getElementById('hoursReaderTitle'),target=document.getElementById('hoursReaderContent');
-  if(!overlay||!title||!target)return;
-  title.textContent=post.plainTitle||'Liturgia das Horas';
-  const sourceLabel=document.getElementById('hoursReaderSource');if(sourceLabel)sourceLabel.textContent='Católico Orante · leitura no app';
-  target.innerHTML='<div class="daily-loading" role="status">Carregando o texto…</div>';
-  overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');
-  loadHoursPostContent(post,index);
-}
-function closeHoursReader(){
-  const overlay=document.getElementById('hoursReaderOverlay');
-  if(!overlay)return;
-  overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');
-  if(document.body.classList.contains('celebration-mode'))toggleCelebrationMode();
-  updateBackButton();
-}
-function sanitizeHoursPostMarkup(markup){
-  const doc=new DOMParser().parseFromString(String(markup||''),'text/html');
-  const blockedTags=new Set(['script','style','iframe','object','embed','form','input','select','textarea','button','svg','video','audio','canvas','template','noscript','img','picture','source','link','meta']);
-  const allowedTags=new Set(['p','div','span','br','hr','h1','h2','h3','h4','h5','h6','strong','b','em','i','u','s','sup','sub','blockquote','ul','ol','li','table','thead','tbody','tfoot','tr','th','td']);
-  const adLike=/(^|[\s_-])(ad|ads|advert|advertisement|sponsor|promoted|newsletter|share|social|comments?)([\s_-]|$)/i;
-  for(const element of Array.from(doc.body.querySelectorAll('*'))){
-    const classes=typeof element.className==='string'?element.className:'';
-    if(adLike.test((element.id||'')+' '+classes))element.remove();
-  }
-  function clean(node){
-    if(node.nodeType===Node.TEXT_NODE)return doc.createTextNode(node.nodeValue||'');
-    if(node.nodeType!==Node.ELEMENT_NODE)return null;
-    const tag=node.tagName.toLowerCase();
-    if(blockedTags.has(tag))return null;
-    const children=Array.from(node.childNodes).map(clean).filter(Boolean);
-    if(!allowedTags.has(tag)){
-      const fragment=doc.createDocumentFragment();children.forEach(child=>fragment.appendChild(child));return fragment;
-    }
-    const safeElement=doc.createElement(tag);
-    children.forEach(child=>safeElement.appendChild(child));
-    return safeElement;
-  }
-  const cleanBody=doc.createElement('div');
-  Array.from(doc.body.childNodes).map(clean).filter(Boolean).forEach(node=>cleanBody.appendChild(node));
-  return cleanBody.innerHTML.trim();
-}
-async function loadHoursPostContent(post,index){
-  const target=document.getElementById('hoursReaderContent');
-  if(!target)return;
-  const originalUrl=safeHoursPostUrl(post?.link);
-  try{
-    if(!Number.isInteger(Number(post?.id))||Number(post.id)<1||!originalUrl)throw new Error('Publicação inválida.');
-    const url=new URL(HOURS_API_BASE+'/'+encodeURIComponent(Number(post.id)));
-    url.searchParams.set('_fields','id,date,link,title,content');
-    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
-    let response;
-    try{response=await fetch(url.toString(),{headers:{Accept:'application/json'},signal:controller.signal});}finally{clearTimeout(timeout);}
-    if(!response.ok)throw new Error('Texto indisponível.');
-    const detail=await response.json(),detailUrl=safeHoursPostUrl(detail?.link);
-    if(Number(detail?.id)!==Number(post.id)||detailUrl?.href!==originalUrl.href)throw new Error('Fonte não confirmada.');
-    const body=sanitizeHoursPostMarkup(detail?.content?.rendered);
-    if(!body)throw new Error('A fonte não forneceu o texto para exibição no app.');
-    const date=String(detail.date||post.date||'').slice(0,10).split('-').reverse().join('/');
-    target.innerHTML='<div class="daily-source"><b>Fonte: Católico Orante</b>'+(date?' · publicação de '+escapeHtml(date):'')+'<br>Texto exibido nesta tela, sem abrir a página externa.</div><article class="daily-reading hours-reading">'+body+'</article>';
-  }catch(error){
-    const message=error?.name==='AbortError'?'A consulta demorou mais do que o esperado.':'Não foi possível exibir o texto nesta tela.';
-    target.innerHTML='<div class="daily-error" role="alert">'+message+'<br><button class="daily-retry" onclick="openHoursTodayPost('+Number(index)+')">Tentar novamente</button>'+'</div>';
-  }
-}
-function safeHoursPostUrl(value){
-  try{const url=new URL(String(value||''));return url.protocol==='https:'&&url.hostname==='liturgiadashoras.online'?url:null;}catch(error){return null;}
-}
-async function loadHoursTodayApi(){
-  const target=document.getElementById('hoursTodayApiResults');
-  if(!target)return;
-  if(!navigator.onLine){target.innerHTML='<p class="hours-api-status" role="status">A consulta das horas do dia precisa de conexão.</p>';return;}
-  target.innerHTML='<p class="hours-api-status" role="status">Consultando as publicações do dia…</p>';
-  const now=new Date(),url=new URL(HOURS_API_BASE);
-  url.searchParams.set('after',localRestDateBound(now,-1));
-  url.searchParams.set('before',localRestDateBound(now,1));
-  url.searchParams.set('per_page','100');
-  url.searchParams.set('_fields','id,date,link,title');
-  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
-  try{
-    const response=await fetch(url.toString(),{headers:{Accept:'application/json'},signal:controller.signal});
-    if(!response.ok)throw new Error('API indisponível');
-    HOURS_TODAY_POSTS=selectDailyHoursPosts(await response.json());
-    if(!HOURS_TODAY_POSTS.length){
-      target.innerHTML='<p class="hours-api-status" role="status">A API não retornou publicações de Ofício para hoje e a véspera.</p><button class="action-btn hours-api-link" onclick="loadHoursTodayApi()">Tentar novamente</button>';
-      return;
-    }
-    target.innerHTML='<p class="hours-api-status" role="status">Publicações de hoje e da véspera; algumas horas podem ser publicadas antecipadamente.</p>'+
-      HOURS_TODAY_POSTS.map(function(post,index){
-        const date=String(post.date||'').slice(0,10).split('-').reverse().join('/');
-        return '<button class="action-btn hours-api-link" onclick="openHoursTodayPost('+index+')">'+escapeHtml(post.plainTitle)+(date?' · '+escapeHtml(date):'')+'</button>';
-      }).join('');
-  }catch(error){
-    const note=error?.name==='AbortError'?'A consulta demorou mais do que o esperado.':'Não foi possível consultar a API agora.';
-    target.innerHTML='<p class="hours-api-status" role="status">'+note+'</p><button class="action-btn hours-api-link" onclick="loadHoursTodayApi()">Tentar novamente</button>';
-  }finally{clearTimeout(timeout);}
-}
-function paulusHoursDateMatches(value,date=new Date()){
-  const weekdays=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
-  const weekday=weekdays[date.getDay()],day=date.getDate();
-  return new RegExp('DIA\\s+0?'+day+'\\s*[–—-]\\s*'+weekday,'i').test(String(value||''));
-}
-async function loadPaulusHours(){
-  const overlay=document.getElementById('hoursReaderOverlay'),title=document.getElementById('hoursReaderTitle'),sourceLabel=document.getElementById('hoursReaderSource'),target=document.getElementById('hoursReaderContent');
-  if(!overlay||!title||!target)return;
-  title.textContent='Laudes de hoje';if(sourceLabel)sourceLabel.textContent='Paulus · leitura no app';
-  target.innerHTML='<div class="daily-loading" role="status">Consultando a Paulus…</div>';
-  overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');updateBackButton();
-  const now=new Date(),controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
-  try{
-    if(!navigator.onLine)throw new Error('Sem conexão.');
-    const response=await fetch(PAULUS_HOURS_URL,{headers:{Accept:'text/html'},signal:controller.signal});
-    if(!response.ok)throw new Error('Página indisponível.');
-    const finalUrl=new URL(response.url||PAULUS_HOURS_URL);
-    if(finalUrl.protocol!=='https:'||finalUrl.hostname!=='www.paulus.com.br'||!finalUrl.pathname.startsWith('/portal/liturgia-diaria-das-horas/'))throw new Error('Fonte não confirmada.');
-    const page=await response.text(),doc=new DOMParser().parseFromString(page,'text/html');
-    const daily=doc.querySelector('#interno, .interno, main article, article');
-    const dailyText=daily?.textContent||doc.body?.textContent||'';
-    if(!paulusHoursDateMatches(dailyText,now))throw new Error('A página não corresponde à data de hoje.');
-    const article=doc.querySelector('#interno .texto, .interno .texto, main article .texto, article .texto');
-    if(!article||!/(laudes\s*\(manhã\)|laudes)/i.test(article.textContent||''))throw new Error('Laudes de hoje não encontradas.');
-    const body=sanitizeHoursPostMarkup(article.innerHTML);
-    if(!body)throw new Error('Texto indisponível.');
-    const date=new Intl.DateTimeFormat('pt-BR').format(now);
-    target.innerHTML='<div class="daily-source"><b>Fonte: Paulus Editora</b> · Liturgia Diária das Horas · '+escapeHtml(date)+'<br>Prévia experimental das Laudes, exibida nesta tela.</div><article class="daily-reading hours-reading">'+body+'</article>';
-  }catch(error){
-    const note=error?.name==='AbortError'?'A consulta demorou mais do que o esperado.':'Não foi possível carregar as Laudes da Paulus nesta tela.';
-    target.innerHTML='<div class="daily-error" role="alert">'+note+'<br><button class="daily-retry" onclick="loadPaulusHours()">Tentar novamente</button></div>';
-  }finally{clearTimeout(timeout);}
-}
 function viewLiturgia(){
   const section=state.liturgiaSection||'missa';
   const switcher=`<div class="toggle-row" aria-label="Seções de Liturgia">
@@ -960,7 +800,7 @@ function viewLiturgia(){
   </div>`;
   if(section==='horas'){
     const saints=SANTORAL.filter(s=>saintHasOffice(s));
-    const todayBlock='<div class="card fade-in"><div class="rowtitle">Liturgia das Horas de hoje</div><p class="reader-note">'+escapeHtml(formatLiturgicalDate())+'</p><button class="action-btn" onclick="openServite(\'oficio\')">Abrir Ofício próprio OSM</button><p class="reader-note" style="text-align:left;margin:12px 0 8px;">Escolha uma fonte para ler nesta tela. A opção Paulus é uma prévia experimental das Laudes.</p><button class="action-btn" onclick="loadHoursTodayApi()">Consultar as horas de hoje · Católico Orante</button><button class="action-btn" onclick="loadPaulusHours()">Experimentar Laudes de hoje · Paulus</button><div id="hoursTodayApiResults" class="hours-api-results" aria-live="polite"></div></div>';
+    const todayBlock='<div class="card fade-in"><div class="rowtitle">Liturgia das Horas de hoje</div><p class="reader-note">'+escapeHtml(formatLiturgicalDate())+'</p><button class="action-btn" onclick="openServite(\'oficio\')">Abrir Ofício próprio OSM</button><p class="reader-note" style="text-align:left;margin:12px 0 8px;">Acesse a Liturgia das Horas nos sites das editoras.</p><a class="action-btn hours-api-link" href="https://liturgiadashoras.online/category/horas-canonicas/" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event, this.href)">Católico Orante · Liturgia das Horas</a><a class="action-btn hours-api-link" href="https://www.paulus.com.br/portal/liturgia-diaria-das-horas/" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event, this.href)">Paulus · Liturgia Diária das Horas</a></div>';
     const officeWarning=!oficiosReady?'<div class="card" role="alert"><p>O cadastro local dos Ofícios está indisponível. A Vida e as orações continuam acessíveis.</p><button class="action-btn" onclick="loadCanonicalOffices()">Tentar carregar os Ofícios</button></div>':'';
     const ownBlocks='<div class="section-title">Ofícios e textos próprios OSM</div><p class="reader-note">A celebração do santo abre somente as horas disponíveis no texto.</p>'+
       '<div class="card fade-in" style="padding:6px 16px;">'+saints.map(function(s){return '<div class="saint-row saint-row-hours"><div class="daynum">'+s.day+'</div><div class="rowtext"><div class="rowtitle">'+escapeHtml(s.title)+'</div><div class="rowrank">'+escapeHtml(s.date)+'</div></div><div class="office-hours-grid">'+officeHoursForSaint(s).map(function(pair){return officeHourButtonHtml(s,pair);}).join('')+'</div></div>';}).join('')+'</div>';
@@ -1127,7 +967,7 @@ function updateBackButton(){
   const button=document.getElementById('floatingBack');
   if(!button) return;
   const hasDetail=state.detailId!==null&&state.detailId!==undefined;
-  const overlay=['serviteOverlay','languageOverlay','mainMenuOverlay','dailyLiturgyOverlay','hoursReaderOverlay'].some(id=>document.getElementById(id)?.classList.contains('open'));
+  const overlay=['serviteOverlay','languageOverlay','mainMenuOverlay','dailyLiturgyOverlay',''].some(id=>document.getElementById(id)?.classList.contains('open'));
   const inlineBack=!!document.querySelector('#view .hub-back, #view .back-btn');
   const needsBack=!!state.devo||state.devoSub!==null&&state.devoSub!==undefined||!!dailyPrayerOpen480;
   const visible=needsBack&&!inlineBack&&!overlay&&!hasDetail;
@@ -1141,7 +981,7 @@ function smartBack(){
   const language=document.getElementById('languageOverlay');
   const servite=document.getElementById('serviteOverlay');
   const mass=document.getElementById('dailyLiturgyOverlay');
-  const hoursReader=document.getElementById('hoursReaderOverlay');
+  const hoursReader=document.getElementById('');
   if(hoursReader&&hoursReader.classList.contains('open')&&typeof window.closeHoursReader==='function'){closeHoursReader();return true;}
   if(menu&&menu.classList.contains('open')){closeMainMenu();return true;}
   if(language&&language.classList.contains('open')){closeLanguagePanel();return true;}
