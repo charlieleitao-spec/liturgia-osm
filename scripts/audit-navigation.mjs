@@ -21,7 +21,7 @@ for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data
 assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
-assert.match(app, /const APP_VERSION = ['"]4\.9\.36['"]/);
+assert.match(app, /const APP_VERSION = ['"]4\.9\.37['"]/);
 assert.match(app, /addListener\(['"]backButton['"]/);
 assert.match(app, /function saintRankSubtitle/);
 assert.match(css, /text-align:\s*center/);
