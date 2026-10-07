@@ -6,9 +6,20 @@ let oficiosReady = false;
 let oficiosLoadError = false;
 let santoralLoading = true;
 let santoralLoadError = false;
+function saintFallbackMonogram(s){
+  const title=String(s?.title||'').replace(/^(?:B(?:\.A)?\.|São|Santo|Santa|Servo de Deus)\s+/i,'');
+  const words=(title.match(/[A-Za-zÀ-ÖØ-öø-ÿ0-9]+/g)||[]).filter(word=>!['a','as','da','das','de','do','dos','e','o','os'].includes(word.toLocaleLowerCase('pt-BR')));
+  return (words.slice(0,2).map(word=>Array.from(word)[0]).join('')||'OSM').toLocaleUpperCase('pt-BR');
+}
 function saintImageHtml(s, detail=false){
   const src=s.image;
-  if(!src) return '';
+  if(!src){
+    const label=`Imagem não disponível para ${escapeHtml(s.title)}`;
+    const mark=escapeHtml(saintFallbackMonogram(s));
+    return detail
+      ? `<div class="saint-image-detail saint-image-placeholder fade-in" role="img" aria-label="${label}"><span>${mark}</span></div>`
+      : `<div class="saint-thumb saint-thumb--fallback" role="img" aria-label="${label}"><span>${mark}</span></div>`;
+  }
   return detail ? `<div class="saint-image-detail fade-in"><img src="${src}" alt="Imagem de ${escapeHtml(s.title)}"></div>` : `<div class="saint-thumb"><img src="${src}" alt="Imagem de ${escapeHtml(s.title)}"></div>`;
 }
 function saintRankSubtitle(s){
@@ -91,11 +102,88 @@ function shareSaint(id){
 function sharePrayer(title,text){ shareText(title,`${title}\n\n${text}\n\nLiturgia OSM`); }
 
 // render a prayer block, coloring "D." / "T." rubrics
-function renderPrayer(text){
-  const esc = escapeHtml(text);
-  return esc.replace(/^(D\.|T\.|C\.|L\.\d?|L\.)/gm, '<span class="rubric">$1</span>');
+const PRAYER_CONTEXT_HEADINGS = /^(?:Comum|Nas festas marianas|Nas visitas de familiares e amigos|Nos momentos de alegria)$/i;
+const PRAYER_TEXT_HEADINGS = /^(?:Antífona(?: de entrada)?|Salmo(?:\s+[\d,.\-–—]+)?|Hino|Invitatório|Salmodia|Cântico(?: evangélico)?|Oração(?: própria| sálmica| sobre o cântico| das (?:Nove|Doze|Quinze) Horas)?|Leitura breve|Introdução(?: à leitura| às leituras)?|Absolvição|Primeira leitura|Segunda leitura|Terceira leitura|Responsório(?: breve)?|Preces|Festa|Laudes|Vésperas|Hora Média|Salve Rainha|Oremos|Oração pela Igreja pela Ordem|À VIRGEM DO (?:SIM|\"MAGNIFICAT\"))$/i;
+function prayerLineHtml(line, vigilia=false){
+  let escaped = escapeHtml(line).replace(/^(D\.|T\.|C\.|R\.|V\.|A\.|B\.|L\d?:|L\.)/, '<span class="rubric">$1</span>');
+  if(vigilia) escaped = escaped.replace(/^([–—=]\s*)(\d{1,3})(?=[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ])/, '$1<span class="verse-number">$2</span> ');
+  return escaped;
 }
-
+function formatPrayerStanza(lines, vigilia, hymnMode){
+  if(!vigilia || hymnMode) return lines.map(line=>prayerLineHtml(line,vigilia)).join('<br>');
+  const speaker = /^(?:D\.|T\.|C\.|R\.|V\.|A\.|B\.|L\d?:|L\.)\s*/;
+  if(lines.some(line=>speaker.test(line))){
+    const turns=[];
+    for(const line of lines){
+      if(speaker.test(line) || !turns.length) turns.push([line]);
+      else turns[turns.length-1].push(line);
+    }
+    return turns.map(turn=>turn.map(line=>prayerLineHtml(line,true)).join(' ')).join('<br>');
+  }
+  const verse = /^[–—=]\s*/;
+  if(lines.some(line=>verse.test(line))){
+    const verses=[];
+    for(const line of lines){
+      if(verse.test(line) || !verses.length) verses.push([line]);
+      else verses[verses.length-1].push(line);
+    }
+    return verses.map(group=>group.map(line=>prayerLineHtml(line,true)).join(' ')).join('<br>');
+  }
+  return lines.map(line=>prayerLineHtml(line,true)).join(' ');
+}
+function renderPrayer(text, options={}){
+  const vigilia = options.vigilia === true;
+  let source = String(text ?? '');
+  if(vigilia){
+    source = source
+      .replace(/([A-Za-zÀ-ÿ])-\n[ \t]*([a-zà-ÿ])/g, '$1-$2')
+      .replace(/^(Primeira fórmula|Segunda fórmula)\n[ \t]*Santa Maria,?\n[ \t]*(Senhora Dos Seus Servos|Serva Do Senhor)/im,
+        (_, formula, title)=>formula+'\nSanta Maria, '+title.replace(/Dos Seus Servos/i,'dos seus servos').replace(/Do Senhor/i,'do Senhor'));
+  }
+  const blocks = [];
+  let stanza = [];
+  let hymnMode = false;
+  let pendingPsalmCaption = false;
+  const flushStanza = () => {
+    if(!stanza.length) return;
+    blocks.push('<p class="prayer-stanza">'+formatPrayerStanza(stanza,vigilia,hymnMode)+'</p>');
+    stanza = [];
+  };
+  for(const rawLine of source.replace(/\r\n?/g,'\n').split('\n')){
+    const line = rawLine.trim();
+    if(!line){ flushStanza(); continue; }
+    if(vigilia && pendingPsalmCaption){
+      flushStanza();
+      blocks.push('<h5 class="prayer-psalm-caption">'+escapeHtml(line)+'</h5>');
+      pendingPsalmCaption = false;
+      continue;
+    }
+    if(PRAYER_CONTEXT_HEADINGS.test(line) || (vigilia && /^(?:Primeira|Segunda) fórmula$/i.test(line))){
+      flushStanza();
+      blocks.push('<h3 class="prayer-context-heading">'+escapeHtml(line)+'</h3>');
+      hymnMode = false;
+      pendingPsalmCaption = false;
+      continue;
+    }
+    if(vigilia && /^Santa Maria, (?:Senhora dos seus servos|Serva do Senhor)$/i.test(line)){
+      flushStanza();
+      blocks.push('<h4 class="prayer-formula-title">'+escapeHtml(line)+'</h4>');
+      hymnMode = false;
+      continue;
+    }
+    if(PRAYER_TEXT_HEADINGS.test(line) || (vigilia && /^Salmo\b/i.test(line))){
+      flushStanza();
+      blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
+      hymnMode = /^Hino$/i.test(line);
+      pendingPsalmCaption = vigilia && /^Salmo\b/i.test(line);
+      continue;
+    }
+    if(vigilia && /^\d+ª Ant\./i.test(line)) hymnMode = false;
+    stanza.push(line);
+  }
+  flushStanza();
+  return blocks.join('');
+}
 // ===================== calendário litúrgico básico =====================
 function easterSunday(year){
   const a=year%19, b=Math.floor(year/100), c=year%100, d=Math.floor(b/4), e=b%4;
@@ -118,7 +206,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.36';
+const APP_VERSION = '4.9.38';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -221,7 +309,7 @@ function viewHoje(){
   const online=navigator.onLine!==false;
   let celebrationCard='<div class="empty-state">Não há celebração servita cadastrada para hoje.</div>';
   if(celebration){
-    const label=saint?'Celebração de hoje':'Próxima celebração OSM';
+    const label=saint?'Celebração de hoje':'Próxima celebração';
     celebrationCard='<button class="home-celebration card fade-in" onclick="openDetail('+celebration._id+')" aria-label="Abrir '+escapeHtml(celebration.title)+'">'+
       saintImageHtml(celebration,false)+
       '<span class="home-celebration-text"><span class="rank">'+label+'</span><b>'+escapeHtml(celebration.title)+'</b><span class="date-line">'+escapeHtml(celebration.date)+'</span></span><span class="chev">›</span></button>'+
@@ -232,7 +320,7 @@ function viewHoje(){
   }
   const prayer=dailyPrayerSuggestion();
   return '<div class="connection-strip '+(online?'':'offline')+'"><span class="connection-dot"></span><strong>'+(online?'Aplicativo disponível':'Modo offline ativo')+'</strong><span>Conteúdo salvo no aparelho</span></div>'+
-    '<section class="liturgical-hero home-hero fade-in"><div class="liturgical-kicker">Ordem dos Servos de Maria</div><div class="home-date-line"><strong>'+today.day+'</strong><span>'+escapeHtml(MONTHS[today.month-1])+'</span></div><div class="liturgical-title">Ao lado da Mãe, aos pés da Cruz</div><div class="liturgical-sub">'+escapeHtml(today.weekday)+'</div></section>'+
+    '<section class="liturgical-hero home-hero fade-in"><div class="liturgical-kicker">Ordem dos Servos de Maria</div><div class="home-date-line"><strong>'+today.day+'</strong><span>'+escapeHtml(MONTHS[today.month-1])+'</span></div><div class="liturgical-sub">'+escapeHtml(today.weekday)+'</div></section>'+
     '<div class="section-title home-heading">Celebração Servita</div>'+celebrationCard+
     '<div class="section-title home-heading">Encontrar uma celebração</div><div class="home-actions fade-in">'+
       '<button class="home-action" onclick="setTab(\'calendario\')"><span class="home-action-icon">▦</span><b>Calendário</b><small>Escolha qualquer data</small></button>'+
@@ -482,9 +570,14 @@ function viewDevoDetail(key){
 
 function backToOracoes(){ state.devo=null; state.devoSub=null; render(); window.scrollTo(0,0); }
 
-function simpleTextDetail(title, sub, text, backFn){
+function normalizeVigiliaLineWraps(text){
+  return String(text ?? '').replace(/([A-Za-zÀ-ÿ])-\n[ \t]*([a-zà-ÿ])/g, '$1-$2');
+}
+function simpleTextDetail(title, sub, text, backFn, readingClass){
   pendingSharePrayer={title,text};
   const back = backFn || 'backToOracoes()';
+  const readerClass = readingClass === 'vigilia-reader' ? ' vigilia-reader' : '';
+  const renderedText = readingClass === 'vigilia-reader' ? normalizeVigiliaLineWraps(text) : text;
   return `
     <button class="back-btn" onclick="${back}">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
@@ -496,8 +589,8 @@ function simpleTextDetail(title, sub, text, backFn){
       <div class="action-row"><button class="action-btn" id="sharePrayerBtn">Partilhar oração</button></div>
       <div class="detail-divider"></div>
     </div>
-    <div class="card fade-in">
-      <div class="prayer-block">${renderPrayer(text)}</div>
+    <div class="card fade-in${readerClass}">
+      <div class="prayer-block">${renderPrayer(renderedText, {vigilia:readingClass === 'vigilia-reader'})}</div>
     </div>
   `;
 }
@@ -507,7 +600,7 @@ function viewVigilia(){
   if(state.devoSub){
     const f = PRAYERS.devotions.vigilia[state.devoSub];
     const title = state.devoSub === 'formula1' ? 'Primeira Fórmula' : 'Segunda Fórmula';
-    return simpleTextDetail(title, 'Vigília de Nossa Senhora', f, "openDevo('vigilia')");
+    return simpleTextDetail(title, 'Vigília de Nossa Senhora', f, "openDevo('vigilia')", 'vigilia-reader');
   }
   return `
     <button class="back-btn" onclick="backToOracoes()">
@@ -874,7 +967,9 @@ function updateBackButton(){
   if(!button) return;
   const hasDetail=state.detailId!==null&&state.detailId!==undefined;
   const overlay=['serviteOverlay','languageOverlay','mainMenuOverlay','dailyLiturgyOverlay'].some(id=>document.getElementById(id)?.classList.contains('open'));
-  const visible=hasDetail||!!state.devo||state.devoSub!==null&&state.devoSub!==undefined||!!dailyPrayerOpen480||overlay||state.tab!=='hoje';
+  const inlineBack=!!document.querySelector('#view .hub-back, #view .back-btn');
+  const needsBack=!!state.devo||state.devoSub!==null&&state.devoSub!==undefined||!!dailyPrayerOpen480;
+  const visible=needsBack&&!inlineBack&&!overlay&&!hasDetail;
   button.classList.toggle('show',visible);
   button.setAttribute('aria-label',hasDetail?'Voltar à origem':'Voltar para Hoje');
   button.title=hasDetail?'Voltar à origem':'Voltar para Hoje';
@@ -1002,7 +1097,7 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
     try{if(active&&navigator.wakeLock)wakeLock=await navigator.wakeLock.request('screen');else if(wakeLock){await wakeLock.release();wakeLock=null;}}catch(e){}
     showToast(active?'Modo celebração ativado.':'Modo celebração encerrado.');
   };
-  function updateCelebrationButton(){const b=document.getElementById('celebrationToggle');if(!b)return;const dailyOpen=typeof dailyPrayerOpen480!=='undefined'&&!!dailyPrayerOpen480;const reading=state.detailId!==null||!!state.devo||!!state.devoSub||dailyOpen;b.classList.toggle('show',reading||document.body.classList.contains('celebration-mode'));}
+  function updateCelebrationButton(){const b=document.getElementById('celebrationToggle');if(!b)return;const dailyOpen=typeof dailyPrayerOpen480!=='undefined'&&!!dailyPrayerOpen480;const reading=!!state.devo||!!state.devoSub||dailyOpen;const inlineMode=!!document.querySelector('#view .hub-mode-button');b.classList.toggle('show',(reading&&!inlineMode)||document.body.classList.contains('celebration-mode'));}
   window.updateCelebrationButton=updateCelebrationButton;
   render();
 })();
@@ -1017,12 +1112,32 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
   const localISO=(date=new Date())=>`${date.getFullYear()}-${two(date.getMonth()+1)}-${two(date.getDate())}`;
   const cacheKey=date=>CACHE_PREFIX+date;
   const CACHE_MAX_AGE=30*24*60*60*1000;
+  function pruneDailyMassCache(now=Date.now()){
+    try{
+      for(let i=localStorage.length-1;i>=0;i--){
+        const key=localStorage.key(i);
+        if(!key||!key.startsWith(CACHE_PREFIX))continue;
+        let saved;
+        try{saved=Date.parse(JSON.parse(localStorage.getItem(key)||'null')?.savedAt||'');}catch(e){saved=NaN;}
+        if(!Number.isFinite(saved)||now-saved>CACHE_MAX_AGE)localStorage.removeItem(key);
+      }
+    }catch(error){console.warn('[Liturgia OSM] Não foi possível limpar o cache antigo da Missa.',error);}
+  }
+  pruneDailyMassCache();
   const readCache=date=>{try{const key=cacheKey(date),cached=JSON.parse(localStorage.getItem(key)||'null'),saved=Date.parse(cached?.savedAt||'');if(!cached||!Number.isFinite(saved)||Date.now()-saved>CACHE_MAX_AGE){localStorage.removeItem(key);return null;}return cached;}catch(e){return null}};
   const saveCache=(date,data)=>{try{localStorage.setItem(cacheKey(date),JSON.stringify({savedAt:new Date().toISOString(),data}))}catch(e){}};
   const safe=value=>escapeHtml(String(value||''));
+  function readingBody(value,label){
+    const scripture=/leitura|evangelho/i.test(String(label||''));
+    return String(value||'').trim().split(/\n\s*\n/).filter(Boolean).map(paragraph=>{
+      let html=safe(paragraph.trim()).replace(/\r?\n/g,'<br>');
+      if(scripture)html=html.replace(/(^|\s)(\d{1,3})(?=[A-Za-zÀ-ÿ])/g,'$1<sup class="verse-number">$2</sup> ');
+      return `<p class="reading-paragraph">${html}</p>`;
+    }).join('');
+  }
   function readingCards(group,label){
     const items=(Array.isArray(group)?group:(group?[group]:[])).filter(item=>item&&(item.texto||item.referencia||item.refrao));
-    return items.map((item,index)=>`<article class="daily-reading"><b>${safe(item.titulo||label+(items.length>1?' '+(index+1):''))}</b>${item.referencia?`<em>${safe(item.referencia)}</em>`:''}${item.refrao?`<em>${safe(item.refrao)}</em>`:''}<p>${safe(item.texto)}</p></article>`).join('');
+    return items.map((item,index)=>`<article class="daily-reading"><b>${safe(item.titulo||label+(items.length>1?' '+(index+1):''))}</b>${item.referencia?`<em>${safe(item.referencia)}</em>`:''}${item.refrao?`<em>${safe(item.refrao)}</em>`:''}${readingBody(item.texto,label)}</article>`).join('');
   }
   function section(title,body){return body?`<section class="daily-section"><h3>${safe(title)}</h3>${body}</section>`:''}
   function renderMass(payload,offline){
@@ -1044,6 +1159,8 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
   }
   window.loadDailyLiturgy=async function(date){
     selectedDate=date||localISO(); const input=document.getElementById('dailyLiturgyDate');if(input)input.value=selectedDate;
+    const dateDisplay=document.getElementById('dailyLiturgyDateDisplay');
+    if(dateDisplay){const [year,month,day]=selectedDate.split('-');dateDisplay.textContent=day+'/'+month+'/'+year;dateDisplay.setAttribute('aria-label','Data selecionada: '+day+'/'+month+'/'+year);}
     const target=document.getElementById('dailyLiturgyContent'),cached=readCache(selectedDate);
     if(!target)return;
     if(cached)target.innerHTML=renderMass(cached,true);else target.innerHTML='<div class="daily-loading">Carregando a liturgia…</div>';
@@ -1053,7 +1170,7 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
       const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),12000);let response;try{response=await fetch(`${API}?dia=${day}&mes=${month}&ano=${year}`,{headers:{Accept:'application/json'},signal:controller.signal});}finally{clearTimeout(timeout);}
       if(!response.ok)throw new Error('Liturgia não encontrada');
       const data=await response.json();saveCache(selectedDate,data);target.innerHTML=renderMass({savedAt:new Date().toISOString(),data},false);
-    }catch(error){if(!cached){const message=error?.name==='AbortError'?'A consulta demorou mais que o esperado. Verifique a conexão e tente novamente.':'Não foi possível acessar o serviço da Missa. Verifique a conexão e tente novamente.';target.innerHTML=`<div class="daily-error">${safe(message)}<br><button class="daily-retry" onclick="loadDailyLiturgy('${safe(selectedDate)}')">Tentar novamente</button></div>`;}}
+    }catch(error){if(!cached){const message=error?.message==='Liturgia não encontrada'?'Não há texto da Missa disponível para esta data.':error?.name==='AbortError'?'O serviço da Missa não respondeu no prazo e não há cópia local para esta data.':'O serviço da Missa está indisponível e não há cópia local para esta data. Verifique a conexão e tente novamente.';target.innerHTML=`<div class="daily-error">${safe(message)}<br><button class="daily-retry" onclick="loadDailyLiturgy('${safe(selectedDate)}')">Tentar novamente</button></div>`;}}
   };
   window.openDailyLiturgy=function(date){document.getElementById('dailyLiturgyOverlay').classList.add('open');document.getElementById('dailyLiturgyOverlay').setAttribute('aria-hidden','false');loadDailyLiturgy(date||localISO());};
   window.closeDailyLiturgy=function(){document.getElementById('dailyLiturgyOverlay').classList.remove('open');document.getElementById('dailyLiturgyOverlay').setAttribute('aria-hidden','true');if(document.body.classList.contains('celebration-mode'))toggleCelebrationMode();};
@@ -1231,10 +1348,10 @@ loadCanonicalSantoral();
     if(index<0||!ordered.length)return hubEmpty('Navegação entre celebrações indisponível.');
     const previous=ordered[(index+ordered.length-1)%ordered.length];
     const next=ordered[(index+1)%ordered.length];
-    return '<div class="hub-navigation-grid">'+
-      '<button class="hub-action" onclick="openSaint('+previous._id+')">‹ Anterior <span>'+escapeHtml(previous.title)+'</span></button>'+
-      '<button class="hub-action" onclick="openSaint('+next._id+')">Próxima <span>'+escapeHtml(next.title)+' ›</span></button>'+
-      '<button class="hub-action hub-share" onclick="shareSaint('+s._id+')">Compartilhar celebração <span>↗</span></button></div>';
+    return '<nav class="hub-navigation-grid" aria-label="Navegação entre celebrações">'+
+      '<button class="hub-action" aria-label="Celebração anterior" onclick="openSaint('+previous._id+')"><span class="hub-action-direction">‹ Anterior</span></button>'+
+      '<button class="hub-action" aria-label="Próxima celebração" onclick="openSaint('+next._id+')"><span class="hub-action-direction">Próxima ›</span></button>'+
+      '<button class="hub-action hub-share" onclick="shareSaint('+s._id+')"><span class="hub-action-direction">Compartilhar celebração</span><span class="hub-share-icon">↗</span></button></nav>';
   }
   window.renderCelebrationHub=function(id){
     const saint=SANTORAL.find(item=>item._id===id||item.id===id);
@@ -1246,7 +1363,7 @@ loadCanonicalSantoral();
       '<h1 class="hub-life-title">'+escapeHtml(saint.title)+'</h1>'+
       '<div class="hub-life-meta">'+escapeHtml(saint.date)+'</div>'+
       '<div class="hub-life-bio">'+escapeHtml(saint.bio||'Biografia não cadastrada.')+'</div></div>';
-    return '<button class="hub-back" onclick="closeDetail()">‹ '+backLabel+'</button>'+
+    return '<div class="hub-top-actions"><button class="hub-back" onclick="closeDetail()">‹ '+backLabel+'</button><button class="hub-mode-button" onclick="toggleCelebrationMode()">Modo celebração</button></div>'+
       '<div class="saint-hub">'+
       '<section class="hub-block" id="hub-vida"><div class="hub-block-title">Vida</div>'+life+'</section>'+
       '<section class="hub-block" id="hub-liturgia"><div class="hub-block-title">Liturgia</div>'+liturgyBlock(saint)+'</section>'+
@@ -1285,3 +1402,67 @@ loadCanonicalSantoral();
   render();
 })();
 /* END SCRIPT BLOCK: canonicalNavigation4926 */
+
+
+/* Recolhe a navegação durante a leitura e a mostra ao tocar ou rolar para cima. */
+(function(){
+  var lastTarget = window;
+  var lastY = readY(window);
+  var touchStartY = null;
+  var touchLastY = null;
+  var touchMoved = false;
+  function readY(target){
+    if(!target || target === window || target === document || target === document.documentElement || target === document.body){
+      return Math.max(0, window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0);
+    }
+    return Math.max(0, Number(target.scrollTop) || 0);
+  }
+  function normalizeTarget(target){
+    return !target || target === document || target === document.documentElement || target === document.body ? window : target;
+  }
+  function show(){ document.body.classList.remove('scroll-controls-hidden'); }
+  function hide(){ document.body.classList.add('scroll-controls-hidden'); }
+  function onScroll(event){
+    var target = normalizeTarget(event.target);
+    var y = readY(target);
+    if(target !== lastTarget){
+      lastTarget = target;
+      lastY = y;
+      if(y > 140) hide(); else show();
+      return;
+    }
+    if(y < 100 || y < lastY - 1) show();
+    else if(y > 140 && y > lastY + 1) hide();
+    lastY = y;
+  }
+  document.addEventListener('scroll', onScroll, true);
+  window.addEventListener('scroll', onScroll, {passive:true});
+  document.addEventListener('touchstart', function(event){
+    if(!event.touches || !event.touches.length) return;
+    touchStartY = touchLastY = event.touches[0].clientY;
+    touchMoved = false;
+  }, {passive:true, capture:true});
+  document.addEventListener('touchmove', function(event){
+    if(touchLastY === null || !event.touches || !event.touches.length) return;
+    var y = event.touches[0].clientY;
+    var delta = touchLastY - y;
+    if(Math.abs(y - touchStartY) > 7) touchMoved = true;
+    if(delta > 4) hide();
+    else if(delta < -4) show();
+    touchLastY = y;
+  }, {passive:true, capture:true});
+  document.addEventListener('touchend', function(){
+    if(!touchMoved) show();
+    touchStartY = touchLastY = null;
+  }, {passive:true, capture:true});
+  document.addEventListener('touchcancel', function(){
+    touchStartY = touchLastY = null;
+  }, {passive:true, capture:true});
+  document.addEventListener('wheel', function(event){
+    if(event.deltaY > 2) hide();
+    else if(event.deltaY < -2) show();
+  }, {passive:true, capture:true});
+  document.addEventListener('click', function(event){
+    if(event.target && event.target.closest && event.target.closest('.tabbar, #floatingBack, #celebrationToggle')) show();
+  }, true);
+})();

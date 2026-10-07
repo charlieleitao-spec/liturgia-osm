@@ -12,11 +12,12 @@ const sw = read('www/sw.js');
 const santoral = json('www/data/santoral.json');
 const offices = json('www/data/oficios-osm.json');
 const memory = json('www/data/memoria-liturgica.json');
+const dataReadme = read('www/data/README.md');
 
-assert.equal(pkg.version, '4.9.36', 'package.json deve identificar a versão 4.9.36');
+assert.equal(pkg.version, '4.9.38', 'package.json deve identificar a versão 4.9.38');
 assert.equal(pkg.dependencies['@capacitor/app'], '8.1.2', 'Plugin nativo do botão Voltar deve fazer parte do app.');
-assert.match(appJs, /const APP_VERSION = ['"]4\.9\.36['"]/);
-assert.match(sw, /liturgia-osm-v4\.9\.36-(?:ui3|causas1|causas2)/);
+assert.match(appJs, /const APP_VERSION = ['"]4\.9\.38['"]/);
+assert.match(sw, /liturgia-osm-v4\.9\.38-(?:ui\d+|causas1|causas2)/);
 assert.match(html, /app\.js/);
 assert.match(html, /app\.css/);
 assert.match(appJs, /function openSantoralOfficeHour/);
@@ -41,4 +42,30 @@ for (const file of core) assert.ok(fs.existsSync(path.join(root, 'www', file)), 
 for (const item of santoral) {
   if (item.image) assert.ok(fs.existsSync(path.join(root, 'www', item.image)), 'Imagem ausente: ' + item.image);
 }
+
+assert.match(appJs, /function formatPrayerStanza/);
+assert.match(appJs, /prayer-psalm-caption/);
+assert.match(appJs, /class="verse-number"/);
+assert.doesNotMatch(read('www/data/devocoes/adoracao.json'), /VERÇÃO/);
+assert.match(read('www/data/devocoes/vigilia.json'), /Pouco abaixo de Deus o fizestes/);
+assert.doesNotMatch(read('www/data/devocoes/vigilia.json'), /Pouco abaixo de um deus o fizestes/i);
+assert.match(read('www/data/devocoes/vigilia.json'), /tem o seu trono/);
+assert.doesNotMatch(read('www/data/devocoes/vigilia.json'), /temo seu trono/);
+assert.match(read('www/data/README.md'), /edição brasileira em quatro volumes publicada pela Paulus/i);
+
+assert.match(appJs, /function saintFallbackMonogram/);
+assert.match(appJs, /class="saint-thumb saint-thumb--fallback"/);
+assert.match(appJs, /function pruneDailyMassCache/);
+assert.match(appJs, /pruneDailyMassCache\(\);/);
+assert.match(appJs, /não há cópia local para esta data/i);
+assert.equal(santoral.find(x => x.title === 'B. Tiago de "Città della Pieve"')?.name, 'B. TIAGO DE "CITTÀ DELLA PIEVE"');
+assert.equal(santoral.find(x => x.title === 'São Peregrino de Forlì')?.name, 'SÃO PEREGRINO DE FORLÌ');
+assert.equal(santoral.find(x => x.title === 'B. Boaventura de Forlì')?.name, 'B. BOAVENTURA DE FORLÌ');
+const missingImageTitles = santoral.filter(x => !x.image).map(x => x.title);
+const noImageSection = dataReadme.split('## Celebrações sem imagem própria')[1]?.split('\n## ')[0] || '';
+const listedMissingImageTitles = [...noImageSection.matchAll(/^- (.+)$/gm)].map(match => match[1]);
+assert.deepEqual(listedMissingImageTitles, missingImageTitles, 'README deve listar exatamente as celebrações sem imagem.');
+assert.ok(!fs.existsSync(path.join(root, 'www/cordova.js')));
+assert.ok(!fs.existsSync(path.join(root, 'www/cordova_plugins.js')));
+
 console.log(JSON.stringify({ status: 'ok', version: pkg.version, santoral: santoral.length, oficios: Object.keys(offices.celebracoes).length, memoria: memory.memory_dates.length, memoriaComTexto: memory.celebrations.length, core: core.length }, null, 2));
