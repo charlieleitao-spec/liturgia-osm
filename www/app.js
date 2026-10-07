@@ -206,7 +206,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.39';
+const APP_VERSION = '4.9.40';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -803,7 +803,7 @@ function selectDailyHoursPosts(posts){
   const seen=new Set();
   return (Array.isArray(posts)?posts:[]).filter(function(post){
     const title=plainHoursTitle(post?.title?.rendered);
-    if(!hourTitle.test(title))return false;
+    if(!hourTitle.test(title)||!Number.isInteger(Number(post?.id))||Number(post.id)<1)return false;
     let url;try{url=new URL(String(post?.link||''));}catch(error){return false;}
     if(url.protocol!=='https:'||url.hostname!=='liturgiadashoras.online')return false;
     const path=url.pathname.replace(/\/+$/,'')+'/';
@@ -822,7 +822,76 @@ function localRestDateBound(baseDate,dayOffset){
 }
 function openHoursTodayPost(index){
   const post=HOURS_TODAY_POSTS[Number(index)];
-  if(post)openExternalLink(null,post.link);
+  if(!post)return;
+  const overlay=document.getElementById('hoursReaderOverlay'),title=document.getElementById('hoursReaderTitle'),target=document.getElementById('hoursReaderContent');
+  if(!overlay||!title||!target)return;
+  title.textContent=post.plainTitle||'Liturgia das Horas';
+  target.innerHTML='<div class="daily-loading" role="status">Carregando o texto…</div>';
+  overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');
+  loadHoursPostContent(post,index);
+}
+function closeHoursReader(){
+  const overlay=document.getElementById('hoursReaderOverlay');
+  if(!overlay)return;
+  overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');
+  if(document.body.classList.contains('celebration-mode'))toggleCelebrationMode();
+  updateBackButton();
+}
+function sanitizeHoursPostMarkup(markup){
+  const doc=new DOMParser().parseFromString(String(markup||''),'text/html');
+  const blockedTags=new Set(['script','style','iframe','object','embed','form','input','select','textarea','button','svg','video','audio','canvas','template','noscript','img','picture','source','link','meta']);
+  const allowedTags=new Set(['p','div','span','br','hr','h1','h2','h3','h4','h5','h6','strong','b','em','i','u','s','sup','sub','blockquote','ul','ol','li','table','thead','tbody','tfoot','tr','th','td']);
+  const adLike=/(^|[\s_-])(ad|ads|advert|advertisement|sponsor|promoted|newsletter|share|social|comments?)([\s_-]|$)/i;
+  for(const element of Array.from(doc.body.querySelectorAll('*'))){
+    const classes=typeof element.className==='string'?element.className:'';
+    if(adLike.test((element.id||'')+' '+classes))element.remove();
+  }
+  function clean(node){
+    if(node.nodeType===Node.TEXT_NODE)return doc.createTextNode(node.nodeValue||'');
+    if(node.nodeType!==Node.ELEMENT_NODE)return null;
+    const tag=node.tagName.toLowerCase();
+    if(blockedTags.has(tag))return null;
+    const children=Array.from(node.childNodes).map(clean).filter(Boolean);
+    if(!allowedTags.has(tag)){
+      const fragment=doc.createDocumentFragment();children.forEach(child=>fragment.appendChild(child));return fragment;
+    }
+    const safeElement=doc.createElement(tag);
+    children.forEach(child=>safeElement.appendChild(child));
+    return safeElement;
+  }
+  const cleanBody=doc.createElement('div');
+  Array.from(doc.body.childNodes).map(clean).filter(Boolean).forEach(node=>cleanBody.appendChild(node));
+  return cleanBody.innerHTML.trim();
+}
+async function loadHoursPostContent(post,index){
+  const target=document.getElementById('hoursReaderContent');
+  if(!target)return;
+  const originalUrl=safeHoursPostUrl(post?.link);
+  try{
+    if(!Number.isInteger(Number(post?.id))||Number(post.id)<1||!originalUrl)throw new Error('Publicação inválida.');
+    const url=new URL(HOURS_API_BASE+'/'+encodeURIComponent(Number(post.id)));
+    url.searchParams.set('_fields','id,date,link,title,content');
+    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
+    let response;
+    try{response=await fetch(url.toString(),{headers:{Accept:'application/json'},signal:controller.signal});}finally{clearTimeout(timeout);}
+    if(!response.ok)throw new Error('Texto indisponível.');
+    const detail=await response.json(),detailUrl=safeHoursPostUrl(detail?.link);
+    if(Number(detail?.id)!==Number(post.id)||detailUrl?.href!==originalUrl.href)throw new Error('Fonte não confirmada.');
+    const body=sanitizeHoursPostMarkup(detail?.content?.rendered);
+    if(!body)throw new Error('A fonte não forneceu o texto para exibição no app.');
+    const date=String(detail.date||post.date||'').slice(0,10).split('-').reverse().join('/');
+    target.innerHTML='<div class="daily-source"><b>Fonte: Católico Orante</b>'+(date?' · publicação de '+escapeHtml(date):'')+'<br>Texto exibido nesta tela, sem abrir a página externa.</div><article class="daily-reading hours-reading">'+body+'</article>';
+  }catch(error){
+    const message=error?.name==='AbortError'?'A consulta demorou mais do que o esperado.':'Não foi possível exibir o texto nesta tela.';
+    target.innerHTML='<div class="daily-error" role="alert">'+message+'<br><button class="daily-retry" onclick="openHoursTodayPost('+Number(index)+')">Tentar novamente</button>'+(originalUrl?'<br><button class="daily-retry" onclick="openHoursPostSource('+Number(index)+')">Abrir fonte original</button>':'')+'</div>';
+  }
+}
+function safeHoursPostUrl(value){
+  try{const url=new URL(String(value||''));return url.protocol==='https:'&&url.hostname==='liturgiadashoras.online'?url:null;}catch(error){return null;}
+}
+function openHoursPostSource(index){
+  const post=HOURS_TODAY_POSTS[Number(index)],url=safeHoursPostUrl(post?.link);
+  if(url)openExternalLink(null,url.href);
 }
 function openHoursTodayArchive(){openExternalLink(null,HOURS_ARCHIVE_URL);}
 async function loadHoursTodayApi(){
@@ -834,7 +903,7 @@ async function loadHoursTodayApi(){
   url.searchParams.set('after',localRestDateBound(now,-1));
   url.searchParams.set('before',localRestDateBound(now,1));
   url.searchParams.set('per_page','100');
-  url.searchParams.set('_fields','date,link,title');
+  url.searchParams.set('_fields','id,date,link,title');
   const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
   try{
     const response=await fetch(url.toString(),{headers:{Accept:'application/json'},signal:controller.signal});
@@ -862,7 +931,7 @@ function viewLiturgia(){
   </div>`;
   if(section==='horas'){
     const saints=SANTORAL.filter(s=>saintHasOffice(s));
-    const todayBlock='<div class="card fade-in"><div class="rowtitle">Liturgia das Horas de hoje</div><p class="reader-note">'+escapeHtml(formatLiturgicalDate())+'</p><button class="action-btn" onclick="openServite(\'oficio\')">Abrir Ofício próprio OSM</button><p class="reader-note" style="text-align:left;margin:12px 0 8px;">Consulte as horas publicadas pelo Católico Orante em português do Brasil.</p><button class="action-btn" onclick="loadHoursTodayApi()">Consultar as horas de hoje</button><div id="hoursTodayApiResults" class="hours-api-results" aria-live="polite"></div></div>';
+    const todayBlock='<div class="card fade-in"><div class="rowtitle">Liturgia das Horas de hoje</div><p class="reader-note">'+escapeHtml(formatLiturgicalDate())+'</p><button class="action-btn" onclick="openServite(\'oficio\')">Abrir Ofício próprio OSM</button><p class="reader-note" style="text-align:left;margin:12px 0 8px;">Consulte e leia as horas do Católico Orante nesta tela, sem sair do app.</p><button class="action-btn" onclick="loadHoursTodayApi()">Consultar as horas de hoje</button><div id="hoursTodayApiResults" class="hours-api-results" aria-live="polite"></div></div>';
     const officeWarning=!oficiosReady?'<div class="card" role="alert"><p>O cadastro local dos Ofícios está indisponível. A Vida e as orações continuam acessíveis.</p><button class="action-btn" onclick="loadCanonicalOffices()">Tentar carregar os Ofícios</button></div>':'';
     const ownBlocks='<div class="section-title">Ofícios e textos próprios OSM</div><p class="reader-note">A celebração do santo abre somente as horas disponíveis no texto.</p>'+
       '<div class="card fade-in" style="padding:6px 16px;">'+saints.map(function(s){return '<div class="saint-row saint-row-hours"><div class="daynum">'+s.day+'</div><div class="rowtext"><div class="rowtitle">'+escapeHtml(s.title)+'</div><div class="rowrank">'+escapeHtml(s.date)+'</div></div><div class="office-hours-grid">'+officeHoursForSaint(s).map(function(pair){return officeHourButtonHtml(s,pair);}).join('')+'</div></div>';}).join('')+'</div>';
@@ -1029,7 +1098,7 @@ function updateBackButton(){
   const button=document.getElementById('floatingBack');
   if(!button) return;
   const hasDetail=state.detailId!==null&&state.detailId!==undefined;
-  const overlay=['serviteOverlay','languageOverlay','mainMenuOverlay','dailyLiturgyOverlay'].some(id=>document.getElementById(id)?.classList.contains('open'));
+  const overlay=['serviteOverlay','languageOverlay','mainMenuOverlay','dailyLiturgyOverlay','hoursReaderOverlay'].some(id=>document.getElementById(id)?.classList.contains('open'));
   const inlineBack=!!document.querySelector('#view .hub-back, #view .back-btn');
   const needsBack=!!state.devo||state.devoSub!==null&&state.devoSub!==undefined||!!dailyPrayerOpen480;
   const visible=needsBack&&!inlineBack&&!overlay&&!hasDetail;
@@ -1043,6 +1112,8 @@ function smartBack(){
   const language=document.getElementById('languageOverlay');
   const servite=document.getElementById('serviteOverlay');
   const mass=document.getElementById('dailyLiturgyOverlay');
+  const hoursReader=document.getElementById('hoursReaderOverlay');
+  if(hoursReader&&hoursReader.classList.contains('open')&&typeof window.closeHoursReader==='function'){closeHoursReader();return true;}
   if(menu&&menu.classList.contains('open')){closeMainMenu();return true;}
   if(language&&language.classList.contains('open')){closeLanguagePanel();return true;}
   if(servite&&servite.classList.contains('open')){if(typeof closeServite==='function')closeServite();else servite.classList.remove('open');updateBackButton();return true;}
