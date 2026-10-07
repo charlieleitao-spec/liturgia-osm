@@ -504,9 +504,6 @@ body.celebration-mode .prayer-block,body.celebration-mode .bio-text,body.celebra
 .daily-date-nav input{min-height:42px;border:1px solid var(--line);border-radius:11px;background:var(--bg-panel);color:var(--paper);padding:0 10px;color-scheme:dark}
 .daily-source{padding:10px 12px;border:1px solid var(--line);border-radius:11px;color:var(--text-muted);font-size:12px;line-height:1.45;margin-bottom:14px}
 .daily-source b{color:var(--gold-soft)}
-.hours-api-results{margin-top:12px}
-.hours-api-results .hours-api-status{font-size:12px;line-height:1.5;color:var(--text-muted);margin:10px 2px;text-align:left}
-.hours-api-results .hours-api-link{display:block;width:100%;max-width:none;text-align:left;white-space:normal;overflow-wrap:anywhere;margin:8px 0;padding:11px 13px;line-height:1.45}
 .daily-title-card h2{font:700 24px Georgia,serif;color:var(--paper);margin:5px 0}
 .daily-color{display:inline-block;border-radius:999px;padding:4px 9px;background:var(--wine);color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
 .daily-section{margin:18px 0}
@@ -1039,8 +1036,3 @@ body.scroll-controls-hidden .celebration-toggle{
   font:italic 500 calc(13px * var(--reader-scale, 1))/1.4 Georgia,'Times New Roman',serif!important;
   text-align:center!important;
 }
-.hours-reading{text-align:center;line-height:1.65}
-.hours-reading p,.hours-reading div,.hours-reading h1,.hours-reading h2,.hours-reading h3,.hours-reading h4,.hours-reading h5,.hours-reading h6,.hours-reading blockquote{text-align:center}
-.hours-reading p{white-space:pre-line;line-height:1.65;margin:0 0 .78em;color:var(--text)}
-.hours-reading h1,.hours-reading h2,.hours-reading h3,.hours-reading h4{color:var(--gold-soft);font-family:Georgia,'Times New Roman',serif;margin:1.1em 0 .45em}
-.hours-reading hr{border:0;border-top:1px solid var(--line);margin:1em auto;max-width:120px}
