@@ -23,6 +23,8 @@ assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
 assert.match(app, /const APP_VERSION = ['"]4\.9\.39['"]/);
 assert.ok(app.includes('https://liturgiadashoras.online/wp-json/wp/v2/posts'), 'Consulta das Horas deve usar a API REST do site brasileiro.');
+assert.ok(html.includes('id="hoursReaderOverlay"') && app.includes('sanitizeHoursPostMarkup'), 'As Horas devem abrir em leitor interno sem carregar a página com anúncios.');
+assert.ok(app.includes("_fields','id,date,link,title,content"), 'O leitor deve carregar o texto da publicação pela API.');
 assert.ok(app.includes('Consultar as horas de hoje') && app.includes('hoursTodayApiResults'), 'Liturgia deve oferecer acesso às publicações das Horas de hoje.');
 const hoursHelperStart = app.indexOf('function plainHoursTitle(value){');
 const hoursHelperEnd = app.indexOf('\nfunction localRestDateBound(', hoursHelperStart);
