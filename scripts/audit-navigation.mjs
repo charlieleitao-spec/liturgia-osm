@@ -21,9 +21,10 @@ for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data
 assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
-assert.match(app, /const APP_VERSION = ['"]4\.9\.39['"]/);
+assert.match(app, /const APP_VERSION = ['"]4\.9\.40['"]/);
 assert.ok(app.includes('https://liturgiadashoras.online/wp-json/wp/v2/posts'), 'Consulta das Horas deve usar a API REST do site brasileiro.');
 assert.ok(html.includes('id="hoursReaderOverlay"') && app.includes('sanitizeHoursPostMarkup'), 'As Horas devem abrir em leitor interno sem carregar a página com anúncios.');
+assert.ok(!app.includes('openHoursTodayArchive') && !app.includes('Abrir fonte original'), 'A leitura deve permanecer no app quando a fonte tem anúncios.');
 assert.ok(app.includes("_fields','id,date,link,title,content"), 'O leitor deve carregar o texto da publicação pela API.');
 assert.ok(app.includes('Consultar as horas de hoje') && app.includes('hoursTodayApiResults'), 'Liturgia deve oferecer acesso às publicações das Horas de hoje.');
 const hoursHelperStart = app.indexOf('function plainHoursTitle(value){');
@@ -40,7 +41,7 @@ const selectedHours = selectDailyHoursPosts(hoursFixture);
 assert.equal(selectedHours.length, 2, 'Filtro da API deve conservar apenas horas litúrgicas do domínio escolhido.');
 assert.match(selectedHours[0].plainTitle, /Hora Terça/);
 
-assert.match(app, /const APP_VERSION = ['"]4\.9\.39['"]/);
+assert.match(app, /const APP_VERSION = ['"]4\.9\.40['"]/);
 assert.match(app, /addListener\(['"]backButton['"]/);
 assert.match(app, /function saintRankSubtitle/);
 assert.match(css, /text-align:\s*center/);
