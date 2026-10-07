@@ -32,10 +32,10 @@ const hoursHelperEnd = app.indexOf('\nfunction localRestDateBound(', hoursHelper
 assert.ok(hoursHelperStart >= 0 && hoursHelperEnd > hoursHelperStart, 'Filtro de publicações da API das Horas ausente.');
 const selectDailyHoursPosts = new Function(app.slice(hoursHelperStart, hoursHelperEnd) + '; return selectDailyHoursPosts;')();
 const hoursFixture = [
-  {date:'2026-10-06T09:00:00-03:00',link:'https://liturgiadashoras.online/laudes-memoria-teste/',title:{rendered:'Laudes – Memória de Nossa Senhora do Rosário'}},
-  {date:'2026-10-07T09:00:00-03:00',link:'https://liturgiadashoras.online/hora-terca-teste/',title:{rendered:'Hora Terça – Quarta-feira'}},
-  {date:'2026-10-07T09:00:00-03:00',link:'https://outro-site.example/laudes/',title:{rendered:'Laudes – teste'}},
-  {date:'2026-10-07T09:00:00-03:00',link:'https://liturgiadashoras.online/noticia/',title:{rendered:'Notícia do dia'}}
+  {id:1,date:'2026-10-06T09:00:00-03:00',link:'https://liturgiadashoras.online/laudes-memoria-teste/',title:{rendered:'Laudes – Memória de Nossa Senhora do Rosário'}},
+  {id:2,date:'2026-10-07T09:00:00-03:00',link:'https://liturgiadashoras.online/hora-terca-teste/',title:{rendered:'Hora Terça – Quarta-feira'}},
+  {id:3,date:'2026-10-07T09:00:00-03:00',link:'https://outro-site.example/laudes/',title:{rendered:'Laudes – teste'}},
+  {id:4,date:'2026-10-07T09:00:00-03:00',link:'https://liturgiadashoras.online/noticia/',title:{rendered:'Notícia do dia'}}
 ];
 const selectedHours = selectDailyHoursPosts(hoursFixture);
 assert.equal(selectedHours.length, 2, 'Filtro da API deve conservar apenas horas litúrgicas do domínio escolhido.');
