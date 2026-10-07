@@ -13,7 +13,7 @@ const santoral = json('www/data/santoral.json');
 const offices = json('www/data/oficios-osm.json');
 const memory = json('www/data/memoria-liturgica.json');
 
-assert.equal(pkg.version, '4.9.36', 'package.json deve identificar a versão 4.9.36');
+assert.equal(pkg.version, '4.9.37', 'package.json deve identificar a versão 4.9.37');
 assert.equal(pkg.dependencies['@capacitor/app'], '8.1.2', 'Plugin nativo do botão Voltar deve fazer parte do app.');
 assert.match(appJs, /const APP_VERSION = ['"]4\.9\.36['"]/);
 assert.match(sw, /liturgia-osm-v4\.9\.36-(?:ui\d+|causas1|causas2)/);
@@ -41,4 +41,14 @@ for (const file of core) assert.ok(fs.existsSync(path.join(root, 'www', file)), 
 for (const item of santoral) {
   if (item.image) assert.ok(fs.existsSync(path.join(root, 'www', item.image)), 'Imagem ausente: ' + item.image);
 }
+
+assert.match(appJs, /function formatPrayerStanza/);
+assert.match(appJs, /prayer-psalm-caption/);
+assert.match(appJs, /class="verse-number"/);
+assert.doesNotMatch(read('www/data/devocoes/adoracao.json'), /VERÇÃO/);
+assert.match(read('www/data/devocoes/vigilia.json'), /Pouco abaixo de um deus o fizestes/);
+assert.match(read('www/data/devocoes/vigilia.json'), /tem o seu trono/);
+assert.doesNotMatch(read('www/data/devocoes/vigilia.json'), /temo seu trono/);
+assert.match(read('www/data/README.md'), /edição brasileira em quatro volumes publicada pela Paulus/i);
+
 console.log(JSON.stringify({ status: 'ok', version: pkg.version, santoral: santoral.length, oficios: Object.keys(offices.celebracoes).length, memoria: memory.memory_dates.length, memoriaComTexto: memory.celebrations.length, core: core.length }, null, 2));

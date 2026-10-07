@@ -92,38 +92,87 @@ function sharePrayer(title,text){ shareText(title,`${title}\n\n${text}\n\nLiturg
 
 // render a prayer block, coloring "D." / "T." rubrics
 const PRAYER_CONTEXT_HEADINGS = /^(?:Comum|Nas festas marianas|Nas visitas de familiares e amigos|Nos momentos de alegria)$/i;
-const PRAYER_TEXT_HEADINGS = /^(?:Antífona(?: de entrada)?|Salmo(?:\s+[\d,.\-–—]+)?|Hino|Invitatório|Salmodia|Cântico(?: evangélico)?|Oração(?: própria| sálmica| sobre o cântico| das (?:Nove|Doze|Quinze) Horas)?|Leitura breve|Primeira leitura|Segunda leitura|Responsório(?: breve)?|Preces|Festa|Laudes|Vésperas|Hora Média)$/i;
-function prayerLineHtml(line){
-  const escaped = escapeHtml(line);
-  return escaped.replace(/^(D\.|T\.|C\.|L\.\d?|L\.)/, '<span class="rubric">$1</span>');
+const PRAYER_TEXT_HEADINGS = /^(?:Antífona(?: de entrada)?|Salmo(?:\s+[\d,.\-–—]+)?|Hino|Invitatório|Salmodia|Cântico(?: evangélico)?|Oração(?: própria| sálmica| sobre o cântico| das (?:Nove|Doze|Quinze) Horas)?|Leitura breve|Introdução(?: à leitura| às leituras)?|Absolvição|Primeira leitura|Segunda leitura|Terceira leitura|Responsório(?: breve)?|Preces|Festa|Laudes|Vésperas|Hora Média|Salve Rainha|Oremos|Oração pela Igreja pela Ordem|À VIRGEM DO (?:SIM|\"MAGNIFICAT\"))$/i;
+function prayerLineHtml(line, vigilia=false){
+  let escaped = escapeHtml(line).replace(/^(D\.|T\.|C\.|R\.|V\.|A\.|B\.|L\d?:|L\.)/, '<span class="rubric">$1</span>');
+  if(vigilia) escaped = escaped.replace(/^([–—=]\s*)(\d{1,3})(?=[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ])/, '$1<span class="verse-number">$2</span> ');
+  return escaped;
 }
-function renderPrayer(text){
+function formatPrayerStanza(lines, vigilia, hymnMode){
+  if(!vigilia || hymnMode) return lines.map(line=>prayerLineHtml(line,vigilia)).join('<br>');
+  const speaker = /^(?:D\.|T\.|C\.|R\.|V\.|A\.|B\.|L\d?:|L\.)\s*/;
+  if(lines.some(line=>speaker.test(line))){
+    const turns=[];
+    for(const line of lines){
+      if(speaker.test(line) || !turns.length) turns.push([line]);
+      else turns[turns.length-1].push(line);
+    }
+    return turns.map(turn=>turn.map(line=>prayerLineHtml(line,true)).join(' ')).join('<br>');
+  }
+  const verse = /^[–—=]\s*/;
+  if(lines.some(line=>verse.test(line))){
+    const verses=[];
+    for(const line of lines){
+      if(verse.test(line) || !verses.length) verses.push([line]);
+      else verses[verses.length-1].push(line);
+    }
+    return verses.map(group=>group.map(line=>prayerLineHtml(line,true)).join(' ')).join('<br>');
+  }
+  return lines.map(line=>prayerLineHtml(line,true)).join(' ');
+}
+function renderPrayer(text, options={}){
+  const vigilia = options.vigilia === true;
+  let source = String(text ?? '');
+  if(vigilia){
+    source = source
+      .replace(/([A-Za-zÀ-ÿ])-\n[ \t]*([a-zà-ÿ])/g, '$1-$2')
+      .replace(/^(Primeira fórmula|Segunda fórmula)\n[ \t]*Santa Maria,?\n[ \t]*(Senhora Dos Seus Servos|Serva Do Senhor)/im,
+        (_, formula, title)=>formula+'\nSanta Maria, '+title.replace(/Dos Seus Servos/i,'dos seus servos').replace(/Do Senhor/i,'do Senhor'));
+  }
   const blocks = [];
   let stanza = [];
+  let hymnMode = false;
+  let pendingPsalmCaption = false;
   const flushStanza = () => {
     if(!stanza.length) return;
-    blocks.push('<p class="prayer-stanza">'+stanza.map(prayerLineHtml).join('<br>')+'</p>');
+    blocks.push('<p class="prayer-stanza">'+formatPrayerStanza(stanza,vigilia,hymnMode)+'</p>');
     stanza = [];
   };
-  for(const rawLine of String(text ?? '').replace(/\r\n?/g,'\n').split('\n')){
+  for(const rawLine of source.replace(/\r\n?/g,'\n').split('\n')){
     const line = rawLine.trim();
     if(!line){ flushStanza(); continue; }
-    if(PRAYER_CONTEXT_HEADINGS.test(line)){
+    if(vigilia && pendingPsalmCaption){
+      flushStanza();
+      blocks.push('<h5 class="prayer-psalm-caption">'+escapeHtml(line)+'</h5>');
+      pendingPsalmCaption = false;
+      continue;
+    }
+    if(PRAYER_CONTEXT_HEADINGS.test(line) || (vigilia && /^(?:Primeira|Segunda) fórmula$/i.test(line))){
       flushStanza();
       blocks.push('<h3 class="prayer-context-heading">'+escapeHtml(line)+'</h3>');
+      hymnMode = false;
+      pendingPsalmCaption = false;
       continue;
     }
-    if(PRAYER_TEXT_HEADINGS.test(line)){
+    if(vigilia && /^Santa Maria, (?:Senhora dos seus servos|Serva do Senhor)$/i.test(line)){
+      flushStanza();
+      blocks.push('<h4 class="prayer-formula-title">'+escapeHtml(line)+'</h4>');
+      hymnMode = false;
+      continue;
+    }
+    if(PRAYER_TEXT_HEADINGS.test(line) || (vigilia && /^Salmo\b/i.test(line))){
       flushStanza();
       blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
+      hymnMode = /^Hino$/i.test(line);
+      pendingPsalmCaption = vigilia && /^Salmo\b/i.test(line);
       continue;
     }
+    if(vigilia && /^\d+ª Ant\./i.test(line)) hymnMode = false;
     stanza.push(line);
   }
   flushStanza();
   return blocks.join('');
 }
-
 // ===================== calendário litúrgico básico =====================
 function easterSunday(year){
   const a=year%19, b=Math.floor(year/100), c=year%100, d=Math.floor(b/4), e=b%4;
@@ -146,7 +195,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.36';
+const APP_VERSION = '4.9.37';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -530,7 +579,7 @@ function simpleTextDetail(title, sub, text, backFn, readingClass){
       <div class="detail-divider"></div>
     </div>
     <div class="card fade-in${readerClass}">
-      <div class="prayer-block">${renderPrayer(renderedText)}</div>
+      <div class="prayer-block">${renderPrayer(renderedText, {vigilia:readingClass === 'vigilia-reader'})}</div>
     </div>
   `;
 }

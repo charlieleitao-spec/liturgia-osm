@@ -1007,3 +1007,28 @@ body.scroll-controls-hidden .celebration-toggle{
   margin:.9em auto .35em!important;
   text-align:center!important;
 }
+
+/* Vigília: hierarquia para fórmulas, títulos dos salmos e numeração dos versos. */
+#view .prayer-block .verse-number{
+  display:inline-block!important;
+  margin-right:.2em!important;
+  color:var(--text-muted)!important;
+  font-size:.68em!important;
+  font-weight:600!important;
+  line-height:0!important;
+  vertical-align:super!important;
+}
+#view .vigilia-reader .prayer-formula-title{
+  margin:.15em auto .75em!important;
+  color:var(--text-muted)!important;
+  font:600 calc(14px * var(--reader-scale, 1))/1.35 Georgia,'Times New Roman',serif!important;
+  letter-spacing:.06em!important;
+  text-align:center!important;
+  text-transform:uppercase!important;
+}
+#view .vigilia-reader .prayer-psalm-caption{
+  margin:-.28em auto .62em!important;
+  color:var(--text-muted)!important;
+  font:italic 500 calc(13px * var(--reader-scale, 1))/1.4 Georgia,'Times New Roman',serif!important;
+  text-align:center!important;
+}

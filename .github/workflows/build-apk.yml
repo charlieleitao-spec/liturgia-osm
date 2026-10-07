@@ -1,4 +1,4 @@
-name: Build APK Liturgia OSM 4.9.36
+name: Build APK Liturgia OSM 4.9.37
 
 on:
   workflow_dispatch:
@@ -77,8 +77,8 @@ jobs:
 
       - name: Definir versão e segurança
         run: |
-          sed -i 's/versionCode [0-9][0-9]*/versionCode 40941/' android/app/build.gradle
-          sed -i 's/versionName "[^"]*"/versionName "4.9.36"/' android/app/build.gradle
+          sed -i 's/versionCode [0-9][0-9]*/versionCode 40942/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "4.9.37"/' android/app/build.gradle
           python3 - <<'PY'
           from pathlib import Path
           p = Path('android/app/build.gradle')
@@ -127,34 +127,34 @@ jobs:
           ./gradlew assembleRelease
 
       - name: Nomear APK
-        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.36.apk
+        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.37.apk
 
       - name: Verificar APK
         run: |
           APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
-          "${APKSIGNER}" verify --verbose --print-certs Liturgia-OSM-4.9.36.apk
+          "${APKSIGNER}" verify --verbose --print-certs Liturgia-OSM-4.9.37.apk
 
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.9.36
-          path: Liturgia-OSM-4.9.36.apk
+          name: Liturgia-OSM-4.9.37
+          path: Liturgia-OSM-4.9.37.apk
           if-no-files-found: error
 
       - name: Disponibilizar lock atualizado (temporário)
         uses: actions/upload-artifact@v5
         with:
-          name: lock-temporario-4.9.36
+          name: lock-temporario-4.9.37
           path: package-lock.json
           if-no-files-found: error
 
-      - name: Publicar versão 4.9.36
+      - name: Publicar versão 4.9.37
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v4.9.36
-          name: Liturgia OSM 4.9.36
+          tag_name: v4.9.37
+          name: Liturgia OSM 4.9.37
           generate_release_notes: true
           overwrite_files: true
-          files: Liturgia-OSM-4.9.36.apk
+          files: Liturgia-OSM-4.9.37.apk
 
