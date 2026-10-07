@@ -504,6 +504,9 @@ body.celebration-mode .prayer-block,body.celebration-mode .bio-text,body.celebra
 .daily-date-nav input{min-height:42px;border:1px solid var(--line);border-radius:11px;background:var(--bg-panel);color:var(--paper);padding:0 10px;color-scheme:dark}
 .daily-source{padding:10px 12px;border:1px solid var(--line);border-radius:11px;color:var(--text-muted);font-size:12px;line-height:1.45;margin-bottom:14px}
 .daily-source b{color:var(--gold-soft)}
+.hours-api-results{margin-top:12px}
+.hours-api-results .hours-api-status{font-size:12px;line-height:1.5;color:var(--text-muted);margin:10px 2px;text-align:left}
+.hours-api-results .hours-api-link{display:block;width:100%;max-width:none;text-align:left;white-space:normal;overflow-wrap:anywhere;margin:8px 0;padding:11px 13px;line-height:1.45}
 .daily-title-card h2{font:700 24px Georgia,serif;color:var(--paper);margin:5px 0}
 .daily-color{display:inline-block;border-radius:999px;padding:4px 9px;background:var(--wine);color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
 .daily-section{margin:18px 0}

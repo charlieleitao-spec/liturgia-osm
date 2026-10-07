@@ -206,7 +206,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.38';
+const APP_VERSION = '4.9.39';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -791,6 +791,69 @@ function viewVida(){
   return tabs+(current==='calendario'?viewCalendario():current==='santoral'?viewSantoral():viewHoje());
 }
 function setLiturgiaSection(section){state.liturgiaSection=section;render();window.scrollTo(0,0);}
+
+const HOURS_API_BASE='https://liturgiadashoras.online/wp-json/wp/v2/posts';
+const HOURS_ARCHIVE_URL='https://liturgiadashoras.online/comunidade/oracao/';
+let HOURS_TODAY_POSTS=[];
+function plainHoursTitle(value){
+  return String(value||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;|&#160;/gi,' ').replace(/&amp;/gi,'&').replace(/&quot;/gi,'"').replace(/&#8211;|&#x2013;/gi,'–').replace(/&#8212;|&#x2014;/gi,'—').replace(/&#39;|&apos;|&#8217;/gi,"'").replace(/\s+/g,' ').trim();
+}
+function selectDailyHoursPosts(posts){
+  const hourTitle=/laudes|of[ií]cio (?:d[aeo]s? )?leituras?|hora (?:interm[eé]dia|m[eé]dia|ter[cç]a|sexta|nona)|v[eé]speras|completas|invitat[oó]rio/i;
+  const seen=new Set();
+  return (Array.isArray(posts)?posts:[]).filter(function(post){
+    const title=plainHoursTitle(post?.title?.rendered);
+    if(!hourTitle.test(title))return false;
+    let url;try{url=new URL(String(post?.link||''));}catch(error){return false;}
+    if(url.protocol!=='https:'||url.hostname!=='liturgiadashoras.online')return false;
+    const path=url.pathname.replace(/\/+$/,'')+'/';
+    if(seen.has(path))return false;
+    seen.add(path);
+    return true;
+  }).map(function(post){return {...post,plainTitle:plainHoursTitle(post.title?.rendered)};})
+    .sort(function(a,b){return String(b.date||'').localeCompare(String(a.date||''));})
+    .slice(0,14);
+}
+function localRestDateBound(baseDate,dayOffset){
+  const date=new Date(baseDate.getFullYear(),baseDate.getMonth(),baseDate.getDate()+dayOffset);
+  const pad=value=>String(value).padStart(2,'0');
+  const offset=-date.getTimezoneOffset(),sign=offset>=0?'+':'-',absolute=Math.abs(offset);
+  return date.getFullYear()+'-'+pad(date.getMonth()+1)+'-'+pad(date.getDate())+'T00:00:00'+sign+pad(Math.floor(absolute/60))+':'+pad(absolute%60);
+}
+function openHoursTodayPost(index){
+  const post=HOURS_TODAY_POSTS[Number(index)];
+  if(post)openExternalLink(null,post.link);
+}
+function openHoursTodayArchive(){openExternalLink(null,HOURS_ARCHIVE_URL);}
+async function loadHoursTodayApi(){
+  const target=document.getElementById('hoursTodayApiResults');
+  if(!target)return;
+  if(!navigator.onLine){target.innerHTML='<p class="hours-api-status" role="status">A consulta das horas do dia precisa de conexão.</p><button class="action-btn hours-api-link" onclick="openHoursTodayArchive()">Abrir Católico Orante</button>';return;}
+  target.innerHTML='<p class="hours-api-status" role="status">Consultando as publicações do dia…</p>';
+  const now=new Date(),url=new URL(HOURS_API_BASE);
+  url.searchParams.set('after',localRestDateBound(now,-1));
+  url.searchParams.set('before',localRestDateBound(now,1));
+  url.searchParams.set('per_page','100');
+  url.searchParams.set('_fields','date,link,title');
+  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
+  try{
+    const response=await fetch(url.toString(),{headers:{Accept:'application/json'},signal:controller.signal});
+    if(!response.ok)throw new Error('API indisponível');
+    HOURS_TODAY_POSTS=selectDailyHoursPosts(await response.json());
+    if(!HOURS_TODAY_POSTS.length){
+      target.innerHTML='<p class="hours-api-status" role="status">A API não retornou publicações de Ofício para hoje e a véspera.</p><button class="action-btn hours-api-link" onclick="openHoursTodayArchive()">Abrir Católico Orante</button>';
+      return;
+    }
+    target.innerHTML='<p class="hours-api-status" role="status">Publicações de hoje e da véspera; algumas horas podem ser publicadas antecipadamente.</p>'+
+      HOURS_TODAY_POSTS.map(function(post,index){
+        const date=String(post.date||'').slice(0,10).split('-').reverse().join('/');
+        return '<button class="action-btn hours-api-link" onclick="openHoursTodayPost('+index+')">'+escapeHtml(post.plainTitle)+(date?' · '+escapeHtml(date):'')+'</button>';
+      }).join('');
+  }catch(error){
+    const note=error?.name==='AbortError'?'A consulta demorou mais do que o esperado.':'Não foi possível consultar a API agora.';
+    target.innerHTML='<p class="hours-api-status" role="status">'+note+'</p><button class="action-btn hours-api-link" onclick="openHoursTodayArchive()">Abrir Católico Orante</button>';
+  }finally{clearTimeout(timeout);}
+}
 function viewLiturgia(){
   const section=state.liturgiaSection||'missa';
   const switcher=`<div class="toggle-row" aria-label="Seções de Liturgia">
@@ -799,7 +862,7 @@ function viewLiturgia(){
   </div>`;
   if(section==='horas'){
     const saints=SANTORAL.filter(s=>saintHasOffice(s));
-    const todayBlock='<div class="card fade-in"><div class="rowtitle">Liturgia das Horas de hoje</div><p class="reader-note">'+escapeHtml(formatLiturgicalDate())+'</p><button class="action-btn" onclick="openServite(\'oficio\')">Abrir Ofício de hoje</button></div>';
+    const todayBlock='<div class="card fade-in"><div class="rowtitle">Liturgia das Horas de hoje</div><p class="reader-note">'+escapeHtml(formatLiturgicalDate())+'</p><button class="action-btn" onclick="openServite(\'oficio\')">Abrir Ofício próprio OSM</button><p class="reader-note" style="text-align:left;margin:12px 0 8px;">Consulte as horas publicadas pelo Católico Orante em português do Brasil.</p><button class="action-btn" onclick="loadHoursTodayApi()">Consultar as horas de hoje</button><div id="hoursTodayApiResults" class="hours-api-results" aria-live="polite"></div></div>';
     const officeWarning=!oficiosReady?'<div class="card" role="alert"><p>O cadastro local dos Ofícios está indisponível. A Vida e as orações continuam acessíveis.</p><button class="action-btn" onclick="loadCanonicalOffices()">Tentar carregar os Ofícios</button></div>':'';
     const ownBlocks='<div class="section-title">Ofícios e textos próprios OSM</div><p class="reader-note">A celebração do santo abre somente as horas disponíveis no texto.</p>'+
       '<div class="card fade-in" style="padding:6px 16px;">'+saints.map(function(s){return '<div class="saint-row saint-row-hours"><div class="daynum">'+s.day+'</div><div class="rowtext"><div class="rowtitle">'+escapeHtml(s.title)+'</div><div class="rowrank">'+escapeHtml(s.date)+'</div></div><div class="office-hours-grid">'+officeHoursForSaint(s).map(function(pair){return officeHourButtonHtml(s,pair);}).join('')+'</div></div>';}).join('')+'</div>';

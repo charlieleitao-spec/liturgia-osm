@@ -21,7 +21,24 @@ for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data
 assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
-assert.match(app, /const APP_VERSION = ['"]4\.9\.38['"]/);
+assert.match(app, /const APP_VERSION = ['"]4\.9\.39['"]/);
+assert.ok(app.includes('https://liturgiadashoras.online/wp-json/wp/v2/posts'), 'Consulta das Horas deve usar a API REST do site brasileiro.');
+assert.ok(app.includes('Consultar as horas de hoje') && app.includes('hoursTodayApiResults'), 'Liturgia deve oferecer acesso às publicações das Horas de hoje.');
+const hoursHelperStart = app.indexOf('function selectDailyHoursPosts(posts){');
+const hoursHelperEnd = app.indexOf('\nfunction localRestDateBound(', hoursHelperStart);
+assert.ok(hoursHelperStart >= 0 && hoursHelperEnd > hoursHelperStart, 'Filtro de publicações da API das Horas ausente.');
+const selectDailyHoursPosts = new Function(app.slice(hoursHelperStart, hoursHelperEnd) + '; return selectDailyHoursPosts;')();
+const hoursFixture = [
+  {date:'2026-10-06T09:00:00-03:00',link:'https://liturgiadashoras.online/laudes-memoria-teste/',title:{rendered:'Laudes – Memória de Nossa Senhora do Rosário'}},
+  {date:'2026-10-07T09:00:00-03:00',link:'https://liturgiadashoras.online/hora-terca-teste/',title:{rendered:'Hora Terça – Quarta-feira'}},
+  {date:'2026-10-07T09:00:00-03:00',link:'https://outro-site.example/laudes/',title:{rendered:'Laudes – teste'}},
+  {date:'2026-10-07T09:00:00-03:00',link:'https://liturgiadashoras.online/noticia/',title:{rendered:'Notícia do dia'}}
+];
+const selectedHours = selectDailyHoursPosts(hoursFixture);
+assert.equal(selectedHours.length, 2, 'Filtro da API deve conservar apenas horas litúrgicas do domínio escolhido.');
+assert.match(selectedHours[0].plainTitle, /Hora Terça/);
+
+assert.match(app, /const APP_VERSION = ['"]4\.9\.39['"]/);
 assert.match(app, /addListener\(['"]backButton['"]/);
 assert.match(app, /function saintRankSubtitle/);
 assert.match(css, /text-align:\s*center/);
