@@ -793,7 +793,6 @@ function viewVida(){
 function setLiturgiaSection(section){state.liturgiaSection=section;render();window.scrollTo(0,0);}
 
 const HOURS_API_BASE='https://liturgiadashoras.online/wp-json/wp/v2/posts';
-const HOURS_ARCHIVE_URL='https://liturgiadashoras.online/category/horas-canonicas/';
 let HOURS_TODAY_POSTS=[];
 function plainHoursTitle(value){
   return String(value||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;|&#160;/gi,' ').replace(/&amp;/gi,'&').replace(/&quot;/gi,'"').replace(/&#8211;|&#x2013;/gi,'–').replace(/&#8212;|&#x2014;/gi,'—').replace(/&#39;|&apos;|&#8217;/gi,"'").replace(/\s+/g,' ').trim();
@@ -883,21 +882,16 @@ async function loadHoursPostContent(post,index){
     target.innerHTML='<div class="daily-source"><b>Fonte: Católico Orante</b>'+(date?' · publicação de '+escapeHtml(date):'')+'<br>Texto exibido nesta tela, sem abrir a página externa.</div><article class="daily-reading hours-reading">'+body+'</article>';
   }catch(error){
     const message=error?.name==='AbortError'?'A consulta demorou mais do que o esperado.':'Não foi possível exibir o texto nesta tela.';
-    target.innerHTML='<div class="daily-error" role="alert">'+message+'<br><button class="daily-retry" onclick="openHoursTodayPost('+Number(index)+')">Tentar novamente</button>'+(originalUrl?'<br><button class="daily-retry" onclick="openHoursPostSource('+Number(index)+')">Abrir fonte original</button>':'')+'</div>';
+    target.innerHTML='<div class="daily-error" role="alert">'+message+'<br><button class="daily-retry" onclick="openHoursTodayPost('+Number(index)+')">Tentar novamente</button>'+'</div>';
   }
 }
 function safeHoursPostUrl(value){
   try{const url=new URL(String(value||''));return url.protocol==='https:'&&url.hostname==='liturgiadashoras.online'?url:null;}catch(error){return null;}
 }
-function openHoursPostSource(index){
-  const post=HOURS_TODAY_POSTS[Number(index)],url=safeHoursPostUrl(post?.link);
-  if(url)openExternalLink(null,url.href);
-}
-function openHoursTodayArchive(){openExternalLink(null,HOURS_ARCHIVE_URL);}
 async function loadHoursTodayApi(){
   const target=document.getElementById('hoursTodayApiResults');
   if(!target)return;
-  if(!navigator.onLine){target.innerHTML='<p class="hours-api-status" role="status">A consulta das horas do dia precisa de conexão.</p><button class="action-btn hours-api-link" onclick="openHoursTodayArchive()">Abrir Católico Orante</button>';return;}
+  if(!navigator.onLine){target.innerHTML='<p class="hours-api-status" role="status">A consulta das horas do dia precisa de conexão.</p>';return;}
   target.innerHTML='<p class="hours-api-status" role="status">Consultando as publicações do dia…</p>';
   const now=new Date(),url=new URL(HOURS_API_BASE);
   url.searchParams.set('after',localRestDateBound(now,-1));
@@ -910,7 +904,7 @@ async function loadHoursTodayApi(){
     if(!response.ok)throw new Error('API indisponível');
     HOURS_TODAY_POSTS=selectDailyHoursPosts(await response.json());
     if(!HOURS_TODAY_POSTS.length){
-      target.innerHTML='<p class="hours-api-status" role="status">A API não retornou publicações de Ofício para hoje e a véspera.</p><button class="action-btn hours-api-link" onclick="openHoursTodayArchive()">Abrir Católico Orante</button>';
+      target.innerHTML='<p class="hours-api-status" role="status">A API não retornou publicações de Ofício para hoje e a véspera.</p><button class="action-btn hours-api-link" onclick="loadHoursTodayApi()">Tentar novamente</button>';
       return;
     }
     target.innerHTML='<p class="hours-api-status" role="status">Publicações de hoje e da véspera; algumas horas podem ser publicadas antecipadamente.</p>'+
@@ -920,7 +914,7 @@ async function loadHoursTodayApi(){
       }).join('');
   }catch(error){
     const note=error?.name==='AbortError'?'A consulta demorou mais do que o esperado.':'Não foi possível consultar a API agora.';
-    target.innerHTML='<p class="hours-api-status" role="status">'+note+'</p><button class="action-btn hours-api-link" onclick="openHoursTodayArchive()">Abrir Católico Orante</button>';
+    target.innerHTML='<p class="hours-api-status" role="status">'+note+'</p><button class="action-btn hours-api-link" onclick="loadHoursTodayApi()">Tentar novamente</button>';
   }finally{clearTimeout(timeout);}
 }
 function viewLiturgia(){
