@@ -6,9 +6,20 @@ let oficiosReady = false;
 let oficiosLoadError = false;
 let santoralLoading = true;
 let santoralLoadError = false;
+function saintFallbackMonogram(s){
+  const title=String(s?.title||'').replace(/^(?:B(?:\.A)?\.|São|Santo|Santa|Servo de Deus)\s+/i,'');
+  const words=(title.match(/[A-Za-zÀ-ÖØ-öø-ÿ0-9]+/g)||[]).filter(word=>!['a','as','da','das','de','do','dos','e','o','os'].includes(word.toLocaleLowerCase('pt-BR')));
+  return (words.slice(0,2).map(word=>Array.from(word)[0]).join('')||'OSM').toLocaleUpperCase('pt-BR');
+}
 function saintImageHtml(s, detail=false){
   const src=s.image;
-  if(!src) return '';
+  if(!src){
+    const label=`Imagem não disponível para ${escapeHtml(s.title)}`;
+    const mark=escapeHtml(saintFallbackMonogram(s));
+    return detail
+      ? `<div class="saint-image-detail saint-image-placeholder fade-in" role="img" aria-label="${label}"><span>${mark}</span></div>`
+      : `<div class="saint-thumb saint-thumb--fallback" role="img" aria-label="${label}"><span>${mark}</span></div>`;
+  }
   return detail ? `<div class="saint-image-detail fade-in"><img src="${src}" alt="Imagem de ${escapeHtml(s.title)}"></div>` : `<div class="saint-thumb"><img src="${src}" alt="Imagem de ${escapeHtml(s.title)}"></div>`;
 }
 function saintRankSubtitle(s){
@@ -195,7 +206,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.37';
+const APP_VERSION = '4.9.38';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1101,6 +1112,18 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
   const localISO=(date=new Date())=>`${date.getFullYear()}-${two(date.getMonth()+1)}-${two(date.getDate())}`;
   const cacheKey=date=>CACHE_PREFIX+date;
   const CACHE_MAX_AGE=30*24*60*60*1000;
+  function pruneDailyMassCache(now=Date.now()){
+    try{
+      for(let i=localStorage.length-1;i>=0;i--){
+        const key=localStorage.key(i);
+        if(!key||!key.startsWith(CACHE_PREFIX))continue;
+        let saved;
+        try{saved=Date.parse(JSON.parse(localStorage.getItem(key)||'null')?.savedAt||'');}catch(e){saved=NaN;}
+        if(!Number.isFinite(saved)||now-saved>CACHE_MAX_AGE)localStorage.removeItem(key);
+      }
+    }catch(error){console.warn('[Liturgia OSM] Não foi possível limpar o cache antigo da Missa.',error);}
+  }
+  pruneDailyMassCache();
   const readCache=date=>{try{const key=cacheKey(date),cached=JSON.parse(localStorage.getItem(key)||'null'),saved=Date.parse(cached?.savedAt||'');if(!cached||!Number.isFinite(saved)||Date.now()-saved>CACHE_MAX_AGE){localStorage.removeItem(key);return null;}return cached;}catch(e){return null}};
   const saveCache=(date,data)=>{try{localStorage.setItem(cacheKey(date),JSON.stringify({savedAt:new Date().toISOString(),data}))}catch(e){}};
   const safe=value=>escapeHtml(String(value||''));
@@ -1147,7 +1170,7 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
       const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),12000);let response;try{response=await fetch(`${API}?dia=${day}&mes=${month}&ano=${year}`,{headers:{Accept:'application/json'},signal:controller.signal});}finally{clearTimeout(timeout);}
       if(!response.ok)throw new Error('Liturgia não encontrada');
       const data=await response.json();saveCache(selectedDate,data);target.innerHTML=renderMass({savedAt:new Date().toISOString(),data},false);
-    }catch(error){if(!cached){const message=error?.name==='AbortError'?'A consulta demorou mais que o esperado. Verifique a conexão e tente novamente.':'Não foi possível acessar o serviço da Missa. Verifique a conexão e tente novamente.';target.innerHTML=`<div class="daily-error">${safe(message)}<br><button class="daily-retry" onclick="loadDailyLiturgy('${safe(selectedDate)}')">Tentar novamente</button></div>`;}}
+    }catch(error){if(!cached){const message=error?.message==='Liturgia não encontrada'?'Não há texto da Missa disponível para esta data.':error?.name==='AbortError'?'O serviço da Missa não respondeu no prazo e não há cópia local para esta data.':'O serviço da Missa está indisponível e não há cópia local para esta data. Verifique a conexão e tente novamente.';target.innerHTML=`<div class="daily-error">${safe(message)}<br><button class="daily-retry" onclick="loadDailyLiturgy('${safe(selectedDate)}')">Tentar novamente</button></div>`;}}
   };
   window.openDailyLiturgy=function(date){document.getElementById('dailyLiturgyOverlay').classList.add('open');document.getElementById('dailyLiturgyOverlay').setAttribute('aria-hidden','false');loadDailyLiturgy(date||localISO());};
   window.closeDailyLiturgy=function(){document.getElementById('dailyLiturgyOverlay').classList.remove('open');document.getElementById('dailyLiturgyOverlay').setAttribute('aria-hidden','true');if(document.body.classList.contains('celebration-mode'))toggleCelebrationMode();};
