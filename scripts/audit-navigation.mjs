@@ -24,7 +24,7 @@ assert.match(app, /function officeHourButtonHtml/);
 assert.match(app, /const APP_VERSION = ['"]4\.9\.39['"]/);
 assert.ok(app.includes('https://liturgiadashoras.online/wp-json/wp/v2/posts'), 'Consulta das Horas deve usar a API REST do site brasileiro.');
 assert.ok(app.includes('Consultar as horas de hoje') && app.includes('hoursTodayApiResults'), 'Liturgia deve oferecer acesso às publicações das Horas de hoje.');
-const hoursHelperStart = app.indexOf('function selectDailyHoursPosts(posts){');
+const hoursHelperStart = app.indexOf('function plainHoursTitle(value){');
 const hoursHelperEnd = app.indexOf('\nfunction localRestDateBound(', hoursHelperStart);
 assert.ok(hoursHelperStart >= 0 && hoursHelperEnd > hoursHelperStart, 'Filtro de publicações da API das Horas ausente.');
 const selectDailyHoursPosts = new Function(app.slice(hoursHelperStart, hoursHelperEnd) + '; return selectDailyHoursPosts;')();
