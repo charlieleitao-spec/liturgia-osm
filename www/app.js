@@ -793,7 +793,7 @@ function viewVida(){
 function setLiturgiaSection(section){state.liturgiaSection=section;render();window.scrollTo(0,0);}
 
 const HOURS_API_BASE='https://liturgiadashoras.online/wp-json/wp/v2/posts';
-const HOURS_ARCHIVE_URL='https://liturgiadashoras.online/comunidade/oracao/';
+const HOURS_ARCHIVE_URL='https://liturgiadashoras.online/category/horas-canonicas/';
 let HOURS_TODAY_POSTS=[];
 function plainHoursTitle(value){
   return String(value||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;|&#160;/gi,' ').replace(/&amp;/gi,'&').replace(/&quot;/gi,'"').replace(/&#8211;|&#x2013;/gi,'–').replace(/&#8212;|&#x2014;/gi,'—').replace(/&#39;|&apos;|&#8217;/gi,"'").replace(/\s+/g,' ').trim();
