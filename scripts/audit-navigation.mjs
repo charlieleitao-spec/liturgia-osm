@@ -22,34 +22,13 @@ assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
 assert.match(app, /const APP_VERSION = ['"]4\.9\.41['"]/);
-assert.ok(app.includes('https://liturgiadashoras.online/wp-json/wp/v2/posts'), 'Consulta das Horas deve usar a API REST do site brasileiro.');
-assert.ok(html.includes('id="hoursReaderOverlay"') && app.includes('sanitizeHoursPostMarkup'), 'As Horas devem abrir em leitor interno sem carregar a página com anúncios.');
-assert.ok(!app.includes('openHoursTodayArchive') && !app.includes('Abrir fonte original'), 'A leitura deve permanecer no app quando a fonte tem anúncios.');
-assert.ok(app.includes("_fields','id,date,link,title,content"), 'O leitor deve carregar o texto da publicação pela API.');
-assert.ok(app.includes('Consultar as horas de hoje') && app.includes('hoursTodayApiResults'), 'Liturgia deve oferecer acesso às publicações das Horas de hoje.');
-assert.ok(app.includes("const PAULUS_HOURS_URL='https://www.paulus.com.br/portal/liturgia-diaria-das-horas/'") && app.includes('async function loadPaulusHours()'), 'A prévia Paulus deve consultar a página diária no leitor interno.');
-assert.ok(app.includes("doc.querySelector('#interno .texto") && app.includes('paulusHoursDateMatches') && html.includes('hoursReaderSource'), 'A prévia deve extrair o texto diário e validar sua data antes de exibir.');
-assert.ok(app.includes('Experimentar Laudes de hoje · Paulus'), 'Liturgia deve oferecer a prévia das Laudes da Paulus.');
-const paulusDateStart = app.indexOf('function paulusHoursDateMatches(value,date=new Date()){');
-const paulusDateEnd = app.indexOf('\nasync function loadPaulusHours()', paulusDateStart);
-assert.ok(paulusDateStart >= 0 && paulusDateEnd > paulusDateStart, 'Validação da data da página Paulus ausente.');
-const paulusHoursDateMatches = new Function(app.slice(paulusDateStart, paulusDateEnd) + '; return paulusHoursDateMatches;')();
-assert.equal(paulusHoursDateMatches('DIA 7 – QUARTA-FEIRA', new Date(2026,9,7)), true);
-assert.equal(paulusHoursDateMatches('DIA 6 – TERÇA-FEIRA', new Date(2026,9,7)), false);
-const hoursHelperStart = app.indexOf('function plainHoursTitle(value){');
-const hoursHelperEnd = app.indexOf('\nfunction localRestDateBound(', hoursHelperStart);
-assert.ok(hoursHelperStart >= 0 && hoursHelperEnd > hoursHelperStart, 'Filtro de publicações da API das Horas ausente.');
-const selectDailyHoursPosts = new Function(app.slice(hoursHelperStart, hoursHelperEnd) + '; return selectDailyHoursPosts;')();
-const hoursFixture = [
-  {id:1,date:'2026-10-06T09:00:00-03:00',link:'https://liturgiadashoras.online/laudes-memoria-teste/',title:{rendered:'Laudes – Memória de Nossa Senhora do Rosário'}},
-  {id:2,date:'2026-10-07T09:00:00-03:00',link:'https://liturgiadashoras.online/hora-terca-teste/',title:{rendered:'Hora Terça – Quarta-feira'}},
-  {id:3,date:'2026-10-07T09:00:00-03:00',link:'https://outro-site.example/laudes/',title:{rendered:'Laudes – teste'}},
-  {id:4,date:'2026-10-07T09:00:00-03:00',link:'https://liturgiadashoras.online/noticia/',title:{rendered:'Notícia do dia'}}
-];
-const selectedHours = selectDailyHoursPosts(hoursFixture);
-assert.equal(selectedHours.length, 2, 'Filtro da API deve conservar apenas horas litúrgicas do domínio escolhido.');
-assert.match(selectedHours[0].plainTitle, /Hora Terça/);
-
+assert.ok(app.includes('https://liturgiadashoras.online/category/horas-canonicas/'), 'A seção deve oferecer o acesso online do Católico Orante.');
+assert.ok(app.includes('https://www.paulus.com.br/portal/liturgia-diaria-das-horas/'), 'A seção deve oferecer o acesso online da Paulus.');
+assert.ok(app.includes('return openExternalLink(event, this.href)'), 'As fontes devem abrir como links externos.');
+assert.doesNotMatch(app, /wp-json\/wp\/v2\/posts|PAULUS_HOURS_URL|sanitizeHoursPostMarkup|loadPaulusHours|loadHoursTodayApi/, 'Não deve haver API nem leitor incorporado para a Liturgia das Horas.');
+assert.doesNotMatch(html, /hoursReaderOverlay/);
+assert.doesNotMatch(css, /hours-api-results|hours-reading/);
+assert.ok(app.includes('Católico Orante · Liturgia das Horas') && app.includes('Paulus · Liturgia Diária das Horas'), 'Os dois acessos externos devem estar identificados.');
 assert.match(app, /const APP_VERSION = ['"]4\.9\.41['"]/);
 assert.match(app, /addListener\(['"]backButton['"]/);
 assert.match(app, /function saintRankSubtitle/);
