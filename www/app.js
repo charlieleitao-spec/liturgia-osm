@@ -942,7 +942,7 @@ async function loadPaulusHours(){
     const dailyText=daily?.textContent||doc.body?.textContent||'';
     if(!paulusHoursDateMatches(dailyText,now))throw new Error('A página não corresponde à data de hoje.');
     const article=doc.querySelector('#interno .texto, .interno .texto, main article .texto, article .texto');
-    if(!article||!/(laudes\\s*\\(manhã\\)|laudes)/i.test(article.textContent||''))throw new Error('Laudes de hoje não encontradas.');
+    if(!article||!/(laudes\s*\(manhã\)|laudes)/i.test(article.textContent||''))throw new Error('Laudes de hoje não encontradas.');
     const body=sanitizeHoursPostMarkup(article.innerHTML);
     if(!body)throw new Error('Texto indisponível.');
     const date=new Intl.DateTimeFormat('pt-BR').format(now);
