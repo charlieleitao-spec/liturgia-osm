@@ -21,7 +21,15 @@ for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data
 assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
-assert.match(app, /const APP_VERSION = ['"]4\.9\.38['"]/);
+assert.match(app, /const APP_VERSION = ['"]4\.9\.43['"]/);
+assert.ok(app.includes('https://www.paulus.com.br/portal/liturgia-diaria-das-horas/'), 'A seção deve oferecer o acesso online da Paulus.');
+assert.ok(app.includes('return openExternalLink(event, this.href)'), 'As fontes devem abrir como links externos.');
+assert.doesNotMatch(app, /wp-json\/wp\/v2\/posts|PAULUS_HOURS_URL|sanitizeHoursPostMarkup|loadPaulusHours|loadHoursTodayApi/, 'Não deve haver API nem leitor incorporado para a Liturgia das Horas.');
+assert.doesNotMatch(html, /hoursReaderOverlay/);
+assert.doesNotMatch(css, /hours-api-results|hours-reading/);
+assert.ok(app.includes('Liturgia Diária das Horas · Paulus'), 'O acesso externo à Paulus deve estar identificado.');
+assert.doesNotMatch(app, /liturgiadashoras\\.online|Católico Orante/, 'O link do Católico Orante deve ser removido.');
+assert.match(app, /const APP_VERSION = ['"]4\.9\.43['"]/);
 assert.match(app, /addListener\(['"]backButton['"]/);
 assert.match(app, /function saintRankSubtitle/);
 assert.match(css, /text-align:\s*center/);

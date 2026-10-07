@@ -206,7 +206,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.38';
+const APP_VERSION = '4.9.43';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -791,6 +791,7 @@ function viewVida(){
   return tabs+(current==='calendario'?viewCalendario():current==='santoral'?viewSantoral():viewHoje());
 }
 function setLiturgiaSection(section){state.liturgiaSection=section;render();window.scrollTo(0,0);}
+
 function viewLiturgia(){
   const section=state.liturgiaSection||'missa';
   const switcher=`<div class="toggle-row" aria-label="Seções de Liturgia">
@@ -799,7 +800,7 @@ function viewLiturgia(){
   </div>`;
   if(section==='horas'){
     const saints=SANTORAL.filter(s=>saintHasOffice(s));
-    const todayBlock='<div class="card fade-in"><div class="rowtitle">Liturgia das Horas de hoje</div><p class="reader-note">'+escapeHtml(formatLiturgicalDate())+'</p><button class="action-btn" onclick="openServite(\'oficio\')">Abrir Ofício de hoje</button></div>';
+    const todayBlock='<div class="card fade-in"><div class="rowtitle">Liturgia das Horas de hoje</div><p class="reader-note">'+escapeHtml(formatLiturgicalDate())+'</p><button class="action-btn" onclick="openServite(\'oficio\')">Abrir Ofício próprio OSM</button><p class="reader-note" style="text-align:left;margin:12px 0 8px;">Acesse a Liturgia das Horas pelo site da Paulus.</p><a class="action-btn" href="https://www.paulus.com.br/portal/liturgia-diaria-das-horas/" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event, this.href)">Liturgia Diária das Horas · Paulus</a></div>';
     const officeWarning=!oficiosReady?'<div class="card" role="alert"><p>O cadastro local dos Ofícios está indisponível. A Vida e as orações continuam acessíveis.</p><button class="action-btn" onclick="loadCanonicalOffices()">Tentar carregar os Ofícios</button></div>':'';
     const ownBlocks='<div class="section-title">Ofícios e textos próprios OSM</div><p class="reader-note">A celebração do santo abre somente as horas disponíveis no texto.</p>'+
       '<div class="card fade-in" style="padding:6px 16px;">'+saints.map(function(s){return '<div class="saint-row saint-row-hours"><div class="daynum">'+s.day+'</div><div class="rowtext"><div class="rowtitle">'+escapeHtml(s.title)+'</div><div class="rowrank">'+escapeHtml(s.date)+'</div></div><div class="office-hours-grid">'+officeHoursForSaint(s).map(function(pair){return officeHourButtonHtml(s,pair);}).join('')+'</div></div>';}).join('')+'</div>';
