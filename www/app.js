@@ -206,7 +206,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.40';
+const APP_VERSION = '4.9.41';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -793,6 +793,7 @@ function viewVida(){
 function setLiturgiaSection(section){state.liturgiaSection=section;render();window.scrollTo(0,0);}
 
 const HOURS_API_BASE='https://liturgiadashoras.online/wp-json/wp/v2/posts';
+const PAULUS_HOURS_URL='https://www.paulus.com.br/portal/liturgia-diaria-das-horas/';
 let HOURS_TODAY_POSTS=[];
 function plainHoursTitle(value){
   return String(value||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;|&#160;/gi,' ').replace(/&amp;/gi,'&').replace(/&quot;/gi,'"').replace(/&#8211;|&#x2013;/gi,'–').replace(/&#8212;|&#x2014;/gi,'—').replace(/&#39;|&apos;|&#8217;/gi,"'").replace(/\s+/g,' ').trim();
@@ -825,6 +826,7 @@ function openHoursTodayPost(index){
   const overlay=document.getElementById('hoursReaderOverlay'),title=document.getElementById('hoursReaderTitle'),target=document.getElementById('hoursReaderContent');
   if(!overlay||!title||!target)return;
   title.textContent=post.plainTitle||'Liturgia das Horas';
+  const sourceLabel=document.getElementById('hoursReaderSource');if(sourceLabel)sourceLabel.textContent='Católico Orante · leitura no app';
   target.innerHTML='<div class="daily-loading" role="status">Carregando o texto…</div>';
   overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');
   loadHoursPostContent(post,index);
@@ -915,6 +917,39 @@ async function loadHoursTodayApi(){
   }catch(error){
     const note=error?.name==='AbortError'?'A consulta demorou mais do que o esperado.':'Não foi possível consultar a API agora.';
     target.innerHTML='<p class="hours-api-status" role="status">'+note+'</p><button class="action-btn hours-api-link" onclick="loadHoursTodayApi()">Tentar novamente</button>';
+  }finally{clearTimeout(timeout);}
+}
+function paulusHoursDateMatches(value,date=new Date()){
+  const weekdays=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+  const weekday=weekdays[date.getDay()],day=date.getDate();
+  return new RegExp('DIA\\s+0?'+day+'\\s*[–—-]\\s*'+weekday,'i').test(String(value||''));
+}
+async function loadPaulusHours(){
+  const overlay=document.getElementById('hoursReaderOverlay'),title=document.getElementById('hoursReaderTitle'),sourceLabel=document.getElementById('hoursReaderSource'),target=document.getElementById('hoursReaderContent');
+  if(!overlay||!title||!target)return;
+  title.textContent='Laudes de hoje';if(sourceLabel)sourceLabel.textContent='Paulus · leitura no app';
+  target.innerHTML='<div class="daily-loading" role="status">Consultando a Paulus…</div>';
+  overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');updateBackButton();
+  const now=new Date(),controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
+  try{
+    if(!navigator.onLine)throw new Error('Sem conexão.');
+    const response=await fetch(PAULUS_HOURS_URL,{headers:{Accept:'text/html'},signal:controller.signal});
+    if(!response.ok)throw new Error('Página indisponível.');
+    const finalUrl=new URL(response.url||PAULUS_HOURS_URL);
+    if(finalUrl.protocol!=='https:'||finalUrl.hostname!=='www.paulus.com.br'||!finalUrl.pathname.startsWith('/portal/liturgia-diaria-das-horas/'))throw new Error('Fonte não confirmada.');
+    const page=await response.text(),doc=new DOMParser().parseFromString(page,'text/html');
+    const daily=doc.querySelector('#interno, .interno, main article, article');
+    const dailyText=daily?.textContent||doc.body?.textContent||'';
+    if(!paulusHoursDateMatches(dailyText,now))throw new Error('A página não corresponde à data de hoje.');
+    const article=doc.querySelector('#interno .texto, .interno .texto, main article .texto, article .texto');
+    if(!article||!/(laudes\\s*\\(manhã\\)|laudes)/i.test(article.textContent||''))throw new Error('Laudes de hoje não encontradas.');
+    const body=sanitizeHoursPostMarkup(article.innerHTML);
+    if(!body)throw new Error('Texto indisponível.');
+    const date=new Intl.DateTimeFormat('pt-BR').format(now);
+    target.innerHTML='<div class="daily-source"><b>Fonte: Paulus Editora</b> · Liturgia Diária das Horas · '+escapeHtml(date)+'<br>Prévia experimental das Laudes, exibida nesta tela.</div><article class="daily-reading hours-reading">'+body+'</article>';
+  }catch(error){
+    const note=error?.name==='AbortError'?'A consulta demorou mais do que o esperado.':'Não foi possível carregar as Laudes da Paulus nesta tela.';
+    target.innerHTML='<div class="daily-error" role="alert">'+note+'<br><button class="daily-retry" onclick="loadPaulusHours()">Tentar novamente</button></div>';
   }finally{clearTimeout(timeout);}
 }
 function viewLiturgia(){
