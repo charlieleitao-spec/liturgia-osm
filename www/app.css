@@ -357,6 +357,8 @@ body.servite-open .celebration-toggle,body.servite-open .floating-back,body.serv
 .social-label{font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:15px;color:var(--paper)}
 .social-sub{font-size:12px;color:var(--text-muted);margin-top:2px}
 .app-creator-card{border-color:var(--gold)}
+.liturgy-page-intro{margin:15px 4px 22px;color:var(--text-muted);font:400 16px/1.5 Georgia,'Times New Roman',serif}
+.liturgy-page-intro p{margin:0;max-width:42rem}
 .office-list-badge{flex:0 0 auto;border:1px solid var(--gold);color:var(--gold-soft);border-radius:999px;padding:5px 8px;font-family:Georgia,'Times New Roman',serif;font-size:11px;line-height:1}
 .office-hours-card{padding:16px}
 .office-hours-intro{font-family:Georgia,'Times New Roman',serif;font-size:1.02rem;color:var(--paper);margin-bottom:12px}
@@ -374,10 +376,9 @@ body.servite-open .celebration-toggle,body.servite-open .floating-back,body.serv
 .office-hour-copy strong{color:var(--paper);font:400 15px/1.25 Georgia,'Times New Roman',serif;overflow-wrap:anywhere}
 .office-hour-note{color:var(--text-muted);font:italic 11px/1.35 Georgia,'Times New Roman',serif;overflow-wrap:anywhere}
 .office-hour-arrow{color:var(--gold-soft);font-size:22px;line-height:1;text-align:center}
-.saint-row.saint-row-hours{display:grid;grid-template-columns:28px minmax(0,1fr);align-items:start;gap:9px 12px}
-.saint-row-hours>.daynum{grid-column:1;grid-row:1}
-.saint-row-hours>.rowtext{grid-column:2;min-width:0}
-.saint-row-hours>.office-hours-grid{grid-column:1/-1;width:100%;margin-top:2px}
+.saint-row.saint-row-hours{display:grid;grid-template-columns:minmax(0,1fr);align-items:start;gap:9px 12px}
+.saint-row-hours>.rowtext{grid-column:1;min-width:0}
+.saint-row-hours>.office-hours-grid{grid-column:1;width:100%;margin-top:2px}
 .hub-action.office-hour-choice{width:100%;font:inherit}
 .hub-text,.prayer-block,.prayer-card .text,.daily-reading p{text-align:center}
 .hub-back{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin:4px 0 12px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg-panel);color:var(--gold-soft);font:600 14px Georgia,'Times New Roman',serif}
@@ -829,8 +830,7 @@ body.light-mode .crest{border-color:#b89a5b}
 
 
 /* Hierarquia equilibrada na lista de Ofícios próprios */
-.saint-row.saint-row-hours{align-items:center;gap:12px 14px;padding:16px 4px 18px}
-.saint-row-hours>.daynum{display:grid;place-items:center;width:40px;height:40px;border:1px solid rgba(184,148,72,.38);border-radius:12px;background:rgba(184,148,72,.08);font-size:18px;color:var(--gold-soft)}
+.saint-row.saint-row-hours{grid-template-columns:minmax(0,1fr);align-items:center;gap:12px;padding:16px 4px 18px}
 .saint-row-hours>.rowtext{align-self:center}
 .saint-row-hours .rowtitle{font-size:19px;line-height:1.2;font-weight:700;color:var(--paper)}
 .saint-row-hours .rowrank{margin-top:3px;font-size:13px;line-height:1.25;font-style:normal;color:var(--text-muted)}
@@ -930,7 +930,7 @@ body.light-mode .crest{border-color:#b89a5b}
 #view .cal-head{min-width:0}
 #view .calendar-celebration-row{min-width:0}
 #view .office-hours-card,#view .saint-row-hours>.office-hours-grid{width:100%;max-width:100%;min-width:0}
-#view .saint-row-hours{grid-template-columns:40px minmax(0,1fr);width:100%}
+#view .saint-row-hours{grid-template-columns:minmax(0,1fr);width:100%}
 #view .saint-row-hours>.office-hours-grid{grid-column:1/-1}
 #view .office-hour-choice{box-sizing:border-box;width:100%;max-width:100%;min-width:0}
 #view .office-hour-copy{min-width:0}
@@ -950,8 +950,7 @@ body.light-mode .crest{border-color:#b89a5b}
   #view .hub-navigation-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   #view .hub-navigation-grid>.hub-action{padding:10px 7px;font-size:13px}
   #view .hub-navigation-grid .hub-action-direction{font-size:14px!important}
-  #view .saint-row-hours{grid-template-columns:34px minmax(0,1fr)}
-  #view .saint-row-hours>.daynum{width:34px;height:34px}
+  #view .saint-row-hours{grid-template-columns:minmax(0,1fr)}
   #view .office-hour-choice{grid-template-columns:28px minmax(0,1fr) 14px!important;gap:7px!important;padding:8px!important}
 }
 
