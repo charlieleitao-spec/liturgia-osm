@@ -848,7 +848,7 @@ function viewLiturgia(){
       return switcher+'<button class="hub-back" onclick="closeProperMass()">‹ Voltar às Missas próprias</button>'+
         '<div class="section-title">Missa própria OSM</div><div class="hub-card"><div class="hub-card-title">'+escapeHtml(title)+'</div>'+
         '<p class="reader-note">'+escapeHtml(date)+(item.rank?' · '+escapeHtml(item.rank):'')+'</p>'+
-        renderProperMassContent(item)+'<p class="hub-source">Fonte: '+escapeHtml(item.source||'fonte não informada')+'</p></div>';
+        (item.pdf_url?'<p class="reader-note">Também disponível no PDF oficial.</p><a class="action-btn" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Abrir Missa própria (PDF)</a>':'')+renderProperMassContent(item)+'<p class="hub-source">Fonte: '+escapeHtml(item.source||'fonte não informada')+'</p></div>';
     }
     state.properMassDate=null;
   }
