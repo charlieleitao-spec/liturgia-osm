@@ -1,5 +1,53 @@
 {
   "schema_version": 1,
-  "description": "Inserir somente Missas próprias transcritas de fonte oficial conferida.",
-  "celebrations": []
+  "description": "Missas próprias OSM transcritas de fontes oficiais conferidas.",
+  "celebrations": [
+    {
+      "date": "01-12",
+      "santoral_id": 0,
+      "title": "Santo Antônio Maria Pucci",
+      "rank": "Festa",
+      "source": "Livro Litúrgico OSM, Missa própria de Santo Antônio Maria Pucci, 12 de janeiro.",
+      "entrance_antiphon": {
+        "reference": "Sl 49,13",
+        "text": "Cantai, ó céus! Terra, exulta de alegria!\nMontes, prorrompei em aclamações!\nPorque o Senhor consolou seu povo,\ncomoveu-se e teve piedade dos seus na aflição!"
+      },
+      "collect": "Ó Deus, tornastes admirável Santo Antônio Maria\ncomo servo da Virgem Gloriosa\ne como pastor do vosso povo.\nConcedei que, inspirando-nos na mesma Virgem Mãe,\nempenhemos nossas vidas\nna propagação do reino de Cristo, vosso Filho.\nEle que convosco vive e reina na unidade do Espírito Santo.",
+      "readings": [
+        {
+          "title": "Primeira leitura",
+          "reference": "Ez 34,11-16.31",
+          "text": "Assim fala o Senhor Deus: Eis que eu mesmo buscarei minhas ovelhas e tomarei conta delas. Como o pastor toma conta delas. Como o pastor toma conta do rebanho quando ele próprio se encontra no meio das ovelhas dispersadas, assim cuidarei de minhas ovelhas e as resgatarei de todos os lugares em que foram dispersadas em dia de nuvens e de escuridão. Eu as retirarei do meio dos povos e as recolherei do meio dos países para reconduzi-las à sua terra. Apascentarei as ovelhas sobre os montes de Israel, no leito das torrentes e em todas as regiões habitáveis do país. Apascentá-las-ei em viçosas pastagens e no alto monte de Israel estará o seu redil. Ali repousarão num belo redil e pastarão em suculentas pastagens sobre os montes de Israel. Eu mesmo apascentarei minhas ovelhas e as farei repousar. Oráculo do Senhor Deus!\nProcurarei a ovelha perdida, reconduzirei a extraviada, enfaixarei a quebrada, fortalecerei a doente, e vigiarei a ovelha gorda e forte. Apascentá-las-ei conforme o direito. E quanto a vós, minhas ovelhas, ovelhas de minha pastagem, vós sois homens, e eu sou o vosso Deus. Oráculo do Senhor Deus!"
+        },
+        {
+          "title": "Salmo de meditação",
+          "reference": "Sl 22,1-3-3b-4.5.6",
+          "text": "R/ O Senhor é meu pastor, nada me pode faltar!\n\nO Senhor é meu pastor, nada me falta;\nem verdes pastagens me faz repousar.\nEle me leva até águas tranqüilas e refaz minhas forças. R/\n\nPelos bons caminhos me conduz, por amor de seu nome.\nAinda que eu passe pelo vale da morte,\nnenhum mal temerei, porque estais comigo;\nvosso bordão e vosso cajado me dão segurança. R/\n\nPreparais a mesa para mim na presença do inimigo;\nsobre minha cabeça derramais perfume,\nminha taça se enche de alegria. R/\n\nGraça e ventura me seguirão todos os dias de minha vida;\ne habitarei na casa do Senhor\nenquanto durarem meus dias. R/"
+        },
+        {
+          "title": "Segunda leitura",
+          "condition": "se a festa for celebrada como solenidade",
+          "reference": "1Jo 4,14-21",
+          "text": "Caríssimos, nós vimos e testemunhamos que o Pai enviou seu Filho como Salvador do mundo. Todo aquele que proclama que Jesus é o Filho de Deus, Deus permanece nele e ele em Deus. Nós conhecemos e cremos no amor que Deus tem para conosco. Deus é amor, e quem permanece no amor permanece em Deus e Deus nele. A perfeição do amor se mostra em nós por termos confiança no dia do juízo. Pois assim como ele é, assim também nós somos neste mundo. No amor não há temor, pois o amor perfeito livra-se do temor. Temor supõe castigo, e quem teme não é perfeito no amor. Amemos a Deus, porque Deus nos amou primeiro. Se alguém disser: “Amo a Deus”, mas odiar o irmão, é mentiroso. Pois quem não ama o irmão, a quem vê, não pode amar a Deus, a quem não vê. Temos de Deus o preceito: quem ama a Deus, ame também o irmão."
+        },
+        {
+          "title": "Aclamação ao Evangelho",
+          "reference": "1Cor 9,22b",
+          "text": "R/ Aleluia! Aleluia! Aleluia!\nTornei-me tudo para todos,\na fim de salvar a todos. R/"
+        },
+        {
+          "title": "Evangelho",
+          "reference": "Jo 10,11-16",
+          "text": "Evangelho de Jesus Cristo segundo João\nNaquele tempo, Jesus disse: Eu sou o bom pastor. O bom pastor dá a vida pelas ovelhas. O mercenário, que não é pastor, de quem não são as ovelhas, vê o lobo, abandona as ovelhas e foge. O lobo rouba e dispersa as ovelhas. Pois é mercenário e não lhe importam as ovelhas.\nEu sou o bom pastor. Conheço os meus e os meus me conhecem, assim como o Pai me conhece e eu conheço o Pai. Entrego minha vida pelas ovelhas. Possuo ainda outras ovelhas que não são deste aprisco. É preciso que as traga e elas ouvirão minha voz e haverá um só rebanho e um só pastor."
+        }
+      ],
+      "offertory": "Senhor, pela força do vosso Espírito,\ntransformai estas nossas ofertas em sacramento de salvação;\ne, assim como quisestes que Santo Antônio Maria\nbrilhasse de modo extraordinário no amor ao próximo,\nfazei que nós também, seguindo seu exemplo,\ncresçamos sempre mais no amor aos irmãos.\nPor Cristo nosso Senhor.",
+      "preface": "Na verdade, é nosso dever e salvação\ndar-vos graças e louvar-vos, Senhor, Pai do céu,\nDeus eterno e todo-poderoso,\npor Jesus Cristo, Senhor nosso,\nque destes à vossa Igreja\ncomo sumo Sacerdote e bom Pastor.\nSeguindo o seu exemplo, Santo Antônio Maria,\nservo da Virgem gloriosa,\nconheceu uma a uma as ovelhas que lhe foram confiadas\ne amou-as com extrema caridade.\nCom palavras divinas, instruiu o seu rebanho\ne o alimentou com os sacramentos da salvação.\nConsolou os aflitos com zelo amoroso\ne conduziu os que estavam no erro à luz da verdade.\nPor isso, com todos os anjos e santos,\nnós vos louvamos, dizendo (cantando) a uma só voz:\nSanto, Santo, Santo...",
+      "communion_antiphon": {
+        "reference": "Is 40,11",
+        "text": "Como um pastor, ele cuida do rebanho\ne com seu braço o reúne;\ncarrega os cordeiros nas dobras do seu manto\ne conduz mansamente as ovelhas que amamentam."
+      }
+    }
+  ]
 }
+
