@@ -41,7 +41,9 @@ Quando uma imagem identificada e autorizada for adicionada ao `santoral.json`, e
 
 ## Missas próprias
 
-`missas-osm.json` permanece válido com `celebrations: []` enquanto não houver Missas próprias transcritas de fonte oficial conferida. O aplicativo carrega e valida esse cadastro para permitir futuras inserções; por isso o arquivo e sua leitura são mantidos, mesmo vazio.
+`missas-osm.json` contém os formulários próprios transcritos dos PDFs oficiais do Missal OSM. Os formulários fixos são indexados por data `MM-DD`; as celebrações móveis e as Missas de Santa Maria no Sábado usam chaves próprias e são exibidas em grupos separados na seção **Liturgia > Missa**. Cada formulário preserva a ordem das seções, as alternativas de leituras e o link ao PDF de origem.
+
+O registro de Santo Antônio Maria Pucci mantém a transcrição estruturada já conferida. Os novos formulários usam `sections`, uma lista ordenada com `heading` e `text`, para conservar títulos e opções como aparecem nos PDFs. O renderizador aceita as duas formas.
 
 ## Ofícios, esquema 3
 
@@ -56,3 +58,6 @@ O aplicativo valida as 32 celebrações e requer o esquema 3. A celebração do 
 ## Conferência editorial da Liturgia das Horas
 
 Para cotejar textos que sejam de fato da Liturgia das Horas oficial, usar a edição brasileira em quatro volumes publicada pela Paulus segundo a edição típica e registrar volume e página na fonte do texto. Os Ofícios próprios OSM e o Livro de Oração dos Servos de Maria permanecem identificados como materiais próprios; não se deve apresentar todo o conteúdo do aplicativo como reprodução integral da Liturgia das Horas.
+
+
+Os 32 PDFs do Missal OSM e os 31 PDFs de Ofícios próprios estão incluídos em `pdfs/missal/` e `pdfs/oficios/`. As bases guardam `local_pdf_url` para abrir a cópia incluída e `pdf_url` como fonte oficial. A transcrição pesquisável dos Ofícios está no campo `pdf_transcript`; a dos formulários de Missa está organizada em `sections`. Os PDFs também integram o cache inicial para leitura sem conexão.
