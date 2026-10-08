@@ -868,8 +868,8 @@ function viewLiturgia(){
   </div>`;
   if(section==='horas'){
     const saints=SANTORAL.filter(s=>saintHasOffice(s));
-    const intro='<div class="liturgy-page-intro"><p>Aqui você encontra o ofício de hoje e os textos próprios da Ordem.</p></div>';
-    const todayBlock='<div class="card fade-in"><div class="rowtitle">Hoje</div><p class="reader-note">'+escapeHtml(formatLiturgicalDate())+'</p><button class="action-btn" onclick="openServite(\'oficio\')">Abrir Ofício</button><p style="margin:12px 0 0"><a class="reader-note" href="https://www.paulus.com.br/portal/liturgia-diaria-das-horas/" target="_blank" rel="noopener">Paulus: Liturgia das Horas ↗</a></p></div>';
+    const intro='<div class="liturgy-page-intro"><p>Veja o ofício do dia e os textos próprios da Ordem.</p></div>';
+    const todayBlock='<div class="card fade-in"><div class="rowtitle">Hoje</div><p class="reader-note">'+escapeHtml(formatLiturgicalDate())+'</p><button class="action-btn" onclick="openServite(\'oficio\')">Abrir ofício próprio</button><p style="margin:12px 0 0"><a class="reader-note" href="https://www.paulus.com.br/portal/liturgia-diaria-das-horas/" target="_blank" rel="noopener">Abrir ofício de hoje na Paulus ↗</a></p></div>';
     const officeWarning=!oficiosReady?'<div class="card" role="alert"><p>O cadastro local dos Ofícios está indisponível. A Vida e as orações continuam acessíveis.</p><button class="action-btn" onclick="loadCanonicalOffices()">Tentar carregar os Ofícios</button></div>':'';
     const ownBlocks='<div class="section-title">Ofícios e textos próprios OSM</div>'+
       '<div class="card fade-in" style="padding:6px 16px;">'+saints.map(function(s){return '<div class="saint-row saint-row-hours"><div class="rowtext"><div class="rowtitle">'+escapeHtml(s.title)+'</div><div class="rowrank">'+escapeHtml(s.date)+'</div></div><div class="office-hours-grid">'+officeHoursForSaint(s).map(function(pair){return officeHourButtonHtml(s,pair);}).join('')+'</div></div>';}).join('')+'</div>';
