@@ -23,7 +23,7 @@ assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
 assert.match(app, /const APP_VERSION = ['"]4\.9\.42['"]/);
 assert.match(workflow, /Build APK Liturgia OSM 4\.9\.42/);
-assert.match(workflow, /versionCode 40946/);
+assert.match(workflow, /versionCode 40947/);
 assert.match(app, /rowtitle">Hoje/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
