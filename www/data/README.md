@@ -18,7 +18,7 @@ Há atualmente 21 celebrações sem imagem. A interface usa um marcador tipográ
 - B. Tiago de "Città della Pieve"
 - B. Joaquim de Sena
 - B. Isabel Picenardi
-- Servo de Deus Frei Paulino Maria Baldassarri
+- Servo de Deus Frei Paulino M. Baldassarri
 - B.A. Virgem Maria, Mãe e Medianeira
 - B. Benincasa de Montepulciano
 - B. Francisco de Sena
