@@ -211,7 +211,7 @@ const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
 let pendingSharePrayer = null;
-let state = { tab: 'hoje', angelus:dailySuggestion.key, detailId:null, search:'', devo:null, devoSub:null };
+let state = { tab: 'hoje', angelus:dailySuggestion.key, detailId:null, search:'', devo:null, devoSub:null, properMassDate:null };
 let readerScale = parseFloat(localStorage.getItem('osmReaderScale') || '1');
 let lightMode = localStorage.getItem('osmTheme') !== 'dark';
 function applyPreferences(){
@@ -247,6 +247,7 @@ function setTab(tab){
   state.tab=tab;
   localStorage.setItem('osmLastTab',tab);
   state.detailId=null;state.devo=null;state.devoSub=null;
+  if(tab!=='liturgia')state.properMassDate=null;
   state.prayerSection='praticas';state.prayerCategory=null;memoriaSelectedDate=null;
   render();window.scrollTo(0,0);
 }
@@ -790,7 +791,40 @@ function viewVida(){
   </div>`;
   return tabs+(current==='calendario'?viewCalendario():current==='santoral'?viewSantoral():viewHoje());
 }
-function setLiturgiaSection(section){state.liturgiaSection=section;render();window.scrollTo(0,0);}
+function properMassSection(title,text){
+  if(!text)return '';
+  return '<div class="section-title">'+escapeHtml(title)+'</div><div class="hub-card hub-text">'+escapeHtml(text)+'</div>';
+}
+function properMassAntiphon(title,item){
+  if(!item)return '';
+  const reference=item.reference||item.referencia||'';
+  return properMassSection(title+(reference?' ('+reference+')':''),item.text||'');
+}
+function renderProperMassContent(item){
+  if(!item)return '';
+  const readings=Array.isArray(item.readings)?item.readings:[];
+  const readingHtml=readings.map(function(reading){
+    const title=reading.title||reading.label||'Leitura';
+    const condition=reading.condition?' ('+reading.condition+')':'';
+    const reference=reading.reference||reading.referencia||'';
+    return '<div class="section-title">'+escapeHtml(title+condition)+'</div><div class="hub-card hub-text">'+
+      (reference?'<b>'+escapeHtml(reference)+'</b><br>':'')+escapeHtml(reading.text||'')+'</div>';
+  }).join('');
+  return properMassAntiphon('Antífona de entrada',item.entrance_antiphon||item.antifona_entrada)+
+    properMassSection('Coleta',item.collect||item.coleta)+readingHtml+
+    properMassSection('Sobre as oferendas',item.offertory||item.sobre_oferendas)+
+    properMassSection('Prefácio',item.preface||item.prefacio)+
+    properMassAntiphon('Antífona da comunhão',item.communion_antiphon||item.antifona_comunhao);
+}
+function properMassRecord(date){
+  const records=window.MISSAS_OSM&&Array.isArray(window.MISSAS_OSM.celebrations)?window.MISSAS_OSM.celebrations:[];
+  return records.find(item=>item.date===date||String(item.santoral_id)===String(SANTORAL.find(s=>String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')===date)?.id));
+}
+function openProperMass(date){state.properMassDate=String(date||'');state.tab='liturgia';state.liturgiaSection='missa';render();window.scrollTo(0,0);}
+function closeProperMass(){state.properMassDate=null;render();window.scrollTo(0,0);}
+window.openProperMass=openProperMass;
+window.closeProperMass=closeProperMass;
+function setLiturgiaSection(section){state.liturgiaSection=section;if(section!=='missa')state.properMassDate=null;render();window.scrollTo(0,0);}
 function viewLiturgia(){
   const section=state.liturgiaSection||'missa';
   const switcher=`<div class="toggle-row" aria-label="Seções de Liturgia">
@@ -805,12 +839,32 @@ function viewLiturgia(){
       '<div class="card fade-in" style="padding:6px 16px;">'+saints.map(function(s){return '<div class="saint-row saint-row-hours"><div class="daynum">'+s.day+'</div><div class="rowtext"><div class="rowtitle">'+escapeHtml(s.title)+'</div><div class="rowrank">'+escapeHtml(s.date)+'</div></div><div class="office-hours-grid">'+officeHoursForSaint(s).map(function(pair){return officeHourButtonHtml(s,pair);}).join('')+'</div></div>';}).join('')+'</div>';
     return switcher+'<div class="section-title">Liturgia das Horas</div>'+officeWarning+todayBlock+(oficiosReady?ownBlocks:'');
   }
+  if(state.properMassDate){
+    const item=properMassRecord(state.properMassDate);
+    if(item){
+      const saint=SANTORAL.find(s=>String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')===item.date)||{};
+      const title=item.title||saint.title||'Missa própria';
+      const date=saint.date||item.date;
+      return switcher+'<button class="hub-back" onclick="closeProperMass()">‹ Voltar às Missas próprias</button>'+
+        '<div class="section-title">Missa própria OSM</div><div class="hub-card"><div class="hub-card-title">'+escapeHtml(title)+'</div>'+
+        '<p class="reader-note">'+escapeHtml(date)+(item.rank?' · '+escapeHtml(item.rank):'')+'</p>'+
+        (item.pdf_url?'<p class="reader-note">Também disponível no PDF oficial.</p><a class="action-btn" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Abrir Missa própria (PDF)</a>':'')+renderProperMassContent(item)+'<p class="hub-source">Fonte: '+escapeHtml(item.source||'fonte não informada')+'</p></div>';
+    }
+    state.properMassDate=null;
+  }
   const d=new Date(), value=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
-  const ownMasses=window.MISSAS_OSM&&Array.isArray(window.MISSAS_OSM.celebrations)?window.MISSAS_OSM.celebrations.filter(item=>item.pdf_url):[];
-  const properRows=ownMasses.map(function(item){return '<div class="hub-card"><div class="hub-card-title">'+escapeHtml(item.title||'Missa própria OSM')+'</div><p class="reader-note">'+escapeHtml(item.date_label||item.date||'')+'</p><a class="action-btn" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Abrir Missa própria (PDF)</a></div>';}).join('');
-  const properBlock='<div class="section-title">Missa própria OSM</div><p class="reader-note">PDFs oficiais dos Servos de Maria. É necessária conexão com a internet para abri-los.</p>'+(properRows||'<div class="card">Nenhum PDF próprio cadastrado.</div>');
-  return switcher+properBlock+`<div class="section-title">Missa do dia</div><p class="reader-note">Liturgia da Missa do dia, com consulta por data e cópia offline quando disponível.</p>
-    <div class="card fade-in"><button class="action-btn" onclick="openDailyLiturgy('${value}')">Abrir Missa do dia</button></div>`;
+  const records=window.MISSAS_OSM&&Array.isArray(window.MISSAS_OSM.celebrations)?window.MISSAS_OSM.celebrations:[];
+  const properRows=records.map(function(item){
+    const saint=SANTORAL.find(s=>String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')===item.date)||{};
+    const title=item.title||saint.title||'Missa própria';
+    const date=saint.date||item.date||'';
+    const key=String(item.date||'').replace(/[^0-9-]/g,'');
+    return '<div class="saint-row" role="button" tabindex="0" onclick="openProperMass(\''+key+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openProperMass(\''+key+'\')}"><div class="rowtext"><div class="rowtitle">'+escapeHtml(title)+'</div><div class="rowrank">'+escapeHtml(date)+(item.rank?' · '+escapeHtml(item.rank):'')+'</div></div><div class="chev">›</div></div>';
+  }).join('');
+  return switcher+`<div class="section-title">Missa</div><p class="reader-note">Liturgia da Missa do dia, com consulta por data e cópia offline quando disponível.</p>
+    <div class="card fade-in"><button class="action-btn" onclick="openDailyLiturgy('${value}')">Abrir Missa do dia</button></div>
+    <div class="section-title">Missas próprias OSM</div><p class="reader-note">Textos próprios da Ordem disponíveis nesta seção.</p>
+    <div class="card fade-in" style="padding:6px 16px;">${properRows||'<div class="empty-state">Nenhuma Missa própria OSM cadastrada.</div>'}</div>`;
 }
 
 function render(){
@@ -987,6 +1041,7 @@ function smartBack(){
   if(language&&language.classList.contains('open')){closeLanguagePanel();return true;}
   if(servite&&servite.classList.contains('open')){if(typeof closeServite==='function')closeServite();else servite.classList.remove('open');updateBackButton();return true;}
   if(mass&&mass.classList.contains('open')&&typeof window.closeDailyLiturgy==='function'){window.closeDailyLiturgy();updateBackButton();return true;}
+  if(state.properMassDate){closeProperMass();return true;}
   if(dailyPrayerOpen480){closeDailyPrayer480();return true;}
   if(memoriaSelectedDate){closeMemoriaLiturgica();return true;}
   if(state.devoSub!==null&&state.devoSub!==undefined){closeDevo();return true;}
@@ -1275,16 +1330,7 @@ loadCanonicalSantoral();
     return records.find(item=>item.date===dateKey(s)||String(item.santoral_id)===String(s.id));
   }
   function properMassBlock(item){
-    const readings=Array.isArray(item.readings)?item.readings:[];
-    const readingHtml=readings.map(function(reading){
-      const title=reading.title||reading.label||'Leitura';
-      const reference=reading.reference||reading.referencia||'';
-      return '<div class="section-title">'+escapeHtml(title)+'</div><div class="hub-card hub-text">'+
-        (reference?'<b>'+escapeHtml(reference)+'</b><br>':'')+escapeHtml(reading.text||'')+'</div>';
-    }).join('');
-    const content=hubText('Coleta',item.collect||item.coleta)+readingHtml+
-      hubText('Prefácio',item.preface||item.prefacio);
-    if(!content&&item.pdf_url)return '<div class="hub-card"><div class="hub-card-title">Missa própria OSM</div><p class="hub-card-note">Texto disponível no PDF oficial.</p><a class="action-btn" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Abrir Missa própria (PDF)</a></div>';
+    const content=renderProperMassContent(item);
     if(!content)return hubEmpty('O cadastro da Missa própria ainda não contém textos conferidos.');
     return '<div class="hub-card"><div class="hub-card-title">Missa própria</div>'+content+
       '<p class="hub-source">Fonte: '+escapeHtml(item.source||'fonte não informada')+'</p></div>';
@@ -1401,7 +1447,7 @@ loadCanonicalSantoral();
   }).then(function(data){
     if(data.schema_version!==1||!Array.isArray(data.celebrations))throw new Error('Cadastro de Missas próprias inválido');
     window.MISSAS_OSM=data;
-    if((state.detailId!==null&&state.detailId!==undefined)||state.tab==='liturgia')render();
+    if(state.detailId!==null&&state.detailId!==undefined||state.tab==='liturgia')render();
   }).catch(function(error){console.info('[Liturgia OSM] Missas próprias ainda sem registros conferidos.',error);});
   render();
 })();
