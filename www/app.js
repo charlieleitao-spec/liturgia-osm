@@ -1401,7 +1401,7 @@ loadCanonicalSantoral();
   }).then(function(data){
     if(data.schema_version!==1||!Array.isArray(data.celebrations))throw new Error('Cadastro de Missas próprias inválido');
     window.MISSAS_OSM=data;
-    if(state.detailId!==null&&state.detailId!==undefined)render();
+    if((state.detailId!==null&&state.detailId!==undefined)||state.tab==='liturgia')render();
   }).catch(function(error){console.info('[Liturgia OSM] Missas próprias ainda sem registros conferidos.',error);});
   render();
 })();
