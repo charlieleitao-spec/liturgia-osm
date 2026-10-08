@@ -806,7 +806,10 @@ function viewLiturgia(){
     return switcher+'<div class="section-title">Liturgia das Horas</div>'+officeWarning+todayBlock+(oficiosReady?ownBlocks:'');
   }
   const d=new Date(), value=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
-  return switcher+`<div class="section-title">Missa</div><p class="reader-note">Liturgia da Missa do dia, com consulta por data e cópia offline quando disponível.</p>
+  const ownMasses=window.MISSAS_OSM&&Array.isArray(window.MISSAS_OSM.celebrations)?window.MISSAS_OSM.celebrations.filter(item=>item.pdf_url):[];
+  const properRows=ownMasses.map(function(item){return '<div class="hub-card"><div class="hub-card-title">'+escapeHtml(item.title||'Missa própria OSM')+'</div><p class="reader-note">'+escapeHtml(item.date_label||item.date||'')+'</p><a class="action-btn" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Abrir Missa própria (PDF)</a></div>';}).join('');
+  const properBlock='<div class="section-title">Missa própria OSM</div><p class="reader-note">PDFs oficiais dos Servos de Maria. É necessária conexão com a internet para abri-los.</p>'+(properRows||'<div class="card">Nenhum PDF próprio cadastrado.</div>');
+  return switcher+properBlock+`<div class="section-title">Missa do dia</div><p class="reader-note">Liturgia da Missa do dia, com consulta por data e cópia offline quando disponível.</p>
     <div class="card fade-in"><button class="action-btn" onclick="openDailyLiturgy('${value}')">Abrir Missa do dia</button></div>`;
 }
 
@@ -1281,6 +1284,7 @@ loadCanonicalSantoral();
     }).join('');
     const content=hubText('Coleta',item.collect||item.coleta)+readingHtml+
       hubText('Prefácio',item.preface||item.prefacio);
+    if(!content&&item.pdf_url)return '<div class="hub-card"><div class="hub-card-title">Missa própria OSM</div><p class="hub-card-note">Texto disponível no PDF oficial.</p><a class="action-btn" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Abrir Missa própria (PDF)</a></div>';
     if(!content)return hubEmpty('O cadastro da Missa própria ainda não contém textos conferidos.');
     return '<div class="hub-card"><div class="hub-card-title">Missa própria</div>'+content+
       '<p class="hub-source">Fonte: '+escapeHtml(item.source||'fonte não informada')+'</p></div>';
