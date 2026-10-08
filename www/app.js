@@ -1231,7 +1231,7 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
   pruneDailyMassCache();
   const readCache=date=>{try{const key=cacheKey(date),cached=JSON.parse(localStorage.getItem(key)||'null'),saved=Date.parse(cached?.savedAt||'');if(!cached||!Number.isFinite(saved)||Date.now()-saved>CACHE_MAX_AGE){localStorage.removeItem(key);return null;}return cached;}catch(e){return null}};
   const saveCache=(date,data)=>{try{localStorage.setItem(cacheKey(date),JSON.stringify({savedAt:new Date().toISOString(),data}))}catch(e){}};
-  const safe=value=>escapeHtml(String(value||''));
+  const safe=value=>escapeHtml(cleanMassText(value));
   function readingBody(value,label){
     const scripture=/leitura|evangelho/i.test(String(label||''));
     return cleanMassText(value).split(/\n\s*\n/).filter(Boolean).map(paragraph=>{
