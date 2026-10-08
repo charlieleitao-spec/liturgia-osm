@@ -1064,3 +1064,8 @@ body.scroll-controls-hidden .celebration-toggle{
 body.light-mode .topbar h1{color:#173b67}
 body.light-mode .topbar .brand-tag{background:#b89448;color:#fffdf8}
 @media(max-width:380px){.topbar h1{font-size:19px}}
+
+/* Ajuste de escala do logotipo para leitura no cabeçalho móvel. */
+.topbar h1{font-size:25px}
+.topbar .brand-tag{font-size:.55em;padding:.24em .48em .27em}
+@media(max-width:380px){.topbar h1{font-size:22px}}
