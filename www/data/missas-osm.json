@@ -1,5 +1,38 @@
 {
   "schema_version": 1,
-  "description": "Inserir somente Missas próprias transcritas de fonte oficial conferida.",
-  "celebrations": []
+  "description": "Índice de Missas próprias OSM. Os PDFs oficiais são abertos online e não são incorporados ao APK.",
+  "celebrations": [
+    {
+      "date": "01-12",
+      "santoral_id": 0,
+      "title": "Santo Antônio Maria Pucci",
+      "date_label": "12 de janeiro",
+      "pdf_url": "http://servidimaria.net/sitoosm/po/textos-osm/livros-liturgicos-osm/missa/antonio.pdf",
+      "source": "Site oficial dos Servos de Maria"
+    },
+    {
+      "date": "01-15",
+      "santoral_id": 1,
+      "title": "Bem-aventurado Tiago de Città della Pieve",
+      "date_label": "15 de janeiro",
+      "pdf_url": "http://servidimaria.net/sitoosm/po/textos-osm/livros-liturgicos-osm/missa/villa.pdf",
+      "source": "Site oficial dos Servos de Maria"
+    },
+    {
+      "date": "02-03",
+      "santoral_id": 2,
+      "title": "Bem-aventurado Joaquim de Sena",
+      "date_label": "3 de fevereiro",
+      "pdf_url": "http://servidimaria.net/sitoosm/po/textos-osm/livros-liturgicos-osm/missa/joaquin.pdf",
+      "source": "Site oficial dos Servos de Maria"
+    },
+    {
+      "date": "02-17",
+      "santoral_id": 3,
+      "title": "Sete Santos Fundadores da nossa Ordem",
+      "date_label": "17 de fevereiro",
+      "pdf_url": "http://servidimaria.net/sitoosm/po/textos-osm/livros-liturgicos-osm/missa/fundadores.pdf",
+      "source": "Site oficial dos Servos de Maria"
+    }
+  ]
 }
