@@ -63,7 +63,7 @@ const homeStart = app.indexOf('function viewHoje(){');
 const homeEnd = app.indexOf('function officeDateKey(', homeStart);
 const homeView = app.slice(homeStart, homeEnd);
 assert.ok(homeView.includes('home-hero') && homeView.includes('Calendário'), 'Página inicial deve preservar o cabeçalho visual e o acesso ao calendário.');
-assert.match(html, /<h1>Liturgia(?:\\s*<span class="brand-tag">OSM<\\/span>| OSM)<\\/h1>/, 'Cabeçalho deve manter a marca Liturgia OSM, com ou sem etiqueta.');
+assert.ok(html.includes('<h1>Liturgia <span class="brand-tag">OSM</span></h1>') || html.includes('<h1>Liturgia OSM</h1>'), 'Cabeçalho deve manter a marca Liturgia OSM, com ou sem etiqueta.');
 assert.ok(css.includes('#view .calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))'), 'Calendário deve manter as sete colunas dentro da largura móvel.');
 assert.ok(css.includes('#view .saint-row-hours>.office-hours-grid{grid-column:1/-1}'), 'Botões de Ofícios devem usar toda a largura disponível.');
 assert.ok(css.includes('#view .hub-navigation-grid{grid-template-columns:repeat(2,minmax(0,1fr))'), 'Navegação anterior/próxima deve manter colunas equilibradas.');
