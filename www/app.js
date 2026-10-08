@@ -206,7 +206,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.41';
+const APP_VERSION = '4.9.42';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -870,7 +870,7 @@ function viewLiturgia(){
     const saints=SANTORAL.filter(s=>saintHasOffice(s));
     const todayBlock='<div class="card fade-in"><div class="rowtitle">Ofício de hoje</div><p class="reader-note">'+escapeHtml(formatLiturgicalDate())+'</p><button class="action-btn" onclick="openServite(\'oficio\')">Abrir Ofício</button><p style="margin:12px 0 0"><a class="reader-note" href="https://www.paulus.com.br/portal/liturgia-diaria-das-horas/" target="_blank" rel="noopener">Consultar também na Paulus ↗</a></p></div>';
     const officeWarning=!oficiosReady?'<div class="card" role="alert"><p>O cadastro local dos Ofícios está indisponível. A Vida e as orações continuam acessíveis.</p><button class="action-btn" onclick="loadCanonicalOffices()">Tentar carregar os Ofícios</button></div>':'';
-    const ownBlocks='<div class="section-title">Ofícios e textos próprios OSM</div><p class="reader-note">A celebração do santo abre somente as horas disponíveis no texto.</p>'+
+    const ownBlocks='<div class="section-title">Próprios OSM</div><p class="reader-note">Escolha uma hora para abrir o texto próprio da celebração.</p>'+
       '<div class="card fade-in" style="padding:6px 16px;">'+saints.map(function(s){return '<div class="saint-row saint-row-hours"><div class="daynum">'+s.day+'</div><div class="rowtext"><div class="rowtitle">'+escapeHtml(s.title)+'</div><div class="rowrank">'+escapeHtml(s.date)+'</div></div><div class="office-hours-grid">'+officeHoursForSaint(s).map(function(pair){return officeHourButtonHtml(s,pair);}).join('')+'</div></div>';}).join('')+'</div>';
     return switcher+officeWarning+todayBlock+(oficiosReady?ownBlocks+movableOfficeBlocks()+marianSaturdayOfficeBlocks():'');
   }
@@ -880,7 +880,7 @@ function viewLiturgia(){
       const saint=SANTORAL.find(s=>String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')===item.date)||{};
       const title=item.title||saint.title||'Missa própria';
       const date=item.display_date||saint.date||item.date;
-      return switcher+'<button class="hub-back" onclick="closeProperMass()">‹ Voltar às Missas próprias</button>'+
+      return switcher+'<button class="hub-back" onclick="closeProperMass()">‹ Voltar aos próprios OSM</button>'+
         '<div class="section-title">Missa própria OSM</div><div class="hub-card"><div class="hub-card-title">'+escapeHtml(title)+'</div>'+
         '<p class="reader-note">'+escapeHtml(date)+(item.rank?' · '+escapeHtml(item.rank):'')+'</p>'+
         (item.local_pdf_url?'<p><a class="action-btn" href="'+escapeHtml(item.local_pdf_url)+'" target="_blank" rel="noopener">Abrir PDF baixado</a></p>':'')+(item.pdf_url?'<a class="reader-note" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Fonte oficial OSM</a>':'')+renderProperMassContent(item)+'<p class="hub-source">Fonte: '+escapeHtml(item.source||'fonte não informada')+'</p></div>';
@@ -894,7 +894,8 @@ function viewLiturgia(){
     const title=item.title||saint.title||'Missa própria';
     const date=item.display_date||saint.date||item.date||'';
     const key=String(item.date||'').replace(/[^a-zA-Z0-9-]/g,'');
-    return '<div class="saint-row" role="button" tabindex="0" onclick="openProperMass(\''+key+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openProperMass(\''+key+'\')}"><div class="rowtext"><div class="rowtitle">'+escapeHtml(title)+'</div><div class="rowrank">'+escapeHtml(date)+(item.rank?' · '+escapeHtml(item.rank):'')+'</div></div><div class="chev">›</div></div>';
+    const day=String(date).match(/\d{1,2}/)?.[0]||'•';
+    return '<div class="saint-row saint-row-hours"><div class="daynum">'+escapeHtml(day)+'</div><div class="rowtext"><div class="rowtitle">'+escapeHtml(title)+'</div><div class="rowrank">'+escapeHtml(date)+(item.rank?' · '+escapeHtml(item.rank):'')+'</div></div><div class="office-hours-grid"><button class="office-hour-btn office-hour-choice" aria-label="Abrir Missa própria de '+escapeHtml(title)+'" onclick="openProperMass(\''+key+'\')"><span class="office-hour-icon" aria-hidden="true">▤</span><span class="office-hour-copy"><small>Missa própria</small><strong>Abrir formulário próprio</strong></span><span class="office-hour-arrow" aria-hidden="true">›</span></button></div></div>';
   };
   const fixedMasses=records.filter(item=>!item.date_rule&&item.group!=='Santa Maria no Sábado');
   const movableMasses=records.filter(item=>Boolean(item.date_rule));
@@ -904,7 +905,7 @@ function viewLiturgia(){
   const marianSaturdayRows=marianSaturdayMasses.map(rowForMass).join('');
   return switcher+`<div class="section-title">Missa</div><p class="reader-note">Liturgia da Missa do dia, com consulta por data e cópia offline quando disponível.</p>
     <div class="card fade-in"><button class="action-btn" onclick="openDailyLiturgy('${value}')">Abrir Missa do dia</button></div>
-    <div class="section-title">Missas próprias OSM</div><p class="reader-note">Textos próprios da Ordem disponíveis nesta seção.</p>
+    <div class="section-title">Próprios OSM</div><p class="reader-note">Abra o formulário próprio da celebração.</p>
     <div class="card fade-in" style="padding:6px 16px;">${properRows||'<div class="empty-state">Nenhuma Missa própria OSM cadastrada.</div>'}</div>`+
     (movableRows?'<div class="section-title">Missas de celebrações móveis</div><div class="card fade-in" style="padding:6px 16px;">'+movableRows+'</div>':'')+
     (marianSaturdayRows?'<div class="section-title">Missas de Santa Maria no Sábado</div><div class="card fade-in" style="padding:6px 16px;">'+marianSaturdayRows+'</div>':'');
