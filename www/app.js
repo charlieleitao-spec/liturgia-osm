@@ -825,6 +825,25 @@ function closeProperMass(){state.properMassDate=null;render();window.scrollTo(0,
 window.openProperMass=openProperMass;
 window.closeProperMass=closeProperMass;
 function setLiturgiaSection(section){state.liturgiaSection=section;if(section!=='missa')state.properMassDate=null;render();window.scrollTo(0,0);}
+function movableOfficeDate(item){
+  if(item.date_rule==='sexta-feira_depois_do_v_domingo_da_quaresma'){
+    const date=easterSunday(new Date().getFullYear());
+    date.setDate(date.getDate()-9);
+    return new Intl.DateTimeFormat('pt-BR',{dateStyle:'long'}).format(date);
+  }
+  return item.date_label||'Data móvel';
+}
+function movableOfficeBlocks(){
+  const items=Array.isArray(OFICIOS_OSM?.celebracoes_moveis)?OFICIOS_OSM.celebracoes_moveis:[];
+  if(!items.length)return '';
+  return '<div class="section-title">Ofícios próprios com data móvel</div>'+items.map(function(item){
+    const title=escapeHtml(item.title||'Ofício próprio');
+    const dateLabel=escapeHtml(item.date_label||'Data móvel');
+    const date=escapeHtml(movableOfficeDate(item));
+    const pdf=item.pdf_url?'<p><a class="action-btn" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Abrir PDF oficial</a></p>':'';
+    return '<div class="card fade-in"><div class="rowtitle">'+title+'</div><div class="rowrank">'+escapeHtml(item.rank||'')+' · '+dateLabel+' ('+date+')</div><details><summary class="action-btn">Abrir Ofício completo</summary><div class="hub-text">'+renderPrayer(item.text||'')+'</div></details>'+pdf+'</div>';
+  }).join('');
+}
 function viewLiturgia(){
   const section=state.liturgiaSection||'missa';
   const switcher=`<div class="toggle-row" aria-label="Seções de Liturgia">
@@ -837,7 +856,7 @@ function viewLiturgia(){
     const officeWarning=!oficiosReady?'<div class="card" role="alert"><p>O cadastro local dos Ofícios está indisponível. A Vida e as orações continuam acessíveis.</p><button class="action-btn" onclick="loadCanonicalOffices()">Tentar carregar os Ofícios</button></div>':'';
     const ownBlocks='<div class="section-title">Ofícios e textos próprios OSM</div><p class="reader-note">A celebração do santo abre somente as horas disponíveis no texto.</p>'+
       '<div class="card fade-in" style="padding:6px 16px;">'+saints.map(function(s){return '<div class="saint-row saint-row-hours"><div class="daynum">'+s.day+'</div><div class="rowtext"><div class="rowtitle">'+escapeHtml(s.title)+'</div><div class="rowrank">'+escapeHtml(s.date)+'</div></div><div class="office-hours-grid">'+officeHoursForSaint(s).map(function(pair){return officeHourButtonHtml(s,pair);}).join('')+'</div></div>';}).join('')+'</div>';
-    return switcher+'<div class="section-title">Liturgia das Horas</div>'+officeWarning+todayBlock+(oficiosReady?ownBlocks:'');
+    return switcher+'<div class="section-title">Liturgia das Horas</div>'+officeWarning+todayBlock+(oficiosReady?ownBlocks+movableOfficeBlocks():'');
   }
   if(state.properMassDate){
     const item=properMassRecord(state.properMassDate);
