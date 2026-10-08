@@ -1275,12 +1275,21 @@ loadCanonicalSantoral();
     const readings=Array.isArray(item.readings)?item.readings:[];
     const readingHtml=readings.map(function(reading){
       const title=reading.title||reading.label||'Leitura';
+      const condition=reading.condition?' ('+reading.condition+')':'';
       const reference=reading.reference||reading.referencia||'';
-      return '<div class="section-title">'+escapeHtml(title)+'</div><div class="hub-card hub-text">'+
+      return '<div class="section-title">'+escapeHtml(title+condition)+'</div><div class="hub-card hub-text">'+
         (reference?'<b>'+escapeHtml(reference)+'</b><br>':'')+escapeHtml(reading.text||'')+'</div>';
     }).join('');
-    const content=hubText('Coleta',item.collect||item.coleta)+readingHtml+
-      hubText('Prefácio',item.preface||item.prefacio);
+    function antiphonBlock(title,antiphon){
+      if(!antiphon)return '';
+      const reference=antiphon.reference||antiphon.referencia||'';
+      return hubText(title+(reference?' ('+reference+')':''),antiphon.text||'');
+    }
+    const content=antiphonBlock('Antífona de entrada',item.entrance_antiphon||item.antifona_entrada)+
+      hubText('Coleta',item.collect||item.coleta)+readingHtml+
+      hubText('Sobre as oferendas',item.offertory||item.sobre_oferendas)+
+      hubText('Prefácio',item.preface||item.prefacio)+
+      antiphonBlock('Antífona da comunhão',item.communion_antiphon||item.antifona_comunhao);
     if(!content)return hubEmpty('O cadastro da Missa própria ainda não contém textos conferidos.');
     return '<div class="hub-card"><div class="hub-card-title">Missa própria</div>'+content+
       '<p class="hub-source">Fonte: '+escapeHtml(item.source||'fonte não informada')+'</p></div>';
