@@ -462,11 +462,10 @@ main#view{position:relative;z-index:1;flex:1;padding:18px 18px 100px;padding-lef
 .calendar-legend .san{background:#b85566}
 .calendar-legend .bea{background:#8c75b8}
 .calendar-legend .ser{background:#7189a7}
-.calendar-celebration-row{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.calendar-celebration-row{display:block;padding:12px 0;border-bottom:1px solid var(--line)}
 .calendar-celebration-row:last-child{border-bottom:0}
-.calendar-entry-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.calendar-entry-actions button{border:1px solid var(--line);background:var(--bg-panel);color:var(--gold-soft);border-radius:999px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer}
-.calendar-entry-actions button.office{background:rgba(138,47,61,.18);border-color:rgba(184,85,102,.55);color:var(--paper)}
+.calendar-celebration-link{display:inline-block;color:var(--paper);font:400 17px/1.35 Georgia,'Times New Roman',serif;text-decoration:none}
+.calendar-celebration-link:hover,.calendar-celebration-link:focus-visible{color:var(--gold-soft);text-decoration:underline;text-underline-offset:3px}
 .detail-navigation{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);width:100%;max-width:100%;overflow:hidden;gap:9px;margin:20px 0}
 .detail-navigation button{min-width:0;max-width:100%;min-height:52px;border:1px solid var(--line);border-radius:12px;background:var(--bg-panel);color:var(--paper);padding:9px 11px;text-align:left;overflow:hidden}
 .detail-navigation button:last-child{text-align:right}
@@ -483,7 +482,6 @@ body.celebration-mode .celebration-toggle{left:auto;right:18px;bottom:18px;backg
 body.celebration-mode .prayer-block,body.celebration-mode .bio-text,body.celebration-mode .text-block,body.celebration-mode .office-text{font-size:1.22em!important;line-height:1.75!important}
 .content-audit-note{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg-panel);color:var(--text-muted);font-size:12px;line-height:1.45;margin:12px 0}
 .content-audit-note b{color:var(--gold-soft)}
-@media(max-width:520px){.calendar-celebration-row{grid-template-columns:auto auto minmax(0,1fr)}.calendar-entry-actions{grid-column:2/4;justify-content:flex-start;padding-bottom:3px}}
 @media(max-width:380px){.detail-navigation{grid-template-columns:1fr}.detail-navigation button:last-child{text-align:left}}
 /* Presidência e liturgia diária 4.9.2 */
 .presidency-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
