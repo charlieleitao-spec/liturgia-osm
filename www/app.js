@@ -862,7 +862,7 @@ function marianSaturdayOfficeBlocks(){
   if(!items.length)return '';
   return '<div class="section-title">Ofícios de Santa Maria no Sábado</div><div class="card fade-in">'+items.map(function(item){
     return '<div class="saint-row"><div class="rowtext"><div class="rowtitle">'+escapeHtml(item.title||'Ofício de Santa Maria no Sábado')+'</div><div class="rowrank">PDF oficial OSM</div></div>'+
-      (item.local_pdf_url?'<a class="action-btn" style="margin:8px 0" href="'+escapeHtml(item.local_pdf_url)+'" target="_blank" rel="noopener">Abrir PDF baixado</a>':(item.pdf_url?'<a class="action-btn" style="margin:8px 0" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Abrir PDF</a>':''))+'</div>'+(item.pdf_transcript?'<details style="margin:8px 0 16px 14px"><summary class="action-btn">Ler texto completo</summary><div class="hub-text" style="white-space:pre-wrap">'+escapeHtml(item.pdf_transcript)+'</div></details>':'');
+      (item.local_pdf_url?'<a class="action-btn" style="margin:8px 0" href="'+escapeHtml(item.local_pdf_url)+'" target="_blank" rel="noopener">Abrir PDF baixado</a>':(item.pdf_url?'<a class="action-btn" style="margin:8px 0" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Abrir PDF</a>':''))+'</div>'+(item.pdf_transcript?'<details style="margin:8px 0 16px 14px"><summary class="action-btn">Ler texto completo</summary><div class="hub-text saturday-pdf-transcript">'+renderPrayer(cleanMassText(item.pdf_transcript))+'</div></details>':'');
   }).join('')+'</div>';
 }
 function viewLiturgia(){

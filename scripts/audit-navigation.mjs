@@ -50,6 +50,18 @@ assert.equal(cleanMassSample, 'Primeiro verso.\nSegundo verso.', 'Copyright no m
 const renderedHymn = massTextHelpers.properMassTextHtml('Hino', 'Estrofe 1, verso 1\nEstrofe 1, verso 2\n\nEstrofe 2');
 assert.equal((renderedHymn.match(/class="mass-hymn-stanza"/g) || []).length, 2, 'Hinos devem manter estrofes separadas.');
 assert.match(renderedHymn, /verso 1<br>Estrofe/);
+const prayerRendererStart = app.indexOf('const PRAYER_CONTEXT_HEADINGS =');
+const prayerRendererEnd = app.indexOf('// ===================== calendário litúrgico básico', prayerRendererStart);
+assert.ok(prayerRendererStart >= 0 && prayerRendererEnd > prayerRendererStart, 'Renderizador comum de textos deve estar disponível.');
+const prayerRendererSource = app.slice(prayerRendererStart, prayerRendererEnd);
+const renderPrayerForTest = new Function('escapeHtml', prayerRendererSource + '; return renderPrayer;')(value => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'));
+const saturdayTranscriptSample = ['Texto antes.', 'Copyright © CURIA GENERALIZIA OSM, Piazza San Marcello, 5 – Roma', 'Texto depois.', '', 'HINO', 'Primeiro verso', 'Segundo verso', '', 'Outra estrofe.'].join('\n');
+const renderedSaturdayTranscript = renderPrayerForTest(massTextHelpers.cleanMassText(saturdayTranscriptSample));
+assert.doesNotMatch(renderedSaturdayTranscript, /Copyright/i, 'A transcrição de Santa Maria no Sábado não deve exibir copyright.');
+assert.ok(renderedSaturdayTranscript.includes('class="prayer-text-heading">HINO</h4>'), 'Hino deve ser reconhecido pelo renderizador comum.');
+assert.equal((renderedSaturdayTranscript.match(/class="prayer-stanza"/g) || []).length, 3, 'O texto antes do hino e as duas estrofes devem permanecer separados.');
+assert.ok(app.includes('renderPrayer(cleanMassText(item.pdf_transcript))'), 'Transcrição dos sábados marianos deve passar pela limpeza e formatação litúrgica.');
+
 assert.match(serviteHtml, /servite-3\.js/);
 assert.match(serviteCss, /text-align:\s*center/);
 assert.match(serviteScript, /hour-tab-btn/);
