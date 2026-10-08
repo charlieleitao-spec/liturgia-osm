@@ -1036,3 +1036,36 @@ body.scroll-controls-hidden .celebration-toggle{
   font:italic 500 calc(13px * var(--reader-scale, 1))/1.4 Georgia,'Times New Roman',serif!important;
   text-align:center!important;
 }
+
+/* Marca do cabeçalho: Liturgia com OSM em etiqueta, adaptada aos dois temas. */
+.topbar h1{
+  font-variant:normal;
+  letter-spacing:-.025em;
+  line-height:1.1;
+  padding:0;
+  border:0;
+  text-shadow:none;
+  color:var(--paper);
+}
+.topbar .brand-tag{
+  display:inline-block;
+  margin-left:.12em;
+  padding:.22em .44em .25em;
+  border-radius:5px;
+  background:var(--gold-soft);
+  color:var(--bg-deep);
+  font-family:Arial, sans-serif;
+  font-size:.48em;
+  font-weight:700;
+  letter-spacing:.06em;
+  line-height:1;
+  vertical-align:.18em;
+}
+body.light-mode .topbar h1{color:#173b67}
+body.light-mode .topbar .brand-tag{background:#b89448;color:#fffdf8}
+@media(max-width:380px){.topbar h1{font-size:19px}}
+
+/* Ajuste de escala do logotipo para leitura no cabeçalho móvel. */
+.topbar h1{font-size:25px}
+.topbar .brand-tag{font-size:.55em;padding:.24em .48em .27em}
+@media(max-width:380px){.topbar h1{font-size:22px}}
