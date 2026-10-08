@@ -779,9 +779,26 @@ function viewVida(){
   </div>`;
   return tabs+(current==='calendario'?viewCalendario():current==='santoral'?viewSantoral():viewHoje());
 }
+function cleanMassText(text){
+  return String(text||'')
+    .replace(/^[ \t]*copyright\b[^\r\n]*(?:\r?\n|$)/gim,'')
+    .replace(/\r\n?/g,'\n')
+    .replace(/\n[ \t]*\n(?:[ \t]*\n)+/g,'\n\n')
+    .trim();
+}
+function properMassTextHtml(title,text){
+  const clean=cleanMassText(text);
+  if(!clean)return '';
+  if(/^hinos?(?:\s|$)/i.test(String(title||''))){
+    const stanzas=clean.split(/\n[ \t]*\n/).map(stanza=>'<p class="mass-hymn-stanza">'+escapeHtml(stanza).replace(/\n/g,'<br>')+'</p>').join('');
+    return '<div class="hub-card mass-hymn">'+stanzas+'</div>';
+  }
+  return '<div class="hub-card hub-text">'+escapeHtml(clean)+'</div>';
+}
 function properMassSection(title,text){
   if(!text)return '';
-  return '<div class="section-title">'+escapeHtml(title)+'</div><div class="hub-card hub-text">'+escapeHtml(text)+'</div>';
+  const body=properMassTextHtml(title,text);
+  return body?'<div class="section-title">'+escapeHtml(title)+'</div>'+body:'';
 }
 function properMassAntiphon(title,item){
   if(!item)return '';
@@ -793,7 +810,7 @@ function renderProperMassContent(item){
   if(Array.isArray(item.sections)&&item.sections.length){
     return item.sections.map(function(section){
       if(!section||!section.heading||!section.text)return '';
-      return '<div class="section-title">'+escapeHtml(section.heading)+'</div><div class="hub-card hub-text">'+escapeHtml(section.text)+'</div>';
+      return properMassSection(section.heading,section.text);
     }).join('');
   }
   const readings=Array.isArray(item.readings)?item.readings:[];
@@ -801,8 +818,8 @@ function renderProperMassContent(item){
     const title=reading.title||reading.label||'Leitura';
     const condition=reading.condition?' ('+reading.condition+')':'';
     const reference=reading.reference||reading.referencia||'';
-    return '<div class="section-title">'+escapeHtml(title+condition)+'</div><div class="hub-card hub-text">'+
-      (reference?'<b>'+escapeHtml(reference)+'</b><br>':'')+escapeHtml(reading.text||'')+'</div>';
+    const body=properMassTextHtml(title+condition,reading.text||'');
+    return body?'<div class="section-title">'+escapeHtml(title+condition)+'</div>'+body.replace('<div class="hub-card hub-text">', '<div class="hub-card hub-text">'+(reference?'<b>'+escapeHtml(reference)+'</b><br>':'')):'';
   }).join('');
   return properMassAntiphon('Antífona de entrada',item.entrance_antiphon||item.antifona_entrada)+
     properMassSection('Coleta',item.collect||item.coleta)+readingHtml+
@@ -1217,7 +1234,7 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
   const safe=value=>escapeHtml(String(value||''));
   function readingBody(value,label){
     const scripture=/leitura|evangelho/i.test(String(label||''));
-    return String(value||'').trim().split(/\n\s*\n/).filter(Boolean).map(paragraph=>{
+    return cleanMassText(value).split(/\n\s*\n/).filter(Boolean).map(paragraph=>{
       let html=safe(paragraph.trim()).replace(/\r?\n/g,'<br>');
       if(scripture)html=html.replace(/(^|\s)(\d{1,3})(?=[A-Za-zÀ-ÿ])/g,'$1<sup class="verse-number">$2</sup> ');
       return `<p class="reading-paragraph">${html}</p>`;
