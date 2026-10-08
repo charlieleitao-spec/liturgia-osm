@@ -21,9 +21,12 @@ for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data
 assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
-assert.match(app, /const APP_VERSION = ['"]4\.9\.40['"]/);
-assert.match(workflow, /Build APK Liturgia OSM 4\.9\.40/);
-assert.match(workflow, /versionCode 40944/);
+assert.match(app, /const APP_VERSION = ['"]4\.9\.41['"]/);
+assert.match(workflow, /Build APK Liturgia OSM 4\.9\.41/);
+assert.match(workflow, /versionCode 40945/);
+assert.match(app, /rowtitle">Ofício de hoje/);
+assert.match(app, /Consultar também na Paulus/);
+assert.doesNotMatch(app, /paulusBlock/);
 assert.match(app, /addListener\(['"]backButton['"]/);
 assert.match(app, /function saintRankSubtitle/);
 assert.match(css, /text-align:\s*center/);
