@@ -39,6 +39,7 @@ assert.match(css, /text-align:\s*center/);
 assert.match(app, /function cleanMassText\(text\)/);
 assert.match(app, /function properMassTextHtml\(title,text\)/);
 assert.match(app, /cleanMassText\(value\)\.split/);
+assert.match(app, /const safe=value=>escapeHtml\(cleanMassText\(value\)\)/);
 assert.match(css, /\.mass-hymn-stanza\{margin:0 auto/);
 const massTextStart = app.indexOf('function cleanMassText(text){');
 const massTextEnd = app.indexOf('function properMassAntiphon(', massTextStart);
