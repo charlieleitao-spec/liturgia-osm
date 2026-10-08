@@ -856,12 +856,11 @@ function viewLiturgia(){
   </div>`;
   if(section==='horas'){
     const saints=SANTORAL.filter(s=>saintHasOffice(s));
-    const intro='<div class="liturgy-page-intro"><p>O ofício de hoje está na Paulus. Os textos próprios da Ordem estão logo abaixo.</p></div>';
     const todayBlock='<div class="card fade-in"><div class="rowtitle">Hoje</div><p class="reader-note">'+escapeHtml(formatLiturgicalDate())+'</p><p style="margin:12px 0 0"><a class="reader-note" href="https://www.paulus.com.br/portal/liturgia-diaria-das-horas/" target="_blank" rel="noopener">Abrir ofício de hoje na Paulus ↗</a></p></div>';
     const officeWarning=!oficiosReady?'<div class="card" role="alert"><p>O cadastro local dos Ofícios está indisponível. A Vida e as orações continuam acessíveis.</p><button class="action-btn" onclick="loadCanonicalOffices()">Tentar carregar os Ofícios</button></div>':'';
     const ownBlocks='<div class="section-title">Ofícios e textos próprios OSM</div>'+
       '<div class="card fade-in" style="padding:6px 16px;">'+saints.map(function(s){return '<div class="saint-row saint-row-hours"><div class="rowtext"><div class="rowtitle">'+escapeHtml(s.title)+'</div><div class="rowrank">'+escapeHtml(s.date)+'</div></div><div class="office-hours-grid">'+officeHoursForSaint(s).map(function(pair){return officeHourButtonHtml(s,pair);}).join('')+'</div></div>';}).join('')+'</div>';
-    return switcher+intro+officeWarning+todayBlock+(oficiosReady?ownBlocks+movableOfficeBlocks()+marianSaturdayOfficeBlocks():'');
+    return switcher+officeWarning+todayBlock+(oficiosReady?ownBlocks+movableOfficeBlocks()+marianSaturdayOfficeBlocks():'');
   }
   if(state.properMassDate){
     const item=properMassRecord(state.properMassDate);
@@ -891,8 +890,7 @@ function viewLiturgia(){
   const properRows=fixedMasses.map(rowForMass).join('');
   const movableRows=movableMasses.map(rowForMass).join('');
   const marianSaturdayRows=marianSaturdayMasses.map(rowForMass).join('');
-  const intro='<div class="liturgy-page-intro"><p>Aqui você encontra a Missa do dia e os formulários próprios do Missal OSM.</p></div>';
-  return switcher+intro+`<div class="card fade-in"><button class="action-btn" onclick="openDailyLiturgy('${value}')">Consultar Missa do dia</button></div>
+  return switcher+`<div class="card fade-in"><button class="action-btn" onclick="openDailyLiturgy('${value}')">Consultar Missa do dia</button></div>
     <div class="section-title">Formulários próprios OSM</div>
     <div class="card fade-in" style="padding:6px 16px;">${properRows||'<div class="empty-state">Nenhuma Missa própria OSM cadastrada.</div>'}</div>`+
     (movableRows?'<div class="section-title">Missas de celebrações móveis</div><div class="card fade-in" style="padding:6px 16px;">'+movableRows+'</div>':'')+
