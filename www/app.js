@@ -345,7 +345,7 @@ function viewHoje(){
     const label=saint?'Celebração de hoje':'Próxima celebração';
     celebrationCard='<button class="home-celebration card fade-in" onclick="openDetail('+celebration._id+')" aria-label="Abrir '+escapeHtml(celebration.title)+'">'+
       saintImageHtml(celebration,false)+
-      '<span class="home-celebration-text"><span class="rank">'+label+'</span><b>'+escapeHtml(celebration.title)+'</b><span class="date-line">'+escapeHtml(celebration.date)+'</span></span><span class="chev">›</span></button>'+
+      '<span class="home-celebration-text"><span class="rank">'+label+'</span><b>'+celebrationNameHtml(celebration.title,celebration)+'</b><span class="date-line">'+escapeHtml(celebration.date)+'</span></span><span class="chev">›</span></button>'+
       '<div class="hub-shortcuts" aria-label="Atalhos da celebração">'+
       '<button onclick="openSaintSection('+celebration._id+',\'vida\')">Vida</button>'+
       '<button onclick="openSaintSection('+celebration._id+',\'liturgia\')">Liturgia</button>'+
@@ -912,8 +912,8 @@ function movableOfficeDate(item){
   }
   return item.date_label||'Data móvel';
 }
-function liturgiaResourceRow(title,subtitle,content){
-  return '<details class="liturgia-resource-detail"><summary class="liturgia-celebration-row liturgia-resource-row"><span class="rowtext"><span class="rowtitle">'+escapeHtml(title)+'</span><span class="rowrank">'+escapeHtml(subtitle)+'</span></span><span class="chev" aria-hidden="true">›</span></summary><div class="liturgia-resource-content">'+content+'</div></details>';
+function liturgiaResourceRow(title,subtitle,content,subtitleUrl){
+  return '<details class="liturgia-resource-detail"><summary class="liturgia-celebration-row liturgia-resource-row"><span class="rowtext"><span class="rowtitle">'+escapeHtml(title)+'</span><span class="rowrank">'+(subtitleUrl?'<a href="'+escapeHtml(subtitleUrl)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">'+escapeHtml(subtitle)+'</a>':escapeHtml(subtitle))+'</span></span><span class="chev" aria-hidden="true">›</span></summary><div class="liturgia-resource-content">'+content+'</div></details>';
 }
 function liturgiaResourceAction(label,url){
   return url?'<a class="action-btn" href="'+escapeHtml(url)+'" target="_blank" rel="noopener">'+escapeHtml(label)+'</a>':'';
@@ -941,10 +941,9 @@ function marianSaturdayOfficeBlocks(){
   if(!items.length)return '';
   const rows=items.map(function(item){
     const title=item.title||'Ofício de Santa Maria no Sábado';
-    const action=((item.local_pdf_url||item.pdf_url)?'<a class="reader-note" href="'+escapeHtml(item.pdf_url||item.local_pdf_url)+'" target="_blank" rel="noopener">PDF oficial OSM</a>':'');
-    const actions=action?'<div class="liturgia-resource-actions">'+action+'</div>':'';
+    const pdfUrl=item.pdf_url||item.local_pdf_url||'';
     const transcript=item.pdf_transcript?'<details class="liturgia-resource-disclosure"><summary class="action-btn">Ler texto completo</summary><div class="hub-text saturday-pdf-transcript">'+renderPrayer(cleanMassText(item.pdf_transcript))+'</div></details>':'';
-    return liturgiaResourceRow(title,'PDF oficial OSM',actions+transcript);
+    return liturgiaResourceRow(title,'PDF oficial OSM',transcript,pdfUrl);
   }).join('');
   return '<div class="section-title">Ofícios de Santa Maria no Sábado</div><div class="card fade-in liturgia-resource-list">'+rows+'</div>';
 }
