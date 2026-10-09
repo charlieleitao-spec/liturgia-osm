@@ -1,4 +1,4 @@
-name: Build APK Liturgia OSM 4.9.48
+name: Build APK Liturgia OSM 4.9.49
 
 on:
   workflow_dispatch:
@@ -77,8 +77,8 @@ jobs:
 
       - name: Definir versão e segurança
         run: |
-          sed -i 's/versionCode [0-9][0-9]*/versionCode 40952/' android/app/build.gradle
-          sed -i 's/versionName "[^"]*"/versionName "4.9.48"/' android/app/build.gradle
+          sed -i 's/versionCode [0-9][0-9]*/versionCode 40953/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "4.9.49"/' android/app/build.gradle
           python3 - <<'PY'
           from pathlib import Path
           p = Path('android/app/build.gradle')
@@ -143,13 +143,13 @@ jobs:
           ./gradlew assembleRelease
 
       - name: Nomear APK
-        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.48.apk
+        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.49.apk
 
       - name: Verificar assinatura e compatibilidade do APK
         run: |
           APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
           AAPT="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/aapt"
-          APK=Liturgia-OSM-4.9.48.apk
+          APK=Liturgia-OSM-4.9.49.apk
           PREVIOUS=Liturgia-OSM-4.9.45.apk
           curl -fsSL https://github.com/charlieleitao-spec/liturgia-osm/releases/download/v4.9.45/Liturgia-OSM-4.9.45.apk -o "$PREVIOUS"
           "$APKSIGNER" verify --verbose --print-certs "$APK" > atual.txt
@@ -164,7 +164,7 @@ jobs:
           ANTERIOR_CODE=$(echo "$ANTERIOR_BADGING" | sed -n "s/.*versionCode='\\([^']*\\)'.*/\\1/p")
           echo "$ATUAL_BADGING"
           echo "Baseline: $ANTERIOR_BADGING"
-          test "$ATUAL_CODE" = 40952
+          test "$ATUAL_CODE" = 40953
           test "$ANTERIOR_CODE" = 40949
           test "$ATUAL_CODE" -gt "$ANTERIOR_CODE"
           "$AAPT" dump resources "$APK" > apk-resources.txt
@@ -174,24 +174,24 @@ jobs:
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.9.48
-          path: Liturgia-OSM-4.9.48.apk
+          name: Liturgia-OSM-4.9.49
+          path: Liturgia-OSM-4.9.49.apk
           if-no-files-found: error
 
       - name: Disponibilizar lock atualizado (temporário)
         uses: actions/upload-artifact@v5
         with:
-          name: lock-temporario-4.9.48
+          name: lock-temporario-4.9.49
           path: package-lock.json
           if-no-files-found: error
 
-      - name: Publicar versão 4.9.48
+      - name: Publicar versão 4.9.49
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v4.9.48
-          name: Liturgia OSM 4.9.48
+          tag_name: v4.9.49
+          name: Liturgia OSM 4.9.49
           generate_release_notes: true
           overwrite_files: true
-          files: Liturgia-OSM-4.9.48.apk
+          files: Liturgia-OSM-4.9.49.apk
 
