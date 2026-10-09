@@ -59,7 +59,8 @@
     "categoria": "santo",
     "genero": "m",
     "grau": "solenidade",
-    "grau_confirmado": true
+    "grau_confirmado": true,
+    "exibir_selo": false
   },
   {
     "id": 4,
