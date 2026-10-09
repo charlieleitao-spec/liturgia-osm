@@ -117,8 +117,8 @@ assert.match(app,/SANTORAL\.filter\(s=>saintHasOffice\(s\)&&officeHoursForSaint\
 assert.equal(testSaints.filter(s=>testHasOffice(s)&&testHoursFor(s).length).length+unavailableSaints.length,testSaints.length);
 const listHelpersStart=app.indexOf('function liturgiaDateKey(s){');
 const listHelpers=app.slice(listHelpersStart,sharedListEnd);
-const celebrationLabelStart=app.indexOf('function celebrationLabel(s){');
-const celebrationLabelEnd=app.indexOf('function celebrationDateText(s){',celebrationLabelStart);
+const celebrationLabelStart=app.indexOf('const CELEBRATION_GRADE_LABELS=');
+const celebrationLabelEnd=app.indexOf('function saintRankSubtitle(s){',celebrationLabelStart);
 const celebrationLabelHelpers=app.slice(celebrationLabelStart,celebrationLabelEnd);
 const listRendererFn=new Function('SANTORAL','window','saintHasOffice','officeHoursForSaint','saintRankSubtitle','escapeHtml',celebrationLabelHelpers+listHelpers+';return {liturgiaCelebrations,renderLiturgiaCelebrationList};')(
   testSaints,{MISSAS_OSM:massData},testHasOffice,testHoursFor,s=>s.rank||'',htmlEscape);
