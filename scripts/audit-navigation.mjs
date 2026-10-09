@@ -30,7 +30,7 @@ assert.match(workflow, /versionCode 40954/);
 assert.match(app, /rowtitle">Hoje/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
-assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.50-ui29/);
+assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.50-ui30/);
 assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
 assert.match(app, /function liturgiaTodayCard\(type,dateValue=''\)/);
