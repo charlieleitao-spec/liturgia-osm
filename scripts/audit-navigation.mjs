@@ -41,6 +41,10 @@ assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
 assert.match(app, /function celebrationLabel/);
 assert.match(app, /function celebrationNameHtml/);
+assert.match(app, /if\(s\?\.categoria==='santo'\)return original/);
+assert.match(app, /return s\.genero==='f'\?'Beata':'Beato'/);
+assert.match(app, /return s\.genero==='f'\?'Serva de Deus':'Servo de Deus'/);
+
 assert.match(app, /function celebrationSubtitle/);
 assert.match(app, /const APP_VERSION = ['"]4\.9\.45['"]/);
 assert.match(workflow, /Build APK Liturgia OSM 4\.9\.45/);
