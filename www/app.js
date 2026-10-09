@@ -873,7 +873,7 @@ function viewLiturgia(){
   </div>`;
   if(section==='horas'){
     const saints=SANTORAL.filter(s=>saintHasOffice(s));
-    const todayBlock='<div class="card fade-in"><div class="rowtitle">Hoje</div><p class="reader-note">'+escapeHtml(formatLiturgicalDate())+'</p><p style="margin:12px 0 0"><a class="reader-note" href="https://www.paulus.com.br/portal/liturgia-diaria-das-horas/" target="_blank" rel="noopener">Abrir ofício de hoje na Paulus ↗</a></p></div>';
+    const todayBlock='<div class="card fade-in"><div class="rowtitle">Hoje</div><p class="reader-note">'+escapeHtml(formatLiturgicalDate())+'</p><p style="margin:12px 0 0"><a class="action-btn" href="https://www.paulus.com.br/portal/liturgia-diaria-das-horas/" target="_blank" rel="noopener">Consultar Ofício do Dia</a></p></div>';
     const officeWarning=!oficiosReady?'<div class="card" role="alert"><p>O cadastro local dos Ofícios está indisponível. A Vida e as orações continuam acessíveis.</p><button class="action-btn" onclick="loadCanonicalOffices()">Tentar carregar os Ofícios</button></div>':'';
     const ownBlocks='<div class="section-title">Ofícios e textos próprios OSM</div>'+
       '<div class="card fade-in liturgia-list-card">'+saints.map(function(s){return '<div class="saint-row saint-row-hours liturgia-list-row"><div class="rowtext"><div class="rowtitle">'+escapeHtml(s.title)+'</div><div class="rowrank">'+escapeHtml(s.date)+'</div></div><div class="office-hours-grid">'+officeHoursForSaint(s).map(function(pair){return officeHourButtonHtml(s,pair);}).join('')+'</div></div>';}).join('')+'</div>';
@@ -907,7 +907,7 @@ function viewLiturgia(){
   const properRows=fixedMasses.map(rowForMass).join('');
   const movableRows=movableMasses.map(rowForMass).join('');
   const marianSaturdayRows=marianSaturdayMasses.map(rowForMass).join('');
-  return switcher+`<div class="card fade-in"><button class="action-btn" onclick="openDailyLiturgy('${value}')">Consultar Missa do dia</button></div>
+  return switcher+`<div class="card fade-in"><button class="action-btn" onclick="openDailyLiturgy('${value}')">Consultar Missa</button></div>
     <div class="section-title">Formulários próprios OSM</div>
     <div class="card fade-in liturgia-list-card">${properRows||'<div class="empty-state">Nenhuma Missa própria OSM cadastrada.</div>'}</div>`+
     (movableRows?'<div class="section-title">Missas de celebrações móveis</div><div class="card fade-in liturgia-list-card">'+movableRows+'</div>':'')+
