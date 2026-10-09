@@ -18,7 +18,7 @@ const dataReadme = read('www/data/README.md');
 
 assert.equal(pkg.version, '4.9.49', 'package.json deve identificar a versão 4.9.47');
 assert.equal(pkg.dependencies['@capacitor/app'], '8.1.2', 'Plugin nativo do botão Voltar deve fazer parte do app.');
-assert.ok(appJs.includes("const APP_VERSION = '4.9.48'"));
+assert.ok(appJs.includes("const APP_VERSION = '4.9.49'"));
 assert.ok(sw.includes('liturgia-osm-v4.9.49-ui28'));
 assert.match(html, /app\.js/);
 assert.match(html, /app\.css/);
