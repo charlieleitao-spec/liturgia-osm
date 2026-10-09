@@ -26,7 +26,7 @@ const CELEBRATION_GRADE_LABELS={solenidade:'Solenidade',festa:'Festa',memoria:'M
 function celebrationGradeLabel(value){
   const raw=String(value||'').trim();
   if(CELEBRATION_GRADE_LABELS[raw])return CELEBRATION_GRADE_LABELS[raw];
-  const normalized=raw.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLocaleLowerCase('pt-BR').split(' · ')[0].trim().replace(/\\s+/g,'_');
+  const normalized=raw.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR').split(' · ')[0].trim().replace(/\s+/g,'_');
   return CELEBRATION_GRADE_LABELS[normalized]||'';
 }
 function celebrationBadgeHtml(s){
@@ -36,11 +36,11 @@ function celebrationBadgeHtml(s){
   return label?'<span class="celebration-badge">'+label+'</span>':'';
 }
 function celebrationTitleText(value,s){
-  let title=String(value||'').replace(/^B\\.A\\.\\s*/i,'').replace(/^B\\.\\s*/i,'').replace(/^Servo de Deus\\s+/i,'').trim();
-  if(s?.categoria)title=title.replace(/^(?:Santo|Santa|São)\\s+/i,'').trim();
+  let title=String(value||'').replace(/^B\.A\.\s*/i,'').replace(/^B\.\s*/i,'').replace(/^Servo de Deus\s+/i,'').trim();
+  if(s?.categoria)title=title.replace(/^(?:Santo|Santa|São)\s+/i,'').trim();
   return title;
 }
-function celebrationDateText(s){return String(s?.date||'').replace(/\\s*\\(dies natalis\\)\\s*/ig,'').trim();}
+function celebrationDateText(s){return String(s?.date||'').replace(/\s*\(dies natalis\)\s*/ig,'').trim();}
 function celebrationSubtitle(s,gradeOverride=''){
   const date=celebrationDateText(s);
   const gradeLabel=celebrationGradeLabel(gradeOverride||s?.grau);
