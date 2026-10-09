@@ -35,7 +35,11 @@ function celebrationBadgeHtml(s){
   const label=labels[s.categoria]?.[s.genero];
   return label?'<span class="celebration-badge">'+label+'</span>':'';
 }
-function celebrationTitleText(value){return String(value||'').replace(/^B\\.A\\.\\s*/i,'').replace(/^B\\.\\s*/i,'').replace(/^Servo de Deus\\s+/i,'').trim();}
+function celebrationTitleText(value,s){
+  let title=String(value||'').replace(/^B\\.A\\.\\s*/i,'').replace(/^B\\.\\s*/i,'').replace(/^Servo de Deus\\s+/i,'').trim();
+  if(s?.categoria)title=title.replace(/^(?:Santo|Santa|São)\\s+/i,'').trim();
+  return title;
+}
 function celebrationDateText(s){return String(s?.date||'').replace(/\\s*\\(dies natalis\\)\\s*/ig,'').trim();}
 function celebrationSubtitle(s,gradeOverride=''){
   const date=celebrationDateText(s);
@@ -427,7 +431,7 @@ function liturgiaCelebrations(type){
 function renderLiturgiaCelebrationList(tipo,entries){
   const rows=entries.map(entry=>{
     const saint=entry.saint,item=entry.mass;
-    const title=celebrationTitleText(saint?.title||item?.title||'Celebração própria');
+    const title=celebrationTitleText(saint?.title||item?.title||'Celebração própria',saint);
     const date=saint?celebrationDateText(saint):(item?.display_date||item?.date_label||item?.date||'');
     const grade=saint?.grau||item?.grau||item?.rank||'';
     const badge=celebrationBadgeHtml(saint);
@@ -459,7 +463,7 @@ function calendarCelebrationRow(s){
   return `<article class="calendar-celebration-row"><a class="calendar-celebration-link" href="?celebracao=${s._id}" onclick="event.preventDefault();openSaint(${s._id})">${escapeHtml(s.title)}</a></article>`;
 }
 
-function viewSantoral(){if(state.detailId!==null)return viewSaintDetail(state.detailId);let letters=[...new Set(SANTORAL.map(s=>s.title.replace(/^(SANTO|SANTA|B\\.|BEATO|BEATA)\\s+/i,'').trim()[0].toUpperCase()))].sort();let alpha=state.alpha||'';let q=state.search.trim().toLowerCase();let list=SANTORAL.filter(s=>(!q||(s.title+' '+celebrationDateText(s)).toLowerCase().includes(q))&&(!alpha||s.title.replace(/^(SANTO|SANTA|B\\.|BEATO|BEATA)\\s+/i,'').trim().toUpperCase().startsWith(alpha)));let rows=list.map(s=>`<div class="saint-row" onclick="openSaint(${s._id})">${saintImageHtml(s,false)}<div class="daynum">${s.day}</div><div class="rowtext"><div class="rowtitle"><span class="celebration-name">${escapeHtml(s.title)}</span>${celebrationBadgeHtml(s)}</div><div class="rowrank">${escapeHtml(celebrationSubtitle(s))}</div></div><div class="chev">›</div></div>`).join('');return `<div class="section-title">Índice do Santoral</div><div class="search-wrap"><input class="search-input" data-live-search="santoral" placeholder="Buscar santo, beato ou data…" value="${escapeHtml(state.search)}" oninput="liveSearchRender('santoral',this)"></div><div class="alpha-index"><button class="alpha-btn ${!alpha?'active':''}" onclick="state.alpha='';render()">•</button>${letters.map(l=>`<button class="alpha-btn ${alpha===l?'active':''}" onclick="state.alpha='${l}';render()">${l}</button>`).join('')}</div><div class="card fade-in" style="padding:6px 16px;">${rows||'<div class="empty-state">Nenhum nome encontrado.</div>'}</div>`}
+function viewSantoral(){if(state.detailId!==null)return viewSaintDetail(state.detailId);let letters=[...new Set(SANTORAL.map(s=>s.title.replace(/^(SANTO|SANTA|B\\.|BEATO|BEATA)\\s+/i,'').trim()[0].toUpperCase()))].sort();let alpha=state.alpha||'';let q=state.search.trim().toLowerCase();let list=SANTORAL.filter(s=>(!q||(s.title+' '+celebrationDateText(s)).toLowerCase().includes(q))&&(!alpha||s.title.replace(/^(SANTO|SANTA|B\\.|BEATO|BEATA)\\s+/i,'').trim().toUpperCase().startsWith(alpha)));let rows=list.map(s=>`<div class="saint-row" onclick="openSaint(${s._id})">${saintImageHtml(s,false)}<div class="daynum">${s.day}</div><div class="rowtext"><div class="rowtitle"><span class="celebration-name">${escapeHtml(celebrationTitleText(s.title,s))}</span>${celebrationBadgeHtml(s)}</div><div class="rowrank">${escapeHtml(celebrationSubtitle(s))}</div></div><div class="chev">›</div></div>`).join('');return `<div class="section-title">Índice do Santoral</div><div class="search-wrap"><input class="search-input" data-live-search="santoral" placeholder="Buscar santo, beato ou data…" value="${escapeHtml(state.search)}" oninput="liveSearchRender('santoral',this)"></div><div class="alpha-index"><button class="alpha-btn ${!alpha?'active':''}" onclick="state.alpha='';render()">•</button>${letters.map(l=>`<button class="alpha-btn ${alpha===l?'active':''}" onclick="state.alpha='${l}';render()">${l}</button>`).join('')}</div><div class="card fade-in" style="padding:6px 16px;">${rows||'<div class="empty-state">Nenhum nome encontrado.</div>'}</div>`}
 
 function liveSearchRender(kind, el){
   const start=el.selectionStart, end=el.selectionEnd;
@@ -937,7 +941,7 @@ function renderLiturgiaDetail(tipo,reference){
     const item=records[Number(reference)];
     if(!item){state.liturgiaDetail=null;return '';}
     const saint=SANTORAL.find(s=>String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')===item.date)||{};
-    const title=celebrationTitleText(item.title||saint.title||'Missa própria');
+    const title=celebrationTitleText(item.title||saint.title||'Missa própria',saint);
     const date=item.display_date||saint.date||item.date_label||item.date||'Data móvel';
     return '<button class="hub-back" onclick="closeLiturgiaDetail()">‹ Voltar às Missas próprias</button>'+
       '<div class="section-title">Missa própria OSM</div><div class="hub-card"><div class="hub-card-title">'+escapeHtml(title)+'</div>'+
@@ -1517,7 +1521,7 @@ loadCanonicalSantoral();
     const backLabel=origin==='calendario'?'Voltar ao Calendário':origin==='hoje'?'Voltar a Hoje':origin==='liturgia'?'Voltar à Liturgia':origin==='oracoes'?'Voltar a Oração':'Voltar ao Santoral';
     const life='<div class="hub-life">'+saintImageHtml(saint,true)+
       (saintRankSubtitle(saint)?'<div class="rank">'+escapeHtml(saintRankSubtitle(saint))+'</div>':'')+
-      '<h1 class="hub-life-title">'+escapeHtml(saint.title)+'</h1>'+
+      '<h1 class="hub-life-title">'+escapeHtml(celebrationTitleText(saint.title,saint))+'</h1>'+
       '<div class="hub-life-meta">'+escapeHtml(celebrationDateText(saint))+'</div>'+(saint.nota_data?'<div class="hub-note-data">'+escapeHtml(saint.nota_data)+'</div>':'')+
       '<div class="hub-life-bio">'+escapeHtml(saint.bio||'Biografia não cadastrada.')+'</div></div>';
     return '<div class="hub-top-actions"><button class="hub-back" onclick="closeDetail()">‹ '+backLabel+'</button><button class="hub-mode-button" onclick="toggleCelebrationMode()">Modo celebração</button></div>'+
