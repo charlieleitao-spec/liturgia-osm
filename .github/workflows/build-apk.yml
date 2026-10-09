@@ -1,4 +1,4 @@
-name: Build APK Liturgia OSM 4.9.43
+name: Build APK Liturgia OSM 4.9.44
 
 on:
   workflow_dispatch:
@@ -77,8 +77,8 @@ jobs:
 
       - name: Definir versão e segurança
         run: |
-          sed -i 's/versionCode [0-9][0-9]*/versionCode 40947/' android/app/build.gradle
-          sed -i 's/versionName "[^"]*"/versionName "4.9.43"/' android/app/build.gradle
+          sed -i 's/versionCode [0-9][0-9]*/versionCode 40948/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "4.9.44"/' android/app/build.gradle
           python3 - <<'PY'
           from pathlib import Path
           p = Path('android/app/build.gradle')
@@ -116,10 +116,26 @@ jobs:
         run: |
           mkdir -p icones-extraidos
           unzip -oq icone-android-liturgia-osm.zip -d icones-extraidos
-          for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
-            cp icones-extraidos/mipmap-${density}-v4/ic_launcher*.png android/app/src/main/res/mipmap-${density}/
-          done
-
+          find android/app/src/main/res -type f -name 'ic_launcher*' -delete
+          cp -R icones-extraidos/res/. android/app/src/main/res/
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('android/app/src/main/AndroidManifest.xml')
+          s = p.read_text()
+          if 'android:icon="@mipmap/ic_launcher"' not in s:
+              raise SystemExit('Manifesto sem o ícone principal @mipmap/ic_launcher')
+          if re.search(r'android:roundIcon="[^"]+"', s):
+              s = re.sub(r'android:roundIcon="[^"]+"', 'android:roundIcon="@mipmap/ic_launcher_round"', s)
+          elif '<application' in s:
+              s = s.replace('<application', '<application android:roundIcon="@mipmap/ic_launcher_round"', 1)
+          else:
+              raise SystemExit('Manifesto sem elemento application')
+          p.write_text(s)
+          PY
+          test -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+          test -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
+          test -f android/app/src/main/res/mipmap-mdpi/ic_launcher_monochrome.png
       - name: Gerar APK
         working-directory: android
         run: |
@@ -127,34 +143,55 @@ jobs:
           ./gradlew assembleRelease
 
       - name: Nomear APK
-        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.43.apk
+        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.44.apk
 
-      - name: Verificar APK
+      - name: Verificar assinatura e compatibilidade do APK
         run: |
           APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
-          "${APKSIGNER}" verify --verbose --print-certs Liturgia-OSM-4.9.43.apk
-
+          AAPT="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/aapt"
+          APK=Liturgia-OSM-4.9.44.apk
+          PREVIOUS=Liturgia-OSM-4.9.43.apk
+          curl -fsSL https://github.com/charlieleitao-spec/liturgia-osm/releases/download/v4.9.43/Liturgia-OSM-4.9.43.apk -o "$PREVIOUS"
+          "$APKSIGNER" verify --verbose --print-certs "$APK" > atual.txt
+          "$APKSIGNER" verify --verbose --print-certs "$PREVIOUS" > anterior.txt
+          cat atual.txt
+          ATUAL_CERT=$(sed -n 's/.*certificate SHA-256 digest: //p' atual.txt | head -1)
+          ANTERIOR_CERT=$(sed -n 's/.*certificate SHA-256 digest: //p' anterior.txt | head -1)
+          test -n "$ATUAL_CERT" && test "$ATUAL_CERT" = "$ANTERIOR_CERT"
+          ATUAL_BADGING=$("$AAPT" dump badging "$APK" | head -1)
+          ANTERIOR_BADGING=$("$AAPT" dump badging "$PREVIOUS" | head -1)
+          ATUAL_CODE=$(echo "$ATUAL_BADGING" | sed -n "s/.*versionCode='\\([^']*\\)'.*/\\1/p")
+          ANTERIOR_CODE=$(echo "$ANTERIOR_BADGING" | sed -n "s/.*versionCode='\\([^']*\\)'.*/\\1/p")
+          echo "$ATUAL_BADGING"
+          echo "Baseline: $ANTERIOR_BADGING"
+          test "$ATUAL_CODE" = 40948
+          test "$ANTERIOR_CODE" = 40947
+          test "$ATUAL_CODE" -gt "$ANTERIOR_CODE"
+          "$AAPT" dump resources "$APK" > apk-resources.txt
+          for resource in ic_launcher ic_launcher_round ic_launcher_monochrome; do grep -q "mipmap/$resource" apk-resources.txt; done
+          grep -E "mipmap/ic_launcher(_round|_monochrome)?" apk-resources.txt | head -12
+          echo "Assinatura SHA-256 igual à versão instalada distribuída: $ATUAL_CERT"
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.9.43
-          path: Liturgia-OSM-4.9.43.apk
+          name: Liturgia-OSM-4.9.44
+          path: Liturgia-OSM-4.9.44.apk
           if-no-files-found: error
 
       - name: Disponibilizar lock atualizado (temporário)
         uses: actions/upload-artifact@v5
         with:
-          name: lock-temporario-4.9.43
+          name: lock-temporario-4.9.44
           path: package-lock.json
           if-no-files-found: error
 
-      - name: Publicar versão 4.9.43
+      - name: Publicar versão 4.9.44
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v4.9.43
-          name: Liturgia OSM 4.9.43
+          tag_name: v4.9.44
+          name: Liturgia OSM 4.9.44
           generate_release_notes: true
           overwrite_files: true
-          files: Liturgia-OSM-4.9.43.apk
+          files: Liturgia-OSM-4.9.44.apk
 
