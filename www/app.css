@@ -1099,3 +1099,17 @@ body.scroll-controls-hidden .celebration-toggle{
   #view .liturgia-resource-actions{flex-direction:column;align-items:stretch;}
   #view .liturgia-resource-actions .action-btn{width:100%;box-sizing:border-box;}
 }
+
+/* Leitura litúrgica ampla, sem caixas; listas e menus mantêm cartões. */
+#view .liturgical-reading{display:block;width:100%;box-sizing:border-box;padding:4px 0 12px;margin:0 0 16px;background:transparent;border:0;border-radius:0;box-shadow:none;color:var(--paper-dim);overflow-wrap:break-word}
+#view .liturgical-reading::before{display:none}
+#view .liturgical-reading .prayer-block{padding:0;margin:0;line-height:1.65}
+#view .liturgia-resource-content .liturgical-reading{margin-bottom:8px}
+#view .vigilia-reader{padding:0 2px 12px;margin:0;background:transparent;border:0;border-radius:0;box-shadow:none}
+#view .vigilia-reader::before{display:none}
+#view .vigilia-reader .prayer-block{white-space:normal;line-height:1.65!important}
+#view .vigilia-reader .prayer-stanza{margin:0 0 1em!important;line-height:1.65!important}
+#view .vigilia-reader .prayer-context-heading{margin:1.3em 0 .65em!important;padding:0 0 .35em!important;border:0!important;border-bottom:1px solid var(--line)!important;border-radius:0!important;background:transparent!important;color:var(--gold-soft)!important}
+#view .vigilia-reader .prayer-formula-title{margin:1em auto .7em!important;line-height:1.4!important}
+#view .vigilia-reader .prayer-text-heading{margin:1.1em auto .5em!important}
+#view .vigilia-reader .prayer-psalm-caption{margin:0 auto .8em!important}
