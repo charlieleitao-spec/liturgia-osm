@@ -35,7 +35,7 @@ assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
 assert.match(app, /function liturgiaTodayCard\(type,dateValue=''\)/);
 
-const resourceStart=app.indexOf('function liturgiaResourceRow(title,subtitle,content){');
+const resourceStart=app.indexOf('function liturgiaResourceRow(title,subtitle,content,subtitleUrl){');
 const resourceEnd=app.indexOf('function liturgiaResourceAction(',resourceStart);
 const resourceRowSource=app.slice(resourceStart,resourceEnd);
 assert.ok(resourceStart>=0&&resourceEnd>resourceStart,'Os detalhes complementares devem usar uma linha comum recolhível.');
