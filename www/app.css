@@ -1118,3 +1118,8 @@ body.scroll-controls-hidden .celebration-toggle{
 #view .vigilia-reader .prayer-antiphon{margin:1.15em 0 .95em!important;line-height:1.55!important;text-align:center!important;color:var(--paper)!important}
 #view .vigilia-reader .prayer-stanza{margin:0 0 1.15em!important;line-height:1.62!important}
 #view .vigilia-reader .prayer-block{overflow-wrap:normal;word-break:normal;hyphens:none}
+
+/* Na leitura da Vigília, controles fixos não cobrem o texto. */
+body:has(#view .vigilia-reader):not(.celebration-mode) .tabbar{transform:translate(-50%, calc(100% + 24px))!important;opacity:0!important;pointer-events:none!important}
+body:has(#view .vigilia-reader):not(.celebration-mode) .celebration-toggle{bottom:calc(18px + env(safe-area-inset-bottom))!important;right:18px!important;left:auto!important;max-width:calc(100vw - 36px);font-size:13px!important;padding:9px 12px!important}
+body:has(#view .vigilia-reader) main#view{padding-bottom:calc(115px + env(safe-area-inset-bottom))!important}
