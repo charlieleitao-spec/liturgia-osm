@@ -25,6 +25,11 @@ for (const item of santoralData) {
   assert.ok(!/\(dies natalis\)/i.test(item.date), 'dies natalis não deve permanecer na data: ' + item.title);
 }
 assert.equal(santoralData.filter(item => !item.grau_confirmado).length, 25, 'A lista de graus não confirmados mudou; revise o relatório.');
+const beatified = santoralData.filter(item => item.categoria === 'beato');
+assert.ok(beatified.length > 0, 'O Santoral deve conter beatos classificados.');
+for (const item of beatified) assert.ok(['m', 'f'].includes(item.genero), 'Gênero ausente para beato: ' + item.title);
+assert.match(app, /if\(s\.categoria==='beato'\)return s\.genero==='f'\?'Beata':'Beato'/);
+
 
 for (const file of ['www/app.js', 'www/servite-1.js', 'www/servite-2.js', 'www/servite-3.js']) {
   const result = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
@@ -34,7 +39,8 @@ for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data
 assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
-assert.match(app, /function celebrationBadgeHtml/);
+assert.match(app, /function celebrationLabel/);
+assert.match(app, /function celebrationNameHtml/);
 assert.match(app, /function celebrationSubtitle/);
 assert.match(app, /const APP_VERSION = ['"]4\.9\.45['"]/);
 assert.match(workflow, /Build APK Liturgia OSM 4\.9\.45/);
