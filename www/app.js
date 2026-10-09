@@ -939,7 +939,7 @@ function renderLiturgiaDetail(tipo,reference){
     if(!saint||!hours.length){state.liturgiaDetail=null;return '';}
     const rank=saintRankSubtitle(saint);
     return '<button class="hub-back" onclick="closeLiturgiaDetail()">‹ Voltar aos Ofícios próprios</button>'+
-      '<div class="section-title">Ofícios próprios OSM</div><div class="hub-card"><div class="hub-card-title">'+escapeHtml(saint.title)+'</div>'+
+      '<div class="section-title">Ofícios próprios OSM</div><div class="hub-card"><div class="hub-card-title">'+celebrationNameHtml(saint.title,saint)+'</div>'+
       '<p class="reader-note">'+escapeHtml(celebrationSubtitle(saint))+'</p>'+(saint.nota_data?'<p class="hub-note-data">'+escapeHtml(saint.nota_data)+'</p>':'')+
       '<p class="hub-card-note">'+escapeHtml(officeClassificationForSaint(saint))+'</p><div class="office-hours-grid">'+
       hours.map(pair=>officeHourButtonHtml(saint,pair)).join('')+'</div></div>';
@@ -952,7 +952,7 @@ function renderLiturgiaDetail(tipo,reference){
     const title=celebrationTitleText(item.title||saint.title||'Missa própria',saint);
     const date=item.display_date||saint.date||item.date_label||item.date||'Data móvel';
     return '<button class="hub-back" onclick="closeLiturgiaDetail()">‹ Voltar às Missas próprias</button>'+
-      '<div class="section-title">Missa própria OSM</div><div class="hub-card"><div class="hub-card-title">'+escapeHtml(title)+'</div>'+
+      '<div class="section-title">Missa própria OSM</div><div class="hub-card"><div class="hub-card-title">'+celebrationNameHtml(item.title||saint.title||'Missa própria',saint)+'</div>'+
       '<p class="reader-note">'+escapeHtml(date)+(date&&celebrationGradeLabel(saint.grau||item.rank)?' · '+escapeHtml(celebrationGradeLabel(saint.grau||item.rank)):'')+'</p>'+(saint.nota_data?'<p class="hub-note-data">'+escapeHtml(saint.nota_data)+'</p>':'')+
       (item.local_pdf_url?'<p><a class="action-btn" href="'+escapeHtml(item.local_pdf_url)+'" target="_blank" rel="noopener">Abrir PDF baixado</a></p>':'')+(item.pdf_url?'<a class="reader-note" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Fonte oficial OSM</a>':'')+renderProperMassContent(item)+'<p class="hub-source">Fonte: '+escapeHtml(item.source||'fonte não informada')+'</p></div>';
   }
