@@ -1077,3 +1077,25 @@ body.scroll-controls-hidden .celebration-toggle{
 #view .liturgia-today-card .liturgia-today-date{margin:4px 0 14px;text-align:center;color:var(--text-muted);font-family:Georgia,'Times New Roman',serif;font-size:calc(16px * var(--reader-scale,1));line-height:1.35;}
 #view .liturgia-today-card .liturgia-today-action{display:flex;justify-content:center;margin:0;}
 #view .liturgia-today-card .action-btn{display:inline-flex;min-width:220px;align-items:center;justify-content:center;text-decoration:none;}
+
+/* Linhas recolhíveis para os materiais complementares no fim das páginas litúrgicas. */
+#view .liturgia-resource-list{padding:6px 16px;}
+#view .liturgia-resource-detail{border-bottom:1px solid var(--line);}
+#view .liturgia-resource-detail:last-child{border-bottom:0;}
+#view .liturgia-resource-row{border-bottom:0;list-style:none;}
+#view .liturgia-resource-row::-webkit-details-marker{display:none;}
+#view .liturgia-resource-detail>summary::-webkit-details-marker{display:none;}
+#view .liturgia-resource-detail[open]>.liturgia-resource-row .chev{transform:rotate(90deg);}
+#view .liturgia-resource-content{padding:2px 4px 16px;color:var(--paper-dim);}
+#view .liturgia-resource-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px;}
+#view .liturgia-resource-actions .action-btn{display:inline-flex;min-height:40px;align-items:center;justify-content:center;white-space:normal;line-height:1.25;text-align:center;}
+#view .liturgia-resource-content-title{margin:2px 0 8px;color:var(--text-muted);font-size:12px;letter-spacing:.1em;text-transform:uppercase;}
+#view .liturgia-resource-disclosure{margin-top:12px;}
+#view .liturgia-resource-disclosure>summary{display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none;}
+#view .liturgia-resource-disclosure>summary::-webkit-details-marker{display:none;}
+#view .liturgia-resource-disclosure[open]>summary:after{content:'−';margin-left:10px;font-size:16px;}
+@media(max-width:420px){
+  #view .liturgia-resource-list{padding:4px 12px;}
+  #view .liturgia-resource-actions{flex-direction:column;align-items:stretch;}
+  #view .liturgia-resource-actions .action-btn{width:100%;box-sizing:border-box;}
+}
