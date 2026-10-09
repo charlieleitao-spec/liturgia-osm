@@ -1129,3 +1129,23 @@ body:has(#view .vigilia-reader) main#view{padding-bottom:calc(115px + env(safe-a
 #view .proper-mass-reader .liturgical-reading{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;max-width:none!important;width:100%!important}
 #view .proper-mass-reader .section-title{margin:1.3em 0 .45em!important}
 #view .proper-mass-reader .hub-card-title{margin:.35em 0 .6em!important}
+
+/* Escala única para o corpo dos textos litúrgicos: Missa, Ofício, devoções e Vigília. */
+#view .liturgical-reading,
+#view .liturgical-reading.hub-text,
+#view .proper-mass-reader .liturgical-reading,
+#view .prayer-block,
+#view .vigilia-reader .prayer-block,
+#view .office-text,
+#view .text-block{
+  font-size:calc(18px * var(--reader-scale, 1))!important;
+  line-height:1.65!important;
+  font-family:Georgia,'Times New Roman',serif!important;
+}
+#view .vigilia-reader .prayer-stanza{font-size:inherit!important;line-height:inherit!important;margin:0 0 1.15em!important}
+#view .vigilia-reader .prayer-antiphon{font-size:inherit!important;line-height:inherit!important}
+#view .vigilia-reader .prayer-text-heading,
+#view .vigilia-reader .prayer-context-heading{font-size:calc(19px * var(--reader-scale, 1))!important;line-height:1.4!important}
+#view .vigilia-reader .prayer-formula-title,
+#view .vigilia-reader .prayer-psalm-caption{font-size:calc(16px * var(--reader-scale, 1))!important}
+#view .vigilia-reader .verse-number{font-size:.75em!important}
