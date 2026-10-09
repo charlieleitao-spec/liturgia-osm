@@ -211,7 +211,7 @@ const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
 let pendingSharePrayer = null;
-let state = { tab: 'hoje', angelus:dailySuggestion.key, detailId:null, search:'', devo:null, devoSub:null, properMassDate:null, properOfficeId:null };
+let state = { tab: 'hoje', angelus:dailySuggestion.key, detailId:null, search:'', devo:null, devoSub:null, liturgiaDetail:null };
 let readerScale = parseFloat(localStorage.getItem('osmReaderScale') || '1');
 let lightMode = localStorage.getItem('osmTheme') !== 'dark';
 function applyPreferences(){
@@ -247,7 +247,7 @@ function setTab(tab){
   state.tab=tab;
   localStorage.setItem('osmLastTab',tab);
   state.detailId=null;state.devo=null;state.devoSub=null;
-  if(tab!=='liturgia'){state.properMassDate=null;state.properOfficeId=null;}
+  if(tab!=='liturgia')state.liturgiaDetail=null;
   state.prayerSection='praticas';state.prayerCategory=null;memoriaSelectedDate=null;
   render();window.scrollTo(0,0);
 }
@@ -399,20 +399,19 @@ function officeHourButtonHtml(s,pair,className='office-hour-btn'){
 }
 function liturgiaDateKey(s){return String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0');}
 function liturgiaCelebrations(type){
-  if(type==='horas')return SANTORAL.filter(s=>saintHasOffice(s)).map(s=>({saint:s}));
+  if(type==='horas')return SANTORAL.filter(s=>saintHasOffice(s)&&officeHoursForSaint(s).length>0).map(s=>({saint:s}));
   const records=window.MISSAS_OSM&&Array.isArray(window.MISSAS_OSM.celebrations)?window.MISSAS_OSM.celebrations:[];
   return SANTORAL.map(s=>({saint:s,mass:records.find(item=>item.date===liturgiaDateKey(s)||(item.santoral_id!==undefined&&String(item.santoral_id)===String(s.id)))}))
     .filter(entry=>entry.mass&&!entry.mass.date_rule&&entry.mass.group!=='Santa Maria no Sábado');
 }
-function renderLiturgiaCelebrationList(type,entries){
+function renderLiturgiaCelebrationList(tipo,entries){
   const rows=entries.map(entry=>{
     const saint=entry.saint,item=entry.mass;
     const title=saint?.title||item?.title||'Celebração própria';
     const date=saint?.date||item?.display_date||item?.date_label||item?.date||'';
     const rank=saint?saintRankSubtitle(saint):(item?.rank||'');
-    const action=type==='horas'&&saint
-      ? 'openProperOffice('+Number(saint._id)+')'
-      : 'openProperMass(\''+String(item.date).replace(/[^a-zA-Z0-9-]/g,'')+'\')';
+    const reference=tipo==='horas'?Number(saint?._id):Number((window.MISSAS_OSM?.celebrations||[]).indexOf(item));
+    const action='openLiturgiaDetail(\''+tipo+'\','+reference+')';
     return '<button class="liturgia-celebration-row" type="button" onclick="'+action+'" aria-label="Abrir '+escapeHtml(title)+'"><span class="rowtext"><span class="rowtitle">'+escapeHtml(title)+'</span><span class="rowrank">'+escapeHtml(date)+(rank?' · '+escapeHtml(rank):'')+'</span></span><span class="chev" aria-hidden="true">›</span></button>';
   }).join('');
   return '<div class="card fade-in">'+(rows||'<div class="empty-state">Nenhuma celebração própria cadastrada.</div>')+'</div>';
@@ -854,20 +853,25 @@ function renderProperMassContent(item){
     properMassAntiphon('Antífona da comunhão',item.communion_antiphon||item.antifona_comunhao)+
     properMassSection('Depois da comunhão',item.after_communion||item.depois_da_comunhao);
 }
-function properMassRecord(date){
-  const records=window.MISSAS_OSM&&Array.isArray(window.MISSAS_OSM.celebrations)?window.MISSAS_OSM.celebrations:[];
-  const saint=SANTORAL.find(s=>String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')===date);
-  return records.find(item=>item.date===date||(item.santoral_id!==undefined&&item.santoral_id!==null&&saint&&String(item.santoral_id)===String(saint.id)));
+function openLiturgiaDetail(tipo,reference){
+  const type=tipo==='horas'?'horas':tipo==='missa'?'missa':null;
+  if(!type)return;
+  if(type==='horas'){
+    const saint=SANTORAL.find(item=>Number(item._id)===Number(reference));
+    if(!saint||!saintHasOffice(saint)||!officeHoursForSaint(saint).length)return;
+    state.liturgiaDetail={tipo:type,reference:Number(saint._id)};
+  }else{
+    const records=window.MISSAS_OSM?.celebrations||[];
+    const index=Number(reference),item=Number.isInteger(index)?records[index]:null;
+    if(!item)return;
+    state.liturgiaDetail={tipo:type,reference:index};
+  }
+  state.tab='liturgia';state.liturgiaSection=type;render();window.scrollTo(0,0);
 }
-function openProperMass(date){state.properOfficeId=null;state.properMassDate=String(date||'');state.tab='liturgia';state.liturgiaSection='missa';render();window.scrollTo(0,0);}
-function closeProperMass(){state.properMassDate=null;render();window.scrollTo(0,0);}
-function openProperOffice(saintId){state.properMassDate=null;state.properOfficeId=Number(saintId);state.tab='liturgia';state.liturgiaSection='horas';render();window.scrollTo(0,0);}
-function closeProperOffice(){state.properOfficeId=null;render();window.scrollTo(0,0);}
-window.openProperMass=openProperMass;
-window.closeProperMass=closeProperMass;
-window.openProperOffice=openProperOffice;
-window.closeProperOffice=closeProperOffice;
-function setLiturgiaSection(section){state.liturgiaSection=section;if(section!=='missa')state.properMassDate=null;if(section!=='horas')state.properOfficeId=null;render();window.scrollTo(0,0);}
+function closeLiturgiaDetail(){state.liturgiaDetail=null;render();window.scrollTo(0,0);}
+window.openLiturgiaDetail=openLiturgiaDetail;
+window.closeLiturgiaDetail=closeLiturgiaDetail;
+function setLiturgiaSection(section){state.liturgiaSection=section;if(state.liturgiaDetail?.tipo!==section)state.liturgiaDetail=null;render();window.scrollTo(0,0);}
 function movableOfficeDate(item){
   if(item.date_rule==='sexta-feira_depois_do_v_domingo_da_quaresma'){
     const date=easterSunday(new Date().getFullYear());
@@ -895,42 +899,45 @@ function marianSaturdayOfficeBlocks(){
       (item.local_pdf_url?'<a class="action-btn" style="margin:8px 0" href="'+escapeHtml(item.local_pdf_url)+'" target="_blank" rel="noopener">Abrir PDF baixado</a>':(item.pdf_url?'<a class="action-btn" style="margin:8px 0" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Abrir PDF</a>':''))+'</div>'+(item.pdf_transcript?'<details style="margin:8px 0 16px 14px"><summary class="action-btn">Ler texto completo</summary><div class="hub-text saturday-pdf-transcript">'+renderPrayer(cleanMassText(item.pdf_transcript))+'</div></details>':'');
   }).join('')+'</div>';
 }
+function renderLiturgiaDetail(tipo,reference){
+  if(tipo==='horas'){
+    const saint=SANTORAL.find(item=>Number(item._id)===Number(reference));
+    const hours=saint&&saintHasOffice(saint)?officeHoursForSaint(saint):[];
+    if(!saint||!hours.length){state.liturgiaDetail=null;return '';}
+    const rank=saintRankSubtitle(saint);
+    return '<button class="hub-back" onclick="closeLiturgiaDetail()">‹ Voltar aos Ofícios próprios</button>'+
+      '<div class="section-title">Ofícios próprios OSM</div><div class="hub-card"><div class="hub-card-title">'+escapeHtml(saint.title)+'</div>'+
+      '<p class="reader-note">'+escapeHtml(saint.date)+(rank?' · '+escapeHtml(rank):'')+'</p>'+
+      '<p class="hub-card-note">'+escapeHtml(officeClassificationForSaint(saint))+'</p><div class="office-hours-grid">'+
+      hours.map(pair=>officeHourButtonHtml(saint,pair)).join('')+'</div></div>';
+  }
+  if(tipo==='missa'){
+    const records=window.MISSAS_OSM?.celebrations||[];
+    const item=records[Number(reference)];
+    if(!item){state.liturgiaDetail=null;return '';}
+    const saint=SANTORAL.find(s=>String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')===item.date)||{};
+    const title=item.title||saint.title||'Missa própria';
+    const date=item.display_date||saint.date||item.date_label||item.date||'Data móvel';
+    return '<button class="hub-back" onclick="closeLiturgiaDetail()">‹ Voltar às Missas próprias</button>'+
+      '<div class="section-title">Missa própria OSM</div><div class="hub-card"><div class="hub-card-title">'+escapeHtml(title)+'</div>'+
+      '<p class="reader-note">'+escapeHtml(date)+(item.rank?' · '+escapeHtml(item.rank):'')+'</p>'+
+      (item.local_pdf_url?'<p><a class="action-btn" href="'+escapeHtml(item.local_pdf_url)+'" target="_blank" rel="noopener">Abrir PDF baixado</a></p>':'')+(item.pdf_url?'<a class="reader-note" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Fonte oficial OSM</a>':'')+renderProperMassContent(item)+'<p class="hub-source">Fonte: '+escapeHtml(item.source||'fonte não informada')+'</p></div>';
+  }
+  state.liturgiaDetail=null;
+  return '';
+}
 function viewLiturgia(){
   const section=state.liturgiaSection||'missa';
   const switcher=`<div class="toggle-row" aria-label="Seções de Liturgia">
     <button class="toggle-btn ${section==='missa'?'active':''}" onclick="setLiturgiaSection('missa')">Missa</button>
     <button class="toggle-btn ${section==='horas'?'active':''}" onclick="setLiturgiaSection('horas')">Liturgia das Horas</button>
   </div>`;
+  if(state.liturgiaDetail){const detail=renderLiturgiaDetail(state.liturgiaDetail.tipo,state.liturgiaDetail.reference);if(detail)return switcher+detail;}
   if(section==='horas'){
-    if(state.properOfficeId!==null){
-      const saint=SANTORAL.find(s=>Number(s._id)===Number(state.properOfficeId));
-      if(saint&&saintHasOffice(saint)){
-        const rank=saintRankSubtitle(saint);
-        return switcher+'<button class="hub-back" onclick="closeProperOffice()">‹ Voltar aos Ofícios próprios</button>'+
-          '<div class="section-title">Ofícios próprios OSM</div><div class="hub-card"><div class="hub-card-title">'+escapeHtml(saint.title)+'</div>'+
-          '<p class="reader-note">'+escapeHtml(saint.date)+(rank?' · '+escapeHtml(rank):'')+'</p>'+
-          '<p class="hub-card-note">'+escapeHtml(officeClassificationForSaint(saint))+'</p><div class="office-hours-grid">'+
-          officeHoursForSaint(saint).map(pair=>officeHourButtonHtml(saint,pair)).join('')+'</div></div>';
-      }
-      state.properOfficeId=null;
-    }
     const todayBlock=liturgiaTodayCard('horas');
     const officeWarning=!oficiosReady?'<div class="card" role="alert"><p>O cadastro local dos Ofícios está indisponível. A Vida e as orações continuam acessíveis.</p><button class="action-btn" onclick="loadCanonicalOffices()">Tentar carregar os Ofícios</button></div>':'';
     const ownBlocks='<div class="section-title">Ofícios próprios OSM</div>'+renderLiturgiaCelebrationList('horas',liturgiaCelebrations('horas'));
     return switcher+todayBlock+officeWarning+(oficiosReady?ownBlocks+movableOfficeBlocks()+marianSaturdayOfficeBlocks():'');
-  }
-  if(state.properMassDate){
-    const item=properMassRecord(state.properMassDate);
-    if(item){
-      const saint=SANTORAL.find(s=>String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')===item.date)||{};
-      const title=item.title||saint.title||'Missa própria';
-      const date=item.display_date||saint.date||item.date;
-      return switcher+'<button class="hub-back" onclick="closeProperMass()">‹ Voltar aos próprios OSM</button>'+
-        '<div class="section-title">Missa própria OSM</div><div class="hub-card"><div class="hub-card-title">'+escapeHtml(title)+'</div>'+
-        '<p class="reader-note">'+escapeHtml(date)+(item.rank?' · '+escapeHtml(item.rank):'')+'</p>'+
-        (item.local_pdf_url?'<p><a class="action-btn" href="'+escapeHtml(item.local_pdf_url)+'" target="_blank" rel="noopener">Abrir PDF baixado</a></p>':'')+(item.pdf_url?'<a class="reader-note" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Fonte oficial OSM</a>':'')+renderProperMassContent(item)+'<p class="hub-source">Fonte: '+escapeHtml(item.source||'fonte não informada')+'</p></div>';
-    }
-    state.properMassDate=null;
   }
   const records=window.MISSAS_OSM&&Array.isArray(window.MISSAS_OSM.celebrations)?window.MISSAS_OSM.celebrations:[];
   const movableMasses=records.filter(item=>Boolean(item.date_rule));
@@ -1120,8 +1127,7 @@ function smartBack(){
   if(language&&language.classList.contains('open')){closeLanguagePanel();return true;}
   if(servite&&servite.classList.contains('open')){if(typeof closeServite==='function')closeServite();else servite.classList.remove('open');updateBackButton();return true;}
   if(mass&&mass.classList.contains('open')&&typeof window.closeDailyLiturgy==='function'){window.closeDailyLiturgy();updateBackButton();return true;}
-  if(state.properMassDate){closeProperMass();return true;}
-  if(state.properOfficeId!==null){closeProperOffice();return true;}
+  if(state.liturgiaDetail){closeLiturgiaDetail();return true;}
   if(dailyPrayerOpen480){closeDailyPrayer480();return true;}
   if(memoriaSelectedDate){closeMemoriaLiturgica();return true;}
   if(state.devoSub!==null&&state.devoSub!==undefined){closeDevo();return true;}
