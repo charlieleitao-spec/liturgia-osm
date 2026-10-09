@@ -29,16 +29,24 @@ function celebrationGradeLabel(value){
   const normalized=raw.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR').split(' · ')[0].trim().replace(/\s+/g,'_');
   return CELEBRATION_GRADE_LABELS[normalized]||'';
 }
-function celebrationBadgeHtml(s){
-  if(!s||s.exibir_selo===false||!s.categoria||!s.genero)return '';
-  const labels={santo:{m:'Santo',f:'Santa'},beato:{m:'Beato',f:'Beata'},servo_de_deus:{m:'Servo de Deus',f:'Serva de Deus'}};
-  const label=labels[s.categoria]?.[s.genero];
-  return label?'<span class="celebration-badge">'+label+'</span>':'';
+function celebrationLabel(s){
+  if(!s||s.exibir_selo===false)return '';
+  if(s.categoria==='beato')return s.genero==='f'?'Beata':'Beato';
+  if(s.categoria==='servo_de_deus')return s.genero==='f'?'Serva de Deus':'Servo de Deus';
+  return '';
 }
 function celebrationTitleText(value,s){
-  let title=String(value||'').replace(/^B\.A\.\s*/i,'').replace(/^B\.\s*/i,'').replace(/^Servo de Deus\s+/i,'').trim();
-  if(s?.categoria)title=title.replace(/^(?:Santo|Santa|São)\s+/i,'').trim();
-  return title;
+  const original=String(value||'').trim();
+  if(s?.categoria==='santo')return original;
+  const name=original.replace(/^(?:B\.A\.|B\.|Beato|Beata|Servo de Deus|Serva de Deus)\s*/i,'').trim();
+  const label=celebrationLabel(s);
+  return label?label+' '+name:name;
+}
+function celebrationNameHtml(value,s){
+  const title=celebrationTitleText(value,s),label=celebrationLabel(s);
+  if(!label)return escapeHtml(title);
+  const name=title.slice(label.length).trim();
+  return '<span class="celebration-label">'+escapeHtml(label)+'</span> <span class="celebration-name">'+escapeHtml(name)+'</span>';
 }
 function celebrationDateText(s){return String(s?.date||'').replace(/\s*\(dies natalis\)\s*/ig,'').trim();}
 function celebrationSubtitle(s,gradeOverride=''){
@@ -434,7 +442,7 @@ function renderLiturgiaCelebrationList(tipo,entries){
     const title=celebrationTitleText(saint?.title||item?.title||'Celebração própria',saint);
     const date=saint?celebrationDateText(saint):(item?.display_date||item?.date_label||item?.date||'');
     const grade=saint?.grau||item?.grau||item?.rank||'';
-    const badge=celebrationBadgeHtml(saint);
+    const displayName=celebrationNameHtml(saint?.title||item?.title||'Celebração própria',saint);
     const reference=tipo==='horas'?Number(saint?._id):Number((window.MISSAS_OSM?.celebrations||[]).indexOf(item));
     const action='openLiturgiaDetail(\''+tipo+'\', '+reference+')';
     const subtitle=celebrationGradeLabel(grade);
@@ -463,7 +471,7 @@ function calendarCelebrationRow(s){
   return `<article class="calendar-celebration-row"><a class="calendar-celebration-link" href="?celebracao=${s._id}" onclick="event.preventDefault();openSaint(${s._id})">${escapeHtml(s.title)}</a></article>`;
 }
 
-function viewSantoral(){if(state.detailId!==null)return viewSaintDetail(state.detailId);let letters=[...new Set(SANTORAL.map(s=>s.title.replace(/^(SANTO|SANTA|B\\.|BEATO|BEATA)\\s+/i,'').trim()[0].toUpperCase()))].sort();let alpha=state.alpha||'';let q=state.search.trim().toLowerCase();let list=SANTORAL.filter(s=>(!q||(s.title+' '+celebrationDateText(s)).toLowerCase().includes(q))&&(!alpha||s.title.replace(/^(SANTO|SANTA|B\\.|BEATO|BEATA)\\s+/i,'').trim().toUpperCase().startsWith(alpha)));let rows=list.map(s=>`<div class="saint-row" onclick="openSaint(${s._id})">${saintImageHtml(s,false)}<div class="daynum">${s.day}</div><div class="rowtext"><div class="rowtitle"><span class="celebration-name">${escapeHtml(celebrationTitleText(s.title,s))}</span>${celebrationBadgeHtml(s)}</div><div class="rowrank">${escapeHtml(celebrationSubtitle(s))}</div></div><div class="chev">›</div></div>`).join('');return `<div class="section-title">Índice do Santoral</div><div class="search-wrap"><input class="search-input" data-live-search="santoral" placeholder="Buscar santo, beato ou data…" value="${escapeHtml(state.search)}" oninput="liveSearchRender('santoral',this)"></div><div class="alpha-index"><button class="alpha-btn ${!alpha?'active':''}" onclick="state.alpha='';render()">•</button>${letters.map(l=>`<button class="alpha-btn ${alpha===l?'active':''}" onclick="state.alpha='${l}';render()">${l}</button>`).join('')}</div><div class="card fade-in" style="padding:6px 16px;">${rows||'<div class="empty-state">Nenhum nome encontrado.</div>'}</div>`}
+function viewSantoral(){if(state.detailId!==null)return viewSaintDetail(state.detailId);let letters=[...new Set(SANTORAL.map(s=>s.title.replace(/^(SANTO|SANTA|B\\.|BEATO|BEATA)\\s+/i,'').trim()[0].toUpperCase()))].sort();let alpha=state.alpha||'';let q=state.search.trim().toLowerCase();let list=SANTORAL.filter(s=>(!q||(s.title+' '+celebrationDateText(s)).toLowerCase().includes(q))&&(!alpha||s.title.replace(/^(SANTO|SANTA|B\\.|BEATO|BEATA)\\s+/i,'').trim().toUpperCase().startsWith(alpha)));let rows=list.map(s=>`<div class="saint-row" onclick="openSaint(${s._id})">${saintImageHtml(s,false)}<div class="daynum">${s.day}</div><div class="rowtext"><div class="rowtitle">${celebrationNameHtml(s.title,s)}</div><div class="rowrank">${escapeHtml(celebrationSubtitle(s))}</div></div><div class="chev">›</div></div>`).join('');return `<div class="section-title">Índice do Santoral</div><div class="search-wrap"><input class="search-input" data-live-search="santoral" placeholder="Buscar santo, beato ou data…" value="${escapeHtml(state.search)}" oninput="liveSearchRender('santoral',this)"></div><div class="alpha-index"><button class="alpha-btn ${!alpha?'active':''}" onclick="state.alpha='';render()">•</button>${letters.map(l=>`<button class="alpha-btn ${alpha===l?'active':''}" onclick="state.alpha='${l}';render()">${l}</button>`).join('')}</div><div class="card fade-in" style="padding:6px 16px;">${rows||'<div class="empty-state">Nenhum nome encontrado.</div>'}</div>`}
 
 function liveSearchRender(kind, el){
   const start=el.selectionStart, end=el.selectionEnd;
@@ -1521,7 +1529,7 @@ loadCanonicalSantoral();
     const backLabel=origin==='calendario'?'Voltar ao Calendário':origin==='hoje'?'Voltar a Hoje':origin==='liturgia'?'Voltar à Liturgia':origin==='oracoes'?'Voltar a Oração':'Voltar ao Santoral';
     const life='<div class="hub-life">'+saintImageHtml(saint,true)+
       (saintRankSubtitle(saint)?'<div class="rank">'+escapeHtml(saintRankSubtitle(saint))+'</div>':'')+
-      '<h1 class="hub-life-title">'+escapeHtml(celebrationTitleText(saint.title,saint))+'</h1>'+
+      '<h1 class="hub-life-title">'+celebrationNameHtml(saint.title,saint)+'</h1>'+
       '<div class="hub-life-meta">'+escapeHtml(celebrationDateText(saint))+'</div>'+(saint.nota_data?'<div class="hub-note-data">'+escapeHtml(saint.nota_data)+'</div>':'')+
       '<div class="hub-life-bio">'+escapeHtml(saint.bio||'Biografia não cadastrada.')+'</div></div>';
     return '<div class="hub-top-actions"><button class="hub-back" onclick="closeDetail()">‹ '+backLabel+'</button><button class="hub-mode-button" onclick="toggleCelebrationMode()">Modo celebração</button></div>'+
