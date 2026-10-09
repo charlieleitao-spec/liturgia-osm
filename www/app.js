@@ -55,6 +55,7 @@ function celebrationSubtitle(s,gradeOverride=''){
   return date+(date&&gradeLabel?' · ':'')+gradeLabel;
 }
 function saintRankSubtitle(s){
+  if(s?.categoria==='beato'||s?.categoria==='servo_de_deus')return '';
   const rank=String(s?.rank||'').trim();
   const title=String(s?.title||'').trim();
   if(!rank||!title)return rank;
