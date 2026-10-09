@@ -1113,3 +1113,8 @@ body.scroll-controls-hidden .celebration-toggle{
 #view .vigilia-reader .prayer-formula-title{margin:1em auto .7em!important;line-height:1.4!important}
 #view .vigilia-reader .prayer-text-heading{margin:1.1em auto .5em!important}
 #view .vigilia-reader .prayer-psalm-caption{margin:0 auto .8em!important}
+
+/* Vigília: antífonas destacadas, versos sem aglutinação e parágrafos legíveis. */
+#view .vigilia-reader .prayer-antiphon{margin:1.15em 0 .95em!important;line-height:1.55!important;text-align:center!important;color:var(--paper)!important}
+#view .vigilia-reader .prayer-stanza{margin:0 0 1.15em!important;line-height:1.62!important}
+#view .vigilia-reader .prayer-block{overflow-wrap:normal;word-break:normal;hyphens:none}
