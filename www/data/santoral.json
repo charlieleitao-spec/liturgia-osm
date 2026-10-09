@@ -126,7 +126,8 @@
     "categoria": "santo",
     "genero": "f",
     "grau": "memoria_facultativa",
-    "grau_confirmado": true
+    "grau_confirmado": true,
+    "exibir_selo": false
   },
   {
     "id": 8,
@@ -376,7 +377,8 @@
     "categoria": "santo",
     "genero": "f",
     "grau": "solenidade",
-    "grau_confirmado": true
+    "grau_confirmado": true,
+    "exibir_selo": false
   },
   {
     "id": 24,
