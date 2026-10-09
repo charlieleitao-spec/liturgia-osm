@@ -15,27 +15,27 @@ O Hoje na Família Servita consome uma base derivada. Corrija primeiro os arquiv
 
 Há atualmente 21 celebrações sem imagem. A interface usa um marcador tipográfico com as iniciais do título, sem criar ou substituir imagens:
 
-- B. Tiago de "Città della Pieve"
-- B. Joaquim de Sena
-- B. Isabel Picenardi
-- Servo de Deus Frei Paulino M. Baldassarri
-- B.A. Virgem Maria, Mãe e Medianeira
-- B. Benincasa de Montepulciano
-- B. Francisco de Sena
-- B. Tiago Filipe de Faenza
-- B. Fernando Maria Baccilieri
-- B. Ubaldo de Sansepolcro
+- Tiago de "Città della Pieve"
+- Joaquim de Sena
+- Isabel Picenardi
+- Frei Paulino M. Baldassarri
+- Virgem Maria, Mãe e Medianeira
+- Benincasa de Montepulciano
+- Francisco de Sena
+- Tiago Filipe de Faenza
+- Fernando Maria Baccilieri
+- Ubaldo de Sansepolcro
 - Santa Clélia Barbieri
-- Servo de Deus Frei Egídio Maria Moscini
+- Frei Egídio Maria Moscini
 - Santo Agostinho
-- B. André de Sansepolcro
-- B. Boaventura de Forlì
+- André de Sansepolcro
+- Boaventura de Forlì
 - Nossa Senhora das Dores
 - Dedicação da Basílica de Monte Senário
-- B. João Ângelo de Milão
+- João Ângelo de Milão
 - Comemoração dos Defuntos da Ordem
-- B. Jerônimo de Sant'Angelo in Vado
-- B. Boaventura de Pistoia
+- Jerônimo de Sant'Angelo in Vado
+- Boaventura de Pistoia
 
 Quando uma imagem identificada e autorizada for adicionada ao `santoral.json`, ela substitui automaticamente o marcador.
 
