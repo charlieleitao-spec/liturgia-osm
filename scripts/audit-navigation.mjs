@@ -102,7 +102,11 @@ assert.match(app,/SANTORAL\.filter\(s=>saintHasOffice\(s\)&&officeHoursForSaint\
 assert.equal(testSaints.filter(s=>testHasOffice(s)&&testHoursFor(s).length).length+unavailableSaints.length,testSaints.length);
 const listHelpersStart=app.indexOf('function liturgiaDateKey(s){');
 const listHelpers=app.slice(listHelpersStart,sharedListEnd);
-const listRendererFn=new Function('SANTORAL','window','saintHasOffice','officeHoursForSaint','saintRankSubtitle','escapeHtml',listHelpers+';return {liturgiaCelebrations,renderLiturgiaCelebrationList};')(
+const labelStart=app.indexOf('const CELEBRATION_GRADE_LABELS=');
+const labelEnd=app.indexOf('function saintRankSubtitle(',labelStart);
+assert.ok(labelStart>=0&&labelEnd>labelStart,'Rótulos das celebrações devem existir.');
+const labelHelpers=app.slice(labelStart,labelEnd);
+const listRendererFn=new Function('SANTORAL','window','saintHasOffice','officeHoursForSaint','saintRankSubtitle','escapeHtml',labelHelpers+listHelpers+';return {liturgiaCelebrations,renderLiturgiaCelebrationList};')(
   testSaints,{MISSAS_OSM:massData},testHasOffice,testHoursFor,s=>s.rank||'',htmlEscape);
 const availableHoursEntries=listRendererFn.liturgiaCelebrations('horas');
 assert.ok(availableHoursEntries.length>0);
@@ -137,7 +141,7 @@ assert.ok(renderedHoursList.includes('onclick="openLiturgiaDetail(\'horas\','+of
 const availableMassEntries=listRendererFn.liturgiaCelebrations('missa');
 const renderedMassList=listRendererFn.renderLiturgiaCelebrationList('missa',availableMassEntries);
 assert.ok(renderedMassList.includes('onclick="openLiturgiaDetail(\'missa\','+massIndex+')"'),'A linha Missa deve chamar o roteador compartilhado com tipo=missa.');
-const detailRendererFn=new Function('SANTORAL','saintHasOffice','officeHoursForSaint','saintRankSubtitle','officeClassificationForSaint','escapeHtml','officeHourButtonHtml','window','renderProperMassContent','state',detailRenderer+';return renderLiturgiaDetail;')(
+const detailRendererFn=new Function('SANTORAL','saintHasOffice','officeHoursForSaint','saintRankSubtitle','officeClassificationForSaint','escapeHtml','officeHourButtonHtml','window','renderProperMassContent','state',labelHelpers+detailRenderer+';return renderLiturgiaDetail;')(
   testSaints,testHasOffice,testHoursFor,s=>s.rank||'',s=>testOfficeRecord(s)?.tipo_material||'',htmlEscape,(s,pair)=>'<button class="office-hour-choice">'+htmlEscape(pair[1])+'</button>',{MISSAS_OSM:massData},()=>'<div>MASS TEXT</div>',{liturgiaDetail:null});
 const hoursPage=detailRendererFn('horas',officeSaint._id);
 assert.match(hoursPage,/Invitatório|Ofício das Leituras|Laudes|Hora Média|Vésperas/);
