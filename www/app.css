@@ -1067,6 +1067,10 @@ body.scroll-controls-hidden .celebration-toggle{
 
 /* Uma linha única para as listas paralelas de Missa e Liturgia das Horas. */
 #view .liturgia-resource-row{cursor:default;}
+#view .liturgia-resource-summary{cursor:pointer;list-style:none;}
+#view .liturgia-resource-summary::-webkit-details-marker{display:none;}
+#view .liturgia-resource-content{padding:0 4px 12px;}
+
 #view .liturgia-resource-row .action-btn{margin:0;white-space:nowrap;}
 #view .liturgia-resource-transcript{margin:0 0 10px 14px;}
 #view .liturgia-resource-transcript summary{cursor:pointer;}
