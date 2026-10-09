@@ -67,13 +67,13 @@ assert.match(app, /return s\.genero==='f'\?'Beata':'Beato'/);
 assert.match(app, /return s\.genero==='f'\?'Serva de Deus':'Servo de Deus'/);
 
 assert.match(app, /function celebrationSubtitle/);
-assert.match(app, /const APP_VERSION = ['"]4\.9\.46['"]/);
-assert.match(workflow, /Build APK Liturgia OSM 4\.9\.46/);
+assert.match(app, /const APP_VERSION = ['"]4\\.9\\.47['"]/);
+assert.match(workflow, /Build APK Liturgia OSM 4\\.9\\.47/);
 assert.match(workflow, /versionCode 40951/);
 assert.match(app, /rowtitle">Hoje/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
-assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.46-ui25/);
+assert.match(read('www/sw.js'), /liturgia-osm-v4\\.9\\.47-ui26/);
 assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
 assert.match(app, /function liturgiaTodayCard\(type,dateValue=''\)/);
