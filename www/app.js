@@ -921,7 +921,8 @@ function movableOfficeBlocks(){
     const dateLabel=escapeHtml(item.date_label||'Data móvel');
     const date=escapeHtml(movableOfficeDate(item));
     const subtitle=[String(item.rank||'').trim(),dateLabel+' ('+date+')'].filter(Boolean).join(' · ');
-    const pdf=item.local_pdf_url?'<p><a class="action-btn" href="'+escapeHtml(item.local_pdf_url)+'" target="_blank" rel="noopener">Abrir PDF baixado</a>'+(item.pdf_url?'<br><a class="reader-note" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Fonte oficial OSM</a>':'')+'</p>':(item.pdf_url?'<p><a class="action-btn" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Abrir PDF oficial</a></p>':'');
+    const pdfUrl=item.local_pdf_url||item.pdf_url||'';
+    const pdf=pdfUrl?'<p><a class="reader-note" href="'+escapeHtml(pdfUrl)+'" target="_blank" rel="noopener">PDF oficial OSM</a></p>':'';
     return '<details class="liturgia-resource-item liturgia-resource-detail"><summary class="liturgia-celebration-row liturgia-resource-row liturgia-resource-summary"><span class="rowtext"><span class="rowtitle">'+title+'</span><span class="rowrank">'+escapeHtml(subtitle)+'</span></span><span class="chev" aria-hidden="true">›</span></summary><div class="liturgia-resource-content"><div class="hub-text">'+renderPrayer(item.text||'')+'</div>'+(item.pdf_transcript?'<details class="liturgia-resource-transcript"><summary class="action-btn">Transcrição completa do PDF</summary><div class="hub-text" style="white-space:pre-wrap">'+escapeHtml(item.pdf_transcript)+'</div></details>':'')+pdf+'</div></details>';
   }).join('')+'</div>';
 }
@@ -930,9 +931,9 @@ function marianSaturdayOfficeBlocks(){
   if(!items.length)return '';
   return '<div class="section-title">Ofícios de Santa Maria no Sábado</div><div class="card fade-in">'+items.map(function(item){
     const pdf=item.local_pdf_url||item.pdf_url||'';
-    const pdfLabel=item.local_pdf_url?'Abrir PDF baixado':'Abrir PDF';
-    return '<div class="liturgia-resource-item"><div class="liturgia-celebration-row liturgia-resource-row"><span class="rowtext"><span class="rowtitle">'+escapeHtml(item.title||'Ofício de Santa Maria no Sábado')+'</span><span class="rowrank">PDF oficial OSM</span></span>'+
-      (pdf?'<a class="action-btn" href="'+escapeHtml(pdf)+'" target="_blank" rel="noopener">'+pdfLabel+'</a>':'<span class="chev" aria-hidden="true">›</span>')+'</div>'+
+    
+    return '<div class="liturgia-resource-item"><div class="liturgia-celebration-row liturgia-resource-row"><span class="rowtext"><span class="rowtitle">'+escapeHtml(item.title||'Ofício de Santa Maria no Sábado')+'</span></span></span>'+
+      (pdf?'<a class="reader-note" href="'+escapeHtml(pdf)+'" target="_blank" rel="noopener">PDF oficial OSM</a>':'<span class="rowrank">PDF não disponível</span>')+'</div>'+
       (item.pdf_transcript?'<details class="liturgia-resource-transcript"><summary class="action-btn">Ler texto completo</summary><div class="hub-text saturday-pdf-transcript">'+renderPrayer(cleanMassText(item.pdf_transcript))+'</div></details>':'')+'</div>';
   }).join('')+'</div>';
 }
@@ -958,7 +959,7 @@ function renderLiturgiaDetail(tipo,reference){
     return '<button class="hub-back" onclick="closeLiturgiaDetail()">‹ Voltar às Missas próprias</button>'+
       '<div class="section-title">Missa própria OSM</div><div class="hub-card"><div class="hub-card-title">'+celebrationNameHtml(item.title||saint.title||'Missa própria',saint)+'</div>'+
       '<p class="reader-note">'+escapeHtml(date)+(date&&celebrationGradeLabel(saint.grau||item.rank)?' · '+escapeHtml(celebrationGradeLabel(saint.grau||item.rank)):'')+'</p>'+(saint.nota_data?'<p class="hub-note-data">'+escapeHtml(saint.nota_data)+'</p>':'')+
-      (item.local_pdf_url?'<p><a class="action-btn" href="'+escapeHtml(item.local_pdf_url)+'" target="_blank" rel="noopener">Abrir PDF baixado</a></p>':'')+(item.pdf_url?'<a class="reader-note" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Fonte oficial OSM</a>':'')+renderProperMassContent(item)+'<p class="hub-source">Fonte: '+escapeHtml(item.source||'fonte não informada')+'</p></div>';
+      ((item.local_pdf_url||item.pdf_url)?'<p><a class="reader-note" href="'+escapeHtml(item.local_pdf_url||item.pdf_url)+'" target="_blank" rel="noopener">PDF oficial OSM</a></p>':'')+renderProperMassContent(item)+'<p class="hub-source">Fonte: '+escapeHtml(item.source||'fonte não informada')+'</p></div>';
   }
   state.liturgiaDetail=null;
   return '';
