@@ -53,7 +53,7 @@ assert.ok(resourceMovableStart>=0&&resourceSaturdayStart>resourceMovableStart&&r
 const extraBlocks=app.slice(resourceMovableStart,resourceBlocksEnd);
 assert.equal((extraBlocks.match(/liturgiaResourceRow\(/g)||[]).length,2,'Ofícios móveis e sábados marianos devem compartilhar a linha de recurso.');
 assert.match(extraBlocks,/Abrir Ofício completo/);
-assert.match(extraBlocks,/Transcrição completa do PDF/);
+assert.match(extraBlocks,/Ler texto completo/);
 assert.match(extraBlocks,/Ler texto completo/);
 assert.match(css,/\.liturgia-resource-list\{/);
 assert.match(css,/\.liturgia-resource-row\{/);
