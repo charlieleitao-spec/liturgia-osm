@@ -24,7 +24,10 @@ for (const item of santoralData) {
   if (!item.grau_confirmado) assert.ok(['memoria', 'memoria_facultativa', 'comemoracao'].includes(item.grau), 'Grau não confirmado acima de Memória: ' + item.title);
   assert.ok(!/\(dies natalis\)/i.test(item.date), 'dies natalis não deve permanecer na data: ' + item.title);
 }
-assert.equal(santoralData.filter(item => !item.grau_confirmado).length, 25, 'A lista de graus não confirmados mudou; revise o relatório.');
+assert.equal(santoralData.filter(item => !item.grau_confirmado).length, 0, 'A lista de graus não confirmados mudou; revise o relatório.');
+const celebrationLabelStyle = css.match(/#view \\.celebration-label\\{[^}]*\\}/)?.[0] || '';
+assert.ok(celebrationLabelStyle, 'Identificação Beato/Beata deve ter estilo textual.');
+assert.doesNotMatch(celebrationLabelStyle, /border|border-radius|padding|background/, 'Identificação não deve aparecer como selo.');
 for (const id of [7, 23]) {
   const marian = santoralData.find(item => item.id === id);
   assert.ok(marian, 'Celebração mariana ausente: ' + id);
@@ -66,7 +69,7 @@ assert.match(app, /return s\.genero==='f'\?'Serva de Deus':'Servo de Deus'/);
 assert.match(app, /function celebrationSubtitle/);
 assert.match(app, /const APP_VERSION = ['"]4\.9\.46['"]/);
 assert.match(workflow, /Build APK Liturgia OSM 4\.9\.46/);
-assert.match(workflow, /versionCode 40950/);
+assert.match(workflow, /versionCode 40951/);
 assert.match(app, /rowtitle">Hoje/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
