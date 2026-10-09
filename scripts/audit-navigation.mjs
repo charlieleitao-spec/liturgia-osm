@@ -25,7 +25,9 @@ for (const item of santoralData) {
   assert.ok(!/\(dies natalis\)/i.test(item.date), 'dies natalis não deve permanecer na data: ' + item.title);
 }
 assert.equal(santoralData.filter(item => !item.grau_confirmado).length, 0, 'A lista de graus não confirmados mudou; revise o relatório.');
-const celebrationLabelStyle = css.match(/#view \\.celebration-label\\{[^}]*\\}/)?.[0] || '';
+const celebrationLabelStart = css.indexOf('#view .celebration-label{');
+const celebrationLabelEnd = css.indexOf('}', celebrationLabelStart);
+const celebrationLabelStyle = celebrationLabelStart >= 0 && celebrationLabelEnd >= celebrationLabelStart ? css.slice(celebrationLabelStart, celebrationLabelEnd + 1) : '';
 assert.ok(celebrationLabelStyle, 'Identificação Beato/Beata deve ter estilo textual.');
 assert.doesNotMatch(celebrationLabelStyle, /border|border-radius|padding|background/, 'Identificação não deve aparecer como selo.');
 for (const id of [7, 23]) {
