@@ -211,7 +211,7 @@ const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
 let pendingSharePrayer = null;
-let state = { tab: 'hoje', angelus:dailySuggestion.key, detailId:null, search:'', devo:null, devoSub:null, properMassDate:null };
+let state = { tab: 'hoje', angelus:dailySuggestion.key, detailId:null, search:'', devo:null, devoSub:null, properMassDate:null, properOfficeId:null };
 let readerScale = parseFloat(localStorage.getItem('osmReaderScale') || '1');
 let lightMode = localStorage.getItem('osmTheme') !== 'dark';
 function applyPreferences(){
@@ -247,7 +247,7 @@ function setTab(tab){
   state.tab=tab;
   localStorage.setItem('osmLastTab',tab);
   state.detailId=null;state.devo=null;state.devoSub=null;
-  if(tab!=='liturgia')state.properMassDate=null;
+  if(tab!=='liturgia'){state.properMassDate=null;state.properOfficeId=null;}
   state.prayerSection='praticas';state.prayerCategory=null;memoriaSelectedDate=null;
   render();window.scrollTo(0,0);
 }
@@ -410,17 +410,12 @@ function renderLiturgiaCelebrationList(type,entries){
     const title=saint?.title||item?.title||'Celebração própria';
     const date=saint?.date||item?.display_date||item?.date_label||item?.date||'';
     const rank=saint?saintRankSubtitle(saint):(item?.rank||'');
-    const action=saint?'openLiturgiaCelebration('+Number(saint._id)+',\''+type+'\')':'openProperMass(\''+String(item.date).replace(/[^a-zA-Z0-9-]/g,'')+'\')';
+    const action=type==='horas'&&saint
+      ? 'openProperOffice('+Number(saint._id)+')'
+      : 'openProperMass(\''+String(item.date).replace(/[^a-zA-Z0-9-]/g,'')+'\')';
     return '<button class="liturgia-celebration-row" type="button" onclick="'+action+'" aria-label="Abrir '+escapeHtml(title)+'"><span class="rowtext"><span class="rowtitle">'+escapeHtml(title)+'</span><span class="rowrank">'+escapeHtml(date)+(rank?' · '+escapeHtml(rank):'')+'</span></span><span class="chev" aria-hidden="true">›</span></button>';
   }).join('');
   return '<div class="card fade-in">'+(rows||'<div class="empty-state">Nenhuma celebração própria cadastrada.</div>')+'</div>';
-}
-function openLiturgiaCelebration(id,type){
-  openDetail(id);
-  requestAnimationFrame(function(){
-    const target=document.getElementById('hub-liturgia');
-    target?.scrollIntoView({behavior:'smooth',block:'start'});
-  });
 }
 function liturgiaTodayCard(type,dateValue=''){
   const action=type==='horas'
@@ -864,11 +859,15 @@ function properMassRecord(date){
   const saint=SANTORAL.find(s=>String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')===date);
   return records.find(item=>item.date===date||(item.santoral_id!==undefined&&item.santoral_id!==null&&saint&&String(item.santoral_id)===String(saint.id)));
 }
-function openProperMass(date){state.properMassDate=String(date||'');state.tab='liturgia';state.liturgiaSection='missa';render();window.scrollTo(0,0);}
+function openProperMass(date){state.properOfficeId=null;state.properMassDate=String(date||'');state.tab='liturgia';state.liturgiaSection='missa';render();window.scrollTo(0,0);}
 function closeProperMass(){state.properMassDate=null;render();window.scrollTo(0,0);}
+function openProperOffice(saintId){state.properMassDate=null;state.properOfficeId=Number(saintId);state.tab='liturgia';state.liturgiaSection='horas';render();window.scrollTo(0,0);}
+function closeProperOffice(){state.properOfficeId=null;render();window.scrollTo(0,0);}
 window.openProperMass=openProperMass;
 window.closeProperMass=closeProperMass;
-function setLiturgiaSection(section){state.liturgiaSection=section;if(section!=='missa')state.properMassDate=null;render();window.scrollTo(0,0);}
+window.openProperOffice=openProperOffice;
+window.closeProperOffice=closeProperOffice;
+function setLiturgiaSection(section){state.liturgiaSection=section;if(section!=='missa')state.properMassDate=null;if(section!=='horas')state.properOfficeId=null;render();window.scrollTo(0,0);}
 function movableOfficeDate(item){
   if(item.date_rule==='sexta-feira_depois_do_v_domingo_da_quaresma'){
     const date=easterSunday(new Date().getFullYear());
@@ -903,6 +902,18 @@ function viewLiturgia(){
     <button class="toggle-btn ${section==='horas'?'active':''}" onclick="setLiturgiaSection('horas')">Liturgia das Horas</button>
   </div>`;
   if(section==='horas'){
+    if(state.properOfficeId!==null){
+      const saint=SANTORAL.find(s=>Number(s._id)===Number(state.properOfficeId));
+      if(saint&&saintHasOffice(saint)){
+        const rank=saintRankSubtitle(saint);
+        return switcher+'<button class="hub-back" onclick="closeProperOffice()">‹ Voltar aos Ofícios próprios</button>'+
+          '<div class="section-title">Ofícios próprios OSM</div><div class="hub-card"><div class="hub-card-title">'+escapeHtml(saint.title)+'</div>'+
+          '<p class="reader-note">'+escapeHtml(saint.date)+(rank?' · '+escapeHtml(rank):'')+'</p>'+
+          '<p class="hub-card-note">'+escapeHtml(officeClassificationForSaint(saint))+'</p><div class="office-hours-grid">'+
+          officeHoursForSaint(saint).map(pair=>officeHourButtonHtml(saint,pair)).join('')+'</div></div>';
+      }
+      state.properOfficeId=null;
+    }
     const todayBlock=liturgiaTodayCard('horas');
     const officeWarning=!oficiosReady?'<div class="card" role="alert"><p>O cadastro local dos Ofícios está indisponível. A Vida e as orações continuam acessíveis.</p><button class="action-btn" onclick="loadCanonicalOffices()">Tentar carregar os Ofícios</button></div>':'';
     const ownBlocks='<div class="section-title">Ofícios próprios OSM</div>'+renderLiturgiaCelebrationList('horas',liturgiaCelebrations('horas'));
@@ -1110,6 +1121,7 @@ function smartBack(){
   if(servite&&servite.classList.contains('open')){if(typeof closeServite==='function')closeServite();else servite.classList.remove('open');updateBackButton();return true;}
   if(mass&&mass.classList.contains('open')&&typeof window.closeDailyLiturgy==='function'){window.closeDailyLiturgy();updateBackButton();return true;}
   if(state.properMassDate){closeProperMass();return true;}
+  if(state.properOfficeId!==null){closeProperOffice();return true;}
   if(dailyPrayerOpen480){closeDailyPrayer480();return true;}
   if(memoriaSelectedDate){closeMemoriaLiturgica();return true;}
   if(state.devoSub!==null&&state.devoSub!==undefined){closeDevo();return true;}
