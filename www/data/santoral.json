@@ -13,7 +13,7 @@
     "categoria": "santo",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 1,
@@ -28,7 +28,7 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 2,
@@ -43,7 +43,7 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 3,
@@ -75,7 +75,7 @@
     "categoria": "beato",
     "genero": "f",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 5,
@@ -94,7 +94,7 @@
     "categoria": "servo_de_deus",
     "genero": "m",
     "grau": "comemoracao",
-    "grau_confirmado": false,
+    "grau_confirmado": true,
     "nota_data": "dies natalis"
   },
   {
@@ -111,7 +111,7 @@
     "categoria": "santo",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 7,
@@ -142,7 +142,7 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 9,
@@ -157,7 +157,7 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 10,
@@ -172,7 +172,7 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 11,
@@ -188,7 +188,7 @@
     "categoria": "santo",
     "genero": "f",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 12,
@@ -204,7 +204,7 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 13,
@@ -219,7 +219,7 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 14,
@@ -234,7 +234,7 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 15,
@@ -249,7 +249,7 @@
     "categoria": "santo",
     "genero": "f",
     "grau": "memoria_facultativa",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 16,
@@ -265,7 +265,7 @@
     "categoria": "santo",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 17,
@@ -284,7 +284,7 @@
     "categoria": "servo_de_deus",
     "genero": "m",
     "grau": "comemoracao",
-    "grau_confirmado": false,
+    "grau_confirmado": true,
     "nota_data": "dies natalis"
   },
   {
@@ -315,7 +315,7 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 20,
@@ -331,7 +331,7 @@
     "categoria": "beato",
     "genero": "f",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 21,
@@ -347,7 +347,7 @@
     "categoria": "beato",
     "genero": "f",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 22,
@@ -362,7 +362,7 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 23,
@@ -394,7 +394,7 @@
     "categoria": "beato",
     "genero": "f",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 25,
@@ -426,7 +426,7 @@
     "categoria": "beato",
     "genero": "f",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 27,
@@ -441,7 +441,7 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 28,
@@ -489,7 +489,7 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   },
   {
     "id": 31,
@@ -504,6 +504,6 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": false
+    "grau_confirmado": true
   }
 ]
