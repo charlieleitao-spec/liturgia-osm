@@ -1066,7 +1066,13 @@ body.scroll-controls-hidden .celebration-toggle{
 
 
 /* Uma linha única para as listas paralelas de Missa e Liturgia das Horas. */
-#view .liturgia-celebration-row{display:grid;width:100%;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;min-height:66px;padding:14px 4px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;color:inherit;text-align:left;cursor:pointer;}
+#view .liturgia-resource-row{cursor:default;}
+#view .liturgia-resource-row .action-btn{margin:0;white-space:nowrap;}
+#view .liturgia-resource-transcript{margin:0 0 10px 14px;}
+#view .liturgia-resource-transcript summary{cursor:pointer;}
+#view .liturgia-resource-item{border-bottom:1px solid var(--line);}
+#view .liturgia-resource-item:last-child{border-bottom:0;}
+.liturgia-celebration-row{display:grid;width:100%;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;min-height:66px;padding:14px 4px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;color:inherit;text-align:left;cursor:pointer;}
 #view .liturgia-celebration-row:last-child{border-bottom:0;}
 #view .liturgia-celebration-row:active{background:rgba(196,154,74,.06);}
 #view .liturgia-celebration-row .rowtext{display:flex;min-width:0;flex-direction:column;}
@@ -1079,6 +1085,4 @@ body.scroll-controls-hidden .celebration-toggle{
 #view .liturgia-today-card .action-btn{display:inline-flex;min-width:220px;align-items:center;justify-content:center;text-decoration:none;}
 
 /* Selo de categoria e nota da data no Santoral e nas listas próprias. */
-#view .celebration-label{display:inline;margin-right:7px;color:var(--gold);font-size:.82em;font-weight:700;line-height:inherit;vertical-align:baseline;}
-#view .celebration-name{display:inline;}
 #view .hub-note-data{margin:4px 0 10px;color:var(--text-muted);font-size:calc(13px * var(--reader-scale,1));font-style:italic;}
