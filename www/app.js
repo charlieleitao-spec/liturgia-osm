@@ -238,7 +238,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.48';
+const APP_VERSION = '4.9.49';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -916,13 +916,14 @@ function movableOfficeDate(item){
 function movableOfficeBlocks(){
   const items=Array.isArray(OFICIOS_OSM?.celebracoes_moveis)?OFICIOS_OSM.celebracoes_moveis:[];
   if(!items.length)return '';
-  return '<div class="section-title">Ofícios próprios com data móvel</div>'+items.map(function(item){
+  return '<div class="section-title">Ofícios próprios com data móvel</div><div class="card fade-in">'+items.map(function(item){
     const title=escapeHtml(item.title||'Ofício próprio');
     const dateLabel=escapeHtml(item.date_label||'Data móvel');
     const date=escapeHtml(movableOfficeDate(item));
+    const subtitle=[String(item.rank||'').trim(),dateLabel+' ('+date+')'].filter(Boolean).join(' · ');
     const pdf=item.local_pdf_url?'<p><a class="action-btn" href="'+escapeHtml(item.local_pdf_url)+'" target="_blank" rel="noopener">Abrir PDF baixado</a>'+(item.pdf_url?'<br><a class="reader-note" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Fonte oficial OSM</a>':'')+'</p>':(item.pdf_url?'<p><a class="action-btn" href="'+escapeHtml(item.pdf_url)+'" target="_blank" rel="noopener">Abrir PDF oficial</a></p>':'');
-    return '<div class="card fade-in"><div class="rowtitle">'+title+'</div><div class="rowrank">'+escapeHtml(item.rank||'')+' · '+dateLabel+' ('+date+')</div><details><summary class="action-btn">Abrir Ofício completo</summary><div class="hub-text">'+renderPrayer(item.text||'')+'</div>'+(item.pdf_transcript?'<details style="margin-top:12px"><summary class="action-btn">Transcrição completa do PDF</summary><div class="hub-text" style="white-space:pre-wrap">'+escapeHtml(item.pdf_transcript)+'</div></details>':'')+'</details>'+pdf+'</div>';
-  }).join('');
+    return '<details class="liturgia-resource-item liturgia-resource-detail"><summary class="liturgia-celebration-row liturgia-resource-row liturgia-resource-summary"><span class="rowtext"><span class="rowtitle">'+title+'</span><span class="rowrank">'+escapeHtml(subtitle)+'</span></span><span class="chev" aria-hidden="true">›</span></summary><div class="liturgia-resource-content"><div class="hub-text">'+renderPrayer(item.text||'')+'</div>'+(item.pdf_transcript?'<details class="liturgia-resource-transcript"><summary class="action-btn">Transcrição completa do PDF</summary><div class="hub-text" style="white-space:pre-wrap">'+escapeHtml(item.pdf_transcript)+'</div></details>':'')+pdf+'</div></details>';
+  }).join('')+'</div>';
 }
 function marianSaturdayOfficeBlocks(){
   const items=Array.isArray(OFICIOS_OSM?.sabados_marianos_pdf)?OFICIOS_OSM.sabados_marianos_pdf:[];
