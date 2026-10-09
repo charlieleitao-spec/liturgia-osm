@@ -151,10 +151,10 @@ assert.deepEqual(massRoute.state.liturgiaDetail,{tipo:'missa',reference:massInde
 assert.equal(massRoute.state.liturgiaSection,'missa');
 assert.equal(massRoute.renderCount,1);
 const renderedHoursList=listRendererFn.renderLiturgiaCelebrationList('horas',availableHoursEntries);
-assert.ok(renderedHoursList.includes('onclick="openLiturgiaDetail(\'horas\','+officeSaint._id+')"'),'A linha Horas deve chamar o roteador compartilhado com tipo=horas.');
+assert.ok(renderedHoursList.includes('onclick="openLiturgiaDetail(\'horas\', '+officeSaint._id+')"'),'A linha Horas deve chamar o roteador compartilhado com tipo=horas.');
 const availableMassEntries=listRendererFn.liturgiaCelebrations('missa');
 const renderedMassList=listRendererFn.renderLiturgiaCelebrationList('missa',availableMassEntries);
-assert.ok(renderedMassList.includes('onclick="openLiturgiaDetail(\'missa\','+massIndex+')"'),'A linha Missa deve chamar o roteador compartilhado com tipo=missa.');
+assert.ok(renderedMassList.includes('onclick="openLiturgiaDetail(\'missa\', '+massIndex+')"'),'A linha Missa deve chamar o roteador compartilhado com tipo=missa.');
 const detailRendererFn=new Function('SANTORAL','saintHasOffice','officeHoursForSaint','saintRankSubtitle','officeClassificationForSaint','escapeHtml','officeHourButtonHtml','window','renderProperMassContent','state',detailRenderer+';return renderLiturgiaDetail;')(
   testSaints,testHasOffice,testHoursFor,s=>s.rank||'',s=>testOfficeRecord(s)?.tipo_material||'',htmlEscape,(s,pair)=>'<button class="office-hour-choice">'+htmlEscape(pair[1])+'</button>',{MISSAS_OSM:massData},()=>'<div>MASS TEXT</div>',{liturgiaDetail:null});
 const hoursPage=detailRendererFn('horas',officeSaint._id);
