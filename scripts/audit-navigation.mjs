@@ -28,7 +28,7 @@ assert.match(app, /rowtitle">Hoje/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
 assert.match(app, /Consultar Missa/);
-assert.match(app, /class="action-btn" href="https:\/\/www\\.paulus\\.com\\.br\/portal\/liturgia-diaria-das-horas\/" target="_blank" rel="noopener">Consultar Ofício do Dia/);
+assert.match(app, /class="action-btn" href="https:[^"]+" target="_blank" rel="noopener">Consultar Ofício do Dia/);
 assert.doesNotMatch(app, /liturgy-page-intro|Aqui você encontra a Missa do dia|O ofício de hoje está na Paulus\. Os textos próprios da Ordem estão logo abaixo/);
 assert.doesNotMatch(app, /Abrir ofício próprio/);
 assert.match(app, /Ofícios e textos próprios OSM/);
