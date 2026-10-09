@@ -25,6 +25,15 @@ for (const item of santoralData) {
   assert.ok(!/\(dies natalis\)/i.test(item.date), 'dies natalis não deve permanecer na data: ' + item.title);
 }
 assert.equal(santoralData.filter(item => !item.grau_confirmado).length, 25, 'A lista de graus não confirmados mudou; revise o relatório.');
+for (const id of [7, 23]) {
+  const marian = santoralData.find(item => item.id === id);
+  assert.ok(marian, 'Celebração mariana ausente: ' + id);
+  assert.equal(marian.exibir_selo, false, 'Celebração mariana não deve exibir selo: ' + marian.title);
+  assert.equal(marian.categoria, 'santo', 'Preservar a classificação da celebração mariana.');
+}
+const labelSource = app.slice(app.indexOf('function celebrationLabel(s){'), app.indexOf('function celebrationTitleText', app.indexOf('function celebrationLabel(s){')));
+assert.doesNotMatch(labelSource, /categoria==='santo'|Santa/,'Celebrações marianas não devem ganhar selo Santo/Santa.');
+
 const beatified = santoralData.filter(item => item.categoria === 'beato');
 assert.ok(beatified.length > 0, 'O Santoral deve conter beatos classificados.');
 for (const item of beatified) assert.ok(['m', 'f'].includes(item.genero), 'Gênero ausente para beato: ' + item.title);
@@ -55,13 +64,13 @@ assert.match(app, /return s\.genero==='f'\?'Beata':'Beato'/);
 assert.match(app, /return s\.genero==='f'\?'Serva de Deus':'Servo de Deus'/);
 
 assert.match(app, /function celebrationSubtitle/);
-assert.match(app, /const APP_VERSION = ['"]4\.9\.45['"]/);
-assert.match(workflow, /Build APK Liturgia OSM 4\.9\.45/);
-assert.match(workflow, /versionCode 40949/);
+assert.match(app, /const APP_VERSION = ['"]4\.9\.46['"]/);
+assert.match(workflow, /Build APK Liturgia OSM 4\.9\.46/);
+assert.match(workflow, /versionCode 40950/);
 assert.match(app, /rowtitle">Hoje/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
-assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.45-ui23/);
+assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.46-ui23/);
 assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
 assert.match(app, /function liturgiaTodayCard\(type,dateValue=''\)/);
