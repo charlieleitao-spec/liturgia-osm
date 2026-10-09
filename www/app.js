@@ -161,14 +161,40 @@ function formatPrayerStanza(lines, vigilia, hymnMode){
     }
     return verses.map(group=>group.map(line=>prayerLineHtml(line,true)).join(' ')).join('<br>');
   }
-  return lines.map(line=>prayerLineHtml(line,true)).join(' ');
+  return lines.map(line=>prayerLineHtml(line,true)).join('<br>');
 }
+
+function normalizeVigiliaTypography(text){
+  let source=String(text??'').replace(/\r\n?/g,'\n')
+    .replace(/([A-Za-zÀ-ÿ])-\n\s*([a-zà-ÿ])/g,'$1$2')
+    .replace(/(\d{1,3})(?=[A-Za-zÀ-ÿ])/g,'$1 ')
+    .replace(/(\dª\s*Ant\.[^\n]*)(?:\n\s*)(?=[a-zà-ÿ])/gi,'$1 ');
+  source=source.replace(/(SÚPLICA DOS SERVOS DE MARIA A NOSSA SENHORA)\s+(?=Bondade)/gi,'$1\n');
+  const structural=/^(?:[–—=]\s*|[DTC RVABL]\d?\.|[123]ª\s*Ant\.|SALMO\s+\d+|Salmodia$|Hino$|Oração sálmica$|Primeira leitura$|Segunda leitura$|Despedida$|Introdução às leituras$|Absolvição$|SÚPLICA DOS SERVOS|Oração pela Igreja|Primeira fórmula$|Segunda fórmula$)/i;
+  const lines=source.split('\n'),out=[];
+  for(const raw of lines){
+    const line=raw.trim();
+    if(!line){if(out.length&&out[out.length-1]!=='')out.push('');continue;}
+    const prev=out[out.length-1]||'';
+    if(prev && !structural.test(line) && !/^[“"'‘]/.test(line) && !/^[.!?;:]$/.test(line)
+       && !/^(?:Santa Maria,|Majestade de Deus|Hino ao Criador|O Senhor entra|A glória e a misericórdia|Bem-aventurado aquele)/i.test(line)
+       && !/^(?:SALMO|Salmodia)/i.test(prev)
+       && !/^(?:Primeira|Segunda) fórmula$/i.test(prev)
+       && !/^(?:Introdução às leituras|Absolvição|Despedida)$/i.test(prev)
+       && !/^(?:Hino|Primeira leitura|Segunda leitura|Oração sálmica)$/i.test(prev)
+       && !/^SÚPLICA DOS SERVOS/i.test(prev)
+       && !/^\s*$/.test(prev)){
+      out[out.length-1]=prev+' '+line;
+    }else out.push(line);
+  }
+  return out.join('\n').replace(/([.!?])\s+(?=[123]ª\s*Ant\.)/g,'$1\n').replace(/(Amém!)\s+(?=[123]ª\s*Ant\.)/gi,'$1\n');
+}
+
 function renderPrayer(text, options={}){
   const vigilia = options.vigilia === true;
   let source = String(text ?? '');
   if(vigilia){
-    source = source
-      .replace(/([A-Za-zÀ-ÿ])-\n[ \t]*([a-zà-ÿ])/g, '$1-$2')
+    source = normalizeVigiliaTypography(source)
       .replace(/^(Primeira fórmula|Segunda fórmula)\n[ \t]*Santa Maria,?\n[ \t]*(Senhora Dos Seus Servos|Serva Do Senhor)/im,
         (_, formula, title)=>formula+'\nSanta Maria, '+title.replace(/Dos Seus Servos/i,'dos seus servos').replace(/Do Senhor/i,'do Senhor'));
   }
@@ -210,7 +236,8 @@ function renderPrayer(text, options={}){
       pendingPsalmCaption = vigilia && /^Salmo\b/i.test(line);
       continue;
     }
-    if(vigilia && /^\d+ª Ant\./i.test(line)) hymnMode = false;
+    if(vigilia && /^\d+ª Ant\./i.test(line)){flushStanza();hymnMode=false;blocks.push('<p class="prayer-antiphon">'+prayerLineHtml(line,true)+'</p>');continue;}
+    if(vigilia && /^(?:SÚPLICA DOS SERVOS DE MARIA|Despedida$)/i.test(line)){flushStanza();hymnMode=false;blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');continue;}
     stanza.push(line);
   }
   flushStanza();
@@ -238,7 +265,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.52';
+const APP_VERSION = '4.9.53';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -623,7 +650,7 @@ function simpleTextDetail(title, sub, text, backFn, readingClass){
   pendingSharePrayer={title,text};
   const back = backFn || 'backToOracoes()';
   const readerClass = readingClass === 'vigilia-reader' ? ' vigilia-reader' : '';
-  const renderedText = readingClass === 'vigilia-reader' ? normalizeVigiliaLineWraps(text) : text;
+  const renderedText = readingClass === 'vigilia-reader' ? normalizeVigiliaTypography(text) : text;
   return `
     <button class="back-btn" onclick="${back}">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
@@ -967,7 +994,7 @@ function renderLiturgiaDetail(tipo,reference){
     const title=celebrationTitleText(saint.title||item.title||'Missa própria',saint);
     const date=item.display_date||saint.date||item.date_label||item.date||'Data móvel';
     return '<button class="hub-back" onclick="closeLiturgiaDetail()">‹ Voltar às Missas próprias</button>'+
-      '<div class="section-title">Missa própria OSM</div><div class="hub-card"><div class="hub-card-title">'+escapeHtml(title)+'</div>'+
+      '<div class="section-title">Missa própria OSM</div><div class="proper-mass-reader"><div class="hub-card-title">'+escapeHtml(title)+'</div>'+
       '<p class="reader-note">'+escapeHtml(date)+(item.rank?' · '+escapeHtml(item.rank):'')+'</p>'+
       ((item.pdf_url||item.local_pdf_url)?'<p><a class="reader-note" href="'+escapeHtml(item.pdf_url||item.local_pdf_url)+'" target="_blank" rel="noopener">PDF oficial OSM</a></p>':'')+renderProperMassContent(item)+'<p class="hub-source">Fonte: '+escapeHtml(item.source||'fonte não informada')+'</p></div>';
   }

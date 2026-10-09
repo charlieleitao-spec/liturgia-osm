@@ -1113,3 +1113,19 @@ body.scroll-controls-hidden .celebration-toggle{
 #view .vigilia-reader .prayer-formula-title{margin:1em auto .7em!important;line-height:1.4!important}
 #view .vigilia-reader .prayer-text-heading{margin:1.1em auto .5em!important}
 #view .vigilia-reader .prayer-psalm-caption{margin:0 auto .8em!important}
+
+/* Vigília: antífonas destacadas, versos sem aglutinação e parágrafos legíveis. */
+#view .vigilia-reader .prayer-antiphon{margin:1.15em 0 .95em!important;line-height:1.55!important;text-align:center!important;color:var(--paper)!important}
+#view .vigilia-reader .prayer-stanza{margin:0 0 1.15em!important;line-height:1.62!important}
+#view .vigilia-reader .prayer-block{overflow-wrap:normal;word-break:normal;hyphens:none}
+
+/* Na leitura da Vigília, controles fixos não cobrem o texto. */
+body:has(#view .vigilia-reader):not(.celebration-mode) .tabbar{transform:translate(-50%, calc(100% + 24px))!important;opacity:0!important;pointer-events:none!important}
+body:has(#view .vigilia-reader):not(.celebration-mode) .celebration-toggle{bottom:calc(18px + env(safe-area-inset-bottom))!important;right:18px!important;left:auto!important;max-width:calc(100vw - 36px);font-size:13px!important;padding:9px 12px!important}
+body:has(#view .vigilia-reader) main#view{padding-bottom:calc(115px + env(safe-area-inset-bottom))!important}
+
+/* Missas próprias: texto litúrgico em página aberta, sem caixas e margens laterais redundantes. */
+#view .proper-mass-reader{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;width:100%!important;max-width:none!important}
+#view .proper-mass-reader .liturgical-reading{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;max-width:none!important;width:100%!important}
+#view .proper-mass-reader .section-title{margin:1.3em 0 .45em!important}
+#view .proper-mass-reader .hub-card-title{margin:.35em 0 .6em!important}
