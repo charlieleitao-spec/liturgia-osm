@@ -15,6 +15,33 @@ const loader = read('www/data/load-devotions.js');
 const santoralData = JSON.parse(read('www/data/santoral.json'));
 const officeData = JSON.parse(read('www/data/oficios-osm.json'));
 const massData = JSON.parse(read('www/data/missas-osm.json'));
+const validGrades = ['solenidade', 'festa', 'memoria', 'memoria_facultativa', 'comemoracao'];
+for (const item of santoralData) {
+  assert.ok(['santo', 'beato', 'servo_de_deus', null].includes(item.categoria), 'Categoria inválida: ' + item.title);
+  assert.ok(['m', 'f', null].includes(item.genero), 'Gênero inválido: ' + item.title);
+  assert.ok(validGrades.includes(item.grau), 'Grau inválido: ' + item.title);
+  assert.equal(typeof item.grau_confirmado, 'boolean', 'grau_confirmado deve ser booleano: ' + item.title);
+  if (!item.grau_confirmado) assert.ok(['memoria', 'memoria_facultativa', 'comemoracao'].includes(item.grau), 'Grau não confirmado acima de Memória: ' + item.title);
+  assert.ok(!/\(dies natalis\)/i.test(item.date), 'dies natalis não deve permanecer na data: ' + item.title);
+}
+assert.equal(santoralData.filter(item => !item.grau_confirmado).length, 0, 'A lista de graus não confirmados mudou; revise o relatório.');
+assert.doesNotMatch(app, /class="celebration-label"|class="celebration-name"/, 'Beato/Beata deve ficar corrido com o nome.');
+assert.doesNotMatch(css, /#view \.celebration-label\{|#view \.celebration-name\{/, 'O rótulo e o nome usam o mesmo estilo tipográfico.');
+assert.ok(app.includes('return escapeHtml(celebrationTitleText(value,s));'));
+for (const id of [7, 23]) {
+  const marian = santoralData.find(item => item.id === id);
+  assert.ok(marian, 'Celebração mariana ausente: ' + id);
+  assert.equal(marian.exibir_selo, false, 'Celebração mariana não deve exibir selo: ' + marian.title);
+  assert.equal(marian.categoria, 'santo', 'Preservar a classificação da celebração mariana.');
+}
+const labelSource = app.slice(app.indexOf('function celebrationLabel(s){'), app.indexOf('function celebrationTitleText', app.indexOf('function celebrationLabel(s){')));
+assert.doesNotMatch(labelSource, /categoria==='santo'|Santa/,'Celebrações marianas não devem ganhar selo Santo/Santa.');
+
+const beatified = santoralData.filter(item => item.categoria === 'beato');
+assert.ok(beatified.length > 0, 'O Santoral deve conter beatos classificados.');
+for (const item of beatified) assert.ok(['m', 'f'].includes(item.genero), 'Gênero ausente para beato: ' + item.title);
+assert.match(app, /if\(s\.categoria==='beato'\)return s\.genero==='f'\?'Beata':'Beato'/);
+
 
 for (const file of ['www/app.js', 'www/servite-1.js', 'www/servite-2.js', 'www/servite-3.js']) {
   const result = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
@@ -24,41 +51,35 @@ for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data
 assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
-assert.match(app, /const APP_VERSION = ['"]4\.9\.50['"]/);
-assert.match(workflow, /Build APK Liturgia OSM 4\.9\.50/);
-assert.match(workflow, /versionCode 40954/);
+assert.match(app, /function celebrationLabel/);
+assert.match(app, /function celebrationNameHtml/);
+assert.ok(app.includes("while(oldPrefix.test(name))name=name.replace(oldPrefix,'').trim();"));
+assert.ok(app.includes("if(s?.categoria==='santo')return original;"));
+assert.ok(app.includes("celebrationNameHtml(s.title,s)"));
+assert.ok(app.includes("celebrationNameHtml(saint?.title||item?.title||'Celebração própria',saint)"));
+assert.match(app, /if\(s\?\.categoria==='beato'\|\|s\?\.categoria==='servo_de_deus'\)return ''/);
+assert.match(app, /function renderLiturgiaDetail/);
+assert.match(app, /class="liturgia-celebration-row liturgia-resource-row"/);
+assert.match(app, /class="liturgia-celebration-row liturgia-resource-row liturgia-resource-summary"/);
+assert.match(app, /class="liturgia-resource-transcript"/);
+assert.match(app, /celebrationNameHtml\(saint\.title,saint\)/);
+assert.match(app, /celebrationNameHtml\(item\.title\|\|saint\.title\|\|'Missa própria',saint\)/);
+
+assert.match(app, /if\(s\?\.categoria==='santo'\)return original/);
+assert.match(app, /return s\.genero==='f'\?'Beata':'Beato'/);
+assert.match(app, /return s\.genero==='f'\?'Serva de Deus':'Servo de Deus'/);
+
+assert.match(app, /function celebrationSubtitle/);
+assert.ok(app.includes("const APP_VERSION = '4.9.49'"));
+assert.ok(workflow.includes('Build APK Liturgia OSM 4.9.49'));
+assert.match(workflow, /versionCode 40953/);
 assert.match(app, /rowtitle">Hoje/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
-assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.50-ui29/);
+assert.ok(read('www/sw.js').includes('liturgia-osm-v4.9.49-ui28'));
 assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
 assert.match(app, /function liturgiaTodayCard\(type,dateValue=''\)/);
-
-const resourceStart=app.indexOf('function liturgiaResourceRow(title,subtitle,content){');
-const resourceEnd=app.indexOf('function liturgiaResourceAction(',resourceStart);
-const resourceRowSource=app.slice(resourceStart,resourceEnd);
-assert.ok(resourceStart>=0&&resourceEnd>resourceStart,'Os detalhes complementares devem usar uma linha comum recolhível.');
-const resourceRow=new Function('escapeHtml',resourceRowSource+';return liturgiaResourceRow;')(value=>String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'));
-const resourceHtml=resourceRow('Título do ofício','Data móvel · Festa','<div>Texto preservado</div>');
-assert.match(resourceHtml,/liturgia-resource-detail/);
-assert.match(resourceHtml,/liturgia-celebration-row liturgia-resource-row/);
-assert.match(resourceHtml,/Título do ofício/);
-assert.match(resourceHtml,/Data móvel · Festa/);
-assert.match(resourceHtml,/Texto preservado/);
-const resourceMovableStart=app.indexOf('function movableOfficeBlocks(){');
-const resourceSaturdayStart=app.indexOf('function marianSaturdayOfficeBlocks(){',resourceMovableStart);
-const resourceBlocksEnd=app.indexOf('function renderLiturgiaDetail(',resourceSaturdayStart);
-assert.ok(resourceMovableStart>=0&&resourceSaturdayStart>resourceMovableStart&&resourceBlocksEnd>resourceSaturdayStart);
-const extraBlocks=app.slice(resourceMovableStart,resourceBlocksEnd);
-assert.equal((extraBlocks.match(/liturgiaResourceRow\(/g)||[]).length,2,'Ofícios móveis e sábados marianos devem compartilhar a linha de recurso.');
-assert.match(extraBlocks,/Abrir Ofício completo/);
-assert.match(extraBlocks,/Transcrição completa do PDF/);
-assert.match(extraBlocks,/Ler texto completo/);
-assert.match(css,/\.liturgia-resource-list\{/);
-assert.match(css,/\.liturgia-resource-row\{/);
-assert.match(css,/\.liturgia-resource-actions/);
-assert.match(css,/\.liturgia-resource-detail\[open\]/);
 const sharedListStart = app.indexOf('function renderLiturgiaCelebrationList(tipo,entries){');
 const sharedListEnd = app.indexOf('\nfunction liturgiaTodayCard(', sharedListStart);
 assert.ok(sharedListStart >= 0 && sharedListEnd > sharedListStart, 'As duas listas devem compartilhar o mesmo renderizador.');
@@ -102,7 +123,10 @@ assert.match(app,/SANTORAL\.filter\(s=>saintHasOffice\(s\)&&officeHoursForSaint\
 assert.equal(testSaints.filter(s=>testHasOffice(s)&&testHoursFor(s).length).length+unavailableSaints.length,testSaints.length);
 const listHelpersStart=app.indexOf('function liturgiaDateKey(s){');
 const listHelpers=app.slice(listHelpersStart,sharedListEnd);
-const listRendererFn=new Function('SANTORAL','window','saintHasOffice','officeHoursForSaint','saintRankSubtitle','escapeHtml',listHelpers+';return {liturgiaCelebrations,renderLiturgiaCelebrationList};')(
+const celebrationLabelCssStart=app.indexOf('const CELEBRATION_GRADE_LABELS=');
+const celebrationLabelCssEnd=app.indexOf('function saintRankSubtitle(s){',celebrationLabelCssStart);
+const celebrationLabelHelpers=app.slice(celebrationLabelCssStart,celebrationLabelCssEnd);
+const listRendererFn=new Function('SANTORAL','window','saintHasOffice','officeHoursForSaint','saintRankSubtitle','escapeHtml',celebrationLabelHelpers+listHelpers+';return {liturgiaCelebrations,renderLiturgiaCelebrationList};')(
   testSaints,{MISSAS_OSM:massData},testHasOffice,testHoursFor,s=>s.rank||'',htmlEscape);
 const availableHoursEntries=listRendererFn.liturgiaCelebrations('horas');
 assert.ok(availableHoursEntries.length>0);
@@ -133,11 +157,11 @@ assert.deepEqual(massRoute.state.liturgiaDetail,{tipo:'missa',reference:massInde
 assert.equal(massRoute.state.liturgiaSection,'missa');
 assert.equal(massRoute.renderCount,1);
 const renderedHoursList=listRendererFn.renderLiturgiaCelebrationList('horas',availableHoursEntries);
-assert.ok(renderedHoursList.includes('onclick="openLiturgiaDetail(\'horas\','+officeSaint._id+')"'),'A linha Horas deve chamar o roteador compartilhado com tipo=horas.');
+assert.ok(renderedHoursList.includes('onclick="openLiturgiaDetail(\'horas\', '+officeSaint._id+')"'),'A linha Horas deve chamar o roteador compartilhado com tipo=horas.');
 const availableMassEntries=listRendererFn.liturgiaCelebrations('missa');
 const renderedMassList=listRendererFn.renderLiturgiaCelebrationList('missa',availableMassEntries);
-assert.ok(renderedMassList.includes('onclick="openLiturgiaDetail(\'missa\','+massIndex+')"'),'A linha Missa deve chamar o roteador compartilhado com tipo=missa.');
-const detailRendererFn=new Function('SANTORAL','saintHasOffice','officeHoursForSaint','saintRankSubtitle','officeClassificationForSaint','escapeHtml','officeHourButtonHtml','window','renderProperMassContent','state',detailRenderer+';return renderLiturgiaDetail;')(
+assert.ok(renderedMassList.includes('onclick="openLiturgiaDetail(\'missa\', '+massIndex+')"'),'A linha Missa deve chamar o roteador compartilhado com tipo=missa.');
+const detailRendererFn=new Function('SANTORAL','saintHasOffice','officeHoursForSaint','saintRankSubtitle','officeClassificationForSaint','escapeHtml','officeHourButtonHtml','window','renderProperMassContent','state',celebrationLabelHelpers+detailRenderer+';return renderLiturgiaDetail;')(
   testSaints,testHasOffice,testHoursFor,s=>s.rank||'',s=>testOfficeRecord(s)?.tipo_material||'',htmlEscape,(s,pair)=>'<button class="office-hour-choice">'+htmlEscape(pair[1])+'</button>',{MISSAS_OSM:massData},()=>'<div>MASS TEXT</div>',{liturgiaDetail:null});
 const hoursPage=detailRendererFn('horas',officeSaint._id);
 assert.match(hoursPage,/Invitatório|Ofício das Leituras|Laudes|Hora Média|Vésperas/);
@@ -149,7 +173,7 @@ assert.match(massPage,/MASS TEXT/);
 assert.match(massPage,/Voltar às Missas próprias/);
 assert.doesNotMatch(massPage,/office-hours-grid|office-hour-choice/);
 assert.equal((app.match(/liturgiaTodayCard\('/g) || []).length, 2, 'O cartão do dia deve usar o mesmo renderizador nas duas abas.');
-assert.match(css, /#view \.liturgia-celebration-row\{/);
+assert.match(css, /\.liturgia-celebration-row\{/);
 assert.match(css, /#view \.liturgia-today-card \.action-btn\{[^}]*text-decoration:none/);
 assert.match(app, /Consultar Missa do Dia/);
 assert.match(app, /class="action-btn" href="https:[^"]+" target="_blank" rel="noopener">Consultar Ofício do Dia/);

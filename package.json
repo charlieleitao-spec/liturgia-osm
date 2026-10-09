@@ -1,6 +1,6 @@
 {
   "name": "liturgia-osm",
-  "version": "4.9.50",
+  "version": "4.9.49",
   "private": true,
   "scripts": {
     "android:add": "npx cap add android",
