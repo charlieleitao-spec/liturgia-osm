@@ -15,6 +15,16 @@ const loader = read('www/data/load-devotions.js');
 const santoralData = JSON.parse(read('www/data/santoral.json'));
 const officeData = JSON.parse(read('www/data/oficios-osm.json'));
 const massData = JSON.parse(read('www/data/missas-osm.json'));
+const validGrades = ['solenidade', 'festa', 'memoria', 'memoria_facultativa', 'comemoracao'];
+for (const item of santoralData) {
+  assert.ok(['santo', 'beato', 'servo_de_deus', null].includes(item.categoria), 'Categoria inválida: ' + item.title);
+  assert.ok(['m', 'f', null].includes(item.genero), 'Gênero inválido: ' + item.title);
+  assert.ok(validGrades.includes(item.grau), 'Grau inválido: ' + item.title);
+  assert.equal(typeof item.grau_confirmado, 'boolean', 'grau_confirmado deve ser booleano: ' + item.title);
+  if (!item.grau_confirmado) assert.ok(['memoria', 'memoria_facultativa', 'comemoracao'].includes(item.grau), 'Grau não confirmado acima de Memória: ' + item.title);
+  assert.ok(!/\\(dies natalis\\)/i.test(item.date), 'dies natalis não deve permanecer na data: ' + item.title);
+}
+assert.equal(santoralData.filter(item => !item.grau_confirmado).length, 25, 'A lista de graus não confirmados mudou; revise o relatório.');
 
 for (const file of ['www/app.js', 'www/servite-1.js', 'www/servite-2.js', 'www/servite-3.js']) {
   const result = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
@@ -24,6 +34,8 @@ for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data
 assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
+assert.match(app, /function celebrationBadgeHtml/);
+assert.match(app, /function celebrationSubtitle/);
 assert.match(app, /const APP_VERSION = ['"]4\.9\.45['"]/);
 assert.match(workflow, /Build APK Liturgia OSM 4\.9\.45/);
 assert.match(workflow, /versionCode 40949/);
