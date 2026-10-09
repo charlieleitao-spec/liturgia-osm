@@ -24,13 +24,13 @@ for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data
 assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
-assert.match(app, /const APP_VERSION = ['"]4\.9\.50['"]/);
-assert.match(workflow, /Build APK Liturgia OSM 4\.9\.50/);
-assert.match(workflow, /versionCode 40954/);
+assert.match(app, /const APP_VERSION = ['"]4\.9\.51['"]/);
+assert.match(workflow, /Build APK Liturgia OSM 4\.9\.51/);
+assert.match(workflow, /versionCode 40955/);
 assert.match(app, /rowtitle">Hoje/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
-assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.50-ui29/);
+assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.51-ui30/);
 assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
 assert.match(app, /function liturgiaTodayCard\(type,dateValue=''\)/);
@@ -53,7 +53,7 @@ assert.ok(resourceMovableStart>=0&&resourceSaturdayStart>resourceMovableStart&&r
 const extraBlocks=app.slice(resourceMovableStart,resourceBlocksEnd);
 assert.equal((extraBlocks.match(/liturgiaResourceRow\(/g)||[]).length,2,'Ofícios móveis e sábados marianos devem compartilhar a linha de recurso.');
 assert.match(extraBlocks,/Abrir Ofício completo/);
-assert.match(extraBlocks,/Transcrição completa do PDF/);
+assert.match(extraBlocks,/Ler texto completo/);
 assert.match(extraBlocks,/Ler texto completo/);
 assert.match(css,/\.liturgia-resource-list\{/);
 assert.match(css,/\.liturgia-resource-row\{/);
