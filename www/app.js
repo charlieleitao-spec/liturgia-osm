@@ -446,7 +446,7 @@ function renderLiturgiaCelebrationList(tipo,entries){
     const reference=tipo==='horas'?Number(saint?._id):Number((window.MISSAS_OSM?.celebrations||[]).indexOf(item));
     const action='openLiturgiaDetail(\''+tipo+'\', '+reference+')';
     const subtitle=celebrationGradeLabel(grade);
-    return '<button class="liturgia-celebration-row" type="button" onclick="'+action+'" aria-label="Abrir '+escapeHtml(title)+'"><span class="rowtext"><span class="rowtitle"><span class="celebration-name">'+escapeHtml(title)+'</span>'+badge+'</span><span class="rowrank">'+escapeHtml(date)+(date&&subtitle?' · ':'')+escapeHtml(subtitle)+'</span></span><span class="chev" aria-hidden="true">›</span></button>';
+    return '<button class="liturgia-celebration-row" type="button" onclick="'+action+'" aria-label="Abrir '+escapeHtml(title)+'"><span class="rowtext"><span class="rowtitle">'+displayName+'</span><span class="rowrank">'+escapeHtml(date)+(date&&subtitle?' · ':'')+escapeHtml(subtitle)+'</span></span><span class="chev" aria-hidden="true">›</span></button>';
   }).join('');
   return '<div class="card fade-in">'+(rows||'<div class="empty-state">Nenhuma celebração própria cadastrada.</div>')+'</div>';
 }
