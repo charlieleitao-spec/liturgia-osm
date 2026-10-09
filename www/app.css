@@ -1079,6 +1079,6 @@ body.scroll-controls-hidden .celebration-toggle{
 #view .liturgia-today-card .action-btn{display:inline-flex;min-width:220px;align-items:center;justify-content:center;text-decoration:none;}
 
 /* Selo de categoria e nota da data no Santoral e nas listas próprias. */
-#view .celebration-badge{display:inline-block;margin-left:7px;padding:2px 7px;border:1px solid rgba(196,154,74,.45);border-radius:999px;color:var(--gold);font-size:.68em;font-weight:700;line-height:1.25;vertical-align:middle;white-space:nowrap;}
+#view .celebration-label{display:inline-block;margin-right:7px;padding:2px 7px;border:1px solid rgba(196,154,74,.45);border-radius:999px;color:var(--gold);font-size:.68em;font-weight:700;line-height:1.25;vertical-align:middle;white-space:nowrap;}
 #view .celebration-name{display:inline;}
 #view .hub-note-data{margin:4px 0 10px;color:var(--text-muted);font-size:calc(13px * var(--reader-scale,1));font-style:italic;}
