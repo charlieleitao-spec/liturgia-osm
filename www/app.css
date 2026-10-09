@@ -1123,3 +1123,9 @@ body.scroll-controls-hidden .celebration-toggle{
 body:has(#view .vigilia-reader):not(.celebration-mode) .tabbar{transform:translate(-50%, calc(100% + 24px))!important;opacity:0!important;pointer-events:none!important}
 body:has(#view .vigilia-reader):not(.celebration-mode) .celebration-toggle{bottom:calc(18px + env(safe-area-inset-bottom))!important;right:18px!important;left:auto!important;max-width:calc(100vw - 36px);font-size:13px!important;padding:9px 12px!important}
 body:has(#view .vigilia-reader) main#view{padding-bottom:calc(115px + env(safe-area-inset-bottom))!important}
+
+/* Missas próprias: texto litúrgico em página aberta, sem caixas e margens laterais redundantes. */
+#view .proper-mass-reader{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;width:100%!important;max-width:none!important}
+#view .proper-mass-reader .liturgical-reading{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;max-width:none!important;width:100%!important}
+#view .proper-mass-reader .section-title{margin:1.3em 0 .45em!important}
+#view .proper-mass-reader .hub-card-title{margin:.35em 0 .6em!important}

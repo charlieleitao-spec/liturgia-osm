@@ -994,7 +994,7 @@ function renderLiturgiaDetail(tipo,reference){
     const title=celebrationTitleText(saint.title||item.title||'Missa própria',saint);
     const date=item.display_date||saint.date||item.date_label||item.date||'Data móvel';
     return '<button class="hub-back" onclick="closeLiturgiaDetail()">‹ Voltar às Missas próprias</button>'+
-      '<div class="section-title">Missa própria OSM</div><div class="hub-card"><div class="hub-card-title">'+escapeHtml(title)+'</div>'+
+      '<div class="section-title">Missa própria OSM</div><div class="proper-mass-reader"><div class="hub-card-title">'+escapeHtml(title)+'</div>'+
       '<p class="reader-note">'+escapeHtml(date)+(item.rank?' · '+escapeHtml(item.rank):'')+'</p>'+
       ((item.pdf_url||item.local_pdf_url)?'<p><a class="reader-note" href="'+escapeHtml(item.pdf_url||item.local_pdf_url)+'" target="_blank" rel="noopener">PDF oficial OSM</a></p>':'')+renderProperMassContent(item)+'<p class="hub-source">Fonte: '+escapeHtml(item.source||'fonte não informada')+'</p></div>';
   }
