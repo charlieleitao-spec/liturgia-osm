@@ -38,7 +38,9 @@ function celebrationLabel(s){
 function celebrationTitleText(value,s){
   const original=String(value||'').trim();
   if(s?.categoria==='santo')return original;
-  const name=original.replace(/^(?:B\.A\.|B\.|Beato|Beata|Servo de Deus|Serva de Deus)\s*/i,'').trim();
+  let name=original;
+  const oldPrefix=/^(?:B\.A\.|B\.|Beato|Beata|Servo de Deus|Serva de Deus)\s*/i;
+  while(oldPrefix.test(name))name=name.replace(oldPrefix,'').trim();
   const label=celebrationLabel(s);
   return label?label+' '+name:name;
 }
