@@ -1071,3 +1071,7 @@ body.scroll-controls-hidden .celebration-toggle{
 #view .liturgia-list-row .rowtitle{font-size:calc(17px * var(--reader-scale,1));font-weight:700;line-height:1.25;color:var(--paper);}
 #view .liturgia-list-row .rowrank{display:block;margin-top:3px;font-size:calc(13px * var(--reader-scale,1));font-style:normal;line-height:1.3;color:var(--text-muted);}
 #view .liturgia-list-row.saint-row-hours{gap:12px;padding:14px 4px;}
+
+#view .liturgia-today-card .liturgia-today-date{margin:4px 0 14px;text-align:center;color:var(--text-muted);font-family:Georgia,'Times New Roman',serif;font-size:calc(16px * var(--reader-scale,1));line-height:1.35;}
+#view .liturgia-today-card .liturgia-today-action{display:flex;justify-content:center;margin:0;}
+#view .liturgia-today-card .action-btn{min-width:220px;}
