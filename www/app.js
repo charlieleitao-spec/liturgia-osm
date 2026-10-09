@@ -22,7 +22,39 @@ function saintImageHtml(s, detail=false){
   }
   return detail ? `<div class="saint-image-detail fade-in"><img src="${src}" alt="Imagem de ${escapeHtml(s.title)}"></div>` : `<div class="saint-thumb"><img src="${src}" alt="Imagem de ${escapeHtml(s.title)}"></div>`;
 }
+const CELEBRATION_GRADE_LABELS={solenidade:'Solenidade',festa:'Festa',memoria:'Memória',memoria_facultativa:'Memória facultativa',comemoracao:'Comemoração'};
+function celebrationGradeLabel(value){
+  const raw=String(value||'').trim();
+  if(CELEBRATION_GRADE_LABELS[raw])return CELEBRATION_GRADE_LABELS[raw];
+  const normalized=raw.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR').split(' · ')[0].trim().replace(/\s+/g,'_');
+  return CELEBRATION_GRADE_LABELS[normalized]||'';
+}
+function celebrationLabel(s){
+  if(!s||s.exibir_selo===false)return '';
+  if(s.categoria==='beato')return s.genero==='f'?'Beata':'Beato';
+  if(s.categoria==='servo_de_deus')return s.genero==='f'?'Serva de Deus':'Servo de Deus';
+  return '';
+}
+function celebrationTitleText(value,s){
+  const original=String(value||'').trim();
+  if(s?.categoria==='santo')return original;
+  let name=original;
+  const oldPrefix=/^(?:B\.A\.|B\.|Beato|Beata|Servo de Deus|Serva de Deus)\s*/i;
+  while(oldPrefix.test(name))name=name.replace(oldPrefix,'').trim();
+  const label=celebrationLabel(s);
+  return label?label+' '+name:name;
+}
+function celebrationNameHtml(value,s){
+  return escapeHtml(celebrationTitleText(value,s));
+}
+function celebrationDateText(s){return String(s?.date||'').replace(/\s*\(dies natalis\)\s*/ig,'').trim();}
+function celebrationSubtitle(s,gradeOverride=''){
+  const date=celebrationDateText(s);
+  const gradeLabel=celebrationGradeLabel(gradeOverride||s?.grau);
+  return date+(date&&gradeLabel?' · ':'')+gradeLabel;
+}
 function saintRankSubtitle(s){
+  if(s?.categoria==='beato'||s?.categoria==='servo_de_deus')return '';
   const rank=String(s?.rank||'').trim();
   const title=String(s?.title||'').trim();
   if(!rank||!title)return rank;
@@ -206,7 +238,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.46';
+const APP_VERSION = '4.9.50';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -407,9 +439,9 @@ function liturgiaCelebrations(type){
 function renderLiturgiaCelebrationList(tipo,entries){
   const rows=entries.map(entry=>{
     const saint=entry.saint,item=entry.mass;
-    const title=saint?.title||item?.title||'Celebração própria';
+    const title=celebrationTitleText(saint?.title||item?.title||'Celebração própria',saint);
     const date=saint?.date||item?.display_date||item?.date_label||item?.date||'';
-    const rank=saint?saintRankSubtitle(saint):(item?.rank||'');
+    const rank=saint?celebrationGradeLabel(saint.grau):(item?.rank||'');
     const reference=tipo==='horas'?Number(saint?._id):Number((window.MISSAS_OSM?.celebrations||[]).indexOf(item));
     const action='openLiturgiaDetail(\''+tipo+'\','+reference+')';
     return '<button class="liturgia-celebration-row" type="button" onclick="'+action+'" aria-label="Abrir '+escapeHtml(title)+'"><span class="rowtext"><span class="rowtitle">'+escapeHtml(title)+'</span><span class="rowrank">'+escapeHtml(date)+(rank?' · '+escapeHtml(rank):'')+'</span></span><span class="chev" aria-hidden="true">›</span></button>';
@@ -434,10 +466,10 @@ function openSantoralOfficeHour(saintId,hour){
   if(title) title.textContent=(saint?saint.title+' — ':'')+label;
 }
 function calendarCelebrationRow(s){
-  return `<article class="calendar-celebration-row"><a class="calendar-celebration-link" href="?celebracao=${s._id}" onclick="event.preventDefault();openSaint(${s._id})">${escapeHtml(s.title)}</a></article>`;
+  return `<article class="calendar-celebration-row"><a class="calendar-celebration-link" href="?celebracao=${s._id}" onclick="event.preventDefault();openSaint(${s._id})">${celebrationNameHtml(s.title,s)}</a></article>`;
 }
 
-function viewSantoral(){if(state.detailId!==null)return viewSaintDetail(state.detailId);let letters=[...new Set(SANTORAL.map(s=>s.title.replace(/^(SANTO|SANTA|B\.|BEATO|BEATA)\s+/i,'').trim()[0].toUpperCase()))].sort();let alpha=state.alpha||'';let q=state.search.trim().toLowerCase();let list=SANTORAL.filter(s=>(!q||(s.title+' '+s.date).toLowerCase().includes(q))&&(!alpha||s.title.replace(/^(SANTO|SANTA|B\.|BEATO|BEATA)\s+/i,'').trim().toUpperCase().startsWith(alpha)));let rows=list.map(s=>`<div class="saint-row" onclick="openSaint(${s._id})">${saintImageHtml(s,false)}<div class="daynum">${s.day}</div><div class="rowtext"><div class="rowtitle">${escapeHtml(s.title)}</div><div class="rowrank">${escapeHtml(s.date)} · ${escapeHtml(saintRankSubtitle(s))}</div></div><div class="chev">›</div></div>`).join('');return `<div class="section-title">Índice do Santoral</div><div class="search-wrap"><input class="search-input" data-live-search="santoral" placeholder="Buscar santo, beato ou data…" value="${escapeHtml(state.search)}" oninput="liveSearchRender('santoral',this)"></div><div class="alpha-index"><button class="alpha-btn ${!alpha?'active':''}" onclick="state.alpha='';render()">•</button>${letters.map(l=>`<button class="alpha-btn ${alpha===l?'active':''}" onclick="state.alpha='${l}';render()">${l}</button>`).join('')}</div><div class="card fade-in" style="padding:6px 16px;">${rows||'<div class="empty-state">Nenhum nome encontrado.</div>'}</div>`}
+function viewSantoral(){if(state.detailId!==null)return viewSaintDetail(state.detailId);let letters=[...new Set(SANTORAL.map(s=>s.title.replace(/^(SANTO|SANTA|B\.|BEATO|BEATA)\s+/i,'').trim()[0].toUpperCase()))].sort();let alpha=state.alpha||'';let q=state.search.trim().toLowerCase();let list=SANTORAL.filter(s=>(!q||(s.title+' '+s.date).toLowerCase().includes(q))&&(!alpha||s.title.replace(/^(SANTO|SANTA|B\.|BEATO|BEATA)\s+/i,'').trim().toUpperCase().startsWith(alpha)));let rows=list.map(s=>`<div class="saint-row" onclick="openSaint(${s._id})">${saintImageHtml(s,false)}<div class="daynum">${s.day}</div><div class="rowtext"><div class="rowtitle">${celebrationNameHtml(s.title,s)}</div><div class="rowrank">${escapeHtml(s.date)} · ${escapeHtml(saintRankSubtitle(s))}</div></div><div class="chev">›</div></div>`).join('');return `<div class="section-title">Índice do Santoral</div><div class="search-wrap"><input class="search-input" data-live-search="santoral" placeholder="Buscar santo, beato ou data…" value="${escapeHtml(state.search)}" oninput="liveSearchRender('santoral',this)"></div><div class="alpha-index"><button class="alpha-btn ${!alpha?'active':''}" onclick="state.alpha='';render()">•</button>${letters.map(l=>`<button class="alpha-btn ${alpha===l?'active':''}" onclick="state.alpha='${l}';render()">${l}</button>`).join('')}</div><div class="card fade-in" style="padding:6px 16px;">${rows||'<div class="empty-state">Nenhum nome encontrado.</div>'}</div>`}
 
 
 function liveSearchRender(kind, el){
@@ -894,7 +926,7 @@ function movableOfficeBlocks(){
     const actualDate=movableOfficeDate(item);
     const subtitle=[item.rank,(item.date_label||'Data móvel')+(actualDate?' ('+actualDate+')':'')].filter(Boolean).join(' · ');
     const actions=[
-      liturgiaResourceAction(item.local_pdf_url?'Abrir PDF baixado':'Abrir PDF oficial',item.local_pdf_url||item.pdf_url),
+      ((item.local_pdf_url||item.pdf_url)?'<a class="reader-note" href="'+escapeHtml(item.local_pdf_url||item.pdf_url)+'" target="_blank" rel="noopener">PDF oficial OSM</a>':''),
       item.local_pdf_url&&item.pdf_url?liturgiaResourceAction('Fonte oficial OSM',item.pdf_url):''
     ].filter(Boolean).join('');
     const transcript=item.pdf_transcript?'<details class="liturgia-resource-disclosure"><summary class="action-btn">Transcrição completa do PDF</summary><div class="hub-text" style="white-space:pre-wrap">'+escapeHtml(item.pdf_transcript)+'</div></details>':'';
@@ -909,7 +941,7 @@ function marianSaturdayOfficeBlocks(){
   if(!items.length)return '';
   const rows=items.map(function(item){
     const title=item.title||'Ofício de Santa Maria no Sábado';
-    const action=liturgiaResourceAction(item.local_pdf_url?'Abrir PDF baixado':'Abrir PDF',item.local_pdf_url||item.pdf_url);
+    const action=((item.local_pdf_url||item.pdf_url)?'<a class="reader-note" href="'+escapeHtml(item.local_pdf_url||item.pdf_url)+'" target="_blank" rel="noopener">PDF oficial OSM</a>':'');
     const actions=action?'<div class="liturgia-resource-actions">'+action+'</div>':'';
     const transcript=item.pdf_transcript?'<details class="liturgia-resource-disclosure"><summary class="action-btn">Ler texto completo</summary><div class="hub-text saturday-pdf-transcript">'+renderPrayer(cleanMassText(item.pdf_transcript))+'</div></details>':'';
     return liturgiaResourceRow(title,'PDF oficial OSM',actions+transcript);
@@ -923,7 +955,7 @@ function renderLiturgiaDetail(tipo,reference){
     if(!saint||!hours.length){state.liturgiaDetail=null;return '';}
     const rank=saintRankSubtitle(saint);
     return '<button class="hub-back" onclick="closeLiturgiaDetail()">‹ Voltar aos Ofícios próprios</button>'+
-      '<div class="section-title">Ofícios próprios OSM</div><div class="hub-card"><div class="hub-card-title">'+escapeHtml(saint.title)+'</div>'+
+      '<div class="section-title">Ofícios próprios OSM</div><div class="hub-card"><div class="hub-card-title">'+celebrationNameHtml(saint.title,saint)+'</div>'+
       '<p class="reader-note">'+escapeHtml(saint.date)+(rank?' · '+escapeHtml(rank):'')+'</p>'+
       '<p class="hub-card-note">'+escapeHtml(officeClassificationForSaint(saint))+'</p><div class="office-hours-grid">'+
       hours.map(pair=>officeHourButtonHtml(saint,pair)).join('')+'</div></div>';

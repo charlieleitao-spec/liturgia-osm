@@ -24,13 +24,13 @@ for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data
 assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
-assert.match(app, /const APP_VERSION = ['"]4\.9\.46['"]/);
-assert.match(workflow, /Build APK Liturgia OSM 4\.9\.46/);
-assert.match(workflow, /versionCode 40950/);
+assert.match(app, /const APP_VERSION = ['"]4\.9\.50['"]/);
+assert.match(workflow, /Build APK Liturgia OSM 4\.9\.50/);
+assert.match(workflow, /versionCode 40954/);
 assert.match(app, /rowtitle">Hoje/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
-assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.46-ui24/);
+assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.50-ui29/);
 assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
 assert.match(app, /function liturgiaTodayCard\(type,dateValue=''\)/);
@@ -102,7 +102,11 @@ assert.match(app,/SANTORAL\.filter\(s=>saintHasOffice\(s\)&&officeHoursForSaint\
 assert.equal(testSaints.filter(s=>testHasOffice(s)&&testHoursFor(s).length).length+unavailableSaints.length,testSaints.length);
 const listHelpersStart=app.indexOf('function liturgiaDateKey(s){');
 const listHelpers=app.slice(listHelpersStart,sharedListEnd);
-const listRendererFn=new Function('SANTORAL','window','saintHasOffice','officeHoursForSaint','saintRankSubtitle','escapeHtml',listHelpers+';return {liturgiaCelebrations,renderLiturgiaCelebrationList};')(
+const labelStart=app.indexOf('const CELEBRATION_GRADE_LABELS=');
+const labelEnd=app.indexOf('function saintRankSubtitle(',labelStart);
+assert.ok(labelStart>=0&&labelEnd>labelStart,'Rótulos das celebrações devem existir.');
+const labelHelpers=app.slice(labelStart,labelEnd);
+const listRendererFn=new Function('SANTORAL','window','saintHasOffice','officeHoursForSaint','saintRankSubtitle','escapeHtml',labelHelpers+listHelpers+';return {liturgiaCelebrations,renderLiturgiaCelebrationList};')(
   testSaints,{MISSAS_OSM:massData},testHasOffice,testHoursFor,s=>s.rank||'',htmlEscape);
 const availableHoursEntries=listRendererFn.liturgiaCelebrations('horas');
 assert.ok(availableHoursEntries.length>0);
@@ -137,7 +141,7 @@ assert.ok(renderedHoursList.includes('onclick="openLiturgiaDetail(\'horas\','+of
 const availableMassEntries=listRendererFn.liturgiaCelebrations('missa');
 const renderedMassList=listRendererFn.renderLiturgiaCelebrationList('missa',availableMassEntries);
 assert.ok(renderedMassList.includes('onclick="openLiturgiaDetail(\'missa\','+massIndex+')"'),'A linha Missa deve chamar o roteador compartilhado com tipo=missa.');
-const detailRendererFn=new Function('SANTORAL','saintHasOffice','officeHoursForSaint','saintRankSubtitle','officeClassificationForSaint','escapeHtml','officeHourButtonHtml','window','renderProperMassContent','state',detailRenderer+';return renderLiturgiaDetail;')(
+const detailRendererFn=new Function('SANTORAL','saintHasOffice','officeHoursForSaint','saintRankSubtitle','officeClassificationForSaint','escapeHtml','officeHourButtonHtml','window','renderProperMassContent','state',labelHelpers+detailRenderer+';return renderLiturgiaDetail;')(
   testSaints,testHasOffice,testHoursFor,s=>s.rank||'',s=>testOfficeRecord(s)?.tipo_material||'',htmlEscape,(s,pair)=>'<button class="office-hour-choice">'+htmlEscape(pair[1])+'</button>',{MISSAS_OSM:massData},()=>'<div>MASS TEXT</div>',{liturgiaDetail:null});
 const hoursPage=detailRendererFn('horas',officeSaint._id);
 assert.match(hoursPage,/Invitatório|Ofício das Leituras|Laudes|Hora Média|Vésperas/);
