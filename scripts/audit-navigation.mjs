@@ -24,18 +24,18 @@ for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data
 assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
-assert.match(app, /const APP_VERSION = ['"]4\.9\.51['"]/);
-assert.match(workflow, /Build APK Liturgia OSM 4\.9\.51/);
-assert.match(workflow, /versionCode 40955/);
+assert.match(app, /const APP_VERSION = ['"]4\.9\.52['"]/);
+assert.match(workflow, /Build APK Liturgia OSM 4\.9\.52/);
+assert.match(workflow, /versionCode 40956/);
 assert.match(app, /rowtitle">Hoje/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
-assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.51-ui30/);
+assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.52-ui31/);
 assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
 assert.match(app, /function liturgiaTodayCard\(type,dateValue=''\)/);
 
-const resourceStart=app.indexOf('function liturgiaResourceRow(title,subtitle,content){');
+const resourceStart=app.indexOf('function liturgiaResourceRow(title,subtitle,content,subtitleUrl){');
 const resourceEnd=app.indexOf('function liturgiaResourceAction(',resourceStart);
 const resourceRowSource=app.slice(resourceStart,resourceEnd);
 assert.ok(resourceStart>=0&&resourceEnd>resourceStart,'Os detalhes complementares devem usar uma linha comum recolhível.');
