@@ -145,11 +145,29 @@ jobs:
       - name: Nomear APK
         run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.44.apk
 
-      - name: Verificar APK
+      - name: Verificar assinatura e compatibilidade do APK
         run: |
           APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
-          "${APKSIGNER}" verify --verbose --print-certs Liturgia-OSM-4.9.44.apk
-
+          AAPT="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/aapt"
+          APK=Liturgia-OSM-4.9.44.apk
+          PREVIOUS=Liturgia-OSM-4.9.43.apk
+          curl -fsSL https://github.com/charlieleitao-spec/liturgia-osm/releases/download/v4.9.43/Liturgia-OSM-4.9.43.apk -o "$PREVIOUS"
+          "$APKSIGNER" verify --verbose --print-certs "$APK" > atual.txt
+          "$APKSIGNER" verify --verbose --print-certs "$PREVIOUS" > anterior.txt
+          cat atual.txt
+          ATUAL_CERT=$(sed -n 's/.*certificate SHA-256 digest: //p' atual.txt | head -1)
+          ANTERIOR_CERT=$(sed -n 's/.*certificate SHA-256 digest: //p' anterior.txt | head -1)
+          test -n "$ATUAL_CERT" && test "$ATUAL_CERT" = "$ANTERIOR_CERT"
+          ATUAL_BADGING=$("$AAPT" dump badging "$APK" | head -1)
+          ANTERIOR_BADGING=$("$AAPT" dump badging "$PREVIOUS" | head -1)
+          ATUAL_CODE=$(echo "$ATUAL_BADGING" | sed -n "s/.*versionCode='\\([^']*\\)'.*/\\1/p")
+          ANTERIOR_CODE=$(echo "$ANTERIOR_BADGING" | sed -n "s/.*versionCode='\\([^']*\\)'.*/\\1/p")
+          echo "$ATUAL_BADGING"
+          echo "Baseline: $ANTERIOR_BADGING"
+          test "$ATUAL_CODE" = 40948
+          test "$ANTERIOR_CODE" = 40947
+          test "$ATUAL_CODE" -gt "$ANTERIOR_CODE"
+          echo "Assinatura SHA-256 igual à versão instalada distribuída: $ATUAL_CERT"
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v5
         with:
