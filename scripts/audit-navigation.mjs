@@ -60,6 +60,7 @@ assert.ok(app.includes("celebrationNameHtml(saint?.title||item?.title||'CelebraÃ
 assert.match(app, /if\(s\?\.categoria==='beato'\|\|s\?\.categoria==='servo_de_deus'\)return ''/);
 assert.match(app, /function renderLiturgiaDetail/);
 assert.match(app, /class="liturgia-celebration-row liturgia-resource-row"/);
+assert.match(app, /class="liturgia-celebration-row liturgia-resource-row liturgia-resource-summary"/);
 assert.match(app, /class="liturgia-resource-transcript"/);
 assert.match(app, /celebrationNameHtml\(saint\.title,saint\)/);
 assert.match(app, /celebrationNameHtml\(item\.title\|\|saint\.title\|\|'Missa prÃ³pria',saint\)/);
@@ -69,13 +70,13 @@ assert.match(app, /return s\.genero==='f'\?'Beata':'Beato'/);
 assert.match(app, /return s\.genero==='f'\?'Serva de Deus':'Servo de Deus'/);
 
 assert.match(app, /function celebrationSubtitle/);
-assert.ok(app.includes("const APP_VERSION = '4.9.48'"));
-assert.ok(workflow.includes('Build APK Liturgia OSM 4.9.48'));
-assert.match(workflow, /versionCode 40952/);
+assert.ok(app.includes("const APP_VERSION = '4.9.49'"));
+assert.ok(workflow.includes('Build APK Liturgia OSM 4.9.49'));
+assert.match(workflow, /versionCode 40953/);
 assert.match(app, /rowtitle">Hoje/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
-assert.ok(read('www/sw.js').includes('liturgia-osm-v4.9.48-ui27'));
+assert.ok(read('www/sw.js').includes('liturgia-osm-v4.9.49-ui28'));
 assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
 assert.match(app, /function liturgiaTodayCard\(type,dateValue=''\)/);
