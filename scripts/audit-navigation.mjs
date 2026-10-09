@@ -25,9 +25,9 @@ for (const item of santoralData) {
   assert.ok(!/\(dies natalis\)/i.test(item.date), 'dies natalis não deve permanecer na data: ' + item.title);
 }
 assert.equal(santoralData.filter(item => !item.grau_confirmado).length, 0, 'A lista de graus não confirmados mudou; revise o relatório.');
-const celebrationLabelStart = css.indexOf('#view .celebration-label{');
-const celebrationLabelEnd = css.indexOf('}', celebrationLabelStart);
-const celebrationLabelStyle = celebrationLabelStart >= 0 && celebrationLabelEnd >= celebrationLabelStart ? css.slice(celebrationLabelStart, celebrationLabelEnd + 1) : '';
+const celebrationLabelCssStart = css.indexOf('#view .celebration-label{');
+const celebrationLabelCssEnd = css.indexOf('}', celebrationLabelCssStart);
+const celebrationLabelStyle = celebrationLabelCssStart >= 0 && celebrationLabelCssEnd >= celebrationLabelCssStart ? css.slice(celebrationLabelCssStart, celebrationLabelCssEnd + 1) : '';
 assert.ok(celebrationLabelStyle, 'Identificação Beato/Beata deve ter estilo textual.');
 assert.doesNotMatch(celebrationLabelStyle, /border|border-radius|padding|background/, 'Identificação não deve aparecer como selo.');
 for (const id of [7, 23]) {
@@ -122,9 +122,9 @@ assert.match(app,/SANTORAL\.filter\(s=>saintHasOffice\(s\)&&officeHoursForSaint\
 assert.equal(testSaints.filter(s=>testHasOffice(s)&&testHoursFor(s).length).length+unavailableSaints.length,testSaints.length);
 const listHelpersStart=app.indexOf('function liturgiaDateKey(s){');
 const listHelpers=app.slice(listHelpersStart,sharedListEnd);
-const celebrationLabelStart=app.indexOf('const CELEBRATION_GRADE_LABELS=');
-const celebrationLabelEnd=app.indexOf('function saintRankSubtitle(s){',celebrationLabelStart);
-const celebrationLabelHelpers=app.slice(celebrationLabelStart,celebrationLabelEnd);
+const celebrationLabelCssStart=app.indexOf('const CELEBRATION_GRADE_LABELS=');
+const celebrationLabelCssEnd=app.indexOf('function saintRankSubtitle(s){',celebrationLabelCssStart);
+const celebrationLabelHelpers=app.slice(celebrationLabelCssStart,celebrationLabelCssEnd);
 const listRendererFn=new Function('SANTORAL','window','saintHasOffice','officeHoursForSaint','saintRankSubtitle','escapeHtml',celebrationLabelHelpers+listHelpers+';return {liturgiaCelebrations,renderLiturgiaCelebrationList};')(
   testSaints,{MISSAS_OSM:massData},testHasOffice,testHoursFor,s=>s.rank||'',htmlEscape);
 const availableHoursEntries=listRendererFn.liturgiaCelebrations('horas');
