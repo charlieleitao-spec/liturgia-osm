@@ -35,6 +35,7 @@ function celebrationBadgeHtml(s){
   const label=labels[s.categoria]?.[s.genero];
   return label?'<span class="celebration-badge">'+label+'</span>':'';
 }
+function celebrationTitleText(value){return String(value||'').replace(/^B\\.A\\.\\s*/i,'').replace(/^B\\.\\s*/i,'').replace(/^Servo de Deus\\s+/i,'').trim();}
 function celebrationDateText(s){return String(s?.date||'').replace(/\\s*\\(dies natalis\\)\\s*/ig,'').trim();}
 function celebrationSubtitle(s,gradeOverride=''){
   const date=celebrationDateText(s);
@@ -426,7 +427,7 @@ function liturgiaCelebrations(type){
 function renderLiturgiaCelebrationList(tipo,entries){
   const rows=entries.map(entry=>{
     const saint=entry.saint,item=entry.mass;
-    const title=saint?.title||item?.title||'Celebração própria';
+    const title=celebrationTitleText(saint?.title||item?.title||'Celebração própria');
     const date=saint?celebrationDateText(saint):(item?.display_date||item?.date_label||item?.date||'');
     const grade=saint?.grau||item?.grau||item?.rank||'';
     const badge=celebrationBadgeHtml(saint);
@@ -936,7 +937,7 @@ function renderLiturgiaDetail(tipo,reference){
     const item=records[Number(reference)];
     if(!item){state.liturgiaDetail=null;return '';}
     const saint=SANTORAL.find(s=>String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')===item.date)||{};
-    const title=item.title||saint.title||'Missa própria';
+    const title=celebrationTitleText(item.title||saint.title||'Missa própria');
     const date=item.display_date||saint.date||item.date_label||item.date||'Data móvel';
     return '<button class="hub-back" onclick="closeLiturgiaDetail()">‹ Voltar às Missas próprias</button>'+
       '<div class="section-title">Missa própria OSM</div><div class="hub-card"><div class="hub-card-title">'+escapeHtml(title)+'</div>'+
