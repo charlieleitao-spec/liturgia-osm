@@ -41,6 +41,10 @@ assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
 assert.match(app, /function celebrationLabel/);
 assert.match(app, /function celebrationNameHtml/);
+assert.match(app, /function renderLiturgiaDetail/);
+assert.match(app, /celebrationNameHtml\(saint\.title,saint\)/);
+assert.match(app, /celebrationNameHtml\(item\.title\|\|saint\.title\|\|'Missa própria',saint\)/);
+
 assert.match(app, /if\(s\?\.categoria==='santo'\)return original/);
 assert.match(app, /return s\.genero==='f'\?'Beata':'Beato'/);
 assert.match(app, /return s\.genero==='f'\?'Serva de Deus':'Servo de Deus'/);
