@@ -22,7 +22,7 @@ for (const item of santoralData) {
   assert.ok(validGrades.includes(item.grau), 'Grau inválido: ' + item.title);
   assert.equal(typeof item.grau_confirmado, 'boolean', 'grau_confirmado deve ser booleano: ' + item.title);
   if (!item.grau_confirmado) assert.ok(['memoria', 'memoria_facultativa', 'comemoracao'].includes(item.grau), 'Grau não confirmado acima de Memória: ' + item.title);
-  assert.ok(!/\\(dies natalis\\)/i.test(item.date), 'dies natalis não deve permanecer na data: ' + item.title);
+  assert.ok(!/\(dies natalis\)/i.test(item.date), 'dies natalis não deve permanecer na data: ' + item.title);
 }
 assert.equal(santoralData.filter(item => !item.grau_confirmado).length, 25, 'A lista de graus não confirmados mudou; revise o relatório.');
 
