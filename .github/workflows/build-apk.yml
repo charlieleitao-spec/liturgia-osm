@@ -150,8 +150,8 @@ jobs:
           APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
           AAPT="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/aapt"
           APK=Liturgia-OSM-4.9.53.apk
-          PREVIOUS=Liturgia-OSM-4.9.51.apk
-          curl -fsSL https://github.com/charlieleitao-spec/liturgia-osm/releases/download/v4.9.51/Liturgia-OSM-4.9.51.apk -o "$PREVIOUS"
+          PREVIOUS=Liturgia-OSM-4.9.52.apk
+          curl -fsSL https://github.com/charlieleitao-spec/liturgia-osm/releases/download/v4.9.52/Liturgia-OSM-4.9.52.apk -o "$PREVIOUS"
           "$APKSIGNER" verify --verbose --print-certs "$APK" > atual.txt
           "$APKSIGNER" verify --verbose --print-certs "$PREVIOUS" > anterior.txt
           cat atual.txt
