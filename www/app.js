@@ -412,7 +412,7 @@ function calendarCelebrationRow(s){
   return `<article class="calendar-celebration-row"><a class="calendar-celebration-link" href="?celebracao=${s._id}" onclick="event.preventDefault();openSaint(${s._id})">${escapeHtml(s.title)}</a></article>`;
 }
 
-function viewSantoral(){if(state.detailId!==null)return viewSaintDetail(state.detailId);let letters=[...new Set(SANTORAL.map(s=>s.title.replace(/^(SANTO|SANTA|B\.|BEATO|BEATA)\s+/i,'').trim()[0].toUpperCase()))].sort();let alpha=state.alpha||'';let q=state.search.trim().toLowerCase();let list=SANTORAL.filter(s=>(!q||(s.title+' '+s.date).toLowerCase().includes(q))&&(!alpha||s.title.replace(/^(SANTO|SANTA|B\.|BEATO|BEATA)\s+/i,'').trim().toUpperCase().startsWith(alpha)));let rows=list.map(s=>`<div class="saint-row" onclick="openSaint(${s._id})">${saintImageHtml(s,false)}<div class="daynum">${s.day}</div><div class="rowtext"><div class="rowtitle">${escapeHtml(s.title)}</div><div class="rowrank">${escapeHtml(s.date)} · ${escapeHtml(saintRankSubtitle(s))}</div></div><div class="chev">›</div></div>`).join('');return `<div class="section-title">Índice do Santoral</div><div class="search-wrap"><input class="search-input" data-live-search="santoral" placeholder="Buscar santo, beato ou data…" value="${escapeHtml(state.search)}" oninput="liveSearchRender('santoral',this)"></div><div class="alpha-index"><button class="alpha-btn ${!alpha?'active':''}" onclick="state.alpha='';render()">•</button>${letters.map(l=>`<button class="alpha-btn ${alpha===l?'active':''}" onclick="state.alpha='${l}';render()">${l}</button>`).join('')}</div><div class="card fade-in liturgia-list-card">${rows||'<div class="empty-state">Nenhum nome encontrado.</div>'}</div>`}
+function viewSantoral(){if(state.detailId!==null)return viewSaintDetail(state.detailId);let letters=[...new Set(SANTORAL.map(s=>s.title.replace(/^(SANTO|SANTA|B\.|BEATO|BEATA)\s+/i,'').trim()[0].toUpperCase()))].sort();let alpha=state.alpha||'';let q=state.search.trim().toLowerCase();let list=SANTORAL.filter(s=>(!q||(s.title+' '+s.date).toLowerCase().includes(q))&&(!alpha||s.title.replace(/^(SANTO|SANTA|B\.|BEATO|BEATA)\s+/i,'').trim().toUpperCase().startsWith(alpha)));let rows=list.map(s=>`<div class="saint-row" onclick="openSaint(${s._id})">${saintImageHtml(s,false)}<div class="daynum">${s.day}</div><div class="rowtext"><div class="rowtitle">${escapeHtml(s.title)}</div><div class="rowrank">${escapeHtml(s.date)} · ${escapeHtml(saintRankSubtitle(s))}</div></div><div class="chev">›</div></div>`).join('');return `<div class="section-title">Índice do Santoral</div><div class="search-wrap"><input class="search-input" data-live-search="santoral" placeholder="Buscar santo, beato ou data…" value="${escapeHtml(state.search)}" oninput="liveSearchRender('santoral',this)"></div><div class="alpha-index"><button class="alpha-btn ${!alpha?'active':''}" onclick="state.alpha='';render()">•</button>${letters.map(l=>`<button class="alpha-btn ${alpha===l?'active':''}" onclick="state.alpha='${l}';render()">${l}</button>`).join('')}</div><div class="card fade-in" style="padding:6px 16px;">${rows||'<div class="empty-state">Nenhum nome encontrado.</div>'}</div>`}
 
 
 function liveSearchRender(kind, el){
@@ -487,7 +487,7 @@ function viewOracoesBase480(){
     </div>
 
     <div class="section-title">Homenagens marianas</div>
-    <div class="card fade-in liturgia-list-card">
+    <div class="card fade-in" style="padding:6px 16px;">
       ${DEVO_LIST.map(devoRowHtml).join('')}
     </div>
 
@@ -498,7 +498,7 @@ function viewOracoesBase480(){
     </div>
 
     <div class="section-title">Orações várias</div>
-    <div class="card fade-in liturgia-list-card">
+    <div class="card fade-in" style="padding:6px 16px;">
       ${VARIAS_LIST.map(devoRowHtml).join('')}
     </div>
   `;
@@ -601,7 +601,7 @@ function viewVigilia(){
       <div class="date-line">Uma das homenagens mais antigas dos Servos a Santa Maria</div>
       <div class="detail-divider"></div>
     </div>
-    <div class="card fade-in liturgia-list-card">
+    <div class="card fade-in" style="padding:6px 16px;">
       <div class="saint-row" onclick="openDevo('vigilia','formula1')">
         <div class="rowtext"><div class="rowtitle">Primeira Fórmula</div><div class="rowrank">Santa Maria, Senhora dos seus Servos</div></div>
         <div class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
@@ -641,7 +641,7 @@ function viewViaMatris(){
       <div class="bio-text" style="font-size:16px;">${escapeHtml(vm.intro.slice(0,420))}…</div>
     </div>
     <div class="section-title">As sete dores</div>
-    <div class="card fade-in liturgia-list-card">${rows}</div>
+    <div class="card fade-in" style="padding:6px 16px;">${rows}</div>
   `;
 }
 
@@ -667,7 +667,7 @@ function viewLadainhas(){
       <div class="date-line">Três ladainhas próprias da espiritualidade servita</div>
       <div class="detail-divider"></div>
     </div>
-    <div class="card fade-in liturgia-list-card">${rows}</div>
+    <div class="card fade-in" style="padding:6px 16px;">${rows}</div>
   `;
 }
 
@@ -767,7 +767,7 @@ function viewMemoriaLiturgica(){
   }).join('');
   return `<div class="section-title">Memória Litúrgica</div>
     <p class="reader-note">Roteiro próprio do Livro de Oração dos Servos de Maria: hino, antífona, salmo, breve vida e oração própria.</p>
-    <div class="card fade-in liturgia-list-card">${rows}</div>`;
+    <div class="card fade-in" style="padding:6px 16px;">${rows}</div>`;
 }
 function viewVida(){
   if(state.detailId!==null) return viewSantoral();
@@ -997,7 +997,7 @@ function allPrayerEntries(){
 }
 function categoryOf(p){let t=(p.title+' '+p.sub).toLowerCase();if(/dor|matris|stabat|coroa/.test(t))return 'dores';if(/voca|miss|apost/.test(t))return 'missao';if(/defunt|doent|alegr|visita|refei|necess/.test(t))return 'comunidade';if(/ladain/.test(t))return 'ladainhas';if(/vigília|vigilia|anjo|rainha/.test(t))return 'diarias';return 'marianas'}
 function globalResults(q){q=q.trim().toLowerCase();if(!q)return [];let rs=[];SANTORAL.forEach(s=>{let hay=(s.title+' '+s.date+' '+s.bio+' '+(s.prayer||'')).toLowerCase();if(hay.includes(q))rs.push({kind:'Santo / Beato',title:s.title,sub:s.date,action:`openSaint(${s._id})`})});allPrayerEntries().forEach(p=>{let hay=(p.title+' '+p.sub+' '+(p.text||'')).toLowerCase();if(hay.includes(q))rs.push({kind:'Oração',title:p.title,sub:p.sub,action:p.open})});return rs.slice(0,40)}
-function resultRows(rs){if(!rs.length)return '<div class="empty-state">Nenhum resultado encontrado.</div>';return `<div class="card fade-in liturgia-list-card">${rs.map(r=>`<div class="saint-row" onclick="${r.action}"><div class="rowtext"><div class="result-kind">${escapeHtml(r.kind)}</div><div class="rowtitle">${escapeHtml(r.title)}</div><div class="rowrank">${escapeHtml(r.sub||'')}</div></div><div class="chev">›</div></div>`).join('')}</div>`}
+function resultRows(rs){if(!rs.length)return '<div class="empty-state">Nenhum resultado encontrado.</div>';return `<div class="card fade-in" style="padding:6px 16px;">${rs.map(r=>`<div class="saint-row" onclick="${r.action}"><div class="rowtext"><div class="result-kind">${escapeHtml(r.kind)}</div><div class="rowtitle">${escapeHtml(r.title)}</div><div class="rowrank">${escapeHtml(r.sub||'')}</div></div><div class="chev">›</div></div>`).join('')}</div>`}
 function goCalendarToday(){
   const n=new Date(); calDate=new Date(n.getFullYear(),n.getMonth(),1); selectedCalDate=new Date(n.getFullYear(),n.getMonth(),n.getDate()); render();
 }
@@ -1013,9 +1013,9 @@ function rankAllowed(s){return calendarRankFilter==='todos'||rankClass(s)===cale
     cells+=`<button class="cal-day ${ss.length?'has-feast rank-'+rankClass(lead):''} ${isT?'today':''} ${isSel?'selected':''}" onclick="selectCalendarDay(${y},${m},${d})" aria-label="${d} de ${MONTHS[m]}${ss.length?', com celebração OSM':''}">${d}${ss.length?'<span class="cal-dot"></span>':''}</button>`;
   }
   const monthFeasts=SANTORAL.filter(s=>s.month===m+1&&rankAllowed(s));let dayBlock='';
-  if(selectedCalDate&&selectedCalDate.getFullYear()===y&&selectedCalDate.getMonth()===m){const d=selectedCalDate.getDate(),selected=SANTORAL.filter(s=>s.month===m+1&&s.day===d&&rankAllowed(s));dayBlock=`<div class="section-title">${d} de ${MONTHS[m]}</div>${selected.length?`<div class="card fade-in liturgia-list-card">${selected.map(calendarCelebrationRow).join('')}</div>`:'<div class="empty-state">Não há celebração desta categoria neste dia.</div>'}`;}
+  if(selectedCalDate&&selectedCalDate.getFullYear()===y&&selectedCalDate.getMonth()===m){const d=selectedCalDate.getDate(),selected=SANTORAL.filter(s=>s.month===m+1&&s.day===d&&rankAllowed(s));dayBlock=`<div class="section-title">${d} de ${MONTHS[m]}</div>${selected.length?`<div class="card fade-in" style="padding:6px 16px;">${selected.map(calendarCelebrationRow).join('')}</div>`:'<div class="empty-state">Não há celebração desta categoria neste dia.</div>'}`;}
   const filters=[['todos','Todas'],['solemnity','Solenidades'],['saint','Santos'],['blessed','Beatos'],['servant','Servos de Deus']];
-  return `<div class="section-title">Calendário OSM</div><select class="calendar-month-select" aria-label="Selecionar mês" onchange="setCalendarMonth(this.value)">${MONTHS.map((n,i)=>`<option value="${i}" ${i===m?'selected':''}>${n[0].toUpperCase()+n.slice(1)} ${y}</option>`).join('')}</select><div class="calendar-filters">${filters.map(f=>`<button class="calendar-filter ${calendarRankFilter===f[0]?'active':''}" onclick="setCalendarFilter('${f[0]}')">${f[1]}</button>`).join('')}</div><div class="calendar-legend"><span><i class="sol"></i>Solenidade</span><span><i class="san"></i>Santo</span><span><i class="bea"></i>Beato</span><span><i class="ser"></i>Servo de Deus</span></div><div class="card fade-in"><div class="calendar-toolbar"><button class="cal-nav" onclick="calDate=new Date(${y},${m-1},1);selectedCalDate=null;render()" aria-label="Mês anterior">‹</button><div class="calendar-title">${MONTHS[m]} ${y}</div><button class="cal-nav" onclick="calDate=new Date(${y},${m+1},1);selectedCalDate=null;render()" aria-label="Próximo mês">›</button></div><button class="today-chip" onclick="goCalendarToday()">Ir para hoje</button><div class="calendar-grid">${['D','S','T','Q','Q','S','S'].map(x=>`<div class="cal-head">${x}</div>`).join('')}${cells}</div></div>${dayBlock}<div class="section-title">Celebrações do mês</div>${monthFeasts.length?`<div class="card fade-in liturgia-list-card">${monthFeasts.map(calendarCelebrationRow).join('')}</div>`:'<div class="empty-state">Não há celebrações desta categoria no mês.</div>'}`;
+  return `<div class="section-title">Calendário OSM</div><select class="calendar-month-select" aria-label="Selecionar mês" onchange="setCalendarMonth(this.value)">${MONTHS.map((n,i)=>`<option value="${i}" ${i===m?'selected':''}>${n[0].toUpperCase()+n.slice(1)} ${y}</option>`).join('')}</select><div class="calendar-filters">${filters.map(f=>`<button class="calendar-filter ${calendarRankFilter===f[0]?'active':''}" onclick="setCalendarFilter('${f[0]}')">${f[1]}</button>`).join('')}</div><div class="calendar-legend"><span><i class="sol"></i>Solenidade</span><span><i class="san"></i>Santo</span><span><i class="bea"></i>Beato</span><span><i class="ser"></i>Servo de Deus</span></div><div class="card fade-in"><div class="calendar-toolbar"><button class="cal-nav" onclick="calDate=new Date(${y},${m-1},1);selectedCalDate=null;render()" aria-label="Mês anterior">‹</button><div class="calendar-title">${MONTHS[m]} ${y}</div><button class="cal-nav" onclick="calDate=new Date(${y},${m+1},1);selectedCalDate=null;render()" aria-label="Próximo mês">›</button></div><button class="today-chip" onclick="goCalendarToday()">Ir para hoje</button><div class="calendar-grid">${['D','S','T','Q','Q','S','S'].map(x=>`<div class="cal-head">${x}</div>`).join('')}${cells}</div></div>${dayBlock}<div class="section-title">Celebrações do mês</div>${monthFeasts.length?`<div class="card fade-in" style="padding:6px 16px;">${monthFeasts.map(calendarCelebrationRow).join('')}</div>`:'<div class="empty-state">Não há celebrações desta categoria no mês.</div>'}`;
 }
 function viewOSMPlus(){return `<div class="section-title">Mais recursos OSM</div><div class="quick-grid fade-in"><button class="quick-card" onclick="openServite('regra')"><b>Regra OSSM</b><span>Regra e textos próprios da Ordem</span></button><button class="quick-card" onclick="openServite('rosario')"><b>Rosário</b><span>Rosário completo e modo guiado</span></button><button class="quick-card" onclick="openServite('coroa')"><b>Coroa das Sete Dores</b><span>Fórmulas e oração guiada</span></button><button class="quick-card" onclick="openServite('oficio')"><b>Ofício</b><span>Horas e textos litúrgicos próprios</span></button><button class="quick-card" onclick="openServite('sabado')"><b>Sábado Mariano</b><span>Textos e devoções marianas</span></button><button class="quick-card" onclick="openLanguagePanel()"><b>Idiomas</b><span>Recursos linguísticos do conteúdo servita</span></button></div>`}
 function resolveStored(k){let [type,key]=k.split(':');if(type==='saint'){let s=SANTORAL.find(x=>String(x._id)===key);if(s)return {kind:'Santoral',title:s.title,sub:s.date,action:`openSaint(${s._id})`}}else{let p=allPrayerEntries().find(x=>x.key===key);if(p)return {kind:'Oração',title:p.title,sub:p.sub,action:prayerActionForKey(key)}}return null}
