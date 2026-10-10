@@ -1198,3 +1198,6 @@ body:not(.celebration-mode):not(.servite-open):has(#view .vigilia-reader) main#v
   white-space:normal!important;
   text-align:left!important;
 }
+
+#view .proper-mass-reader .liturgical-prose{text-align:left!important;white-space:normal!important}
+#view .proper-mass-reader .liturgical-verse{white-space:pre-wrap!important}

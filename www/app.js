@@ -885,7 +885,9 @@ function properMassTextHtml(title,text){
     const stanzas=clean.split(/\n[ \t]*\n/).map(stanza=>'<p class="mass-hymn-stanza">'+escapeHtml(stanza).replace(/\n/g,'<br>')+'</p>').join('');
     return '<div class="liturgical-reading mass-hymn">'+stanzas+'</div>';
   }
-  return '<div class="liturgical-reading hub-text">'+escapeHtml(clean)+'</div>';
+  const isVerse=/\\b(?:salmo|cântico|hino|responsório|aclamação)\\b/i.test(String(title||''));
+  const normalized=isVerse?clean:clean.replace(/([A-Za-zÀ-ÿ])-\\n\\s*([a-zà-ÿ])/g,'$1$2').split(/\\n\\s*\\n/).map(p=>p.replace(/\\s*\\n\\s*/g,' ').replace(/\\s+/g,' ').trim()).filter(Boolean).join('\\n\\n');
+  return '<div class="liturgical-reading hub-text '+(isVerse?'liturgical-verse':'liturgical-prose')+'">'+escapeHtml(normalized).replace(/\\n\\n/g,'<br><br>')+'</div>';
 }
 function properMassSection(title,text){
   if(!text)return '';
