@@ -1178,3 +1178,23 @@ body:not(.celebration-mode):not(.servite-open):has(#view .vigilia-reader) main#v
 #view .saturday-pdf-transcript .marian-office-prose{text-align:left!important;line-height:1.65;margin:0 0 1.1em;white-space:normal}
 #view .saturday-pdf-transcript .marian-office-hymn{text-align:center!important;line-height:1.55;margin:0 0 1.25em}
 #view .saturday-pdf-transcript .prayer-text-heading{text-align:center!important;margin:1.4em 0 .7em}
+
+/* Leitura litúrgica: não preservar quebras de PDF em prosa. */
+#view .proper-mass-reader .liturgical-reading.hub-text,
+#view .proper-mass-reader .hub-text,
+#view .liturgia-resource-content .liturgical-reading.hub-text:not(.saturday-pdf-transcript),
+#view .daily-reading p{
+  text-align:left!important;
+  white-space:normal!important;
+  overflow-wrap:break-word;
+  word-break:normal;
+  hyphens:none;
+}
+#view .proper-mass-reader .mass-hymn-stanza{
+  text-align:center!important;
+  white-space:normal!important;
+}
+#view .saturday-pdf-transcript .marian-office-prose{
+  white-space:normal!important;
+  text-align:left!important;
+}
