@@ -25,7 +25,7 @@ assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
 assert.match(app, /const APP_VERSION = ['"]4\.9\.56['"]/);
-assert.match(workflow, /Build APK Liturgia OSM 4\.9\.57/);
+assert.match(workflow, /Build APK Liturgia OSM 4\.9\.58/);
 assert.match(workflow, /versionCode 40962/);
 assert.match(app, /rowtitle">Hoje/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
