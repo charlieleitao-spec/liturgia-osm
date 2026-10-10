@@ -1200,3 +1200,7 @@ body:not(.celebration-mode):not(.servite-open):has(#view .vigilia-reader) main#v
 }
 
 #view .proper-mass-reader .proper-mass-prose-reader p.proper-mass-prose{margin:0 0 1em;text-align:left!important;white-space:normal!important;line-height:1.65}
+
+/* Prosa litúrgica contínua, com versos e hinos preservados pelo renderizador. */
+#view .prayer-block .prayer-stanza{text-align:left!important;white-space:normal!important}
+#view .prayer-block .prayer-text-heading{text-align:center!important}

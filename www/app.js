@@ -142,7 +142,12 @@ function prayerLineHtml(line, vigilia=false){
   return escaped;
 }
 function formatPrayerStanza(lines, vigilia, hymnMode){
-  if(!vigilia || hymnMode) return lines.map(line=>prayerLineHtml(line,vigilia)).join('<br>');
+  if(hymnMode) return lines.map(line=>prayerLineHtml(line,vigilia)).join('<br>');
+  if(!vigilia){
+    const structural=/^(?:[–—=]\\s*|(?:D|T|C|R|V|A|B|L\\d?)\\.\\s*|\\d{1,3}\\s*[†*]|\\d{1,3}\\s+(?=[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ]))/;
+    if(lines.some(line=>structural.test(line)))return lines.map(line=>prayerLineHtml(line,false)).join('<br>');
+    return lines.map(line=>prayerLineHtml(line,false)).join(' ');
+  }
   const speaker = /^(?:D\.|T\.|C\.|R\.|V\.|A\.|B\.|L\d?:|L\.)\s*/;
   if(lines.some(line=>speaker.test(line))){
     const turns=[];
