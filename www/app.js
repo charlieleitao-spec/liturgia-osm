@@ -471,9 +471,11 @@ function renderLiturgiaCelebrationList(tipo,entries){
     const title=celebrationTitleText(saint?.title||item?.title||'Celebração própria',saint);
     const date=saint?.date||item?.display_date||item?.date_label||item?.date||'';
     const rank=saint?celebrationGradeLabel(saint.grau):(item?.rank||'');
+    const subtitleParts=[date,rank].map(x=>String(x||'').trim()).filter(Boolean);
+    const subtitle=[...new Set(subtitleParts)].join(' · ');
     const reference=tipo==='horas'?Number(saint?._id):Number((window.MISSAS_OSM?.celebrations||[]).indexOf(item));
     const action='openLiturgiaDetail(\''+tipo+'\','+reference+')';
-    return '<button class="liturgia-celebration-row" type="button" onclick="'+action+'" aria-label="Abrir '+escapeHtml(title)+'"><span class="rowtext"><span class="rowtitle">'+escapeHtml(title)+'</span><span class="rowrank">'+escapeHtml(date)+(rank?' · '+escapeHtml(rank):'')+'</span></span><span class="chev" aria-hidden="true">›</span></button>';
+    return '<button class="liturgia-celebration-row" type="button" onclick="'+action+'" aria-label="Abrir '+escapeHtml(title)+'"><span class="rowtext"><span class="rowtitle">'+escapeHtml(title)+'</span><span class="rowrank">'+escapeHtml(subtitle)+'</span></span><span class="chev" aria-hidden="true">›</span></button>';
   }).join('');
   return '<div class="card fade-in">'+(rows||'<div class="empty-state">Nenhuma celebração própria cadastrada.</div>')+'</div>';
 }
