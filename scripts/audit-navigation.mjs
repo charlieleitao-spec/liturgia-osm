@@ -24,13 +24,13 @@ for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data
 assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
-assert.match(app, /const APP_VERSION = ['"]4\.9\.54['"]/);
-assert.match(workflow, /Build APK Liturgia OSM 4\.9\.54/);
+assert.match(app, /const APP_VERSION = ['"]4\.9\.55['"]/);
+assert.match(workflow, /Build APK Liturgia OSM 4\.9\.55/);
 assert.match(workflow, /versionCode 40959/);
 assert.match(app, /rowtitle">Hoje/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
-assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.54-ui31/);
+assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.55-ui31/);
 assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
 assert.match(app, /function liturgiaTodayCard\(type,dateValue=''\)/);
