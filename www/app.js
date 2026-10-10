@@ -972,13 +972,13 @@ function movableOfficeBlocks(){
   return '<div class="section-title">Ofícios próprios com data móvel</div><div class="card fade-in liturgia-resource-list">'+rows+'</div>';
 }
 function normalizeMarianOfficeTranscript(text, season){
-  let value=cleanMassText(text).replace(/\\bce-lebra-se\\b/gi,'celebra-se');
-  const lines=value.split('\\n');
-  const heading=/^MEMÓRIAS DE SANTA MARIA NO SÁBADO\\s+TEMPO (?:DO ADVENTO|DO NATAL|PASCAL|COMUM)$/i;
+  let value=cleanMassText(text).replace(/\bce-lebra-se\b/gi,'celebra-se');
+  const lines=value.split('\n');
+  const heading=/^MEMÓRIAS DE SANTA MARIA NO SÁBADO\s+TEMPO (?:DO ADVENTO|DO NATAL|PASCAL|COMUM)$/i;
   if(lines.length>1 && heading.test(lines[0].trim()) && lines[1].trim().toLowerCase()===String(season).toLowerCase()){
     lines.splice(0,2,'Santa Maria no Sábado — '+season);
   }
-  return lines.join('\\n');
+  return lines.join('\n');
 }
 function marianSaturdayOfficeBlocks(){
   const items=Array.isArray(OFICIOS_OSM?.sabados_marianos_pdf)?OFICIOS_OSM.sabados_marianos_pdf:[];
