@@ -1402,7 +1402,9 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
   function readingBody(value,label){
     const scripture=/leitura|evangelho/i.test(String(label||''));
     return cleanMassText(value).split(/\n\s*\n/).filter(Boolean).map(paragraph=>{
-      let html=safe(paragraph.trim()).replace(/\r?\n/g,'<br>');
+      let html=safe(paragraph.trim());
+      if(!/salmo|cântico|hino|responsório/i.test(String(label||'')))html=html.replace(/\r?\n[ \t]*/g,' ');
+      else html=html.replace(/\r?\n/g,'<br>');
       if(scripture)html=html.replace(/(^|\s)(\d{1,3})(?=[A-Za-zÀ-ÿ])/g,'$1<sup class="verse-number">$2</sup> ');
       return `<p class="reading-paragraph">${html}</p>`;
     }).join('');
