@@ -300,7 +300,8 @@
     "categoria": "santo",
     "genero": "m",
     "grau": "festa",
-    "grau_confirmado": true
+    "grau_confirmado": true,
+    "image": "media/santo-agostinho.webp"
   },
   {
     "id": 19,
@@ -378,7 +379,8 @@
     "genero": "f",
     "grau": "solenidade",
     "grau_confirmado": true,
-    "exibir_selo": false
+    "exibir_selo": false,
+    "image": "media/nossa-senhora-das-dores.webp"
   },
   {
     "id": 24,
