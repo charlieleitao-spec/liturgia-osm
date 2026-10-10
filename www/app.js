@@ -472,7 +472,11 @@ function renderLiturgiaCelebrationList(tipo,entries){
     const date=saint?.date||item?.display_date||item?.date_label||item?.date||'';
     const rank=saint?celebrationGradeLabel(saint.grau):(item?.rank||'');
     const subtitleParts=[date,rank].map(x=>String(x||'').trim()).filter(Boolean);
-    const subtitle=[...new Set(subtitleParts)].join(' · ');
+    // Nas Missas marianas o grupo já aparece no título da seção: não o repetir no subtítulo.
+    const normalizedSubtitleParts=item?.group==='Santa Maria no Sábado'
+      ?subtitleParts.map(x=>x.replace(/(?:^|\s*·\s*)Santa Maria no Sábado(?:\s*·\s*|$)/gi,' · ').replace(/^\s*·\s*|\s*·\s*$/g,'').trim()).filter(Boolean)
+      :subtitleParts;
+    const subtitle=[...new Set(normalizedSubtitleParts.flatMap(x=>x.split(/\s*·\s*/).map(y=>y.trim()).filter(Boolean)))].join(' · ');
     const reference=tipo==='horas'?Number(saint?._id):Number((window.MISSAS_OSM?.celebrations||[]).indexOf(item));
     const action='openLiturgiaDetail(\''+tipo+'\','+reference+')';
     return '<button class="liturgia-celebration-row" type="button" onclick="'+action+'" aria-label="Abrir '+escapeHtml(title)+'"><span class="rowtext"><span class="rowtitle">'+escapeHtml(title)+'</span><span class="rowrank">'+escapeHtml(subtitle)+'</span></span><span class="chev" aria-hidden="true">›</span></button>';
