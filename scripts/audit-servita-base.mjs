@@ -16,7 +16,7 @@ const masses = json('www/data/missas-osm.json');
 const variousPrayers = json('www/data/devocoes/oracoes-varias.json');
 const dataReadme = read('www/data/README.md');
 
-assert.equal(pkg.version, '4.9.57', 'package.json deve identificar a versão 4.9.57');
+assert.equal(pkg.version, '4.9.58', 'package.json deve identificar a versão 4.9.58');
 assert.equal(pkg.dependencies['@capacitor/app'], '8.1.2', 'Plugin nativo do botão Voltar deve fazer parte do app.');
 assert.match(appJs, /const APP_VERSION = ['"]4\.9\.56['"]/);
 assert.match(sw, /liturgia-osm-v4\.9\.56-ui\d+/);
