@@ -1,0 +1,114 @@
+{
+  "objetivo": "Localização e validação das 17 imagens ainda ausentes do Santoral OSM",
+  "fontes": [
+    {
+      "titulo": "Agiografia da Ordem dos Servos de Maria",
+      "url": "https://servidimaria.net/sitoosm/it/spiritualita/agiografia.html"
+    },
+    {
+      "titulo": "Agiografia em português",
+      "url": "https://servidimaria.net/sitoosm/po/espiritualidade/hagiografia.html"
+    },
+    {
+      "titulo": "Fonti iconografiche OSM",
+      "url": "https://servidimaria.net/sitoosm/it/storia/fons2/06.pdf"
+    },
+    {
+      "titulo": "Fonti agiografiche OSM",
+      "url": "https://servidimaria.net/sitoosm/it/storia/fons3/04.pdf"
+    }
+  ],
+  "pendentes": [
+    {
+      "celebracao": "Tiago de \"Città della Pieve\"",
+      "nome_italiano": "Giacomo da Città della Pieve",
+      "status": "pendente_de_arquivo_e_licenca"
+    },
+    {
+      "celebracao": "Joaquim de Sena",
+      "nome_italiano": "Gioacchino da Siena",
+      "status": "pendente_de_arquivo_e_licenca"
+    },
+    {
+      "celebracao": "Frei Paulino M. Baldassarri",
+      "nome_italiano": "Paolino Maria Baldassarri",
+      "status": "pendente_de_arquivo_e_licenca"
+    },
+    {
+      "celebracao": "Virgem Maria, Mãe e Medianeira",
+      "nome_italiano": "Maria Mediatrice",
+      "status": "pendente_de_arquivo_e_licenca"
+    },
+    {
+      "celebracao": "Benincasa de Montepulciano",
+      "nome_italiano": "Benincasa da Montepulciano",
+      "status": "pendente_de_arquivo_e_licenca"
+    },
+    {
+      "celebracao": "Francisco de Sena",
+      "nome_italiano": "Francesco da Siena",
+      "status": "pendente_de_arquivo_e_licenca"
+    },
+    {
+      "celebracao": "Tiago Filipe de Faenza",
+      "nome_italiano": "Giacomo Filippo Bertoni",
+      "status": "pendente_de_arquivo_e_licenca"
+    },
+    {
+      "celebracao": "Fernando Maria Baccilieri",
+      "nome_italiano": "Ferdinando Maria Baccilieri",
+      "status": "pendente_de_arquivo_e_licenca"
+    },
+    {
+      "celebracao": "Ubaldo de Sansepolcro",
+      "nome_italiano": "Ubaldo da Borgo Sansepolcro",
+      "status": "pendente_de_arquivo_e_licenca"
+    },
+    {
+      "celebracao": "Frei Egídio Maria Moscini",
+      "nome_italiano": "Egidio Maria Moscini",
+      "status": "pendente_de_arquivo_e_licenca"
+    },
+    {
+      "celebracao": "André de Sansepolcro",
+      "nome_italiano": "Andrea da Borgo Sansepolcro",
+      "status": "pendente_de_arquivo_e_licenca"
+    },
+    {
+      "celebracao": "Boaventura de Forlì",
+      "nome_italiano": "Bonaventura da Forlì",
+      "status": "pendente_de_arquivo_e_licenca"
+    },
+    {
+      "celebracao": "Dedicação da Basílica de Monte Senário",
+      "nome_italiano": "Basilica di Monte Senario",
+      "status": "pendente_de_arquivo_e_licenca"
+    },
+    {
+      "celebracao": "João Ângelo de Milão",
+      "nome_italiano": "Giovannangelo Porro",
+      "status": "pendente_de_arquivo_e_licenca"
+    },
+    {
+      "celebracao": "Comemoração dos Defuntos da Ordem",
+      "nome_italiano": "Commemorazione defunti OSM",
+      "status": "pendente_de_arquivo_e_licenca"
+    },
+    {
+      "celebracao": "Jerônimo de Sant'Angelo in Vado",
+      "nome_italiano": "Girolamo da Sant'Angelo in Vado",
+      "status": "pendente_de_arquivo_e_licenca"
+    },
+    {
+      "celebracao": "Boaventura de Pistoia",
+      "nome_italiano": "Bonaventura da Pistoia",
+      "status": "pendente_de_arquivo_e_licenca"
+    }
+  ],
+  "criterios": [
+    "Conferir correspondência visual com a celebração, não apenas com o nome da página",
+    "Registrar URL da imagem original, autoria e licença ou autorização expressa",
+    "Não copiar imagens do site OSM sem verificar direitos de reutilização",
+    "Converter para WebP e manter disponível offline após validação"
+  ]
+}
