@@ -1161,3 +1161,15 @@ body:has(#view .vigilia-reader) main#view{padding-bottom:calc(115px + env(safe-a
 #view .calendar-celebration-day{display:inline-block;min-width:2.2em;font-variant-numeric:tabular-nums;font-weight:700;color:var(--gold-soft);}
 /* A barra inferior e o controle de celebração não devem cobrir o fim do conteúdo. */
 body:has(#view .prayer-block) main#view{padding-bottom:calc(190px + env(safe-area-inset-bottom))!important;}
+
+/* Navegação fixa: reserva real de espaço no final das listas e leituras.
+   Mantém a barra visível sem encobrir o último cartão. */
+body:not(.celebration-mode):not(.servite-open) main#view{
+  padding-bottom:calc(124px + env(safe-area-inset-bottom))!important;
+}
+body:not(.celebration-mode):not(.servite-open):has(#view .prayer-block) main#view{
+  padding-bottom:calc(160px + env(safe-area-inset-bottom))!important;
+}
+body:not(.celebration-mode):not(.servite-open):has(#view .vigilia-reader) main#view{
+  padding-bottom:calc(160px + env(safe-area-inset-bottom))!important;
+}
