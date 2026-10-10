@@ -885,7 +885,9 @@ function properMassTextHtml(title,text){
     const stanzas=clean.split(/\n[ \t]*\n/).map(stanza=>'<p class="mass-hymn-stanza">'+escapeHtml(stanza).replace(/\n/g,'<br>')+'</p>').join('');
     return '<div class="liturgical-reading mass-hymn">'+stanzas+'</div>';
   }
-  return '<div class="liturgical-reading hub-text">'+escapeHtml(clean)+'</div>';
+  const paragraphs=clean.replace(/\r\n?/g,'\n').split(/\n[ \t]*\n+/).map(block=>block.trim()).filter(Boolean);
+  const content=paragraphs.map(block=>'<p class="proper-mass-prose">'+escapeHtml(block.replace(/\n[ \t]*/g,' ').replace(/[ \t]+/g,' '))+'</p>').join('');
+  return '<div class="liturgical-reading hub-text proper-mass-prose-reader">'+content+'</div>';
 }
 function properMassSection(title,text){
   if(!text)return '';
