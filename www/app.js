@@ -165,29 +165,31 @@ function formatPrayerStanza(lines, vigilia, hymnMode){
 }
 
 function normalizeVigiliaTypography(text){
-  let source=String(text??'').replace(/\r\n?/g,'\n')
+  // Não unir automaticamente linhas dos salmos: o asterisco e o sinal †
+  // marcam a estrutura poética, não uma quebra de linha acidental do PDF.
+  const source=String(text??'').replace(/\r\n?/g,'\n')
     .replace(/([A-Za-zÀ-ÿ])-\n\s*([a-zà-ÿ])/g,'$1$2')
-    .replace(/(\d{1,3})(?=[A-Za-zÀ-ÿ])/g,'$1 ')
-    .replace(/(\dª\s*Ant\.[^\n]*)(?:\n\s*)(?=[a-zà-ÿ])/gi,'$1 ');
-  source=source.replace(/(SÚPLICA DOS SERVOS DE MARIA A NOSSA SENHORA)\s+(?=Bondade)/gi,'$1\n');
-  const structural=/^(?:[–—=]\s*|[DTC RVABL]\d?\.|[123]ª\s*Ant\.|SALMO\s+\d+|Salmodia$|Hino$|Oração sálmica$|Primeira leitura$|Segunda leitura$|Despedida$|Introdução às leituras$|Absolvição$|SÚPLICA DOS SERVOS|Oração pela Igreja|Primeira fórmula$|Segunda fórmula$)/i;
+    .replace(/([–—=]\s*\d{1,3})(?=[A-Za-zÀ-ÿ])/g,'$1 ')
+    .replace(/(SÚPLICA DOS SERVOS DE MARIA A NOSSA SENHORA)\s+(?=Bondade)/gi,'$1\n');
   const lines=source.split('\n'),out=[];
+  const structural=/^(?:[–—=]\s*|[DTC RVABL]\d?\.|[123]ª\s*Ant\.|SALMO\s+\d+|Salmodia$|Hino$|Oração sálmica$|Primeira leitura$|Segunda leitura$|Despedida$|Introdução às leituras$|Absolvição$|SÚPLICA DOS SERVOS|Oração pela Igreja|Primeira fórmula$|Segunda fórmula$)/i;
+  let inPsalm=false;
   for(const raw of lines){
     const line=raw.trim();
     if(!line){if(out.length&&out[out.length-1]!=='')out.push('');continue;}
-    const prev=out[out.length-1]||'';
-    if(prev && !structural.test(line) && !/^[“"'‘]/.test(line) && !/^[.!?;:]$/.test(line)
-       && !/^(?:Santa Maria,|Majestade de Deus|Hino ao Criador|O Senhor entra|A glória e a misericórdia|Bem-aventurado aquele)/i.test(line)
-       && !/^(?:SALMO|Salmodia)/i.test(prev)
-       && !/^(?:Primeira|Segunda) fórmula$/i.test(prev)
-       && !/^(?:Introdução às leituras|Absolvição|Despedida)$/i.test(prev)
-       && !/^(?:Hino|Primeira leitura|Segunda leitura|Oração sálmica)$/i.test(prev)
-       && !/^SÚPLICA DOS SERVOS/i.test(prev)
-       && !/^\s*$/.test(prev)){
-      out[out.length-1]=prev+' '+line;
-    }else out.push(line);
+    if(/^SALMO\s+\d+/i.test(line))inPsalm=true;
+    else if(/^[123]ª\s*Ant\.|^(?:Hino|Primeira leitura|Segunda leitura|Oração sálmica|Despedida|SÚPLICA DOS SERVOS)/i.test(line))inPsalm=false;
+    const previous=out[out.length-1]||'';
+    // Apenas a prosa e as antífonas quebradas na extração do PDF são recompostas.
+    // Versos dos salmos e estrofes de hinos permanecem em linhas distintas.
+    const joinAntiphon=/^[123]ª\s*Ant\./i.test(previous)&&!structural.test(line);
+    const joinProse=!inPsalm&&!structural.test(line)&&previous
+      &&!/^(?:[–—=]|SALMO|Salmodia|Hino|Primeira fórmula|Segunda fórmula|Santa Maria,)/i.test(previous)
+      &&!/[.!?:;]$/.test(previous)&&!/^["“]/.test(line);
+    if(joinAntiphon||joinProse)out[out.length-1]=previous+' '+line;
+    else out.push(line);
   }
-  return out.join('\n').replace(/([.!?])\s+(?=[123]ª\s*Ant\.)/g,'$1\n').replace(/(Amém!)\s+(?=[123]ª\s*Ant\.)/gi,'$1\n');
+  return out.join('\n').replace(/([.!?])\s+(?=[123]ª\s*Ant\.)/g,'$1\n');
 }
 
 function renderPrayer(text, options={}){
