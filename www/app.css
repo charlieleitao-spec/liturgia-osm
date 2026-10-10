@@ -1173,3 +1173,8 @@ body:not(.celebration-mode):not(.servite-open):has(#view .prayer-block) main#vie
 body:not(.celebration-mode):not(.servite-open):has(#view .vigilia-reader) main#view{
   padding-bottom:calc(160px + env(safe-area-inset-bottom))!important;
 }
+
+/* Ofícios marianos transcritos: prosa fluida, hinos em versos. */
+#view .saturday-pdf-transcript .marian-office-prose{text-align:left!important;line-height:1.65;margin:0 0 1.1em;white-space:normal}
+#view .saturday-pdf-transcript .marian-office-hymn{text-align:center!important;line-height:1.55;margin:0 0 1.25em}
+#view .saturday-pdf-transcript .prayer-text-heading{text-align:center!important;margin:1.4em 0 .7em}

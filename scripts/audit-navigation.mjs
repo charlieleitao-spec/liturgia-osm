@@ -194,7 +194,7 @@ const renderedSaturdayTranscript = renderPrayerForTest(massTextHelpers.cleanMass
 assert.doesNotMatch(renderedSaturdayTranscript, /Copyright/i, 'A transcrição de Santa Maria no Sábado não deve exibir copyright.');
 assert.ok(renderedSaturdayTranscript.includes('class="prayer-text-heading">HINO</h4>'), 'Hino deve ser reconhecido pelo renderizador comum.');
 assert.equal((renderedSaturdayTranscript.match(/class="prayer-stanza"/g) || []).length, 3, 'O texto antes do hino e as duas estrofes devem permanecer separados.');
-assert.ok(app.includes('renderPrayer(normalizeMarianOfficeTranscript(item.pdf_transcript,subtitle))'), 'Transcrição dos sábados marianos deve passar pela limpeza e formatação litúrgica.');
+assert.ok(app.includes('renderMarianOfficeTranscript(item.pdf_transcript,subtitle)'), 'Transcrição dos sábados marianos deve passar pela limpeza e formatação litúrgica.');
 
 assert.match(serviteHtml, /servite-3\.js/);
 assert.match(serviteCss, /text-align:\s*center/);

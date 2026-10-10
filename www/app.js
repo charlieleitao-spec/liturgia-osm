@@ -972,13 +972,43 @@ function movableOfficeBlocks(){
   return '<div class="section-title">Ofícios próprios com data móvel</div><div class="card fade-in liturgia-resource-list">'+rows+'</div>';
 }
 function normalizeMarianOfficeTranscript(text, season){
-  let value=cleanMassText(text).replace(/\bce-lebra-se\b/gi,'celebra-se');
+  let value=cleanMassText(text)
+    .replace(/([A-Za-zÀ-ÿ])-\n\s*([a-zà-ÿ])/g,'$1$2')
+    .replace(/\bce-lebra-se\b/gi,'celebra-se')
+    .replace(/\boutu-bro\b/gi,'outubro');
   const lines=value.split('\n');
   const heading=/^MEMÓRIAS DE SANTA MARIA NO SÁBADO\s+TEMPO (?:DO ADVENTO|DO NATAL|PASCAL|COMUM)$/i;
   if(lines.length>1 && heading.test(lines[0].trim()) && lines[1].trim().toLowerCase()===String(season).toLowerCase()){
-    lines.splice(0,2,'Santa Maria no Sábado — '+season);
+    lines.splice(0,2);
   }
-  return lines.join('\n');
+  return lines.join('\n').trim();
+}
+function renderMarianOfficeTranscript(text, season){
+  const source=normalizeMarianOfficeTranscript(text,season);
+  const lines=source.split('\n');
+  const blocks=[];
+  let paragraph=[];
+  let hymn=false;
+  const heading=/^(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média|HINO|Hino|Salmodia|Preces|Oração|Cântico evangélico|Responsório breve|RESPONSÓRIO BREVE|Leitura breve(?:\s+.*)?|LEITURA BREVE(?:\s+.*)?)$/i;
+  const flush=()=>{
+    if(!paragraph.length)return;
+    const joined=hymn?paragraph.map(escapeHtml).join('<br>'):escapeHtml(paragraph.join(' ').replace(/\s+/g,' '));
+    blocks.push('<p class="marian-office-'+(hymn?'hymn':'prose')+'">'+joined+'</p>');
+    paragraph=[];
+  };
+  for(const raw of lines){
+    const line=raw.trim();
+    if(!line){flush();continue;}
+    if(heading.test(line)){
+      flush();
+      hymn=/^HINO$/i.test(line);
+      blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
+      continue;
+    }
+    paragraph.push(line);
+  }
+  flush();
+  return blocks.join('');
 }
 function marianSaturdayOfficeBlocks(){
   const items=Array.isArray(OFICIOS_OSM?.sabados_marianos_pdf)?OFICIOS_OSM.sabados_marianos_pdf:[];
@@ -989,7 +1019,7 @@ function marianSaturdayOfficeBlocks(){
     const subtitle=(originalTitle.match(/Tempo (?:do Advento|do Natal|Pascal|Comum)/i)||[])[0]||originalTitle;
     const pdfUrl=item.pdf_url||item.local_pdf_url||'';
     const pdfAction=liturgiaResourceAction('Consultar PDF oficial OSM',pdfUrl);
-    const transcript=item.pdf_transcript?'<details class="liturgia-resource-disclosure"><summary class="action-btn">Ler texto completo</summary><div class="liturgical-reading hub-text saturday-pdf-transcript">'+renderPrayer(normalizeMarianOfficeTranscript(item.pdf_transcript,subtitle))+'</div></details>':'';
+    const transcript=item.pdf_transcript?'<details class="liturgia-resource-disclosure"><summary class="action-btn">Ler texto completo</summary><div class="liturgical-reading hub-text saturday-pdf-transcript">'+renderMarianOfficeTranscript(item.pdf_transcript,subtitle)+'</div></details>':'';
     const content=(pdfAction?'<div class="liturgia-resource-actions">'+pdfAction+'</div>':'')+transcript;
     return liturgiaResourceRow(title,subtitle,content);
   }).join('');
