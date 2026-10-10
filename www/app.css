@@ -1154,3 +1154,10 @@ body:has(#view .vigilia-reader) main#view{padding-bottom:calc(115px + env(safe-a
 #view .vigilia-reader .prayer-formula-title,
 #view .vigilia-reader .prayer-psalm-caption{font-size:calc(16px * var(--reader-scale, 1))!important}
 #view .vigilia-reader .verse-number{font-size:.75em!important}
+
+/* Leitura em prosa: evitar centralização de linhas e palavras isoladas. */
+#view .prayer-block:not(.vigilia-reader .prayer-block) .prayer-stanza{ text-align:left!important; }
+#view .prayer-block:not(.vigilia-reader .prayer-block){text-align:left!important;}
+#view .calendar-celebration-day{display:inline-block;min-width:2.2em;font-variant-numeric:tabular-nums;font-weight:700;color:var(--gold-soft);}
+/* A barra inferior e o controle de celebração não devem cobrir o fim do conteúdo. */
+body:has(#view .prayer-block) main#view{padding-bottom:calc(190px + env(safe-area-inset-bottom))!important;}
