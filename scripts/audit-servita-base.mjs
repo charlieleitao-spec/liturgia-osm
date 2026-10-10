@@ -18,8 +18,8 @@ const dataReadme = read('www/data/README.md');
 
 assert.equal(pkg.version, '4.9.55', 'package.json deve identificar a versão 4.9.55');
 assert.equal(pkg.dependencies['@capacitor/app'], '8.1.2', 'Plugin nativo do botão Voltar deve fazer parte do app.');
-assert.match(appJs, /const APP_VERSION = ['"]4\.9\.54['"]/);
-assert.match(sw, /liturgia-osm-v4\.9\.54-ui\d+/);
+assert.match(appJs, /const APP_VERSION = ['"]4\.9\.55['"]/);
+assert.match(sw, /liturgia-osm-v4\.9\.55-ui\d+/);
 assert.match(html, /app\.js/);
 assert.match(html, /app\.css/);
 assert.match(appJs, /function openSantoralOfficeHour/);
