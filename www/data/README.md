@@ -13,7 +13,7 @@ O Hoje na Família Servita consome uma base derivada. Corrija primeiro os arquiv
 
 ## Celebrações sem imagem própria
 
-Há atualmente 21 celebrações sem imagem. A interface usa um marcador tipográfico com as iniciais do título, sem criar ou substituir imagens:
+Há atualmente 19 celebrações sem imagem. A interface usa um marcador tipográfico com as iniciais do título, sem criar ou substituir imagens:
 
 - Tiago de "Città della Pieve"
 - Joaquim de Sena
@@ -27,10 +27,8 @@ Há atualmente 21 celebrações sem imagem. A interface usa um marcador tipográ
 - Ubaldo de Sansepolcro
 - Santa Clélia Barbieri
 - Frei Egídio Maria Moscini
-- Santo Agostinho
 - André de Sansepolcro
 - Boaventura de Forlì
-- Nossa Senhora das Dores
 - Dedicação da Basílica de Monte Senário
 - João Ângelo de Milão
 - Comemoração dos Defuntos da Ordem
