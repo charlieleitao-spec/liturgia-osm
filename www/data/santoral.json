@@ -75,7 +75,8 @@
     "categoria": "beato",
     "genero": "f",
     "grau": "memoria",
-    "grau_confirmado": true
+    "grau_confirmado": true,
+    "image": "media/isabel-picenardi.webp"
   },
   {
     "id": 5,
@@ -249,7 +250,8 @@
     "categoria": "santo",
     "genero": "f",
     "grau": "memoria_facultativa",
-    "grau_confirmado": true
+    "grau_confirmado": true,
+    "image": "media/santa-clelia-barbieri.webp"
   },
   {
     "id": 16,

@@ -1,0 +1,16 @@
+[
+  {
+    "celebracao": "Santa Clélia Barbieri",
+    "arquivo": "www/media/santa-clelia-barbieri.webp",
+    "fonte": "https://commons.wikimedia.org/wiki/File%3AClelia_Barbieri.jpg",
+    "licenca": "public domain",
+    "titulo_arquivo_original": "Clelia Barbieri.jpg"
+  },
+  {
+    "celebracao": "Isabel Picenardi",
+    "arquivo": "www/media/isabel-picenardi.webp",
+    "fonte": "https://commons.wikimedia.org/wiki/File%3ABeata_elisabetta_picenardi%2C_1490_ca.jpg",
+    "licenca": "cc by 3.0",
+    "titulo_arquivo_original": "Beata elisabetta picenardi, 1490 ca.jpg"
+  }
+]
