@@ -975,10 +975,14 @@ function marianSaturdayOfficeBlocks(){
   const items=Array.isArray(OFICIOS_OSM?.sabados_marianos_pdf)?OFICIOS_OSM.sabados_marianos_pdf:[];
   if(!items.length)return '';
   const rows=items.map(function(item){
-    const title=item.title||'Ofício de Santa Maria no Sábado';
+    const originalTitle=item.title||'Ofício de Santa Maria no Sábado';
+    const title='Santa Maria no Sábado';
+    const subtitle=(originalTitle.match(/Tempo (?:do Advento|do Natal|Pascal|Comum)/i)||[])[0]||originalTitle;
     const pdfUrl=item.pdf_url||item.local_pdf_url||'';
+    const pdfAction=liturgiaResourceAction('Consultar PDF oficial OSM',pdfUrl);
     const transcript=item.pdf_transcript?'<details class="liturgia-resource-disclosure"><summary class="action-btn">Ler texto completo</summary><div class="liturgical-reading hub-text saturday-pdf-transcript">'+renderPrayer(cleanMassText(item.pdf_transcript))+'</div></details>':'';
-    return liturgiaResourceRow(title,'PDF oficial OSM',transcript,pdfUrl);
+    const content=(pdfAction?'<div class="liturgia-resource-actions">'+pdfAction+'</div>':'')+transcript;
+    return liturgiaResourceRow(title,subtitle,content);
   }).join('');
   return '<div class="section-title">Ofícios de Santa Maria no Sábado</div><div class="card fade-in liturgia-resource-list">'+rows+'</div>';
 }
