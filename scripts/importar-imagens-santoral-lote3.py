@@ -18,7 +18,9 @@ sources=[]
 for title,filename,url,article in IMAGES:
  matches=[x for x in records if x.get("title")==title]
  if len(matches)!=1:raise ValueError(f"Expected exactly one celebration: {title}; got {len(matches)}")
- if matches[0].get("image"):raise ValueError(f"Already has image: {title}")
+ if matches[0].get("image"):
+  print("Already imported",title,flush=True)
+  continue
  req=urllib.request.Request(url,headers={"User-Agent":"LiturgiaOSM/1.0 (Servite liturgical project)"})
  with urllib.request.urlopen(req,timeout=45) as f:raw=f.read()
  im=Image.open(BytesIO(raw))
