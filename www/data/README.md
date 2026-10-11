@@ -25,12 +25,8 @@ Há atualmente 13 celebrações sem imagem. A interface usa um marcador tipográ
 - Fernando Maria Baccilieri
 - Ubaldo de Sansepolcro
 - Frei Egídio Maria Moscini
-- André de Sansepolcro
-- Boaventura de Forlì
 - Dedicação da Basílica de Monte Senário
-- João Ângelo de Milão
 - Comemoração dos Defuntos da Ordem
-- Jerônimo de Sant'Angelo in Vado
 - Boaventura de Pistoia
 
 Quando uma imagem identificada e autorizada for adicionada ao `santoral.json`, ela substitui automaticamente o marcador.
