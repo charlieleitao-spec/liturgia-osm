@@ -318,7 +318,8 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": true
+    "grau_confirmado": true,
+    "image": "media/andre-sansepolcro.webp"
   },
   {
     "id": 20,
@@ -365,7 +366,8 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": true
+    "grau_confirmado": true,
+    "image": "media/boaventura-forli.webp"
   },
   {
     "id": 23,
@@ -445,7 +447,8 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": true
+    "grau_confirmado": true,
+    "image": "media/joao-angelo-porro.webp"
   },
   {
     "id": 28,
@@ -493,7 +496,8 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": true
+    "grau_confirmado": true,
+    "image": "media/jeronimo-sant-angelo-in-vado.webp"
   },
   {
     "id": 31,
