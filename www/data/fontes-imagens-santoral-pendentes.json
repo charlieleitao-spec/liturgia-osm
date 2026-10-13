@@ -53,7 +53,14 @@
     {
       "celebracao": "Ubaldo de Sansepolcro",
       "nome_italiano": "Ubaldo da Borgo Sansepolcro",
-      "status": "pendente_de_arquivo_e_licenca"
+      "status": "imagem_historica_localizada_licenca_cc_by_sa_4_confirmada_aguarda_integracao",
+      "fonte_imagem": "https://commons.wikimedia.org/wiki/File:Matteo_bonechi%2C_storie_dell%27ordine_servita%2C_1722%2C_beato_ubaldo_adimari_raccoglie_l%27acqua_col_suo_saio%2C_02.jpg",
+      "autor_fotografia": "Francesco Bini (Sailko)",
+      "autor_obra": "Matteo Bonechi",
+      "ano_obra": 1722,
+      "licenca": "CC BY-SA 4.0",
+      "fonte_confirmacao": "https://catalogo.beniculturali.it/detail/HistoricOrArtisticProperty/0900298845",
+      "observacao": "Afresco da Santissima Annunziata, Florença, representando Ubaldo Adimari recolhendo água no hábito; fonte e licença da fotografia conferidas. Converter em WebP, registrar atribuição e testar antes de integrar."
     },
     {
       "celebracao": "Frei Egídio Maria Moscini",
