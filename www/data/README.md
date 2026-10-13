@@ -13,14 +13,7 @@ O Hoje na Família Servita consome uma base derivada. Corrija primeiro os arquiv
 
 ## Celebrações sem imagem própria
 
-Há atualmente 3 celebrações sem imagem. A interface usa um marcador tipográfico com as iniciais do título, sem criar ou substituir imagens:
-
-- Frei Paulino M. Baldassarri
-- Fernando Maria Baccilieri
-- Frei Egídio Maria Moscini
-
-Quando uma imagem identificada e autorizada for adicionada ao `santoral.json`, ela substitui automaticamente o marcador.
-
+Todas as 32 celebrações possuem imagem cadastrada.
 ## Missas próprias
 
 `missas-osm.json` contém os formulários próprios transcritos dos PDFs oficiais do Missal OSM. Os formulários fixos são indexados por data `MM-DD`; as celebrações móveis e as Missas de Santa Maria no Sábado usam chaves próprias e são exibidas em grupos separados na seção **Liturgia > Missa**. Cada formulário preserva a ordem das seções, as alternativas de leituras e o link ao PDF de origem.

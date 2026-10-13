@@ -1,5 +1,5 @@
 {
-  "objetivo": "Localização e validação das 3 imagens ainda ausentes do Santoral OSM",
+  "objetivo": "Registro de imagens e direitos de uso do Santoral OSM",
   "fontes": [
     {
       "titulo": "Agiografia da Ordem dos Servos de Maria",
@@ -18,25 +18,7 @@
       "url": "https://servidimaria.net/sitoosm/it/storia/fons3/04.pdf"
     }
   ],
-  "pendentes": [
-    {
-      "celebracao": "Frei Paulino M. Baldassarri",
-      "nome_italiano": "Paolino Maria Baldassarri",
-      "status": "pendente_de_arquivo_e_licenca"
-    },
-    {
-      "celebracao": "Fernando Maria Baccilieri",
-      "nome_italiano": "Ferdinando Maria Baccilieri",
-      "status": "retrato_em_documento_oficial_licenca_de_reutilizacao_a_confirmar",
-      "fonte_imagem": "https://servidimaria.net/sitoosm/it/spiritualita/bea/baccillieri.pdf",
-      "observacao": "Documento hagiográfico oficial OSM inclui retrato do beato; identificar a origem da imagem e confirmar autorização antes de extrair ou publicar no aplicativo."
-    },
-    {
-      "celebracao": "Frei Egídio Maria Moscini",
-      "nome_italiano": "Egidio Maria Moscini",
-      "status": "pendente_de_arquivo_e_licenca"
-    }
-  ],
+  "pendentes": [],
   "criterios": [
     "Conferir correspondência visual com a celebração, não apenas com o nome da página",
     "Registrar URL da imagem original, autoria e licença ou autorização expressa",
