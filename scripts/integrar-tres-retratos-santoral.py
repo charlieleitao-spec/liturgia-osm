@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Integra tres retratos fornecidos pelo usuario no Santoral OSM.
+"""Integra três retratos fornecidos pelo usuário no Santoral OSM.
 
 Uso: python scripts/integrar-tres-retratos-santoral.py /caminho/para/pasta-com-webp
 """
@@ -21,7 +21,7 @@ entries = json.loads(santoral_path.read_text(encoding="utf-8"))
 pending = json.loads(pendentes_path.read_text(encoding="utf-8"))
 by_id = {entry["id"]: entry for entry in entries}
 
-# Validate all inputs before writing anything.
+# Validar todos os arquivos e correspondências antes de alterar o repositório.
 for ident, (name, filename) in IMAGES.items():
     if ident not in by_id or by_id[ident]["name"] != name:
         raise SystemExit(f"Celebracao incorreta: {ident} {name}")
@@ -38,21 +38,31 @@ for ident, (name, filename) in IMAGES.items():
     target.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(SOURCE / filename, target)
 
-names = {name.lower() for name, _ in IMAGES.values()}
-pending["pendentes"] = [p for p in pending["pendentes"] if p["celebracao"].lower() not in names and not (
-    "paulino" in p["celebracao"].lower() or "baccilieri" in p["celebracao"].lower() or "egídio" in p["celebracao"].lower()
-)]
-pending["objetivo"] = "Registro de imagens do Santoral OSM"
+labels = {
+    "paulino": ("FREI PAULINO M. BALDASSARRI", "frei-paulino-baldassarri.webp"),
+    "baccilieri": ("FERNANDO MARIA BACCILIERI", "fernando-maria-baccilieri.webp"),
+    "egídio": ("FREI EGÍDIO MARIA MOSCINI", "frei-egidio-moscini.webp"),
+}
+for item in pending.get("pendentes", []):
+    lower = item.get("celebracao", "").lower()
+    match = next((value for key, value in labels.items() if key in lower), None)
+    if match:
+        name, filename = match
+        item["status"] = "imagem integrada; autoria e licença original não informadas; pendente de verificação"
+        item["arquivo"] = "media/" + filename
+        item["origem"] = "imagem fornecida pelo usuário"
+
+pending["objetivo"] = "Rastrear autoria e licença das imagens integradas ao Santoral OSM"
 sources = [{
     "celebracao": name,
     "arquivo": "media/" + filename,
-    "fonte": "Imagem enviada pelo usuario",
-    "autorizacao": "Publicacao no Liturgia OSM e Somos Servos autorizada em 13/10/2026",
-    "autor_original": "Nao informado; autorizacao do usuario nao comprova titularidade de direitos de terceiros",
+    "fonte": "Imagem fornecida pelo usuário",
+    "autorizacao": "Publicação no Liturgia OSM e Somos Servos autorizada em 13/10/2026",
+    "autor_original": "Não informado; autoria e licença original pendentes de verificação"
 } for name, filename in IMAGES.values()]
 santoral_path.write_text(json.dumps(entries, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 pendentes_path.write_text(json.dumps(pending, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 (ROOT / "www/data/fontes-imagens-santoral-lote12.json").write_text(
     json.dumps(sources, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
 )
-print("Tres imagens integradas. Execute npm test e o build do APK.")
+print("Tres imagens integradas; autoria e licença original permanecem pendentes de verificação.")
