@@ -58,10 +58,24 @@
     {
       "celebracao": "Comemoração dos Defuntos da Ordem",
       "nome_italiano": "Commemorazione defunti OSM",
-      "status": "referencia_servita_identificada_fotografia_e_licenca_pendentes",
-      "fonte_documental": "https://www.montesenario.it/evento/solennita-dei-sette-santi-fondatori/",
+      "status": "fotografias_cemiterio_localizadas_licenca_pendente",
+      "fonte_documental": "https://prg.servidimaria.net/notizie/archivio/dol_marzo_2014.pdf",
       "referencia_iconografica": "Sepulcro comum dos Sete Santos Fundadores em Monte Senário, sinal concreto da memória dos irmãos falecidos da Ordem",
-      "observacao": "O site oficial de Monte Senário confirma o sepulcro comum dos Sete Fundadores. Procurar fotografia própria desse lugar com licença/autorização; não utilizar imagens genéricas nem confundir a memória dos Fundadores com a comemoração de todos os defuntos OSM."
+      "observacao": "Fontes identificam o Cemitério dos Frades (San Martino) de Monte Senario e apresentam fotografias. Direitos de reprodução das fotos ainda não confirmados. Solicitar autorização expressa ao fotógrafo ou buscar licença aberta antes da incorporação.",
+      "fontes_fotograficas": [
+        {
+          "titulo": "Cemitério dos Frades — Wikiloc",
+          "url": "https://it.wikiloc.com/percorsi-escursionismo/bivigliano-montesenario-sentiero-delle-burraie-e-sentiero-di-andrea-131244780"
+        },
+        {
+          "titulo": "Monte Senario Sacro Eremo — Flickr",
+          "url": "https://www.flickr.com/photos/132956738@N06/albums/72157696323255835"
+        },
+        {
+          "titulo": "Monte Senario — Grazie a te",
+          "url": "https://grazieate.com.br/tag/onde-surgiu-a-ordem-dos-servos-de-maria/"
+        }
+      ]
     }
   ],
   "criterios": [
