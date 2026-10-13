@@ -146,7 +146,8 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": true
+    "grau_confirmado": true,
+    "image": "media/benincasa-montepulciano.webp"
   },
   {
     "id": 9,
