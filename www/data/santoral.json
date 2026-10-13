@@ -159,7 +159,8 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": true
+    "grau_confirmado": true,
+    "image": "media/francisco-de-sena.webp"
   },
   {
     "id": 10,
@@ -514,6 +515,7 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": true
+    "grau_confirmado": true,
+    "image": "media/boaventura-de-pistoia.webp"
   }
 ]

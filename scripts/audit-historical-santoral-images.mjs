@@ -23,3 +23,24 @@ for (const [title, filename] of [
   assert.ok(credits[0].licenca?.startsWith('CC BY'));
   console.log('Imagem, referência e créditos válidos:', title);
 }
+
+const fontesLavello = JSON.parse(fs.readFileSync('www/data/fontes-imagens-santoral-lote5.json', 'utf8'));
+for (const [title, filename] of [
+  ['Francisco de Sena', 'francisco-de-sena.webp'],
+  ['Boaventura de Pistoia', 'boaventura-de-pistoia.webp'],
+]) {
+  const matches = santoral.filter(item => item.title === title);
+  assert.equal(matches.length, 1, 'Celebração única: ' + title);
+  assert.equal(matches[0].image, 'media/' + filename);
+  const file = path.join('www', matches[0].image);
+  const buffer = fs.readFileSync(file);
+  assert.ok(buffer.length > 1000, 'Imagem não vazia: ' + file);
+  assert.equal(buffer.toString('ascii', 0, 4), 'RIFF', 'Cabeçalho RIFF: ' + file);
+  assert.equal(buffer.toString('ascii', 8, 12), 'WEBP', 'Formato WebP: ' + file);
+  const credits = fontesLavello.filter(item => item.celebracao === title);
+  assert.equal(credits.length, 1, 'Crédito único: ' + title);
+  assert.equal(credits[0].arquivo, matches[0].image);
+  assert.equal(credits[0].licenca, 'CC0 1.0');
+  assert.ok(credits[0].fonte?.startsWith('https://commons.wikimedia.org/wiki/File:'));
+  console.log('Afresco WebP e créditos válidos:', title);
+}

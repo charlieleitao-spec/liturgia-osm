@@ -1,5 +1,5 @@
 {
-  "objetivo": "Localização e validação das 11 imagens ainda ausentes do Santoral OSM",
+  "objetivo": "Localização e validação das 9 imagens ainda ausentes do Santoral OSM",
   "fontes": [
     {
       "titulo": "Agiografia da Ordem dos Servos de Maria",
@@ -42,15 +42,6 @@
       "observacao": "Wikimedia Commons sinaliza copyright disputado e autoria desconhecida; não incorporar."
     },
     {
-      "celebracao": "Francisco de Sena",
-      "nome_italiano": "Francesco da Siena",
-      "status": "fonte_cc0_identificada_recorte_pendente",
-      "fonte_imagem": "https://commons.wikimedia.org/wiki/File:Santa_Maria_del_Lavello_-_high_altar.jpg",
-      "fotografia": "Kaitu",
-      "licenca": "CC0 1.0",
-      "observacao": "Afresco à direita do altar, atribuído a Antonio Maria Caneva; recorte e inspeção visual pendentes."
-    },
-    {
       "celebracao": "Fernando Maria Baccilieri",
       "nome_italiano": "Ferdinando Maria Baccilieri",
       "status": "pendente_de_arquivo_e_licenca"
@@ -74,15 +65,6 @@
       "celebracao": "Comemoração dos Defuntos da Ordem",
       "nome_italiano": "Commemorazione defunti OSM",
       "status": "pendente_de_arquivo_e_licenca"
-    },
-    {
-      "celebracao": "Boaventura de Pistoia",
-      "nome_italiano": "Bonaventura da Pistoia",
-      "status": "fonte_cc0_identificada_recorte_pendente",
-      "fonte_imagem": "https://commons.wikimedia.org/wiki/File:Santa_Maria_del_Lavello_-_high_altar.jpg",
-      "fotografia": "Kaitu",
-      "licenca": "CC0 1.0",
-      "observacao": "Afresco à esquerda do altar, atribuído a Antonio Maria Caneva; recorte e inspeção visual pendentes."
     }
   ],
   "criterios": [
