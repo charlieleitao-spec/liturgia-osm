@@ -44,7 +44,9 @@
     {
       "celebracao": "Fernando Maria Baccilieri",
       "nome_italiano": "Ferdinando Maria Baccilieri",
-      "status": "pendente_de_arquivo_e_licenca"
+      "status": "retrato_em_documento_oficial_licenca_de_reutilizacao_a_confirmar",
+      "fonte_imagem": "https://servidimaria.net/sitoosm/it/spiritualita/bea/baccillieri.pdf",
+      "observacao": "Documento hagiográfico oficial OSM inclui retrato do beato; identificar a origem da imagem e confirmar autorização antes de extrair ou publicar no aplicativo."
     },
     {
       "celebracao": "Ubaldo de Sansepolcro",
