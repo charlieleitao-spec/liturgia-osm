@@ -59,7 +59,11 @@
     {
       "celebracao": "Dedicação da Basílica de Monte Senário",
       "nome_italiano": "Basilica di Monte Senario",
-      "status": "pendente_de_arquivo_e_licenca"
+      "status": "fonte_identificada_licenca_verificada_aguarda_integracao",
+      "fonte_imagem": "https://commons.wikimedia.org/wiki/File:Montesenario_interno.jpg",
+      "autor": "Vignaccia76",
+      "licenca": "CC BY-SA 3.0",
+      "observacao": "Fotografia do interior da igreja de Monte Senario (2008); conferir enquadramento e atribuição antes de converter para WebP e integrar."
     },
     {
       "celebracao": "Comemoração dos Defuntos da Ordem",
