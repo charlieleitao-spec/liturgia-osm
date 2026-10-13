@@ -1,6 +1,10 @@
 name: Preparar imagens do Santoral OSM
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/preparar-imagens-santoral.yml'
 
 permissions:
   contents: read
