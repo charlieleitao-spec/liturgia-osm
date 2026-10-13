@@ -37,12 +37,18 @@
     {
       "celebracao": "Benincasa de Montepulciano",
       "nome_italiano": "Benincasa da Montepulciano",
-      "status": "pendente_de_arquivo_e_licenca"
+      "status": "imagem_encontrada_licenca_contestada_nao_utilizar",
+      "fonte_imagem": "https://commons.wikimedia.org/wiki/File:Blessed_benincasa_of_montepulciano.png",
+      "observacao": "Wikimedia Commons sinaliza copyright disputado e autoria desconhecida; não incorporar."
     },
     {
       "celebracao": "Francisco de Sena",
       "nome_italiano": "Francesco da Siena",
-      "status": "pendente_de_arquivo_e_licenca"
+      "status": "fonte_cc0_identificada_recorte_pendente",
+      "fonte_imagem": "https://commons.wikimedia.org/wiki/File:Santa_Maria_del_Lavello_-_high_altar.jpg",
+      "fotografia": "Kaitu",
+      "licenca": "CC0 1.0",
+      "observacao": "Afresco à direita do altar, atribuído a Antonio Maria Caneva; recorte e inspeção visual pendentes."
     },
     {
       "celebracao": "Fernando Maria Baccilieri",
@@ -72,7 +78,11 @@
     {
       "celebracao": "Boaventura de Pistoia",
       "nome_italiano": "Bonaventura da Pistoia",
-      "status": "pendente_de_arquivo_e_licenca"
+      "status": "fonte_cc0_identificada_recorte_pendente",
+      "fonte_imagem": "https://commons.wikimedia.org/wiki/File:Santa_Maria_del_Lavello_-_high_altar.jpg",
+      "fotografia": "Kaitu",
+      "licenca": "CC0 1.0",
+      "observacao": "Afresco à esquerda do altar, atribuído a Antonio Maria Caneva; recorte e inspeção visual pendentes."
     }
   ],
   "criterios": [
