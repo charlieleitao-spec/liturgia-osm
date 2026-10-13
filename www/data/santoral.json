@@ -238,7 +238,8 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": true
+    "grau_confirmado": true,
+    "image": "media/ubaldo-de-sansepolcro.webp"
   },
   {
     "id": 15,

@@ -1,5 +1,5 @@
 {
-  "objetivo": "Localização e validação das 8 imagens ainda ausentes do Santoral OSM",
+  "objetivo": "Localização e validação das 7 imagens ainda ausentes do Santoral OSM",
   "fontes": [
     {
       "titulo": "Agiografia da Ordem dos Servos de Maria",
@@ -49,18 +49,6 @@
       "status": "retrato_em_documento_oficial_licenca_de_reutilizacao_a_confirmar",
       "fonte_imagem": "https://servidimaria.net/sitoosm/it/spiritualita/bea/baccillieri.pdf",
       "observacao": "Documento hagiográfico oficial OSM inclui retrato do beato; identificar a origem da imagem e confirmar autorização antes de extrair ou publicar no aplicativo."
-    },
-    {
-      "celebracao": "Ubaldo de Sansepolcro",
-      "nome_italiano": "Ubaldo da Borgo Sansepolcro",
-      "status": "imagem_historica_localizada_licenca_cc_by_sa_4_confirmada_aguarda_integracao",
-      "fonte_imagem": "https://commons.wikimedia.org/wiki/File:Matteo_bonechi%2C_storie_dell%27ordine_servita%2C_1722%2C_beato_ubaldo_adimari_raccoglie_l%27acqua_col_suo_saio%2C_02.jpg",
-      "autor_fotografia": "Francesco Bini (Sailko)",
-      "autor_obra": "Matteo Bonechi",
-      "ano_obra": 1722,
-      "licenca": "CC BY-SA 4.0",
-      "fonte_confirmacao": "https://catalogo.beniculturali.it/detail/HistoricOrArtisticProperty/0900298845",
-      "observacao": "Afresco da Santissima Annunziata, Florença, representando Ubaldo Adimari recolhendo água no hábito; fonte e licença da fotografia conferidas. Converter em WebP, registrar atribuição e testar antes de integrar."
     },
     {
       "celebracao": "Frei Egídio Maria Moscini",
