@@ -98,7 +98,8 @@
     "genero": "m",
     "grau": "comemoracao",
     "grau_confirmado": true,
-    "nota_data": "dies natalis"
+    "nota_data": "dies natalis",
+    "image": "media/frei-paulino-baldassarri.webp"
   },
   {
     "id": 6,
@@ -226,7 +227,8 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": true
+    "grau_confirmado": true,
+    "image": "media/fernando-maria-baccilieri.webp"
   },
   {
     "id": 14,
@@ -294,7 +296,8 @@
     "genero": "m",
     "grau": "comemoracao",
     "grau_confirmado": true,
-    "nota_data": "dies natalis"
+    "nota_data": "dies natalis",
+    "image": "media/frei-egidio-moscini.webp"
   },
   {
     "id": 18,
