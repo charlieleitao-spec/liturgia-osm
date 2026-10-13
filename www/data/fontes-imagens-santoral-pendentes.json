@@ -1,5 +1,5 @@
 {
-  "objetivo": "Localização e validação das 6 imagens ainda ausentes do Santoral OSM",
+  "objetivo": "Localização e validação das 5 imagens ainda ausentes do Santoral OSM",
   "fontes": [
     {
       "titulo": "Agiografia da Ordem dos Servos de Maria",
@@ -29,11 +29,6 @@
     {
       "celebracao": "Frei Paulino M. Baldassarri",
       "nome_italiano": "Paolino Maria Baldassarri",
-      "status": "pendente_de_arquivo_e_licenca"
-    },
-    {
-      "celebracao": "Virgem Maria, Mãe e Medianeira",
-      "nome_italiano": "Maria Mediatrice",
       "status": "pendente_de_arquivo_e_licenca"
     },
     {

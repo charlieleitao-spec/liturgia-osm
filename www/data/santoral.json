@@ -129,7 +129,8 @@
     "genero": "f",
     "grau": "memoria_facultativa",
     "grau_confirmado": true,
-    "exibir_selo": false
+    "exibir_selo": false,
+    "image": "media/maria-mae-medianeira.webp"
   },
   {
     "id": 8,
