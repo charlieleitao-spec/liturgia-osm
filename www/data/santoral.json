@@ -28,7 +28,8 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": true
+    "grau_confirmado": true,
+    "image": "media/tiago-citta-della-pieve.webp"
   },
   {
     "id": 2,
