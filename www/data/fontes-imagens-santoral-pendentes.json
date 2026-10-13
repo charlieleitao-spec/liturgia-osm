@@ -1,5 +1,5 @@
 {
-  "objetivo": "Localização e validação das 7 imagens ainda ausentes do Santoral OSM",
+  "objetivo": "Localização e validação das 6 imagens ainda ausentes do Santoral OSM",
   "fontes": [
     {
       "titulo": "Agiografia da Ordem dos Servos de Maria",
@@ -54,33 +54,6 @@
       "celebracao": "Frei Egídio Maria Moscini",
       "nome_italiano": "Egidio Maria Moscini",
       "status": "pendente_de_arquivo_e_licenca"
-    },
-    {
-      "celebracao": "Comemoração dos Defuntos da Ordem",
-      "nome_italiano": "Commemorazione defunti OSM",
-      "status": "gravura_servita_identificada_cc0_validada_aguarda_integracao",
-      "fonte_documental": "https://prg.servidimaria.net/notizie/archivio/dol_marzo_2014.pdf",
-      "referencia_iconografica": "Sepulcro comum dos Sete Santos Fundadores em Monte Senário, sinal concreto da memória dos irmãos falecidos da Ordem",
-      "observacao": "Gravura da vida de São Filipe Benício: o santo reza a Maria pelas almas de dois irmãos falecidos, levadas por anjos. Rijksmuseum RP-P-OB-37.539, arquivo Wikimedia Commons CC0 1.0. Adequada à comemoração servita dos defuntos; converter para WebP, documentar e testar.",
-      "fontes_fotograficas": [
-        {
-          "titulo": "Cemitério dos Frades — Wikiloc",
-          "url": "https://it.wikiloc.com/percorsi-escursionismo/bivigliano-montesenario-sentiero-delle-burraie-e-sentiero-di-andrea-131244780"
-        },
-        {
-          "titulo": "Monte Senario Sacro Eremo — Flickr",
-          "url": "https://www.flickr.com/photos/132956738@N06/albums/72157696323255835"
-        },
-        {
-          "titulo": "Monte Senario — Grazie a te",
-          "url": "https://grazieate.com.br/tag/onde-surgiu-a-ordem-dos-servos-de-maria/"
-        }
-      ],
-      "fonte_imagem": "https://commons.wikimedia.org/wiki/File:De_heilige_Philippus_bidt_voor_de_zielen_van_twee_broeders_Het_Leven_van_Philippus_Benitius_(serietitel)_Vita_B._Philippi_Benicii_Florent._ord._servor_B._Mariae_virginis_(serietitel),_RP-P-OB-37.539.jpg",
-      "fonte_museu": "https://id.rijksmuseum.nl/200262492",
-      "autor_obra": "Antonio Tempesta",
-      "ano_obra": 1591,
-      "licenca": "CC0 1.0"
     }
   ],
   "criterios": [

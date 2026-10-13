@@ -486,7 +486,8 @@
     "genero": null,
     "grau": "comemoracao",
     "grau_confirmado": true,
-    "exibir_selo": false
+    "exibir_selo": false,
+    "image": "media/defuntos-da-ordem.webp"
   },
   {
     "id": 30,
