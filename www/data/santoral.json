@@ -43,7 +43,8 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": true
+    "grau_confirmado": true,
+    "image": "media/joaquim-de-sena.webp"
   },
   {
     "id": 3,
@@ -173,7 +174,8 @@
     "categoria": "beato",
     "genero": "m",
     "grau": "memoria",
-    "grau_confirmado": true
+    "grau_confirmado": true,
+    "image": "media/tiago-filipe-de-faenza.webp"
   },
   {
     "id": 11,
