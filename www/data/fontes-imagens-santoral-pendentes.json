@@ -1,5 +1,5 @@
 {
-  "objetivo": "Rastrear autoria e licença das imagens integradas ao Santoral OSM",
+  "objetivo": "Registro de imagens e direitos de uso do Santoral OSM",
   "fontes": [
     {
       "titulo": "Agiografia da Ordem dos Servos de Maria",
@@ -18,26 +18,7 @@
       "url": "https://servidimaria.net/sitoosm/it/storia/fons3/04.pdf"
     }
   ],
-  "pendentes": [
-    {
-      "celebracao": "FREI PAULINO M. BALDASSARRI",
-      "arquivo": "media/frei-paulino-baldassarri.webp",
-      "origem": "imagem fornecida pelo usuário",
-      "status": "imagem integrada; autoria e licença original não informadas; pendente de verificação"
-    },
-    {
-      "celebracao": "FERNANDO MARIA BACCILIERI",
-      "arquivo": "media/fernando-maria-baccilieri.webp",
-      "origem": "imagem fornecida pelo usuário",
-      "status": "imagem integrada; autoria e licença original não informadas; pendente de verificação"
-    },
-    {
-      "celebracao": "FREI EGÍDIO MARIA MOSCINI",
-      "arquivo": "media/frei-egidio-moscini.webp",
-      "origem": "imagem fornecida pelo usuário",
-      "status": "imagem integrada; autoria e licença original não informadas; pendente de verificação"
-    }
-  ],
+  "pendentes": [],
   "criterios": [
     "Conferir correspondência visual com a celebração, não apenas com o nome da página",
     "Registrar URL da imagem original, autoria e licença ou autorização expressa",
