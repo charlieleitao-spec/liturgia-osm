@@ -58,7 +58,10 @@
     {
       "celebracao": "Comemoração dos Defuntos da Ordem",
       "nome_italiano": "Commemorazione defunti OSM",
-      "status": "pendente_de_arquivo_e_licenca"
+      "status": "referencia_servita_identificada_fotografia_e_licenca_pendentes",
+      "fonte_documental": "https://www.montesenario.it/evento/solennita-dei-sette-santi-fondatori/",
+      "referencia_iconografica": "Sepulcro comum dos Sete Santos Fundadores em Monte Senário, sinal concreto da memória dos irmãos falecidos da Ordem",
+      "observacao": "O site oficial de Monte Senário confirma o sepulcro comum dos Sete Fundadores. Procurar fotografia própria desse lugar com licença/autorização; não utilizar imagens genéricas nem confundir a memória dos Fundadores com a comemoração de todos os defuntos OSM."
     }
   ],
   "criterios": [
