@@ -1,5 +1,5 @@
 {
-  "objetivo": "Localização e validação das 17 imagens ainda ausentes do Santoral OSM",
+  "objetivo": "Localização e validação das 11 imagens ainda ausentes do Santoral OSM",
   "fontes": [
     {
       "titulo": "Agiografia da Ordem dos Servos de Maria",
@@ -25,16 +25,6 @@
       "status": "pendente_de_arquivo_e_licenca"
     },
     {
-      "celebracao": "Joaquim de Sena",
-      "nome_italiano": "Gioacchino da Siena",
-      "status": "fonte_e_licenca_verificadas_arquivo_pendente",
-      "fonte_imagem": "https://commons.wikimedia.org/wiki/File:Gano_di_fazio,_episodi_della_vita_del_beato_gioacchino_piccolomini,_1302-1317_ca,_da_s.m._dei_servi.JPG",
-      "fotografia": "Combusken",
-      "licenca": "CC BY-SA 3.0",
-      "obra": "Relevos de Gano di Fazio, Pinacoteca Nazionale di Siena",
-      "observacao": "Conversão WebP, atribuição e integração ao app ainda pendentes."
-    },
-    {
       "celebracao": "Frei Paulino M. Baldassarri",
       "nome_italiano": "Paolino Maria Baldassarri",
       "status": "pendente_de_arquivo_e_licenca"
@@ -55,16 +45,6 @@
       "status": "pendente_de_arquivo_e_licenca"
     },
     {
-      "celebracao": "Tiago Filipe de Faenza",
-      "nome_italiano": "Giacomo Filippo Bertoni",
-      "status": "fonte_e_licenca_verificadas_arquivo_pendente",
-      "fonte_imagem": "https://commons.wikimedia.org/wiki/File:Bartolomeo_della_gatta,_beato_giacomo_filippo_bertoni_da_faenza,_1485-86_ca.,_da_s._pier_piccolo_ad_arezzo_01.jpg",
-      "fotografia": "Sailko",
-      "licenca": "CC BY 3.0",
-      "obra": "Pintura de Bartolomeo della Gatta, Museo Diocesano di Arezzo",
-      "observacao": "Conversão WebP, atribuição e integração ao app ainda pendentes."
-    },
-    {
       "celebracao": "Fernando Maria Baccilieri",
       "nome_italiano": "Ferdinando Maria Baccilieri",
       "status": "pendente_de_arquivo_e_licenca"
@@ -80,33 +60,13 @@
       "status": "pendente_de_arquivo_e_licenca"
     },
     {
-      "celebracao": "André de Sansepolcro",
-      "nome_italiano": "Andrea da Borgo Sansepolcro",
-      "status": "pendente_de_arquivo_e_licenca"
-    },
-    {
-      "celebracao": "Boaventura de Forlì",
-      "nome_italiano": "Bonaventura da Forlì",
-      "status": "pendente_de_arquivo_e_licenca"
-    },
-    {
       "celebracao": "Dedicação da Basílica de Monte Senário",
       "nome_italiano": "Basilica di Monte Senario",
       "status": "pendente_de_arquivo_e_licenca"
     },
     {
-      "celebracao": "João Ângelo de Milão",
-      "nome_italiano": "Giovannangelo Porro",
-      "status": "pendente_de_arquivo_e_licenca"
-    },
-    {
       "celebracao": "Comemoração dos Defuntos da Ordem",
       "nome_italiano": "Commemorazione defunti OSM",
-      "status": "pendente_de_arquivo_e_licenca"
-    },
-    {
-      "celebracao": "Jerônimo de Sant'Angelo in Vado",
-      "nome_italiano": "Girolamo da Sant'Angelo in Vado",
       "status": "pendente_de_arquivo_e_licenca"
     },
     {
