@@ -1,0 +1,29 @@
+name: Integrar fotografia de Monte Senario ao Santoral
+on:
+  push:
+    branches: [feat/monte-senario-imagem-santoral]
+    paths:
+      - 'scripts/integrar-monte-senario.py'
+      - '.github/workflows/integrar-monte-senario.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  integrar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/monte-senario-imagem-santoral
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install Pillow
+      - name: Gerar imagem e atualizar referências
+        run: python scripts/integrar-monte-senario.py
+      - name: Registrar imagem e créditos
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add www/media/monte-senario-basilica.webp www/data/santoral.json www/data/README.md www/data/fontes-imagens-santoral-pendentes.json www/data/fontes-imagens-santoral-lote6.json
+          git diff --cached --quiet || (git commit -m "Integrar fotografia licenciada de Monte Senario em WebP" && git push)

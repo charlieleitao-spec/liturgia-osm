@@ -419,7 +419,8 @@
     "genero": null,
     "grau": "memoria_facultativa",
     "grau_confirmado": true,
-    "exibir_selo": false
+    "exibir_selo": false,
+    "image": "media/monte-senario-basilica.webp"
   },
   {
     "id": 26,

@@ -13,7 +13,7 @@ O Hoje na Família Servita consome uma base derivada. Corrija primeiro os arquiv
 
 ## Celebrações sem imagem própria
 
-Há atualmente 9 celebrações sem imagem. A interface usa um marcador tipográfico com as iniciais do título, sem criar ou substituir imagens:
+Há atualmente 8 celebrações sem imagem. A interface usa um marcador tipográfico com as iniciais do título, sem criar ou substituir imagens:
 
 - Tiago de "Città della Pieve"
 - Frei Paulino M. Baldassarri
@@ -22,7 +22,6 @@ Há atualmente 9 celebrações sem imagem. A interface usa um marcador tipográf
 - Fernando Maria Baccilieri
 - Ubaldo de Sansepolcro
 - Frei Egídio Maria Moscini
-- Dedicação da Basílica de Monte Senário
 - Comemoração dos Defuntos da Ordem
 
 Quando uma imagem identificada e autorizada for adicionada ao `santoral.json`, ela substitui automaticamente o marcador.
