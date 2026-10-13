@@ -13,10 +13,9 @@ O Hoje na Família Servita consome uma base derivada. Corrija primeiro os arquiv
 
 ## Celebrações sem imagem própria
 
-Há atualmente 4 celebrações sem imagem. A interface usa um marcador tipográfico com as iniciais do título, sem criar ou substituir imagens:
+Há atualmente 3 celebrações sem imagem. A interface usa um marcador tipográfico com as iniciais do título, sem criar ou substituir imagens:
 
 - Frei Paulino M. Baldassarri
-- Benincasa de Montepulciano
 - Fernando Maria Baccilieri
 - Frei Egídio Maria Moscini
 

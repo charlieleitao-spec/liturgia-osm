@@ -1,5 +1,5 @@
 {
-  "objetivo": "Localização e validação das 4 imagens ainda ausentes do Santoral OSM",
+  "objetivo": "Localização e validação das 3 imagens ainda ausentes do Santoral OSM",
   "fontes": [
     {
       "titulo": "Agiografia da Ordem dos Servos de Maria",
@@ -23,13 +23,6 @@
       "celebracao": "Frei Paulino M. Baldassarri",
       "nome_italiano": "Paolino Maria Baldassarri",
       "status": "pendente_de_arquivo_e_licenca"
-    },
-    {
-      "celebracao": "Benincasa de Montepulciano",
-      "nome_italiano": "Benincasa da Montepulciano",
-      "status": "imagem_encontrada_licenca_contestada_nao_utilizar",
-      "fonte_imagem": "https://commons.wikimedia.org/wiki/File:Blessed_benincasa_of_montepulciano.png",
-      "observacao": "Wikimedia Commons sinaliza copyright disputado e autoria desconhecida; não incorporar."
     },
     {
       "celebracao": "Fernando Maria Baccilieri",
