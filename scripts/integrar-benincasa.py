@@ -6,7 +6,7 @@ import urllib.request
 from pathlib import Path
 from io import BytesIO
 from PIL import Image
-TITLE='Tiago de "Città della Pieve"'
+TITLE="Benincasa de Montepulciano"
 FILE="Luigi ademollo, scene bibliche, 1828, 03 beato benincasa da montepulciano.jpg"
 PAGE="https://commons.wikimedia.org/wiki/File:"+FILE.replace(" ","_")
 URL="https://commons.wikimedia.org/wiki/Special:Redirect/file/"+urllib.parse.quote(FILE)
@@ -41,7 +41,7 @@ pending["objetivo"]="Localização e validação das 3 imagens ainda ausentes do
 p.write_text(json.dumps(pending,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 p=Path("www/data/README.md")
 readme=p.read_text(encoding="utf-8")
-if "Há atualmente 5 celebrações sem imagem" not in readme: raise ValueError("README inesperado")
-readme=readme.replace("Há atualmente 5 celebrações sem imagem","Há atualmente 3 celebrações sem imagem")
+if "Há atualmente 4 celebrações sem imagem" not in readme: raise ValueError("README inesperado")
+readme=readme.replace("Há atualmente 4 celebrações sem imagem","Há atualmente 3 celebrações sem imagem")
 readme=readme.replace("- "+TITLE+"\n","")
 p.write_text(readme,encoding="utf-8")
