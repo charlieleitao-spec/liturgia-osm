@@ -22,7 +22,9 @@
     {
       "celebracao": "Tiago de \"Città della Pieve\"",
       "nome_italiano": "Giacomo da Città della Pieve",
-      "status": "pendente_de_arquivo_e_licenca"
+      "status": "documentacao_historica_localizada_imagem_e_licenca_pendentes",
+      "fonte_documental": "https://servidimaria.net/sitoosm/it/spiritualita/bea/giacomopieve.pdf",
+      "observacao": "Biografia oficial da Cúria Generalícia OSM refere imagens antigas do beato Giacomo, mas não identifica arquivo reutilizável nem concede licença; pesquisar acervo e autorização antes da integração."
     },
     {
       "celebracao": "Frei Paulino M. Baldassarri",
