@@ -13,15 +13,13 @@ O Hoje na Família Servita consome uma base derivada. Corrija primeiro os arquiv
 
 ## Celebrações sem imagem própria
 
-Há atualmente 13 celebrações sem imagem. A interface usa um marcador tipográfico com as iniciais do título, sem criar ou substituir imagens:
+Há atualmente 11 celebrações sem imagem. A interface usa um marcador tipográfico com as iniciais do título, sem criar ou substituir imagens:
 
 - Tiago de "Città della Pieve"
-- Joaquim de Sena
 - Frei Paulino M. Baldassarri
 - Virgem Maria, Mãe e Medianeira
 - Benincasa de Montepulciano
 - Francisco de Sena
-- Tiago Filipe de Faenza
 - Fernando Maria Baccilieri
 - Ubaldo de Sansepolcro
 - Frei Egídio Maria Moscini
