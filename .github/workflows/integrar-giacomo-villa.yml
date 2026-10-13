@@ -1,0 +1,28 @@
+name: Integrar imagem de Giacomo Villa
+on:
+  push:
+    branches: [feat/giacomo-villa-commons]
+    paths:
+      - 'scripts/integrar-giacomo-villa.py'
+      - '.github/workflows/integrar-giacomo-villa.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  integrar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/giacomo-villa-commons
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install Pillow
+      - run: python scripts/integrar-giacomo-villa.py
+      - name: Registrar imagem e créditos
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add www/media/tiago-citta-della-pieve.webp www/data/santoral.json www/data/README.md www/data/fontes-imagens-santoral-pendentes.json www/data/fontes-imagens-santoral-lote10.json
+          git diff --cached --quiet || (git commit -m "Integrar imagem histórica de Giacomo Villa" && git push)
