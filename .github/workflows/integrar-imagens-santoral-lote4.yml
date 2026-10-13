@@ -1,0 +1,31 @@
+name: Integrar imagens históricas Santoral lote 4
+on:
+  push:
+    branches: [feat/integrar-webp-joaquim-tiago]
+    paths:
+      - '.github/workflows/integrar-imagens-santoral-lote4.yml'
+      - 'scripts/integrar-imagens-santoral-lote4.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  integrar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install Pillow==11.3.0
+      - name: Integrar imagens com fontes e licenças
+        run: python scripts/integrar-imagens-santoral-lote4.py
+      - name: Validar e registrar arquivos
+        run: |
+          python -m json.tool www/data/santoral.json >/dev/null
+          python -m json.tool www/data/fontes-imagens-santoral-lote4.json >/dev/null
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add www/data/santoral.json www/data/fontes-imagens-santoral-lote4.json www/media/joaquim-de-sena.webp www/media/tiago-filipe-de-faenza.webp
+          git diff --cached --quiet || (git commit -m "Integrar duas imagens históricas ao Santoral" && git push)
