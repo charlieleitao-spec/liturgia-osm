@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.66-ui35-modo-celebracao-unico';
+const CACHE = 'liturgia-osm-v4.9.67-ui36-idioma-compacto';
 const CORE = [
   "./",
   "./index.html",

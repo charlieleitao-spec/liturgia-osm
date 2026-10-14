@@ -49,16 +49,18 @@
 </div>
 
 <div id="languageOverlay" class="language-overlay" aria-hidden="true" onclick="if(event.target===this)closeLanguagePanel()">
-  <div class="language-sheet">
-    <h3 id="languageTitle">Idioma</h3>
-    <p id="languageNote">Escolha o idioma da interface. Os textos litúrgicos permanecem na língua em que estão disponíveis.</p>
+  <div class="language-sheet" role="dialog" aria-modal="true" aria-labelledby="languageTitle">
+    <div class="language-sheet-head">
+      <h3 id="languageTitle">Idioma</h3>
+      <button class="language-close" onclick="closeLanguagePanel()">Fechar</button>
+    </div>
+    <p id="languageNote">Altera os rótulos da interface; os textos litúrgicos mantêm o idioma original.</p>
     <div class="language-options">
       <button class="language-option" data-main-lang="pt" onclick="setMainLanguage('pt')">Português</button>
       <button class="language-option" data-main-lang="la" onclick="setMainLanguage('la')">Latina</button>
       <button class="language-option" data-main-lang="it" onclick="setMainLanguage('it')">Italiano</button>
       <button class="language-option" data-main-lang="en" onclick="setMainLanguage('en')">English</button>
     </div>
-    <button class="language-close" onclick="closeLanguagePanel()">Fechar</button>
   </div>
 </div>
 

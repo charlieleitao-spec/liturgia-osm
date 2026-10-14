@@ -300,13 +300,14 @@ body.servite-open .celebration-toggle,body.servite-open .floating-back,body.serv
 .servite-overlay .mini-tools button{border:1px solid var(--line);background:transparent;color:var(--text);border-radius:10px;height:36px;min-width:36px}
 .language-overlay{position:fixed;inset:0;z-index:120000;background:rgba(0,0,0,.58);display:none;align-items:flex-end;justify-content:center}
 .language-overlay.open{display:flex}
-.language-sheet{width:min(680px,100%);background:var(--bg-panel-2);border:1px solid var(--line);border-radius:22px 22px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom));box-shadow:0 -12px 40px rgba(0,0,0,.35)}
-.language-sheet h3{margin:0 0 6px;color:var(--paper);font-family:var(--font-app)}
-.language-sheet p{margin:0 0 16px;color:var(--text-muted);font-size:13px}
+.language-sheet{width:min(560px,100%);background:var(--bg-panel-2);border:1px solid var(--line);border-radius:20px 20px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -12px 40px rgba(0,0,0,.35)}
+.language-sheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:5px}
+.language-sheet h3{margin:0;color:var(--paper);font-family:var(--font-app)}
+.language-sheet p{margin:0 0 12px;color:var(--text-muted);font-size:12px;line-height:1.4}
 .language-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.language-option{border:1px solid var(--line);border-radius:14px;padding:13px;background:var(--bg-panel);color:var(--paper);font-weight:700}
+.language-option{border:1px solid var(--line);border-radius:12px;padding:11px;background:var(--bg-panel);color:var(--paper);font-weight:700}
 .language-option.active{outline:2px solid var(--gold-soft);color:var(--gold-soft)}
-.language-close{width:100%;margin-top:14px;padding:12px;border:0;border-radius:14px;background:var(--wine);color:#fff;font-weight:700}
+.language-close{flex:none;padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg-panel);color:var(--text-muted);font-size:12px;font-weight:700}
 #view .card p,#view .card li,#view .card blockquote,#view .card .daily-meta,
 #view .prayer-block,#view .bio-text,#view .about-text,#view .text-block,
 #view .station-text,#view .office-text,#view .rule-text,#view .saint-text,
