@@ -1,4 +1,4 @@
-# Simplificação de layout, interface e navegação (conteúdo web do APK 4.9.65)
+# Simplificação de layout, interface e navegação (conteúdo web do APK 4.9.66)
 
 Arquivos alterados: index.html, app.js, sw.js (app.css e demais arquivos intactos).
 
@@ -22,3 +22,8 @@ Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebraç�
 
 10. Calendário e Santoral: o calendário mensal permanece no início da subtela e o índice visual do Santoral volta logo abaixo, com miniaturas, busca e índice alfabético. A busca filtra o índice sem ocultar o calendário. A lista mensal duplicada foi removida; a seleção de um dia continua mostrando as celebrações daquele dia.
 11. APP_VERSION atualizado para 4.9.65; cache: `liturgia-osm-v4.9.65-ui34-santoral-abaixo-calendario`.
+
+## Quarta rodada (4.9.66)
+
+12. Modo celebração: controle único flutuante nos detalhes do Santoral, orações e Missa do dia. Removidos os botões repetidos da ficha e do cabeçalho da Missa. O botão flutuante permanece acessível sobre a consulta da Missa e informa “Sair do modo celebração” quando ativo.
+13. APP_VERSION atualizado para 4.9.66; cache: `liturgia-osm-v4.9.66-ui35-modo-celebracao-unico`.

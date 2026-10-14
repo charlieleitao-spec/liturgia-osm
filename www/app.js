@@ -272,7 +272,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.65';
+const APP_VERSION = '4.9.66';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1391,8 +1391,9 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
     const active=document.body.classList.toggle('celebration-mode'),button=document.getElementById('celebrationToggle');button.textContent=active?'Sair do modo celebração':'Modo celebração';
     try{if(active&&navigator.wakeLock)wakeLock=await navigator.wakeLock.request('screen');else if(wakeLock){await wakeLock.release();wakeLock=null;}}catch(e){}
     showToast(active?'Modo celebração ativado.':'Modo celebração encerrado.');
+    updateCelebrationButton();
   };
-  function updateCelebrationButton(){const b=document.getElementById('celebrationToggle');if(!b)return;const dailyOpen=typeof dailyPrayerOpen480!=='undefined'&&!!dailyPrayerOpen480;const reading=!!state.devo||!!state.devoSub||dailyOpen;const inlineMode=!!document.querySelector('#view .hub-mode-button');b.classList.toggle('show',(reading&&!inlineMode)||document.body.classList.contains('celebration-mode'));}
+  function updateCelebrationButton(){const b=document.getElementById('celebrationToggle');if(!b)return;const dailyPrayerOpen=typeof dailyPrayerOpen480!=='undefined'&&!!dailyPrayerOpen480;const dailyMassOpen=!!document.querySelector('#dailyLiturgyOverlay.open');const celebrationDetail=state.detailId!==null&&state.detailId!==undefined;const reading=celebrationDetail||!!state.devo||!!state.devoSub||dailyPrayerOpen||dailyMassOpen;b.classList.toggle('show',reading||document.body.classList.contains('celebration-mode'));}
   window.updateCelebrationButton=updateCelebrationButton;
   render();
 })();
@@ -1469,8 +1470,8 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
       const data=await response.json();saveCache(selectedDate,data);target.innerHTML=renderMass({savedAt:new Date().toISOString(),data},false);
     }catch(error){if(!cached){const message=error?.message==='Liturgia não encontrada'?'Não há texto da Missa disponível para esta data.':error?.name==='AbortError'?'O serviço da Missa não respondeu no prazo e não há cópia local para esta data.':'O serviço da Missa está indisponível e não há cópia local para esta data. Verifique a conexão e tente novamente.';target.innerHTML=`<div class="daily-error">${safe(message)}<br><button class="daily-retry" onclick="loadDailyLiturgy('${safe(selectedDate)}')">Tentar novamente</button></div>`;}}
   };
-  window.openDailyLiturgy=function(date){document.getElementById('dailyLiturgyOverlay').classList.add('open');document.getElementById('dailyLiturgyOverlay').setAttribute('aria-hidden','false');loadDailyLiturgy(date||localISO());};
-  window.closeDailyLiturgy=function(){document.getElementById('dailyLiturgyOverlay').classList.remove('open');document.getElementById('dailyLiturgyOverlay').setAttribute('aria-hidden','true');if(document.body.classList.contains('celebration-mode'))toggleCelebrationMode();};
+  window.openDailyLiturgy=function(date){document.getElementById('dailyLiturgyOverlay').classList.add('open');document.getElementById('dailyLiturgyOverlay').setAttribute('aria-hidden','false');if(window.updateCelebrationButton)window.updateCelebrationButton();loadDailyLiturgy(date||localISO());};
+  window.closeDailyLiturgy=function(){document.getElementById('dailyLiturgyOverlay').classList.remove('open');document.getElementById('dailyLiturgyOverlay').setAttribute('aria-hidden','true');if(document.body.classList.contains('celebration-mode'))toggleCelebrationMode();if(window.updateCelebrationButton)window.updateCelebrationButton();};
   window.moveDailyDate=function(amount){const date=new Date(selectedDate+'T12:00:00');date.setDate(date.getDate()+amount);loadDailyLiturgy(localISO(date));};
   
   const menu=document.querySelector('.main-menu');
@@ -1652,7 +1653,7 @@ loadCanonicalSantoral();
       '<h1 class="hub-life-title">'+escapeHtml(saint.title)+'</h1>'+
       '<div class="hub-life-meta">'+escapeHtml(saint.date)+'</div>'+
       '<div class="hub-life-bio">'+escapeHtml(saint.bio||'Biografia não cadastrada.')+'</div></div>';
-    return '<div class="hub-top-actions"><button class="hub-back" onclick="closeDetail()">‹ '+backLabel+'</button><button class="hub-mode-button" onclick="toggleCelebrationMode()">Modo celebração</button></div>'+
+    return '<div class="hub-top-actions"><button class="hub-back" onclick="closeDetail()">‹ '+backLabel+'</button></div>'+
       '<div class="saint-hub">'+
       '<section class="hub-block" id="hub-vida"><div class="hub-block-title">Vida</div>'+life+'</section>'+
       '<section class="hub-block" id="hub-liturgia"><div class="hub-block-title">Liturgia</div>'+liturgyBlock(saint)+'</section>'+

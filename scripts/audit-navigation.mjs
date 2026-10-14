@@ -24,17 +24,17 @@ for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data
 assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
-assert.match(app, /const APP_VERSION = ['"]4\.9\.65['"]/);
+assert.match(app, /const APP_VERSION = ['"]4\.9\.66['"]/);
 assert.match(app, /menu-label\">Recursos/);
 assert.match(app, /openDailyLiturgy\(\)\">Missa do dia/);
 assert.doesNotMatch(app, /menu-nav-grid|Encontrar uma celebração|Aplicativo disponível|offline-note/);
 assert.doesNotMatch(app, /hub-block-title\">Navegação/);
-assert.match(workflow, /Build APK Liturgia OSM 4\.9\.65/);
-assert.match(workflow, /versionCode 40969/);
+assert.match(workflow, /Build APK Liturgia OSM 4\.9\.66/);
+assert.match(workflow, /versionCode 40970/);
 assert.match(app, /rowtitle">Hoje/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
-assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.65-ui34-santoral-abaixo-calendario/);
+assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.66-ui35-modo-celebracao-unico/);
 assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
 assert.match(app, /function liturgiaTodayCard\(type,dateValue=''\)/);
@@ -259,7 +259,8 @@ const massScriptStart = app.indexOf("window.loadDailyLiturgy=async function(date
 const massScriptEnd = app.indexOf("window.openDailyLiturgy=", massScriptStart);
 assert.ok(app.slice(massScriptStart, massScriptEnd).includes("dailyLiturgyDateDisplay") && app.slice(massScriptStart, massScriptEnd).includes("dateDisplay.textContent=day+'/'+month+'/'+year"), 'A data escolhida deve aparecer no campo da Missa.');
 assert.ok(!app.includes("||state.tab!=='hoje'"), 'O botão Voltar flutuante não deve cobrir as telas principais.');
-assert.ok(app.includes('hub-mode-button') && app.includes("inlineBack&&!overlay"), 'Controles do santo devem ter retorno e modo celebração sem sobreposição.');
+assert.ok(app.includes('function updateCelebrationButton()') && app.includes('dailyMassOpen') && !app.includes('hub-mode-button'), 'Modo celebração deve usar um controle flutuante único.');
+assert.equal(html.split('onclick=\"toggleCelebrationMode()\"').length-1,1,'A interface deve ter um único controle para o Modo celebração.');
 assert.ok(css.includes('body.light-mode #view .office-hour-choice{background:#f7f4ec!important'), 'Botões de Ofício precisam de contraste no tema claro.');
 
 
