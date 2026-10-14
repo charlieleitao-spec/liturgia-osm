@@ -136,7 +136,6 @@ window.addEventListener('servite-ready', function(){
     }
     else if(q==='oficio' && typeof setTab==='function' && typeof openDevo==='function'){setTab('oracoes');openDevo('oficio');}
     else if(q==='sabado' && typeof setTab==='function' && typeof openDevo==='function'){setTab('oracoes');openDevo('sabado');}
-    else if(q==='idioma') { if(typeof setTab==='function') setTab('sobre'); setTimeout(function(){var p=document.getElementById('settingsPanel'); var b=document.getElementById('settingsBtn'); if(p){p.removeAttribute('hidden');} if(b){b.classList.add('active');}},60); }
   }catch(e){}
 });
 </script>

@@ -272,7 +272,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.68';
+const APP_VERSION = '4.9.69';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -507,7 +507,6 @@ function viewSantoral(){if(state.detailId!==null)return viewSaintDetail(state.de
 function liveSearchRender(kind, el){
   const start=el.selectionStart, end=el.selectionEnd;
   if(kind==='santoral'){ state.search=el.value; state.alpha=''; }
-  else { globalQuery=el.value; }
   render();
   requestAnimationFrame(function(){
     const n=document.querySelector('input[data-live-search="'+kind+'"]');
@@ -577,13 +576,16 @@ function viewOracoesBase480(){
 
     <div class="section-title">Homenagens marianas</div>
     <div class="card fade-in" style="padding:6px 16px;">
-      ${DEVO_LIST.map(devoRowHtml).join('')}
+      ${DEVO_LIST.filter(x=>x.key!=='coroa').map(devoRowHtml).join('')}
     </div>
 
     <div class="section-title">Recursos de oração servita</div>
     <div class="quick-grid fade-in">
       <button class="quick-card" onclick="openServite('rosario')"><b>Rosário</b><span>Rosário guiado</span></button>
       <button class="quick-card" onclick="openServite('regra')"><b>Regra OSSM</b><span>Espiritualidade da Ordem Secular</span></button>
+      <button class="quick-card" onclick="openDevo('coroa')"><b>Coroa das Sete Dores</b><span>Oração pelas dores de Maria</span></button>
+      <button class="quick-card" onclick="openServite('sabado')"><b>Sábado Mariano</b><span>Ofícios e devoções marianas</span></button>
+      <button class="quick-card" onclick="openServite('oficio')"><b>Ofício</b><span>Horas e textos litúrgicos próprios</span></button>
     </div>
 
     <div class="section-title">Orações várias</div>
@@ -1115,8 +1117,6 @@ document.querySelectorAll('.tab-btn').forEach(b=>{
 let calDate = new Date();
 let selectedCalDate = null;
 let calendarSearch = '';
-let globalQuery = '';
-let libraryMode = 'todos';
 let prayerCategory = null;
 const FAV_KEY='osmFavoritesV4', RECENT_KEY='osmRecentV4';
 function loadJSON(k,d){try{return JSON.parse(localStorage.getItem(k)||'')||d}catch(e){return d}}
@@ -1159,7 +1159,6 @@ function allPrayerEntries(){
  ]; return a;
 }
 function categoryOf(p){let t=(p.title+' '+p.sub).toLowerCase();if(/dor|matris|stabat|coroa/.test(t))return 'dores';if(/voca|miss|apost/.test(t))return 'missao';if(/defunt|doent|alegr|visita|refei|necess/.test(t))return 'comunidade';if(/ladain/.test(t))return 'ladainhas';if(/vigília|vigilia|anjo|rainha/.test(t))return 'diarias';return 'marianas'}
-function globalResults(q){q=q.trim().toLowerCase();if(!q)return [];let rs=[];SANTORAL.forEach(s=>{let hay=(s.title+' '+s.date+' '+s.bio+' '+(s.prayer||'')).toLowerCase();if(hay.includes(q))rs.push({kind:'Santo / Beato',title:s.title,sub:s.date,action:`openSaint(${s._id})`})});allPrayerEntries().forEach(p=>{let hay=(p.title+' '+p.sub+' '+(p.text||'')).toLowerCase();if(hay.includes(q))rs.push({kind:'Oração',title:p.title,sub:p.sub,action:p.open})});return rs.slice(0,40)}
 function resultRows(rs){if(!rs.length)return '<div class="empty-state">Nenhum resultado encontrado.</div>';return `<div class="card fade-in" style="padding:6px 16px;">${rs.map(r=>`<div class="saint-row" onclick="${r.action}"><div class="rowtext"><div class="result-kind">${escapeHtml(r.kind)}</div><div class="rowtitle">${escapeHtml(r.title)}</div><div class="rowrank">${escapeHtml(r.sub||'')}</div></div><div class="chev">›</div></div>`).join('')}</div>`}
 function goCalendarToday(){
   const n=new Date(); calDate=new Date(n.getFullYear(),n.getMonth(),1); selectedCalDate=new Date(n.getFullYear(),n.getMonth(),n.getDate()); render();
@@ -1209,7 +1208,13 @@ function prayerActionForKey(key){
  if(key==='daily-rainha') return "openDailyPrayer480('rainha')";
  return `openDevo('${String(key).replace(/'/g,"\\'")}')`;
 }
-function viewBiblioteca(){let f=favs().map(resolveStored).filter(Boolean),r=recents().map(x=>({kind:x.type==='saint'?'Santoral':'Oração',title:x.title,sub:x.sub,action:x.type==='saint'?`openSaint(${x.key})`:prayerActionForKey(x.key)}));let search=globalQuery?globalResults(globalQuery):[];return `<div class="section-title">Biblioteca pessoal</div><div class="global-search"><input data-live-search="global" value="${escapeHtml(globalQuery)}" placeholder="Pesquisar santos e orações…" oninput="liveSearchRender('global',this)"><span class="glass">⌕</span></div><div class="library-pills"><button class="library-pill ${libraryMode==='todos'?'active':''}" onclick="libraryMode='todos';render()">Visão geral</button><button class="library-pill ${libraryMode==='favoritos'?'active':''}" onclick="libraryMode='favoritos';render()">Favoritos</button><button class="library-pill ${libraryMode==='recentes'?'active':''}" onclick="libraryMode='recentes';render()">Últimos acessados</button></div>${globalQuery?`<div class="section-title">Resultados</div>${resultRows(search)}`:`${libraryMode!=='recentes'?`<div class="section-title">Favoritos</div>${f.length?resultRows(f):'<div class="empty-state">Toque na estrela de uma oração ou celebração para guardá-la aqui.</div>'}`:''}${libraryMode!=='favoritos'?`<div class="section-title">Últimos acessados</div>${r.length?resultRows(r):'<div class="empty-state">Os conteúdos consultados aparecerão aqui.</div>'}`:''}`}`}
+function viewBiblioteca(){
+  const favorites=favs().map(resolveStored).filter(Boolean);
+  const recent=recents().map(x=>({kind:x.type==='saint'?'Santoral':'Oração',title:x.title,sub:x.sub,action:x.type==='saint'?`openSaint(${x.key})`:prayerActionForKey(x.key)}));
+  return `<div class="section-title">Biblioteca pessoal</div>
+    <div class="section-title">Favoritos</div>${favorites.length?resultRows(favorites):'<div class="empty-state">Toque na estrela de uma oração ou celebração para guardá-la aqui.</div>'}
+    <div class="section-title">Últimos acessados</div>${recent.length?resultRows(recent):'<div class="empty-state">Os conteúdos consultados aparecerão aqui.</div>'}`;
+}
 const MAIN_I18N={
  pt:{today:'Hoje',calendar:'Calendário',sanctoral:'Santoral',prayers:'Orações',library:'Biblioteca',resources:'Recursos Servitas',languages:'Idiomas',title:'Idioma',close:'Fechar'},
  la:{today:'Hodie',calendar:'Calendarium',sanctoral:'Sanctorale',prayers:'Preces',library:'Bibliotheca',resources:'Instrumenta Servorum Mariae',languages:'Lingua',title:'Lingua',close:'Claudere'},
@@ -1322,7 +1327,7 @@ if ("serviceWorker" in navigator && !window.Capacitor?.isNativePlatform?.()) {
 
 /* BEGIN SCRIPT BLOCK: serviteIntegrationScript */
 let currentServiteView='';
-const serviteNames={regra:'Regra OSSM',rosario:'Rosário',coroa:'Coroa das Sete Dores',oficio:'Ofício',sabado:'Sábado Mariano',idioma:'Idiomas',completo:'Recursos OSM'};
+const serviteNames={regra:'Regra OSSM',rosario:'Rosário',coroa:'Coroa das Sete Dores',oficio:'Ofício',sabado:'Sábado Mariano',completo:'Recursos OSM'};
 function serviteUrl(view){return 'servite.html?view='+encodeURIComponent(view||'completo');}
 function serviteAdjustFont(delta){try{const frame=document.getElementById('serviteFrame');const change=frame?.contentWindow?.changeFontSize;if(typeof change==='function')change(delta);}catch(error){console.warn('[Liturgia OSM] Controle de fonte do recurso indisponível.',error);}} function openServite(view){
   currentServiteView=view||'completo';
@@ -1357,8 +1362,9 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
   const menu=document.querySelector('.main-menu');
   if(menu) menu.innerHTML=`<div class="main-menu-head"><h3>Menu</h3><button class="tool-btn" onclick="closeMainMenu()" aria-label="Fechar menu">✕</button></div>
     <div class="menu-section"><div class="menu-label">Leitura</div><div class="menu-row"><button class="menu-action" onclick="adjustFont(-0.08)">A−</button><span class="reader-scale-value">100%</span><button class="menu-action" onclick="adjustFont(0.08)">A+</button><button class="menu-action" onclick="resetFont()">Padrão</button></div><button class="menu-action menu-wide" onclick="toggleTheme()">☼ / ☾ Alternar tema claro ou escuro</button></div>
-    <div class="menu-section"><div class="menu-label">Recursos</div><button class="menu-action menu-wide" onclick="closeMainMenu();openDailyLiturgy()">Missa do dia</button><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('biblioteca')">Biblioteca: favoritos, recentes e busca</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('oficio')">Ofício</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('regra')">Regra OSSM</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('rosario')">Rosário</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('coroa')">Coroa das Sete Dores</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('sabado')">Sábado Mariano</button></div>
-    <div class="menu-section"><div class="menu-label">Aplicativo</div><button class="menu-action menu-wide" onclick="closeMainMenu();openLanguagePanel()">Idioma da interface</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('idioma')">Idiomas dos recursos servitas</button><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('sobre')">Sobre, créditos e redes sociais</button></div>
+    <div class="menu-section"><div class="menu-label">Conteúdo</div><button class="menu-action menu-wide" onclick="closeMainMenu();openDailyLiturgy()">Missa do dia</button><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('biblioteca')">Biblioteca: favoritos e recentes</button></div>
+    <div class="menu-section"><div class="menu-label">Preferências</div><button class="menu-action menu-wide" onclick="closeMainMenu();openLanguagePanel()">Idioma da interface</button></div>
+    <div class="menu-section"><div class="menu-label">Sobre</div><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('sobre')">Sobre, créditos e redes sociais</button></div>
     <div class="menu-section"><div class="menu-status"><span class="connection-dot"></span><span>Versão ${APP_VERSION} · textos OSM offline; Missa do dia exige internet ou cópia salva</span></div></div>`;
 
   window.addEventListener('online',()=>{if(state.tab==='hoje')render();});
