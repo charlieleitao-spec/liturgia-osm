@@ -1,4 +1,4 @@
-# Simplificação de layout, interface e navegação (conteúdo web do APK 4.9.67)
+# Simplificação de layout, interface e navegação (conteúdo web do APK 4.9.68)
 
 Arquivos alterados nesta rodada: index.html, app.js, app.css e sw.js.
 
@@ -33,3 +33,10 @@ Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebraç�
 14. Painel de idioma da interface: reduzidos largura, margens e altura; o botão Fechar passou para o cabeçalho e a explicação foi encurtada. Mantidas as quatro opções e o estado selecionado.
 15. O cartão “Idiomas” dos recursos servitas agora abre a página de recursos linguísticos; “Idioma da interface” no menu continua abrindo o seletor de idioma.
 16. APP_VERSION atualizado para 4.9.67; cache: `liturgia-osm-v4.9.67-ui36-idioma-compacto`.
+
+## Sexta rodada (4.9.68)
+
+17. Missa do dia: o acesso do menu continua abrindo diretamente a leitura. O cartão de Hoje, que duplicava os atalhos da aba Liturgia, saiu; na aba Missa, o cartão de hoje agora informa a data sem repetir o botão de consulta.
+18. Tela Hoje: removidos os cartões “Missa do dia” e “Liturgia das Horas”; permanecem a celebração com seus atalhos e a oração diária.
+19. Recursos: removida a função não utilizada `viewOSMPlus()`. O atalho “Idiomas dos recursos servitas” foi colocado no menu, ao lado do idioma da interface.
+20. APP_VERSION atualizado para 4.9.68; cache: `liturgia-osm-v4.9.68-ui37-missa-hoje-menu`.
