@@ -1,4 +1,4 @@
-# Simplificação de layout, interface e navegação (conteúdo web do APK 4.9.70)
+# Simplificação de layout, interface e navegação (conteúdo web do APK 4.9.71)
 
 Arquivos alterados ao longo das rodadas: index.html, app.js, app.css, sw.js e servite.html.
 
@@ -55,3 +55,10 @@ Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebraç�
 
 27. Corrige a visibilidade do menu em telas estreitas: regras responsivas antigas escondiam o primeiro botão da barra superior, agora o único botão é o menu.
 28. Atualiza APP_VERSION e o cache para 4.9.70.
+
+
+## Nona rodada (4.9.71)
+
+29. A aba Liturgia passa a mostrar somente as Missas próprias OSM e os Ofícios próprios OSM; remove o cartão de data e o atalho para a fonte externa da Paulus.
+30. Identifica as seções como Missa OSM e Ofício OSM e renova o cache.
+31. Harmoniza as fontes da interface e dos recursos servitas com Georgia, preservando tamanhos, pesos e estilos de leitura.

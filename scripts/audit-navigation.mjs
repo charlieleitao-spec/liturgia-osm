@@ -24,18 +24,19 @@ for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data
 assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
-assert.match(app, /const APP_VERSION = ['"]4\.9\.70['"]/);
+assert.match(app, /const APP_VERSION = ['"]4\.9\.71['"]/);
 assert.match(app, /menu-label\">Conteúdo/);
 assert.match(app, /openDailyLiturgy\(\)\">Missa do dia/);
 assert.doesNotMatch(app, /menu-nav-grid|Encontrar uma celebração|Aplicativo disponível|offline-note/);
 assert.doesNotMatch(app, /hub-block-title\">Navegação/);
-assert.match(workflow, /Build APK Liturgia OSM 4\.9\.70/);
-assert.match(workflow, /versionCode 40974/);
+assert.match(workflow, /Build APK Liturgia OSM 4\.9\.71/);
+assert.match(workflow, /versionCode 40975/);
 assert.match(app, /rowtitle">Hoje/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
 assert.doesNotMatch(css,/\.topbar-tools \.tool-btn:first-child\{display:none\}/,'O menu deve permanecer visível em telas estreitas.');
-assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.70-ui39-menu-visivel/);
+assert.doesNotMatch(serviteCss,/Cinzel|EB Garamond|Cormorant Garamond|system-ui,-apple-system,sans-serif/,'Fontes da interface e recursos servitas devem estar harmonizadas.');
+assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.71-ui40-menu-liturgia-propria/);
 assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
 assert.match(app, /function liturgiaTodayCard\(type\)/);
@@ -157,20 +158,27 @@ assert.match(massPage,/Missa própria OSM/);
 assert.match(massPage,/MASS TEXT/);
 assert.match(massPage,/Voltar às Missas próprias/);
 assert.doesNotMatch(massPage,/office-hours-grid|office-hour-choice/);
-assert.equal((app.match(/liturgiaTodayCard\('/g) || []).length, 2, 'O cartão do dia deve usar o mesmo renderizador nas duas abas.');
+
 assert.match(css, /#view \.liturgia-celebration-row\{/);
-assert.match(css, /#view \.liturgia-today-card \.action-btn\{[^}]*text-decoration:none/);
+
 assert.doesNotMatch(app, /Consultar Missa do Dia/);
-assert.match(app, /class="action-btn" href="https:[^"]+" target="_blank" rel="noopener">Consultar Ofício do Dia/);
-assert.equal((app.match(/class="card fade-in liturgia-today-card"/g) || []).length, 1, 'Missa e Ofício devem compartilhar um único renderizador do cartão do dia.');
-assert.equal((app.match(/class="liturgia-today-date"/g) || []).length, 1, 'O renderizador compartilhado deve posicionar a data uma única vez.');
-assert.equal((app.match(/Consultar Ofício do Dia/g) || []).length, 1, 'O Ofício do Dia deve manter o acesso à fonte externa.');
+assert.doesNotMatch(app, /liturgiaTodayCard|liturgia-today-card|Consultar Ofício do Dia|paulus\.com\.br/);
+const liturgiaOnlyStart=app.indexOf('function viewLiturgia(){');
+const liturgiaOnlyEnd=app.indexOf('\nfunction render(){',liturgiaOnlyStart);
+const liturgiaOnly=app.slice(liturgiaOnlyStart,liturgiaOnlyEnd);
+assert.match(liturgiaOnly,/Missa OSM/);
+assert.match(liturgiaOnly,/Ofício OSM/);
+assert.doesNotMatch(liturgiaOnly,/todayBlock|liturgiaTodayCard/);
+
+
+
+
 assert.doesNotMatch(app, /Consultar Missa do Dia/);
 assert.doesNotMatch(app, /liturgy-page-intro|Aqui você encontra a Missa do dia|O ofício de hoje está na Paulus\. Os textos próprios da Ordem estão logo abaixo/);
 assert.doesNotMatch(app, /Abrir ofício próprio/);
 assert.match(app, /Missas próprias OSM/);
 assert.match(app, /Ofícios próprios OSM/);
-assert.match(app, /liturgia-today-card/);
+
 assert.doesNotMatch(app, /Hora litúrgica própria/);
 assert.doesNotMatch(app, /paulusBlock/);
 assert.match(app, /addListener\(['"]backButton['"]/);

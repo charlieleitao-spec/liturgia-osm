@@ -68,7 +68,7 @@ html,body{margin:0;padding:0;}
 body{
   background:var(--bg-deep);
   color:var(--text);
-  font-family:'EB Garamond', Georgia, serif;
+  font-family:Georgia,'Times New Roman',serif;
   min-height:100vh;
   overflow-x:hidden;
   transition:background .25s ease, color .25s ease;
@@ -114,11 +114,11 @@ body{
 .crest{flex:none; width:38px; height:38px; display:flex; align-items:center; justify-content:center;}
 .crest img{width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 1px 2px rgba(47,43,39,.22));}
 .eyebrow{
-  margin:0 0 2px; font-family:'Cinzel',serif; font-size:10px; letter-spacing:.14em;
+  margin:0 0 2px; font-family:Georgia,'Times New Roman',serif; font-size:10px; letter-spacing:.14em;
   text-transform:uppercase; color:var(--wine-soft); font-weight:600;
 }
 .topbar h1{
-  margin:0; font-family:'Cinzel',serif; font-size:18px; font-weight:600;
+  margin:0; font-family:Georgia,'Times New Roman',serif; font-size:18px; font-weight:600;
   color:var(--gold-soft); letter-spacing:.02em; line-height:1.15;
 }
 .theme-toggle{
@@ -133,7 +133,7 @@ body{
 }
 .font-btn{
   border:none; background:none; color:var(--gold-soft); cursor:pointer;
-  font-family:'Cinzel',serif; font-size:11px; font-weight:600; padding:8px 9px; line-height:1;
+  font-family:Georgia,'Times New Roman',serif; font-size:11px; font-weight:600; padding:8px 9px; line-height:1;
 }
 .font-btn:first-child{ border-right:1px solid var(--line); }
 .font-btn:active{ background:rgba(138,106,30,.14); }
@@ -156,12 +156,12 @@ body{
 .settings-panel[hidden]{ display:none; }
 .settings-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
 .settings-label{
-  font-family:'Cinzel',serif; font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  font-family:Georgia,'Times New Roman',serif; font-size:11px; letter-spacing:.08em; text-transform:uppercase;
   color:var(--text-muted); flex:none;
 }
 .chip-group{ display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
 .chip{
-  font-family:'EB Garamond',serif; font-size:13px; border:1px solid var(--line); background:var(--bg-panel-2);
+  font-family:Georgia,'Times New Roman',serif; font-size:13px; border:1px solid var(--line); background:var(--bg-panel-2);
   color:var(--text-muted); border-radius:16px; padding:6px 12px; cursor:pointer;
 }
 .chip.active{ background:rgba(138,106,30,.16); border-color:var(--gold); color:var(--gold-soft); font-weight:600; }
@@ -182,7 +182,7 @@ main#view{
 }
 
 .section-title{
-  font-family:'Cinzel',serif; font-size:0.75rem; letter-spacing:.15em; text-transform:uppercase;
+  font-family:Georgia,'Times New Roman',serif; font-size:0.75rem; letter-spacing:.15em; text-transform:uppercase;
   color:var(--gold-soft); margin:26px 0 10px; padding-left:2px;
 }
 .section-title:first-child{margin-top:0;}
@@ -212,15 +212,15 @@ main#view{
   padding:26px 18px 22px;
 }
 .hero-date .weekday{
-  font-family:'Cinzel',serif; font-size:0.6875rem; letter-spacing:.22em; text-transform:uppercase;
+  font-family:Georgia,'Times New Roman',serif; font-size:0.6875rem; letter-spacing:.22em; text-transform:uppercase;
   color:var(--wine-soft); margin-bottom:6px;
 }
 .hero-date .day{
-  font-family:'Cinzel',serif; font-size:3.5rem; line-height:1; color:var(--gold-soft);
+  font-family:Georgia,'Times New Roman',serif; font-size:3.5rem; line-height:1; color:var(--gold-soft);
   font-weight:600;
 }
 .hero-date .month{
-  font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1.1875rem; color:var(--text-muted);
+  font-family:Georgia,'Times New Roman',serif; font-style:italic; font-size:1.1875rem; color:var(--text-muted);
   margin-top:6px;
 }
 .hero-divider{
@@ -230,12 +230,12 @@ main#view{
 
 /* ---- saint of the day card ---- */
 .saint-card .rank{
-  display:inline-block; font-family:'Cinzel',serif; font-size:0.625rem; letter-spacing:.14em;
+  display:inline-block; font-family:Georgia,'Times New Roman',serif; font-size:0.625rem; letter-spacing:.14em;
   text-transform:uppercase; color:var(--rank-text); background:var(--wine);
   padding:3px 9px; border-radius:20px; margin-bottom:10px; font-weight:600;
 }
 .saint-card h2{
-  font-family:'Cormorant Garamond',serif; font-weight:700; font-size:1.5625rem; margin:0 0 4px;
+  font-family:Georgia,'Times New Roman',serif; font-weight:700; font-size:1.5625rem; margin:0 0 4px;
   color:var(--paper); line-height:1.2;
 }
 .saint-card .date-line{
@@ -248,7 +248,7 @@ main#view{
   margin-top:14px; display:flex; justify-content:flex-end;
 }
 .btn-link{
-  font-family:'Cinzel',serif; font-size:0.6875rem; letter-spacing:.1em; text-transform:uppercase;
+  font-family:Georgia,'Times New Roman',serif; font-size:0.6875rem; letter-spacing:.1em; text-transform:uppercase;
   color:var(--gold-soft); background:none; border:1px solid var(--line); border-radius:20px;
   padding:9px 16px; cursor:pointer; transition:.2s;
 }
@@ -257,14 +257,14 @@ main#view{
 /* ---- angelus toggle card ---- */
 .toggle-row{ display:flex; gap:8px; margin-bottom:14px; }
 .toggle-btn{
-  flex:1; font-family:'Cinzel',serif; font-size:0.6875rem; letter-spacing:.06em;
+  flex:1; font-family:Georgia,'Times New Roman',serif; font-size:0.6875rem; letter-spacing:.06em;
   background:var(--bg-panel); border:1px solid var(--line); color:var(--text-muted);
   padding:10px 6px; border-radius:10px; cursor:pointer; text-transform:uppercase;
 }
 .toggle-btn.active{ background:rgba(138,106,30,.14); border-color:var(--gold); color:var(--gold-soft); }
 
 .prayer-block{
-  font-family:'Times New Roman', Times, serif; font-size:1.0625rem; line-height:1.72; color:var(--text);
+  font-family:Georgia,'Times New Roman',serif; font-size:1.0625rem; line-height:1.72; color:var(--text);
   white-space:normal;
 }
 .prayer-block .prayer-paragraph{
@@ -275,7 +275,7 @@ main#view{
 .prayer-block .prayer-paragraph:last-child{ margin-bottom:0; }
 /* Liturgia das Horas: o espaço entre estrofes e salmos segue o modelo dos documentos litúrgicos fornecidos. */
 .prayer-block .prayer-paragraph + .prayer-paragraph{ margin-top:0.18em; }
-.prayer-block .rubric{ color:var(--wine); font-weight:700; font-family:'Times New Roman', Times, serif; }
+.prayer-block .rubric{ color:var(--wine); font-weight:700; font-family:Georgia,'Times New Roman',serif; }
 
 .guided-crown-card{ border:1px solid rgba(138,106,30,.3); background:linear-gradient(135deg, rgba(255,248,220,.95), rgba(255,255,255,.72)); }
 .guided-crown-visual{ margin:0 0 16px; padding:10px; border:1px solid var(--line); border-radius:14px; background:rgba(255,255,255,.78); box-shadow:0 8px 24px rgba(74,48,24,.08); }
@@ -283,21 +283,21 @@ main#view{
 .guided-crown-visual figcaption{ margin:9px 4px 0; color:var(--text-faint); font-size:.86rem; line-height:1.45; text-align:center; }
 @media(max-width:560px){ .guided-crown-visual{ padding:6px; } .guided-crown-visual img{ max-height:300px; } .guided-crown-visual figcaption{ font-size:.78rem; } }
 .guided-crown-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
-.guided-crown-kicker{ font-family:'Cinzel',serif; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); }
+.guided-crown-kicker{ font-family:Georgia,'Times New Roman',serif; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); }
 .guided-crown-progress{ height:6px; border-radius:999px; background:rgba(138,106,30,.14); overflow:hidden; margin:10px 0 18px; }
 .guided-crown-progress > span{ display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,var(--wine),var(--gold)); transition:width .45s ease; }
 .guided-crown-step{ animation:guidedCrownIn .42s ease both; }
 @keyframes guidedCrownIn{ from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
-.guided-crown-pain{ font-family:'Cinzel',serif; font-size:1.05rem; color:var(--wine); margin:0 0 10px; }
+.guided-crown-pain{ font-family:Georgia,'Times New Roman',serif; font-size:1.05rem; color:var(--wine); margin:0 0 10px; }
 .guided-crown-actions{ display:flex; justify-content:space-between; gap:10px; margin-top:20px; }
 .guided-crown-actions button{ flex:1; }
-.guided-crown-dot{ display:inline-flex; width:28px; height:28px; align-items:center; justify-content:center; border-radius:50%; background:rgba(138,106,30,.13); color:var(--wine); font-family:'Cinzel',serif; margin-right:8px; }
+.guided-crown-dot{ display:inline-flex; width:28px; height:28px; align-items:center; justify-content:center; border-radius:50%; background:rgba(138,106,30,.13); color:var(--wine); font-family:Georgia,'Times New Roman',serif; margin-right:8px; }
 .hour-tabs{
   display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;
   border-bottom:1px solid var(--line); padding-bottom:14px;
 }
 .hour-tab-btn{
-  min-height:42px; font-family:'Cinzel',serif; font-size:0.75rem; letter-spacing:.04em; text-transform:none;
+  min-height:42px; font-family:Georgia,'Times New Roman',serif; font-size:0.75rem; letter-spacing:.04em; text-transform:none;
   color:var(--text-muted); background:var(--bg-panel); border:1px solid var(--line);
   border-radius:12px; padding:9px 13px; cursor:pointer; transition:all .2s ease;
 }
@@ -308,7 +308,7 @@ main#view{
 .hour-tab-btn.small{ min-height:38px; font-size:0.7rem; padding:7px 10px; }
 .hour-tab-content{}
 .hour-sublabel{
-  font-family:'Cinzel',serif; font-size:0.6875rem; letter-spacing:.08em; text-transform:uppercase;
+  font-family:Georgia,'Times New Roman',serif; font-size:0.6875rem; letter-spacing:.08em; text-transform:uppercase;
   color:var(--text-faint); margin:12px 0 4px;
 }
 .hour-sublabel:first-child{ margin-top:0; }
@@ -320,7 +320,7 @@ main#view{
 .search-wrap{ margin-bottom:18px; }
 .search-input{
   width:100%; background:var(--bg-panel); border:1px solid var(--line); border-radius:12px;
-  color:var(--text); font-family:'EB Garamond',serif; font-size:1rem; padding:12px 16px;
+  color:var(--text); font-family:Georgia,'Times New Roman',serif; font-size:1rem; padding:12px 16px;
   outline:none;
 }
 .search-input::placeholder{ color:var(--text-faint); }
@@ -328,7 +328,7 @@ main#view{
 
 .month-group{ margin-bottom:6px; }
 .month-label{
-  font-family:'Cinzel',serif; font-size:0.75rem; letter-spacing:.15em; text-transform:uppercase;
+  font-family:Georgia,'Times New Roman',serif; font-size:0.75rem; letter-spacing:.15em; text-transform:uppercase;
   color:var(--wine-soft); margin:22px 2px 8px;
 }
 .saint-row{
@@ -344,7 +344,7 @@ main#view{
 .saint-image-caption{ padding:8px 4px 2px; color:var(--text-faint); font-size:.78rem; line-height:1.4; text-align:center; }
 @media(max-width:560px){ .saint-thumb{ width:46px; height:56px; flex-basis:46px; } .saint-image-detail{ max-width:100%; } }
 .saint-row .daynum{
-  font-family:'Cinzel',serif; font-size:1.25rem; color:var(--gold-soft); width:30px; text-align:center; flex:none;
+  font-family:Georgia,'Times New Roman',serif; font-size:1.25rem; color:var(--gold-soft); width:30px; text-align:center; flex:none;
 }
 .saint-row .rowtext{ flex:1; min-width:0; }
 .saint-row .rowtitle{ font-size:1.0625rem; color:var(--paper); }
@@ -355,16 +355,16 @@ main#view{
 /* ===== detail view ===== */
 .back-btn{
   display:inline-flex; align-items:center; gap:6px;
-  background:none; border:none; color:var(--gold-soft); font-family:'Cinzel',serif;
+  background:none; border:none; color:var(--gold-soft); font-family:Georgia,'Times New Roman',serif;
   font-size:0.6875rem; letter-spacing:.1em; text-transform:uppercase; padding:8px 2px; margin-bottom:14px; cursor:pointer;
 }
 .detail-header{ text-align:center; padding:6px 6px 22px; }
 .detail-header .rank{
-  display:inline-block; font-family:'Cinzel',serif; font-size:0.6562rem; letter-spacing:.16em;
+  display:inline-block; font-family:Georgia,'Times New Roman',serif; font-size:0.6562rem; letter-spacing:.16em;
   text-transform:uppercase; color:var(--wine); margin-bottom:10px; font-weight:600;
 }
 .detail-header h2{
-  font-family:'Cormorant Garamond',serif; font-weight:700; font-size:1.875rem; color:var(--paper);
+  font-family:Georgia,'Times New Roman',serif; font-weight:700; font-size:1.875rem; color:var(--paper);
   margin:0 0 8px; line-height:1.15;
 }
 .detail-header .date-line{ color:var(--text-muted); font-style:italic; font-size:1rem; }
@@ -383,7 +383,7 @@ main#view{
   border-radius:14px; padding:20px;
 }
 .prayer-card .label{
-  font-family:'Cinzel',serif; font-size:0.6875rem; letter-spacing:.16em; text-transform:uppercase;
+  font-family:Georgia,'Times New Roman',serif; font-size:0.6875rem; letter-spacing:.16em; text-transform:uppercase;
   color:var(--wine-soft); margin-bottom:10px;
 }
 .prayer-card .text{
@@ -397,7 +397,7 @@ main#view{
 .about-text{ font-size:1.0625rem; line-height:1.75; color:var(--paper); }
 .about-text p{ margin:0 0 14px; }
 .about-quote{
-  font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1.1875rem; text-align:center;
+  font-family:Georgia,'Times New Roman',serif; font-style:italic; font-size:1.1875rem; text-align:center;
   color:var(--gold-soft); padding:22px 10px; line-height:1.6;
 }
 .credit-list{ font-size:0.9375rem; color:var(--text-muted); line-height:1.9; }
@@ -429,7 +429,7 @@ main#view{
 .tab-btn{
   flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;
   background:none; border:none; color:var(--text-faint); cursor:pointer;
-  padding:6px 2px; font-family:'Cinzel',serif; font-size:10px; letter-spacing:.04em;
+  padding:6px 2px; font-family:Georgia,'Times New Roman',serif; font-size:10px; letter-spacing:.04em;
 }
 .tab-btn svg{ width:21px; height:21px; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
 .tab-btn.active{ color:var(--gold-soft); }
@@ -559,7 +559,7 @@ body.direct-office-view .hour-tab-content{padding:0!important;border:0!important
  background:var(--surface)!important;
  color:var(--text)!important;
  box-shadow:0 4px 18px rgba(0,0,0,.18)!important;
- font:600 .9rem/1 system-ui,-apple-system,sans-serif!important;
+ font:600 .9rem/1 Georgia,'Times New Roman',serif!important;
  cursor:pointer!important;
 }
 .regra-floating-back:active{transform:scale(.97)}
@@ -574,7 +574,7 @@ body.direct-office-view .hour-tab-content{padding:0!important;border:0!important
   margin:0 auto;
   padding:2px 2px 20px;
   color:var(--paper);
-  font-family:'EB Garamond',Georgia,serif;
+  font-family:Georgia,'Times New Roman',serif;
   font-size:1.1rem;
   line-height:1.65;
   text-align:left;
@@ -589,7 +589,7 @@ body.direct-office-view .hour-tab-content{padding:0!important;border:0!important
 .rule-article-number{
   padding-top:.12em;
   color:var(--wine-soft);
-  font-family:'Cinzel',serif;
+  font-family:Georgia,'Times New Roman',serif;
   font-size:.82em;
   font-weight:700;
   line-height:1.55;

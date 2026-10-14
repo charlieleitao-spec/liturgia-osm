@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.70-ui39-menu-visivel';
+const CACHE = 'liturgia-osm-v4.9.71-ui40-menu-liturgia-propria';
 const CORE = [
   "./",
   "./index.html",

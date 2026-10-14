@@ -272,7 +272,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.70';
+const APP_VERSION = '4.9.71';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -479,12 +479,6 @@ function renderLiturgiaCelebrationList(tipo,entries){
     return '<button class="liturgia-celebration-row" type="button" onclick="'+action+'" aria-label="Abrir '+escapeHtml(title)+'"><span class="rowtext"><span class="rowtitle">'+escapeHtml(title)+'</span><span class="rowrank">'+escapeHtml(subtitle)+'</span></span><span class="chev" aria-hidden="true">›</span></button>';
   }).join('');
   return '<div class="card fade-in">'+(rows||'<div class="empty-state">Nenhuma celebração própria cadastrada.</div>')+'</div>';
-}
-function liturgiaTodayCard(type){
-  const action=type==='horas'
-    ? '<a class="action-btn" href="https://www.paulus.com.br/portal/liturgia-diaria-das-horas/" target="_blank" rel="noopener">Consultar Ofício do Dia</a>'
-    : '';
-  return '<div class="card fade-in liturgia-today-card"><div class="rowtitle">Hoje</div><p class="liturgia-today-date">'+escapeHtml(formatLiturgicalDate())+'</p>'+(action?'<p class="liturgia-today-action">'+action+'</p>':'')+'</div>';
 }
 function openSantoralOfficeHour(saintId,hour){
   const saint=SANTORAL.find(x=>x._id===saintId);
@@ -1055,15 +1049,14 @@ function renderLiturgiaDetail(tipo,reference){
 function viewLiturgia(){
   const section=state.liturgiaSection||'missa';
   const switcher=`<div class="toggle-row" aria-label="Seções de Liturgia">
-    <button class="toggle-btn ${section==='missa'?'active':''}" onclick="setLiturgiaSection('missa')">Missa</button>
-    <button class="toggle-btn ${section==='horas'?'active':''}" onclick="setLiturgiaSection('horas')">Liturgia das Horas</button>
+    <button class="toggle-btn ${section==='missa'?'active':''}" onclick="setLiturgiaSection('missa')">Missa OSM</button>
+    <button class="toggle-btn ${section==='horas'?'active':''}" onclick="setLiturgiaSection('horas')">Ofício OSM</button>
   </div>`;
   if(state.liturgiaDetail){const detail=renderLiturgiaDetail(state.liturgiaDetail.tipo,state.liturgiaDetail.reference);if(detail)return switcher+detail;}
   if(section==='horas'){
-    const todayBlock=liturgiaTodayCard('horas');
     const officeWarning=!oficiosReady?'<div class="card" role="alert"><p>O cadastro local dos Ofícios está indisponível. A Vida e as orações continuam acessíveis.</p><button class="action-btn" onclick="loadCanonicalOffices()">Tentar carregar os Ofícios</button></div>':'';
     const ownBlocks='<div class="section-title">Ofícios próprios OSM</div>'+renderLiturgiaCelebrationList('horas',liturgiaCelebrations('horas'));
-    return switcher+todayBlock+officeWarning+(oficiosReady?ownBlocks+movableOfficeBlocks()+marianSaturdayOfficeBlocks():'');
+    return switcher+officeWarning+(oficiosReady?ownBlocks+movableOfficeBlocks()+marianSaturdayOfficeBlocks():'');
   }
   const records=window.MISSAS_OSM&&Array.isArray(window.MISSAS_OSM.celebrations)?window.MISSAS_OSM.celebrations:[];
   const movableMasses=records.filter(item=>Boolean(item.date_rule));
@@ -1071,8 +1064,7 @@ function viewLiturgia(){
   const canonicalMasses=liturgiaCelebrations('missa');
   const movableRows=movableMasses.map(item=>({mass:item}));
   const marianSaturdayRows=marianSaturdayMasses.map(item=>({mass:item}));
-  const todayBlock=liturgiaTodayCard('missa');
-  return switcher+todayBlock+`<div class="section-title">Missas próprias OSM</div>
+  return switcher+`<div class="section-title">Missas próprias OSM</div>
     ${renderLiturgiaCelebrationList('missa',canonicalMasses)}`+
     (movableRows.length?'<div class="section-title">Missas de celebrações móveis</div>'+renderLiturgiaCelebrationList('missa',movableRows):'')+
     (marianSaturdayRows.length?'<div class="section-title">Missas de Santa Maria no Sábado</div>'+renderLiturgiaCelebrationList('missa',marianSaturdayRows):'');
