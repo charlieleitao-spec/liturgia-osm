@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.63-ui32-simples';
+const CACHE = 'liturgia-osm-v4.9.64-ui33-calendario-santoral';
 const CORE = [
   "./",
   "./index.html",

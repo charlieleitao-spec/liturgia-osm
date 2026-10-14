@@ -1,6 +1,8 @@
-# Simplificação de layout, interface e navegação (sobre o conteúdo web do APK 4.9.63)
+# Simplificação de layout, interface e navegação (conteúdo web do APK 4.9.64)
 
 Arquivos alterados: index.html, app.js, sw.js (app.css e demais arquivos intactos).
+
+## Primeira rodada (4.9.63)
 
 1. Barra superior: só o título e o botão ☰. A−, A+ e tema (☼) saíram do topo; continuam no menu, em "Leitura".
 2. Menu: removida a seção "Navegação" (repetia Hoje/Calendário/Santoral e a aba Oração). Biblioteca e Ofício passaram para "Recursos". Removido o menu estático do index.html (o app.js já o sobrescrevia).
@@ -8,6 +10,10 @@ Arquivos alterados: index.html, app.js, sw.js (app.css e demais arquivos intacto
 4. Ficha da celebração: o último bloco perdeu o título "Navegação" (ficam só Anterior, Próxima e Compartilhar).
 5. sw.js: cache renomeado para liturgia-osm-v4.9.63-ui32-simples, para o aparelho baixar a versão nova.
 
-Não alterados (decisão pendente): estrutura das 3 abas, modo celebração, painel de idioma, causas-beatos.html.
+Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebração, painel de idioma e causas-beatos.html. A estrutura foi atualizada nesta segunda rodada, conforme o item 8.
 6. Menu: "Missa do dia" incluído em Recursos (o atalho antigo dependia da seção removida).
 7. APP_VERSION e nome do cache alinhados a 4.9.63 (ajuste ao número que for compilado).
+## Segunda rodada (4.9.64)
+
+8. Calendário e Santoral: uma única subtela reúne o calendário mensal e o índice pesquisável. A busca procura celebrações pelo nome, data e grau; os resultados mantêm a data e abrem a ficha existente. A navegação antiga `santoral` continua aceita para links e estado salvo, mas exibe a subtela unificada.
+9. APP_VERSION e cache atualizados para 4.9.64; cache: `liturgia-osm-v4.9.64-ui33-calendario-santoral`.
