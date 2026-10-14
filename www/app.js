@@ -1187,7 +1187,7 @@ function viewSantoralIndex(){
   const letters=[...new Set(SANTORAL.map(s=>String(s.title||'').replace(/^(SANTO|SANTA|B\.|BEATO|BEATA)\s+/i,'').trim()[0]?.toLocaleUpperCase('pt-BR')).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
   const alpha=state.alpha||'';
   const query=String(state.search||'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR');
-  const list=celebrationOrder().filter(s=>{
+  const list=SANTORAL.filter(s=>{
     const hay=`${s.title} ${s.date} ${celebrationSubtitle(s)} ${String(s.day).padStart(2,'0')}/${String(s.month).padStart(2,'0')}`.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR');
     const name=String(s.title||'').replace(/^(SANTO|SANTA|B\.|BEATO|BEATA)\s+/i,'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleUpperCase('pt-BR');
     return (!query||hay.includes(query))&&(!alpha||name.startsWith(alpha));
