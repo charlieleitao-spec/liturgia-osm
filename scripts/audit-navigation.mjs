@@ -159,7 +159,7 @@ assert.doesNotMatch(massPage,/office-hours-grid|office-hour-choice/);
 assert.equal((app.match(/liturgiaTodayCard\('/g) || []).length, 2, 'O cartão do dia deve usar o mesmo renderizador nas duas abas.');
 assert.match(css, /#view \.liturgia-celebration-row\{/);
 assert.match(css, /#view \.liturgia-today-card \.action-btn\{[^}]*text-decoration:none/);
-assert.match(app, /Consultar Missa do Dia/);
+assert.doesNotMatch(app, /Consultar Missa do Dia/);
 assert.match(app, /class="action-btn" href="https:[^"]+" target="_blank" rel="noopener">Consultar Ofício do Dia/);
 assert.equal((app.match(/class="card fade-in liturgia-today-card"/g) || []).length, 1, 'Missa e Ofício devem compartilhar um único renderizador do cartão do dia.');
 assert.equal((app.match(/class="liturgia-today-date"/g) || []).length, 1, 'O renderizador compartilhado deve posicionar a data uma única vez.');
