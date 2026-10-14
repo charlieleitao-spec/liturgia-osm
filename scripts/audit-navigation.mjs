@@ -266,7 +266,7 @@ const prayerStart=app.indexOf('function viewOracoesBase480(){');
 const prayerEnd=app.indexOf('let dailyPrayerOpen480',prayerStart);
 const prayerView=app.slice(prayerStart,prayerEnd);
 for(const resource of ["openServite('rosario')","openServite('regra')","openDevo('coroa')","openServite('sabado')","openServite('oficio')"]) assert.ok(prayerView.includes(resource),'Recurso de oração ausente: '+resource);
-assert.equal((app.match(/openDevo\\('coroa'\\)/g)||[]).length,1,'A Coroa deve ter uma única entrada na aba Oração.');
+assert.equal((app.match(/openDevo\('coroa'\)/g)||[]).length,1,'A Coroa deve ter uma única entrada na aba Oração.');
 const libraryStart=app.indexOf('function viewBiblioteca(){');
 const libraryEnd=app.indexOf('const MAIN_I18N=',libraryStart);
 const library=app.slice(libraryStart,libraryEnd);
