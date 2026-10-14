@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.69-ui38-menu-oracao-biblioteca';
+const CACHE = 'liturgia-osm-v4.9.70-ui39-menu-visivel';
 const CORE = [
   "./",
   "./index.html",

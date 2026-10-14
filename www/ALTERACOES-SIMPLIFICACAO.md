@@ -1,4 +1,4 @@
-# Simplificação de layout, interface e navegação (conteúdo web do APK 4.9.69)
+# Simplificação de layout, interface e navegação (conteúdo web do APK 4.9.70)
 
 Arquivos alterados ao longo das rodadas: index.html, app.js, app.css, sw.js e servite.html.
 
@@ -41,11 +41,17 @@ Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebraç�
 19. Recursos: removida a função não utilizada `viewOSMPlus()`. O atalho “Idiomas dos recursos servitas” foi colocado no menu, ao lado do idioma da interface.
 20. APP_VERSION atualizado para 4.9.68; cache: `liturgia-osm-v4.9.68-ui37-missa-hoje-menu`.
 
-## Sétima rodada (4.9.69)
+## Sétima rodada (4.9.70)
 
 21. Menu reorganizado em Leitura, Conteúdo, Preferências e Sobre. Removidos do menu os atalhos de Ofício, Regra, Rosário, Coroa e Sábado Mariano; removido o item sem destino próprio “Idiomas dos recursos servitas”. O único seletor de idioma do menu é o da interface.
 22. Aba Oração: Rosário, Regra, Coroa, Sábado Mariano e Ofício reunidos em “Recursos de oração servita”. A Coroa nativa aparece uma única vez nessa seção.
 23. Biblioteca: removida a busca geral; ficam apenas Favoritos e Últimos acessados. A busca do Santoral permanece.
 24. Retorno do iframe: a seta de voltar foi trocada por um botão Fechar, mantendo uma saída clara do recurso. O retorno flutuante e o retorno da ficha permanecem.
 25. Removido o destino antigo `servite.html?view=idioma`, que abria as configurações gerais em vez de um recurso linguístico.
-26. APP_VERSION atualizado para 4.9.69; cache: `liturgia-osm-v4.9.69-ui38-menu-oracao-biblioteca`.
+26. APP_VERSION atualizado para 4.9.70; cache: `liturgia-osm-v4.9.70-ui38-menu-oracao-biblioteca`.
+
+
+## Oitava rodada (4.9.70)
+
+27. Corrige a visibilidade do menu em telas estreitas: regras responsivas antigas escondiam o primeiro botão da barra superior, agora o único botão é o menu.
+28. Atualiza APP_VERSION e o cache para 4.9.70.
