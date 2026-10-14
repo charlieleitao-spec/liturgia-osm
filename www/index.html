@@ -27,10 +27,7 @@
       <div class="topbar-text">
         <h1>Liturgia <span class="brand-tag">OSM</span></h1>
       </div>
-      <div class="topbar-tools" aria-label="Controles de leitura">
-        <button class="tool-btn" onclick="adjustFont(-0.08)" aria-label="Diminuir texto">A−</button>
-        <button class="tool-btn" onclick="adjustFont(0.08)" aria-label="Aumentar texto">A+</button>
-        <button class="tool-btn" onclick="toggleTheme()" aria-label="Alternar modo claro e escuro" id="themeBtn">☼</button>
+      <div class="topbar-tools" aria-label="Menu">
 <button class="tool-btn" onclick="openMainMenu()" aria-label="Abrir menu" id="menuBtn">☰</button>
       </div>
     </div>
@@ -48,43 +45,7 @@
 </div>
 
 <div id="mainMenuOverlay" class="main-menu-overlay" aria-hidden="true" onclick="if(event.target===this)closeMainMenu()">
- <aside class="main-menu">
-  <div class="main-menu-head"><h3>Menu</h3><button class="tool-btn" onclick="closeMainMenu()">✕</button></div>
-  <div class="menu-section">
-   <div class="menu-label">Tamanho do texto</div>
-   <div class="menu-row">
-    <button class="menu-action" onclick="adjustFont(-0.08)">A−</button>
-    <span class="reader-scale-value">100%</span>
-    <button class="menu-action" onclick="adjustFont(0.08)">A+</button>
-    <button class="menu-action" onclick="resetFont()">100%</button>
-   </div>
-  </div>
-  <div class="menu-section">
-   <div class="menu-label">Aparência</div>
-   <button class="menu-action menu-wide" onclick="toggleTheme()">☼ / ☾ Alternar tema claro/escuro</button>
-  </div>
-  <div class="menu-section">
-   <div class="menu-label">Idioma</div>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();openLanguagePanel()">Alterar idioma</button>
-  </div>
-  <div class="menu-section">
-   <div class="menu-label">Recursos Servitas</div>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();openServite('regra')">Regra OSSM</button>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();openServite('rosario')">Rosário</button>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();openServite('coroa')">Coroa das Sete Dores</button>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();openServite('oficio')">Ofício</button>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();openServite('sabado')">Sábado Mariano</button>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();location.href='./causas-beatos.html'">Causas e Beatos servitas</button>
-  </div>
-  <div class="menu-section">
-   <div class="menu-label">Biblioteca</div>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();setTab('biblioteca')">Favoritos, recentes e pesquisa</button>
-  </div>
-  <div class="menu-section">
-   <div class="menu-label">Aplicativo</div>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();setTab('sobre')">Sobre, créditos e redes sociais</button>
-  </div>
- </aside>
+ <aside class="main-menu"></aside>
 </div>
 
 <div id="languageOverlay" class="language-overlay" aria-hidden="true" onclick="if(event.target===this)closeLanguagePanel()">
