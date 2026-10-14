@@ -37,7 +37,7 @@ assert.match(css, /\.topbar \.brand-tag/);
 assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.68-ui37-missa-hoje-menu/);
 assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
-assert.match(app, /function liturgiaTodayCard\(type,dateValue=''\)/);
+assert.match(app, /function liturgiaTodayCard\(type\)/);
 
 const resourceStart=app.indexOf('function liturgiaResourceRow(title,subtitle,content,subtitleUrl){');
 const resourceEnd=app.indexOf('function liturgiaResourceAction(',resourceStart);
