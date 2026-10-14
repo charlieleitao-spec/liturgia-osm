@@ -24,17 +24,17 @@ for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data
 assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
-assert.match(app, /const APP_VERSION = ['"]4\.9\.64['"]/);
+assert.match(app, /const APP_VERSION = ['"]4\.9\.65['"]/);
 assert.match(app, /menu-label\">Recursos/);
 assert.match(app, /openDailyLiturgy\(\)\">Missa do dia/);
 assert.doesNotMatch(app, /menu-nav-grid|Encontrar uma celebração|Aplicativo disponível|offline-note/);
 assert.doesNotMatch(app, /hub-block-title\">Navegação/);
-assert.match(workflow, /Build APK Liturgia OSM 4\.9\.64/);
-assert.match(workflow, /versionCode 40968/);
+assert.match(workflow, /Build APK Liturgia OSM 4\.9\.65/);
+assert.match(workflow, /versionCode 40969/);
 assert.match(app, /rowtitle">Hoje/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
-assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.64-ui33-calendario-santoral/);
+assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.65-ui34-santoral-abaixo-calendario/);
 assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
 assert.match(app, /function liturgiaTodayCard\(type,dateValue=''\)/);
@@ -228,8 +228,12 @@ assert.ok(vidaView.includes("setTab('calendario')") && vidaView.includes('viewCa
 const calendarStart = app.indexOf('function viewCalendario(){');
 const calendarEnd = app.indexOf('function viewOSMPlus()', calendarStart);
 const calendarView = app.slice(calendarStart, calendarEnd);
-for (const part of ['calendar-month-select', 'calendar-toolbar', 'calendar-grid', 'Celebrações do mês']) assert.ok(calendarView.includes(part), 'Calendário incompleto: ' + part);
-assert.ok(app.includes('data-calendar-search'));
+for (const part of ['calendar-month-select', 'calendar-toolbar', 'calendar-grid', 'Santoral', 'alpha-index', 'data-live-search=\\\"santoral']) assert.ok(calendarView.includes(part), 'Calendário/Santoral incompleto: ' + part);
+assert.ok(!calendarView.includes('Celebrações do mês'), 'A lista mensal repetida deve sair.');
+
+assert.ok(calendarView.includes('${viewSantoralIndex()}'), 'O Santoral visual deve aparecer depois do calendário.');
+assert.ok(app.includes('data-live-search=\\\"santoral'));
+assert.ok(app.includes('function viewSantoralIndex()'));
 assert.ok(app.includes('function liveCalendarSearch(input)'));
 assert.ok(app.includes('function viewSantoral(){if(state.detailId!==null)return viewSaintDetail(state.detailId);return viewCalendario();}'));
 assert.ok(!vidaView.includes('>Santoral</button>'));
