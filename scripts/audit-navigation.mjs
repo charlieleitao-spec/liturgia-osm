@@ -287,7 +287,7 @@ const massScriptEnd = app.indexOf("window.openDailyLiturgy=", massScriptStart);
 assert.ok(app.slice(massScriptStart, massScriptEnd).includes("dailyLiturgyDateDisplay") && app.slice(massScriptStart, massScriptEnd).includes("dateDisplay.textContent=day+'/'+month+'/'+year"), 'A data escolhida deve aparecer no campo da Missa.');
 assert.ok(!app.includes("||state.tab!=='hoje'"), 'O botão Voltar flutuante não deve cobrir as telas principais.');
 assert.ok(html.includes('language-sheet-head') && html.includes('role="dialog"'), 'Seletor de idioma deve permanecer compacto e acessível.');
-assert.ok(app.includes("openServite('idioma')") && app.includes('openLanguagePanel()'), 'Recursos linguísticos servitas e idioma da interface devem manter destinos separados.');
+assert.ok(app.includes('openLanguagePanel()') && !app.includes("openServite('idioma')"), 'Menu mantém o idioma da interface e não oferece um destino sem conteúdo de recursos linguísticos.');
 assert.ok(app.includes('function updateCelebrationButton()') && app.includes('dailyMassOpen') && !app.includes('hub-mode-button'), 'Modo celebração deve usar um controle flutuante único.');
 assert.equal(html.split('onclick=\"toggleCelebrationMode()\"').length-1,1,'A interface deve ter um único controle para o Modo celebração.');
 assert.ok(css.includes('body.light-mode #view .office-hour-choice{background:#f7f4ec!important'), 'Botões de Ofício precisam de contraste no tema claro.');
