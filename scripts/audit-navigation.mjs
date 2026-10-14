@@ -228,12 +228,13 @@ assert.ok(vidaView.includes("setTab('calendario')") && vidaView.includes('viewCa
 const calendarStart = app.indexOf('function viewCalendario(){');
 const calendarEnd = app.indexOf('function viewOSMPlus()', calendarStart);
 const calendarView = app.slice(calendarStart, calendarEnd);
-for (const part of ['calendar-month-select', 'calendar-toolbar', 'calendar-grid', 'Santoral', 'alpha-index', 'data-live-search=\\\"santoral']) assert.ok(calendarView.includes(part), 'Calendário/Santoral incompleto: ' + part);
+for (const part of ['calendar-month-select', 'calendar-toolbar', 'calendar-grid']) assert.ok(calendarView.includes(part), 'Calendário/Santoral incompleto: ' + part);
 assert.ok(!calendarView.includes('Celebrações do mês'), 'A lista mensal repetida deve sair.');
 
 assert.ok(calendarView.includes('${viewSantoralIndex()}'), 'O Santoral visual deve aparecer depois do calendário.');
 assert.ok(app.includes('data-live-search=\\\"santoral'));
 assert.ok(app.includes('function viewSantoralIndex()'));
+assert.ok(app.includes('alpha-index') && app.includes('Santoral</div>'), 'O índice visual do Santoral deve ser mantido.');
 assert.ok(app.includes('function liveCalendarSearch(input)'));
 assert.ok(app.includes('function viewSantoral(){if(state.detailId!==null)return viewSaintDetail(state.detailId);return viewCalendario();}'));
 assert.ok(!vidaView.includes('>Santoral</button>'));
