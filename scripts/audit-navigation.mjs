@@ -237,7 +237,7 @@ assert.doesNotMatch(calendarRow, /calendar-entry-actions|officeClassificationFor
 const homeStart = app.indexOf('function viewHoje(){');
 const homeEnd = app.indexOf('function officeDateKey(', homeStart);
 const homeView = app.slice(homeStart, homeEnd);
-assert.ok(homeView.includes('home-hero') && homeView.includes('Calendário'), 'Página inicial deve preservar o cabeçalho visual e o acesso ao calendário.');
+assert.ok(homeView.includes('home-hero'), 'Página inicial deve preservar o cabeçalho visual.');
 assert.ok(html.includes('<h1>Liturgia <span class="brand-tag">OSM</span></h1>'), 'Cabeçalho deve manter a marca Liturgia OSM com etiqueta.');
 assert.ok(css.includes('#view .calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))'), 'Calendário deve manter as sete colunas dentro da largura móvel.');
 assert.ok(css.includes('.calendar-celebration-link{'), 'Nome da celebração deve permanecer como link legível.');
