@@ -232,8 +232,9 @@ for (const part of ['calendar-month-select', 'calendar-toolbar', 'calendar-grid'
 assert.ok(!calendarView.includes('Celebrações do mês'), 'A lista mensal repetida deve sair.');
 
 assert.ok(calendarView.includes('${viewSantoralIndex()}'), 'O Santoral visual deve aparecer depois do calendário.');
-assert.ok(app.includes('data-live-search=\\\"santoral'));
+
 assert.ok(app.includes('function viewSantoralIndex()'));
+assert.ok(app.includes('data-live-search="santoral'), 'A busca precisa permanecer no Santoral.');
 assert.ok(app.includes('alpha-index') && app.includes('Santoral</div>'), 'O índice visual do Santoral deve ser mantido.');
 assert.ok(app.includes('function liveCalendarSearch(input)'));
 assert.ok(app.includes('function viewSantoral(){if(state.detailId!==null)return viewSaintDetail(state.detailId);return viewCalendario();}'));
