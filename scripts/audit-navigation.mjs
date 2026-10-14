@@ -39,7 +39,6 @@ assert.doesNotMatch(serviteCss,/Cinzel|EB Garamond|Cormorant Garamond|system-ui,
 assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.71-ui40-menu-liturgia-propria/);
 assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
-assert.match(app, /function liturgiaTodayCard\(type\)/);
 
 const resourceStart=app.indexOf('function liturgiaResourceRow(title,subtitle,content,subtitleUrl){');
 const resourceEnd=app.indexOf('function liturgiaResourceAction(',resourceStart);
@@ -66,7 +65,7 @@ assert.match(css,/\.liturgia-resource-row\{/);
 assert.match(css,/\.liturgia-resource-actions/);
 assert.match(css,/\.liturgia-resource-detail\[open\]/);
 const sharedListStart = app.indexOf('function renderLiturgiaCelebrationList(tipo,entries){');
-const sharedListEnd = app.indexOf('\nfunction liturgiaTodayCard(', sharedListStart);
+const sharedListEnd = app.indexOf('\nfunction openSantoralOfficeHour(', sharedListStart);
 assert.ok(sharedListStart >= 0 && sharedListEnd > sharedListStart, 'As duas listas devem compartilhar o mesmo renderizador.');
 const sharedList = app.slice(sharedListStart, sharedListEnd);
 assert.match(sharedList, /class="liturgia-celebration-row"/);

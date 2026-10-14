@@ -77,7 +77,7 @@ assert.match(appJs, /function marianSaturdayOfficeBlocks/);
 assert.match(appJs, /Array\.isArray\(item\.sections\)/);
 assert.match(appJs, /item\.santoral_id!==undefined/);
 assert.match(appJs, /PDF oficial OSM/);
-assert.match(appJs, /paulus\.com\.br\/portal\/liturgia-diaria-das-horas/);
+assert.doesNotMatch(appJs, /paulus\.com\.br\/portal\/liturgia-diaria-das-horas/);
 assert.match(read('www/servite-3.js'), /Transcrição completa do PDF/);
 assert.match(appJs, /pruneDailyMassCache\(\);/);
 assert.match(appJs, /não há cópia local para esta data/i);
