@@ -272,7 +272,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.56';
+const APP_VERSION = '4.9.63';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -386,17 +386,13 @@ function viewHoje(){
       '<button onclick="openSaintSection('+celebration._id+',\'oracao\')">Oração</button></div>';
   }
   const prayer=dailyPrayerSuggestion();
-  return '<div class="connection-strip '+(online?'':'offline')+'"><span class="connection-dot"></span><strong>'+(online?'Aplicativo disponível':'Modo offline ativo')+'</strong><span>Conteúdo salvo no aparelho</span></div>'+
-    '<section class="liturgical-hero home-hero fade-in"><div class="liturgical-kicker">Ordem dos Servos de Maria</div><div class="home-date-line"><strong>'+today.day+'</strong><span>'+escapeHtml(MONTHS[today.month-1])+'</span></div><div class="liturgical-sub">'+escapeHtml(today.weekday)+'</div></section>'+
+  return '<section class="liturgical-hero home-hero fade-in"><div class="liturgical-kicker">Ordem dos Servos de Maria</div><div class="home-date-line"><strong>'+today.day+'</strong><span>'+escapeHtml(MONTHS[today.month-1])+'</span></div><div class="liturgical-sub">'+escapeHtml(today.weekday)+'</div></section>'+
     '<div class="section-title home-heading">Celebração Servita</div>'+celebrationCard+
-    '<div class="section-title home-heading">Encontrar uma celebração</div><div class="home-actions fade-in">'+
-      '<button class="home-action" onclick="setTab(\'calendario\')"><span class="home-action-icon">▦</span><b>Calendário</b><small>Escolha qualquer data</small></button>'+
-      '<button class="home-action" onclick="setTab(\'santoral\')"><span class="home-action-icon">✦</span><b>Santoral</b><small>Todos os santos e beatos OSM</small></button></div>'+
     '<div class="section-title home-heading">Liturgia de hoje</div><div class="presidency-grid fade-in">'+
       '<button class="presidency-card" onclick="openLiturgiaSection(\'missa\')"><span class="presidency-icon">✠</span><b>Missa do dia</b><small>Consulta online com cópia offline</small></button>'+
       '<button class="presidency-card" onclick="openLiturgiaSection(\'horas\')"><span class="presidency-icon">☷</span><b>Liturgia das Horas</b><small>Ofício do dia e textos próprios OSM</small></button></div>'+
     '<div class="section-title home-heading">Oração diária</div><div class="home-prayer-card card fade-in"><div><span class="rank">'+escapeHtml(prayer.label)+'</span><h3>'+(state.angelus==='rainha'?'Rainha do Céu':'O Anjo do Senhor')+'</h3><p>'+escapeHtml(prayer.note)+'</p></div><button class="action-btn" onclick="openDailyPrayer480(\''+escapeHtml(state.angelus)+'\')">Rezar</button></div>'+
-    '<p class="offline-note"><b>Observação:</b> textos já baixados ficam disponíveis sem internet; a primeira consulta da Missa exige conexão.</p>';
+    '';
 }
 
 function officeDateKey(s){return String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0');}
@@ -1343,9 +1339,8 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
 
   const menu=document.querySelector('.main-menu');
   if(menu) menu.innerHTML=`<div class="main-menu-head"><h3>Menu</h3><button class="tool-btn" onclick="closeMainMenu()" aria-label="Fechar menu">✕</button></div>
-    <div class="menu-section"><div class="menu-label">Navegação</div><div class="menu-nav-grid"><button class="menu-action" onclick="closeMainMenu();setTab('hoje')">Hoje</button><button class="menu-action" onclick="closeMainMenu();setTab('calendario')">Calendário</button><button class="menu-action" onclick="closeMainMenu();setTab('santoral')">Santoral</button><button class="menu-action" onclick="closeMainMenu();setTab('oracoes')">Orações</button><button class="menu-action" onclick="closeMainMenu();openServite('oficio')">Ofício</button><button class="menu-action" onclick="closeMainMenu();setTab('biblioteca')">Biblioteca</button></div></div>
     <div class="menu-section"><div class="menu-label">Leitura</div><div class="menu-row"><button class="menu-action" onclick="adjustFont(-0.08)">A−</button><span class="reader-scale-value">100%</span><button class="menu-action" onclick="adjustFont(0.08)">A+</button><button class="menu-action" onclick="resetFont()">Padrão</button></div><button class="menu-action menu-wide" onclick="toggleTheme()">☼ / ☾ Alternar tema claro ou escuro</button></div>
-    <div class="menu-section"><div class="menu-label">Recursos Servitas</div><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('regra')">Regra OSSM</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('rosario')">Rosário</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('coroa')">Coroa das Sete Dores</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('sabado')">Sábado Mariano</button></div>
+    <div class="menu-section"><div class="menu-label">Recursos</div><button class="menu-action menu-wide" onclick="closeMainMenu();openDailyLiturgy()">Missa do dia</button><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('biblioteca')">Biblioteca: favoritos, recentes e busca</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('oficio')">Ofício</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('regra')">Regra OSSM</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('rosario')">Rosário</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('coroa')">Coroa das Sete Dores</button><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('sabado')">Sábado Mariano</button></div>
     <div class="menu-section"><div class="menu-label">Aplicativo</div><button class="menu-action menu-wide" onclick="closeMainMenu();openLanguagePanel()">Idioma da interface</button><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('sobre')">Sobre, créditos e redes sociais</button></div>
     <div class="menu-section"><div class="menu-status"><span class="connection-dot"></span><span>Versão ${APP_VERSION} · textos OSM offline; Missa do dia exige internet ou cópia salva</span></div></div>`;
 
@@ -1456,7 +1451,7 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
   window.moveDailyDate=function(amount){const date=new Date(selectedDate+'T12:00:00');date.setDate(date.getDate()+amount);loadDailyLiturgy(localISO(date));};
   
   const menu=document.querySelector('.main-menu');
-  if(menu){const nav=menu.querySelector('.menu-nav-grid');if(nav)nav.insertAdjacentHTML('beforeend','<button class="menu-action" onclick="closeMainMenu();openDailyLiturgy()">Missa do dia</button>');const status=menu.querySelector('.menu-status span:last-child');if(status)status.textContent=`Versão ${APP_VERSION} · Missa do dia online; cópias locais por até 30 dias`;}
+  if(menu){const status=menu.querySelector('.menu-status span:last-child');if(status)status.textContent=`Versão ${APP_VERSION} · Missa do dia online; cópias locais por até 30 dias`;}
   window.addEventListener('online',()=>{if(document.getElementById('dailyLiturgyOverlay').classList.contains('open'))loadDailyLiturgy(selectedDate);});
   render();
 })();
@@ -1639,7 +1634,7 @@ loadCanonicalSantoral();
       '<section class="hub-block" id="hub-vida"><div class="hub-block-title">Vida</div>'+life+'</section>'+
       '<section class="hub-block" id="hub-liturgia"><div class="hub-block-title">Liturgia</div>'+liturgyBlock(saint)+'</section>'+
       '<section class="hub-block" id="hub-oracao"><div class="hub-block-title">Oração</div>'+prayerBlock(saint)+'</section>'+
-      '<section class="hub-block" id="hub-navegacao"><div class="hub-block-title">Navegação</div>'+navigationBlock(saint)+'</section>'+
+      '<section class="hub-block hub-block-plain" id="hub-navegacao">'+navigationBlock(saint)+'</section>'+
       '</div>';
   };
   window.openSaintSection=function(id,section){
