@@ -25,7 +25,7 @@ assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
 assert.match(app, /const APP_VERSION = ['"]4\.9\.73['"]/);
-assert.match(app, /menu-label\">Conteúdo/);
+assert.match(app, /menu-label\">Biblioteca/);
 assert.match(app, /Consultar Missa desta data/);
 assert.doesNotMatch(app, /onclick="closeMainMenu\(\);openDailyLiturgy\(\)">Missa do dia/);
 assert.doesNotMatch(app, /menu-nav-grid|Encontrar uma celebração|Aplicativo disponível|offline-note/);
