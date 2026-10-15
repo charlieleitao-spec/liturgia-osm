@@ -100,3 +100,10 @@ Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebraç�
 
 43. Recursos Servitas: removidos o seletor de idioma, as traduções auxiliares em latim, italiano e inglês e o código de persistência. O leitor fica em português; textos e funcionalidades portuguesas foram preservados.
 44. APP_VERSION 4.9.77; cache: `liturgia-osm-v4.9.77-ui46-idiomas-removidos`.
+
+
+## Décima sexta rodada (4.9.78)
+
+45. Calendário: separa categoria da pessoa (santo, beato, servo de Deus) do grau litúrgico (solenidade, festa, memória, memória facultativa, comemoração); os dois filtros podem ser combinados.
+46. Simplifica o marcador do calendário para uma única cor e remove a legenda de cores por categoria.
+47. APP_VERSION 4.9.78; cache: `liturgia-osm-v4.9.78-ui47-calendario-categorias`.

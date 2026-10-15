@@ -440,17 +440,9 @@ main#view{position:relative;z-index:1;flex:1;padding:18px 18px 100px;padding-lef
 .calendar-filter{white-space:nowrap;border:1px solid var(--line);background:var(--bg-panel);color:var(--text-muted);border-radius:999px;padding:8px 11px;font-size:12px}
 .calendar-filter.active{border-color:var(--gold);color:var(--gold-soft);background:rgba(196,154,74,.12)}
 .calendar-month-select{width:100%;margin:0 0 12px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:var(--bg-panel);color:var(--paper);font-family:var(--font-app);font-size:15px}
-.cal-day.rank-solemnity .cal-dot{background:#d9b65c;box-shadow:0 0 0 2px rgba(217,182,92,.2)}
-.cal-day.rank-saint .cal-dot{background:#b85566}
-.cal-day.rank-blessed .cal-dot{background:#8c75b8}
-.cal-day.rank-servant .cal-dot{background:#7189a7}
-.calendar-legend{display:flex;flex-wrap:wrap;gap:8px 12px;margin:2px 0 12px;color:var(--text-muted);font-size:11px}
-.calendar-legend span{display:flex;align-items:center;gap:5px}
-.calendar-legend i{width:7px;height:7px;border-radius:50%;display:inline-block}
-.calendar-legend .sol{background:#d9b65c}
-.calendar-legend .san{background:#b85566}
-.calendar-legend .bea{background:#8c75b8}
-.calendar-legend .ser{background:#7189a7}
+.calendar-category-label,.calendar-grade-label{display:block;margin:2px 0 6px;color:var(--text-muted);font-size:12px}
+.calendar-grade-select{margin-top:0}
+.cal-day.has-feast .cal-dot{background:var(--gold-soft)}
 .calendar-celebration-row{display:block;padding:12px 0;border-bottom:1px solid var(--line)}
 .calendar-celebration-row:last-child{border-bottom:0}
 .calendar-celebration-link{display:block;width:100%;color:var(--paper);font:400 17px/1.35 var(--font-app);text-decoration:none}
@@ -909,7 +901,7 @@ body.light-mode .crest{border-color:#b89a5b}
 #view>.toggle-row{width:100%;box-sizing:border-box}
 #view .calendar-month-select{display:block;width:100%;min-height:44px;box-sizing:border-box;margin:0 0 10px}
 #view .calendar-filters{max-width:100%;overscroll-behavior-inline:contain}
-#view .calendar-legend{display:flex;flex-wrap:wrap;gap:7px 12px}
+#view .calendar-category-label,#view .calendar-grade-label{margin-top:8px}
 #view .calendar-toolbar{display:grid;grid-template-columns:42px minmax(0,1fr) 42px;align-items:center;gap:8px}
 #view .calendar-title{min-width:0;text-align:center;overflow-wrap:anywhere}
 #view .calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));width:100%;gap:clamp(3px,1.4vw,6px)}

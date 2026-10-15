@@ -272,7 +272,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.77';
+const APP_VERSION = '4.9.78';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1205,9 +1205,12 @@ function liveCalendarSearch(input){
     if(next){next.focus({preventScroll:true});try{next.setSelectionRange(start,end);}catch(e){}}
   });
 }
-window.calendarRankFilter='todos';
-function rankClass(s){const r=(s?.rank||'').toLowerCase();if(r.includes('solenidade'))return 'solemnity';if(r.includes('beato'))return 'blessed';if(r.includes('servo'))return 'servant';return 'saint';}
-function rankAllowed(s){return calendarRankFilter==='todos'||rankClass(s)===calendarRankFilter;}
+window.calendarPersonFilter='todos';
+window.calendarGradeFilter='todos';
+function calendarGrade(s){return String(s?.grau||'').trim().toLocaleLowerCase('pt-BR');}
+function calendarCategoryAllowed(s){return calendarPersonFilter==='todos'||s?.categoria===calendarPersonFilter;}
+function calendarGradeAllowed(s){return calendarGradeFilter==='todos'||calendarGrade(s)===calendarGradeFilter;}
+function rankAllowed(s){return calendarCategoryAllowed(s)&&calendarGradeAllowed(s);}
 function viewSantoralIndex(){
   const letters=[...new Set(SANTORAL.map(s=>String(s.title||'').replace(/^(SANTO|SANTA|B\.|BEATO|BEATA)\s+/i,'').trim()[0]?.toLocaleUpperCase('pt-BR')).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
   const alpha=state.alpha||'';
@@ -1226,12 +1229,13 @@ function viewCalendario(){
   for(let i=0;i<first;i++)cells+='<div class="cal-day empty"></div>';
   for(let d=1;d<=days;d++){
     const all=SANTORAL.filter(s=>s.month===m+1&&s.day===d),ss=all.filter(rankAllowed),lead=ss[0],isT=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d,isSel=selectedCalDate&&selectedCalDate.getFullYear()===y&&selectedCalDate.getMonth()===m&&selectedCalDate.getDate()===d;
-    cells+=`<button class="cal-day ${ss.length?'has-feast rank-'+rankClass(lead):''} ${isT?'today':''} ${isSel?'selected':''}" onclick="selectCalendarDay(${y},${m},${d})" aria-label="${d} de ${MONTHS[m]}${ss.length?', com celebração OSM':''}">${d}${ss.length?'<span class="cal-dot"></span>':''}</button>`;
+    cells+=`<button class="cal-day ${ss.length?'has-feast':''} ${isT?'today':''} ${isSel?'selected':''}" onclick="selectCalendarDay(${y},${m},${d})" aria-label="${d} de ${MONTHS[m]}${ss.length?', com celebração OSM':''}">${d}${ss.length?'<span class="cal-dot"></span>':''}</button>`;
   }
   let dayBlock='';
   if(selectedCalDate&&selectedCalDate.getFullYear()===y&&selectedCalDate.getMonth()===m){const d=selectedCalDate.getDate(),selected=SANTORAL.filter(s=>s.month===m+1&&s.day===d&&rankAllowed(s));dayBlock=`<div class="section-title">${d} de ${MONTHS[m]}</div>${selected.length?`<div class="card fade-in" style="padding:6px 16px;">${selected.map(calendarCelebrationRow).join('')}</div>`:'<div class="empty-state">Não há celebração desta categoria neste dia.</div>'}`;}
-  const filters=[['todos','Todas'],['solemnity','Solenidades'],['saint','Santos'],['blessed','Beatos'],['servant','Servos de Deus']];
-  return `<div class="section-title">Calendário</div><select class="calendar-month-select" aria-label="Selecionar mês" onchange="setCalendarMonth(this.value)">${MONTHS.map((n,i)=>`<option value="${i}" ${i===m?'selected':''}>${n[0].toUpperCase()+n.slice(1)} ${y}</option>`).join('')}</select><div class="calendar-filters">${filters.map(f=>`<button class="calendar-filter ${calendarRankFilter===f[0]?'active':''}" onclick="setCalendarFilter('${f[0]}')">${f[1]}</button>`).join('')}</div><div class="calendar-legend"><span><i class="sol"></i>Solenidade</span><span><i class="san"></i>Santo</span><span><i class="bea"></i>Beato</span><span><i class="ser"></i>Servo de Deus</span></div><div class="card fade-in"><div class="calendar-toolbar"><button class="cal-nav" onclick="calDate=new Date(${y},${m-1},1);selectedCalDate=null;render()" aria-label="Mês anterior">‹</button><div class="calendar-title">${MONTHS[m]} ${y}</div><button class="cal-nav" onclick="calDate=new Date(${y},${m+1},1);selectedCalDate=null;render()" aria-label="Próximo mês">›</button></div><button class="today-chip" onclick="goCalendarToday()">Ir para hoje</button><div class="calendar-grid">${['D','S','T','Q','Q','S','S'].map(x=>`<div class="cal-head">${x}</div>`).join('')}${cells}</div></div>${dayBlock}${viewSantoralIndex()}`;
+  const categories=[['todos','Todas'],['santo','Santos'],['beato','Beatos'],['servo_de_deus','Servos de Deus']];
+  const grades=[['todos','Todos os graus'],['solenidade','Solenidade'],['festa','Festa'],['memoria','Memória'],['memoria_facultativa','Memória facultativa'],['comemoracao','Comemoração']];
+  return `<div class="section-title">Calendário</div><select class="calendar-month-select" aria-label="Selecionar mês" onchange="setCalendarMonth(this.value)">${MONTHS.map((n,i)=>`<option value="${i}" ${i===m?'selected':''}>${n[0].toUpperCase()+n.slice(1)} ${y}</option>`).join('')}</select><div class="calendar-category-label">Categoria da pessoa</div><div class="calendar-filters">${categories.map(f=>`<button class="calendar-filter ${calendarPersonFilter===f[0]?'active':''}" onclick="setCalendarPersonFilter('${f[0]}')">${f[1]}</button>`).join('')}</div><label class="calendar-grade-label" for="calendar-grade">Grau litúrgico</label><select id="calendar-grade" class="calendar-month-select calendar-grade-select" aria-label="Filtrar por grau litúrgico" onchange="setCalendarGradeFilter(this.value)">${grades.map(g=>`<option value="${g[0]}" ${calendarGradeFilter===g[0]?'selected':''}>${g[1]}</option>`).join('')}</select><div class="card fade-in"><div class="calendar-toolbar"><button class="cal-nav" onclick="calDate=new Date(${y},${m-1},1);selectedCalDate=null;render()" aria-label="Mês anterior">‹</button><div class="calendar-title">${MONTHS[m]} ${y}</div><button class="cal-nav" onclick="calDate=new Date(${y},${m+1},1);selectedCalDate=null;render()" aria-label="Próximo mês">›</button></div><button class="today-chip" onclick="goCalendarToday()">Ir para hoje</button><div class="calendar-grid">${['D','S','T','Q','Q','S','S'].map(x=>`<div class="cal-head">${x}</div>`).join('')}${cells}</div></div>${dayBlock}${viewSantoralIndex()}`;
 }
 function resolveStored(k){let [type,key]=k.split(':');if(type==='saint'){let s=SANTORAL.find(x=>String(x._id)===key);if(s)return {kind:'Santoral',title:s.title,sub:s.date,action:`openSaint(${s._id})`}}else{let p=allPrayerEntries().find(x=>x.key===key);if(p)return {kind:'Oração',title:p.title,sub:p.sub,action:prayerActionForKey(key)}}return null}
 function prayerActionForKey(key){
@@ -1372,7 +1376,8 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
   SANTORAL.forEach(s=>{s.bio=normalizeExtractedProse(s.bio);});
 
   window.setCalendarMonth=function(month){calDate=new Date(calDate.getFullYear(),Number(month),1);selectedCalDate=null;render();};
-  window.setCalendarFilter=function(filter){calendarRankFilter=filter;selectedCalDate=null;render();};
+  window.setCalendarPersonFilter=function(filter){calendarPersonFilter=filter;selectedCalDate=null;render();};
+  window.setCalendarGradeFilter=function(filter){calendarGradeFilter=filter;selectedCalDate=null;render();};
 
 
   let wakeLock=null;

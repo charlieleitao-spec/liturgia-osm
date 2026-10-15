@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.77-ui46-idiomas-removidos';
+const CACHE = 'liturgia-osm-v4.9.78-ui47-calendario-categorias';
 const CORE = [
   "./",
   "./index.html",
