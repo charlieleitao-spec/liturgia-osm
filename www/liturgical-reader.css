@@ -34,3 +34,5 @@ body.liturgical-page #app #view .liturgical-reference{font-family:Georgia,'Times
 
 body.liturgical-page #app #view .prayer-formula-title{font:inherit!important;font-weight:700!important;color:var(--liturgical-ink)!important;text-align:center!important;letter-spacing:normal!important;margin:1em 0!important}
 body.liturgical-page #app #view .liturgical-psalm-quote{font:inherit!important;font-style:italic!important;text-align:left!important;margin:0 0 1em!important}
+
+body.liturgical-page #app #view .mass-psalm-stanza{font:inherit!important;line-height:inherit!important;margin:0 0 1.1em!important;text-align:left!important}

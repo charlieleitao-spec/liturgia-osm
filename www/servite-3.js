@@ -96,7 +96,7 @@ function liturgicalLineHtml(value, verse=false){
     if(number){prefix+='<sup class="verse-number">'+number[1]+'</sup> ';text=text.slice(number[0].length).trimStart();}
   }
   let html=escapeHtml(text);
-  html=html.replace(/^((?:\d+ª\s*)?(?:Ant\.(?:\s*\d+)?|Antífona)|D\.|T\.|C\.|R\.|V\.|A\.|B\.|L\d?:|L\.|℣\.?|℟\.?)(?=\s|[A-Za-zÀ-ÿ]|$)\s*/, '<span class="rubric">$1</span> ');
+  html=html.replace(/^((?:\d+ª\s*)?(?:Ant\.(?:\s*\d+)?|Antífona)|D\.|T\.|C\.|R[./]|V[./]|A\.|B\.|L\d?:|L\.|℣\.?|℟\.?)(?=\s|[A-Za-zÀ-ÿ]|$)\s*/, '<span class="rubric">$1</span> ');
   // Rubric signs remain with the following word when the screen wraps.
   html=html.replace(/(<span class="rubric">[^<]+<\/span>) ([^\s<]+)/g,'<span class="liturgical-cue">$1 $2</span>');
   html=html.replace(/([^\s<>]+)\s+([*†])(?=\s|$)/g,'<span class="liturgical-cue">$1 $2</span>');
@@ -121,15 +121,15 @@ function renderPrayer(text){
   const flush=()=>{
     if(!paragraph.length)return;
     const clean=paragraph.map(line=>normalizeServiteLineBreaks(line).trim()).filter(Boolean);
-    const speaker=/^(?:D\.|T\.|C\.|R\.|V\.|A\.|B\.|L\d?:|L\.)\s*/;
+    const speaker=/^(?:D\.|T\.|C\.|R[./]|V[./]|A\.|B\.|L\d?:|L\.)\s*/;
     const verse=/^(?:[–—=]\s*|\d{1,3}\s*[†*])/;
     let joined;
-    if(poetry)joined=clean.map(escapeHtml).join('<br>');
+    if(poetry)joined=clean.map(line=>liturgicalLineHtml(line,/^(?:SALMO|CÂNTICO)/i.test(poetry))).join('<br>');
     else if(clean.some(speaker.test.bind(speaker))){
       const turns=[];
       for(const line of clean){if(speaker.test(line)||verse.test(line)||!turns.length)turns.push(line);else turns[turns.length-1]+=' '+line;}
-      joined=turns.map(escapeHtml).join('<br>');
-    }else if(clean.some(verse.test.bind(verse)))joined=clean.map(escapeHtml).join('<br>');
+      joined=turns.map(line=>liturgicalLineHtml(line)).join('<br>');
+    }else if(clean.some(verse.test.bind(verse)))joined=clean.map(line=>liturgicalLineHtml(line,true)).join('<br>');
     else joined=escapeHtml(clean.join(' ').replace(/\s+/g,' ').trim());
     const marked=joined.replace(/^(D\.|T\.|C\.|L\.\d?|L\.|V\.|R\.|\u2123\.|\u211f\.)/gm,'<span class="rubric">$1</span>');
     blocks.push(`<p class="prayer-paragraph">${marked}</p>`);paragraph=[];
@@ -139,7 +139,7 @@ function renderPrayer(text){
     if(!line){flush();continue;}
     if(heading.test(line)){
       flush();
-      poetry=/^(?:HINO|CANTO|SALMO|CÂNTICO)/i.test(line);
+      poetry=/^(?:HINO|CANTO|SALMO|CÂNTICO)/i.test(line)?line:false;
       blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
       continue;
     }

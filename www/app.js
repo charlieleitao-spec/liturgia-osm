@@ -146,7 +146,7 @@ function liturgicalLineHtml(value, verse=false){
     if(number){prefix+='<sup class="verse-number">'+number[1]+'</sup> ';text=text.slice(number[0].length).trimStart();}
   }
   let html=escapeHtml(text);
-  html=html.replace(/^((?:\d+ª\s*)?(?:Ant\.(?:\s*\d+)?|Antífona)|D\.|T\.|C\.|R\.|V\.|A\.|B\.|L\d?:|L\.|℣\.?|℟\.?)(?=\s|[A-Za-zÀ-ÿ]|$)\s*/, '<span class="rubric">$1</span> ');
+  html=html.replace(/^((?:\d+ª\s*)?(?:Ant\.(?:\s*\d+)?|Antífona)|D\.|T\.|C\.|R[./]|V[./]|A\.|B\.|L\d?:|L\.|℣\.?|℟\.?)(?=\s|[A-Za-zÀ-ÿ]|$)\s*/, '<span class="rubric">$1</span> ');
   // Rubric signs remain with the following word when the screen wraps.
   html=html.replace(/(<span class="rubric">[^<]+<\/span>) ([^\s<]+)/g,'<span class="liturgical-cue">$1 $2</span>');
   html=html.replace(/([^\s<>]+)\s+([*†])(?=\s|$)/g,'<span class="liturgical-cue">$1 $2</span>');
@@ -170,7 +170,7 @@ function normalizeCopiedLineBreaks(value){
 function formatPrayerStanza(lines, vigilia, hymnMode, preces=false){
   const clean=lines.map(line=>normalizeCopiedLineBreaks(line).trim());
   if(hymnMode) return clean.map(line=>'<span class="'+(hymnMode==='psalm'?'liturgical-verse-line':'liturgical-hymn-line')+'">'+prayerLineHtml(line,hymnMode==='psalm')+'</span>').join('');
-  const speaker=/^(?:D\.|T\.|C\.|R\.|V\.|A\.|B\.|L\d?:|L\.)\s*/;
+  const speaker=/^(?:D\.|T\.|C\.|R[./]|V[./]|A\.|B\.|L\d?:|L\.)\s*/;
   const verse=/^(?:[–—=]\s*|\d{1,3}\s*[†*])/;
   if(clean.some(speaker.test.bind(speaker))){
     const turns=[];
@@ -873,6 +873,10 @@ function properMassTextHtml(title,text){
   if(/^hinos?(?:\s|$)/i.test(String(title||''))){
     const stanzas=clean.split(/\n[ \t]*\n/).map(stanza=>'<p class="mass-hymn-stanza">'+escapeHtml(stanza).replace(/\n/g,'<br>')+'</p>').join('');
     return '<div class="liturgical-reading mass-hymn">'+stanzas+'</div>';
+  }
+  if(/^(?:Salmo|Cântico|Aclamação)/i.test(String(title||''))){
+    const stanzas=clean.split(/\n[ \t]*\n/).map(stanza=>'<p class="mass-psalm-stanza">'+stanza.split('\n').map(line=>'<span class="liturgical-verse-line">'+liturgicalLineHtml(line,true)+'</span>').join('')+'</p>').join('');
+    return '<div class="liturgical-reading mass-psalm">'+stanzas+'</div>';
   }
   const paragraphs=clean.replace(/\r\n?/g,'\n').split(/\n[ \t]*\n+/).map(block=>block.trim()).filter(Boolean);
   const content=paragraphs.map(block=>'<p class="proper-mass-prose">'+escapeHtml(block.replace(/\n[ \t]*/g,' ').replace(/[ \t]+/g,' '))+'</p>').join('');

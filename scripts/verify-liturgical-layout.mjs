@@ -33,6 +33,11 @@ try{
     return {text:node.textContent,verses:node.querySelectorAll('.liturgical-verse-line').length,response:!!node.querySelector('.liturgical-response'),sup:node.querySelector('sup')?.textContent};
   });
   assert.match(preserved.text,/Bendito seja o Senhor, meu rochedo, †/);assert.match(preserved.text,/luta, \*/);assert.match(preserved.text,/Ó Deus, que nos amais, concedei-nos a paz\./);assert.equal(preserved.sup,'1');assert.ok(preserved.response);report.push({preserved});
+  const massPsalm=await page.evaluate(()=>{
+    const n=document.createElement('div');n.innerHTML=properMassTextHtml('Salmo de meditação','R/ O Senhor é meu pastor.\n\nO Senhor é meu pastor, nada me falta;\nem verdes pastagens me faz repousar.');
+    return {lines:n.querySelectorAll('.liturgical-verse-line').length,rubric:n.querySelector('.rubric')?.textContent,text:n.textContent};
+  });
+  assert.equal(massPsalm.lines,3);assert.equal(massPsalm.rubric,'R/');report.push({massPsalm});
   // Use an actual proper office and the full reader in servite.html.
   const saintId=await page.evaluate(()=>SANTORAL.find(s=>s.month===2&&s.day===17)._id);
   await page.goto(`http://127.0.0.1:8766/servite.html?view=oficio:${saintId}:vesperas`);
