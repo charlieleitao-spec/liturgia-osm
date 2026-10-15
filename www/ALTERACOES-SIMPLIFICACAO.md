@@ -68,3 +68,10 @@ Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebraç�
 
 31. Unifica os dois acessos aos Ofícios próprios OSM na aba Liturgia, preservando o cabeçalho editorial, o número do dia, os nomes, as datas, os graus litúrgicos e os conteúdos complementares.
 32. Mantém Missa OSM e Ofício OSM como únicas seções da aba Liturgia e renova o cache.
+
+
+## Décima primeira rodada (4.9.73)
+
+33. Harmoniza os cabeçalhos e as linhas das páginas Missa própria OSM e Ofício próprio OSM, com datas, graus litúrgicos e dias do mês no mesmo padrão.
+34. Remove de Oração o atalho para Ofício próprio, já acessível na aba Liturgia.
+35. Remove do menu os atalhos de Missa do dia e idioma da interface; a consulta da Missa datada permanece na tela Hoje. Atualiza o status e o cache.

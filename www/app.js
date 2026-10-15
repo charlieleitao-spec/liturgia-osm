@@ -272,7 +272,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.72';
+const APP_VERSION = '4.9.73';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -476,9 +476,9 @@ function renderLiturgiaCelebrationList(tipo,entries){
     const subtitle=[...new Set(normalizedSubtitleParts.flatMap(x=>x.split(/\s*·\s*/).map(y=>y.trim()).filter(Boolean)))].join(' · ');
     const reference=tipo==='horas'?Number(saint?._id):Number((window.MISSAS_OSM?.celebrations||[]).indexOf(item));
     const action='openLiturgiaDetail(\''+tipo+'\','+reference+')';
-    const dayNumber=tipo==='horas'&&saint?String(saint.day||''):'';
+    const dayNumber=saint?String(saint.day||''):'';
     const dayMarkup=dayNumber?'<span class="daynum" aria-hidden="true">'+escapeHtml(dayNumber)+'</span>':'';
-    return '<button class="liturgia-celebration-row '+(tipo==='horas'?'liturgia-office-row':'')+'" type="button" onclick="'+action+'" aria-label="Abrir '+escapeHtml(title)+'"><span class="liturgia-daynum">'+dayMarkup+'</span><span class="rowtext"><span class="rowtitle">'+escapeHtml(title)+'</span><span class="rowrank">'+escapeHtml(subtitle)+'</span></span><span class="chev" aria-hidden="true">›</span></button>';
+    return '<button class="liturgia-celebration-row '+(dayNumber?'liturgia-day-row':'')+'" type="button" onclick="'+action+'" aria-label="Abrir '+escapeHtml(title)+'"><span class="liturgia-daynum">'+dayMarkup+'</span><span class="rowtext"><span class="rowtitle">'+escapeHtml(title)+'</span><span class="rowrank">'+escapeHtml(subtitle)+'</span></span><span class="chev" aria-hidden="true">›</span></button>';
   }).join('');
   return '<div class="card fade-in">'+(rows||'<div class="empty-state">Nenhuma celebração própria cadastrada.</div>')+'</div>';
 }
@@ -581,7 +581,6 @@ function viewOracoesBase480(){
       <button class="quick-card" onclick="openServite('regra')"><b>Regra OSSM</b><span>Espiritualidade da Ordem Secular</span></button>
       <button class="quick-card" onclick="openDevo('coroa')"><b>Coroa das Sete Dores</b><span>Oração pelas dores de Maria</span></button>
       <button class="quick-card" onclick="openServite('sabado')"><b>Sábado Mariano</b><span>Ofícios e devoções marianas</span></button>
-      <button class="quick-card" onclick="openLiturgiaSection('horas')"><b>Ofício próprio OSM</b><span>Celebrações com textos próprios do Ofício</span></button>
     </div>
 
     <div class="section-title">Orações várias</div>
@@ -1066,7 +1065,7 @@ function viewLiturgia(){
   const canonicalMasses=liturgiaCelebrations('missa');
   const movableRows=movableMasses.map(item=>({mass:item}));
   const marianSaturdayRows=marianSaturdayMasses.map(item=>({mass:item}));
-  return switcher+`<div class="section-title">Missas próprias OSM</div>
+  return switcher+`<header class="liturgia-own-heading"><h1>Missa própria OSM</h1><p>Celebrações com textos próprios da Missa</p><span aria-hidden="true"></span></header>
     ${renderLiturgiaCelebrationList('missa',canonicalMasses)}`+
     (movableRows.length?'<div class="section-title">Missas de celebrações móveis</div>'+renderLiturgiaCelebrationList('missa',movableRows):'')+
     (marianSaturdayRows.length?'<div class="section-title">Missas de Santa Maria no Sábado</div>'+renderLiturgiaCelebrationList('missa',marianSaturdayRows):'');
@@ -1356,10 +1355,9 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
   const menu=document.querySelector('.main-menu');
   if(menu) menu.innerHTML=`<div class="main-menu-head"><h3>Menu</h3><button class="tool-btn" onclick="closeMainMenu()" aria-label="Fechar menu">✕</button></div>
     <div class="menu-section"><div class="menu-label">Leitura</div><div class="menu-row"><button class="menu-action" onclick="adjustFont(-0.08)">A−</button><span class="reader-scale-value">100%</span><button class="menu-action" onclick="adjustFont(0.08)">A+</button><button class="menu-action" onclick="resetFont()">Padrão</button></div><button class="menu-action menu-wide" onclick="toggleTheme()">☼ / ☾ Alternar tema claro ou escuro</button></div>
-    <div class="menu-section"><div class="menu-label">Conteúdo</div><button class="menu-action menu-wide" onclick="closeMainMenu();openDailyLiturgy()">Missa do dia</button><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('biblioteca')">Biblioteca: favoritos e recentes</button></div>
-    <div class="menu-section"><div class="menu-label">Preferências</div><button class="menu-action menu-wide" onclick="closeMainMenu();openLanguagePanel()">Idioma da interface</button></div>
+    <div class="menu-section"><div class="menu-label">Biblioteca</div><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('biblioteca')">Favoritos e recentes</button></div>
     <div class="menu-section"><div class="menu-label">Sobre</div><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('sobre')">Sobre, créditos e redes sociais</button></div>
-    <div class="menu-section"><div class="menu-status"><span class="connection-dot"></span><span>Versão ${APP_VERSION} · textos OSM offline; Missa do dia exige internet ou cópia salva</span></div></div>`;
+    <div class="menu-section"><div class="menu-status"><span class="connection-dot"></span><span>Versão ${APP_VERSION} · Missa e Ofício próprios OSM disponíveis offline</span></div></div>`;
 
   window.addEventListener('online',()=>{if(state.tab==='hoje')render();});
   window.addEventListener('offline',()=>{if(state.tab==='hoje')render();});
@@ -1469,7 +1467,7 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
   window.moveDailyDate=function(amount){const date=new Date(selectedDate+'T12:00:00');date.setDate(date.getDate()+amount);loadDailyLiturgy(localISO(date));};
   
   const menu=document.querySelector('.main-menu');
-  if(menu){const status=menu.querySelector('.menu-status span:last-child');if(status)status.textContent=`Versão ${APP_VERSION} · Missa do dia online; cópias locais por até 30 dias`;}
+  if(menu){const status=menu.querySelector('.menu-status span:last-child');if(status)status.textContent=`Versão ${APP_VERSION} · Missa e Ofício próprios OSM disponíveis offline`;}
   window.addEventListener('online',()=>{if(document.getElementById('dailyLiturgyOverlay').classList.contains('open'))loadDailyLiturgy(selectedDate);});
   render();
 })();
