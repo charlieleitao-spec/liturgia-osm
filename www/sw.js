@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.71-ui40-menu-liturgia-propria';
+const CACHE = 'liturgia-osm-v4.9.72-ui41-oficio-proprio-unificado';
 const CORE = [
   "./",
   "./index.html",

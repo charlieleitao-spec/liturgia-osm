@@ -62,3 +62,9 @@ Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebraç�
 29. A aba Liturgia passa a mostrar somente as Missas próprias OSM e os Ofícios próprios OSM; remove o cartão de data e o atalho para a fonte externa da Paulus.
 30. Identifica as seções como Missa OSM e Ofício OSM e renova o cache.
 31. Harmoniza as fontes da interface e dos recursos servitas com Georgia, preservando tamanhos, pesos e estilos de leitura.
+
+
+## Décima rodada (4.9.72)
+
+31. Unifica os dois acessos aos Ofícios próprios OSM na aba Liturgia, preservando o cabeçalho editorial, o número do dia, os nomes, as datas, os graus litúrgicos e os conteúdos complementares.
+32. Mantém Missa OSM e Ofício OSM como únicas seções da aba Liturgia e renova o cache.

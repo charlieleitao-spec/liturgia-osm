@@ -272,7 +272,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.71';
+const APP_VERSION = '4.9.72';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -476,7 +476,9 @@ function renderLiturgiaCelebrationList(tipo,entries){
     const subtitle=[...new Set(normalizedSubtitleParts.flatMap(x=>x.split(/\s*·\s*/).map(y=>y.trim()).filter(Boolean)))].join(' · ');
     const reference=tipo==='horas'?Number(saint?._id):Number((window.MISSAS_OSM?.celebrations||[]).indexOf(item));
     const action='openLiturgiaDetail(\''+tipo+'\','+reference+')';
-    return '<button class="liturgia-celebration-row" type="button" onclick="'+action+'" aria-label="Abrir '+escapeHtml(title)+'"><span class="rowtext"><span class="rowtitle">'+escapeHtml(title)+'</span><span class="rowrank">'+escapeHtml(subtitle)+'</span></span><span class="chev" aria-hidden="true">›</span></button>';
+    const dayNumber=tipo==='horas'&&saint?String(saint.day||''):'';
+    const dayMarkup=dayNumber?'<span class="daynum" aria-hidden="true">'+escapeHtml(dayNumber)+'</span>':'';
+    return '<button class="liturgia-celebration-row '+(tipo==='horas'?'liturgia-office-row':'')+'" type="button" onclick="'+action+'" aria-label="Abrir '+escapeHtml(title)+'"><span class="liturgia-daynum">'+dayMarkup+'</span><span class="rowtext"><span class="rowtitle">'+escapeHtml(title)+'</span><span class="rowrank">'+escapeHtml(subtitle)+'</span></span><span class="chev" aria-hidden="true">›</span></button>';
   }).join('');
   return '<div class="card fade-in">'+(rows||'<div class="empty-state">Nenhuma celebração própria cadastrada.</div>')+'</div>';
 }
@@ -579,7 +581,7 @@ function viewOracoesBase480(){
       <button class="quick-card" onclick="openServite('regra')"><b>Regra OSSM</b><span>Espiritualidade da Ordem Secular</span></button>
       <button class="quick-card" onclick="openDevo('coroa')"><b>Coroa das Sete Dores</b><span>Oração pelas dores de Maria</span></button>
       <button class="quick-card" onclick="openServite('sabado')"><b>Sábado Mariano</b><span>Ofícios e devoções marianas</span></button>
-      <button class="quick-card" onclick="openServite('oficio')"><b>Ofício</b><span>Horas e textos litúrgicos próprios</span></button>
+      <button class="quick-card" onclick="openLiturgiaSection('horas')"><b>Ofício próprio OSM</b><span>Celebrações com textos próprios do Ofício</span></button>
     </div>
 
     <div class="section-title">Orações várias</div>
@@ -1055,7 +1057,7 @@ function viewLiturgia(){
   if(state.liturgiaDetail){const detail=renderLiturgiaDetail(state.liturgiaDetail.tipo,state.liturgiaDetail.reference);if(detail)return switcher+detail;}
   if(section==='horas'){
     const officeWarning=!oficiosReady?'<div class="card" role="alert"><p>O cadastro local dos Ofícios está indisponível. A Vida e as orações continuam acessíveis.</p><button class="action-btn" onclick="loadCanonicalOffices()">Tentar carregar os Ofícios</button></div>':'';
-    const ownBlocks='<div class="section-title">Ofícios próprios OSM</div>'+renderLiturgiaCelebrationList('horas',liturgiaCelebrations('horas'));
+    const ownBlocks='<header class="liturgia-own-heading"><h1>Ofício próprio OSM</h1><p>Celebrações com textos próprios do Ofício</p><span aria-hidden="true"></span></header>'+renderLiturgiaCelebrationList('horas',liturgiaCelebrations('horas'));
     return switcher+officeWarning+(oficiosReady?ownBlocks+movableOfficeBlocks()+marianSaturdayOfficeBlocks():'');
   }
   const records=window.MISSAS_OSM&&Array.isArray(window.MISSAS_OSM.celebrations)?window.MISSAS_OSM.celebrations:[];
