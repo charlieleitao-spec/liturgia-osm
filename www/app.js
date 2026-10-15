@@ -580,7 +580,6 @@ function viewOracoesBase480(){
       <button class="quick-card" onclick="openServite('rosario')"><b>Rosário</b><span>Rosário guiado</span></button>
       <button class="quick-card" onclick="openServite('regra')"><b>Regra OSSM</b><span>Espiritualidade da Ordem Secular</span></button>
       <button class="quick-card" onclick="openDevo('coroa')"><b>Coroa das Sete Dores</b><span>Oração pelas dores de Maria</span></button>
-      <button class="quick-card" onclick="openMarianSaturdayOffices()"><b>Santa Maria no Sábado</b><span>Cinco formulários próprios do Tempo Comum</span></button>
     </div>
 
     <div class="section-title">Orações várias</div>
