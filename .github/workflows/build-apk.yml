@@ -137,11 +137,25 @@ jobs:
           test -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
           test -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
           test -f android/app/src/main/res/mipmap-mdpi/ic_launcher_monochrome.png
+      - name: Preparar instrumentação de validação da versão release
+        run: |
+          mkdir -p android/app/src/androidTest/java/com/liturgia_osm/validation
+          cp scripts/android-validation/UpgradeInstrumentation.java android/app/src/androidTest/java/com/liturgia_osm/validation/
+          python3 - <<'PYTEST'
+          from pathlib import Path
+          p = Path('android/app/build.gradle')
+          s = p.read_text()
+          import re
+          s = re.sub(r'testInstrumentationRunner "[^"]+"', 'testInstrumentationRunner "com.liturgia_osm.validation.UpgradeInstrumentation"', s)
+          s = s.replace('android {', "android {\n    testBuildType 'release'", 1)
+          p.write_text(s)
+          PYTEST
+
       - name: Gerar APK
         working-directory: android
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease
+          ./gradlew assembleRelease assembleReleaseAndroidTest
 
       - name: Nomear APK
         run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.86.apk
@@ -190,7 +204,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
-          target: default
+          target: google_apis
           arch: x86_64
           profile: pixel_6
           disable-animations: true
