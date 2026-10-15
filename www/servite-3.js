@@ -41,15 +41,14 @@ seu coração não conheceu os meus caminhos!"
 como era no princípio, agora e sempre. Amém!`;
 
 // ===================== i18n helpers =====================
-let LANG = 'pt';
-function t(key){
-  return (I18N[LANG] && I18N[LANG][key]) || I18N.pt[key] || key;
+function ptText(key){
+  return SERVITE_TEXT_PT[key] || key;
 }
 
 function todayInfo(){
   const d = new Date();
-  const months = MONTHS_I18N[LANG] || MONTHS_I18N.pt;
-  const weekdays = WEEKDAYS_I18N[LANG] || WEEKDAYS_I18N.pt;
+  const months = MONTHS_PT;
+  const weekdays = WEEKDAYS_PT;
   return { day:d.getDate(), month:d.getMonth()+1, weekday:weekdays[d.getDay()], monthName:months[d.getMonth()] };
 }
 
@@ -272,7 +271,7 @@ function renderFinalAntifonaBlock(){
   const active = FINAL_ANTIFONAS.find(a => a.key === state.finalAntifona);
   return `
     <div class="hour-divider"></div>
-    <div class="hour-sublabel">${escapeHtml(t('antifonasTitle'))}</div>
+    <div class="hour-sublabel">${escapeHtml(ptText('antifonasTitle'))}</div>
     <div class="hour-tabs" style="margin-bottom:10px;">${tabs}</div>
     <div class="fade-in">
       <div style="font-family:'Cinzel',serif; font-size:0.75rem; letter-spacing:.04em; color:var(--text-faint); margin-bottom:6px;">${escapeHtml(active.titleLat)}</div>
@@ -317,11 +316,11 @@ function renderOficioTabs(oficioData){
     buckets = splitOficioByHour(String(oficioData||''));
   }
   const order = [
-    { key:'invitatorio', title:t('hourInvitatorio') },
-    { key:'oficio', title:t('hourOficio') },
-    { key:'laudes', title:t('hourLaudes') },
-    { key:'horaMedia', title:t('hourHoraMedia') },
-    { key:'vesperas', title:t('hourVesperas') },
+    { key:'invitatorio', title:ptText('hourInvitatorio') },
+    { key:'oficio', title:ptText('hourOficio') },
+    { key:'laudes', title:ptText('hourLaudes') },
+    { key:'horaMedia', title:ptText('hourHoraMedia') },
+    { key:'vesperas', title:ptText('hourVesperas') },
   ].filter(o => buckets[o.key] && buckets[o.key].length);
 
   if(!order.length) return '';
@@ -344,20 +343,12 @@ function renderOficioTabs(oficioData){
   `;
 }
 
-// note shown under non-Portuguese-translated content
-function langNoteHtml(){
-  if(LANG === 'pt') return '';
-  return `<p class="lang-note">${escapeHtml(t('langNote'))}</p>`;
-}
-
 function dailyPrayerText(which){
-  if(LANG === 'pt') return which === 'anjo' ? PRAYERS.daily.anjo : PRAYERS.daily.rainha;
-  return DAILY_I18N[which][LANG];
+  return which === 'anjo' ? PRAYERS.daily.anjo : PRAYERS.daily.rainha;
 }
 
 function stabatText(){
-  if(LANG === 'pt') return PRAYERS.devotions.stabat;
-  return STABAT_I18N[LANG];
+  return PRAYERS.devotions.stabat;
 }
 
 // ===================== state =====================
@@ -406,18 +397,17 @@ function viewHoje(){
   if(saint){
     saintHtml = `
       <div class="card saint-card fade-in">
-        <span class="rank">${escapeHtml(saint.rank || t('memoriaBadge'))}</span>
+        <span class="rank">${escapeHtml(saint.rank || ptText('memoriaBadge'))}</span>
         <h2>${escapeHtml(saint.title)}</h2>
         <div class="date-line">${escapeHtml(saint.date)} · Ordo Servorum Mariæ</div>
-        ${langNoteHtml()}
-        <div class="link-row"><button class="btn-link" onclick="openDetail(${saint._id})">${escapeHtml(t('readBio'))}</button></div>
+        <div class="link-row"><button class="btn-link" onclick="openDetail(${saint._id})">${escapeHtml(ptText('readBio'))}</button></div>
       </div>`;
   } else {
     saintHtml = `
       <div class="card saint-card fade-in">
-        <span class="rank">${escapeHtml(t('hojeBadge'))}</span>
-        <p class="empty-note">${escapeHtml(t('noSaintToday'))} <b style="color:var(--gold-soft); font-style:normal;">${escapeHtml(next.title)}</b>, ${escapeHtml(t('em'))} ${escapeHtml(next.date)}.</p>
-        <div class="link-row"><button class="btn-link" onclick="openDetail(${next._id})">${escapeHtml(t('viewCelebration'))}</button></div>
+        <span class="rank">${escapeHtml(ptText('hojeBadge'))}</span>
+        <p class="empty-note">${escapeHtml(ptText('noSaintToday'))} <b style="color:var(--gold-soft); font-style:normal;">${escapeHtml(next.title)}</b>, ${escapeHtml(ptText('em'))} ${escapeHtml(next.date)}.</p>
+        <div class="link-row"><button class="btn-link" onclick="openDetail(${next._id})">${escapeHtml(ptText('viewCelebration'))}</button></div>
       </div>`;
   }
 
@@ -425,18 +415,18 @@ function viewHoje(){
     <div class="hero-date fade-in">
       <div class="weekday">${escapeHtml(ti.weekday)}</div>
       <div class="day">${ti.day}</div>
-      <div class="month">${LANG==='pt'?'de ':''}${escapeHtml(ti.monthName)}</div>
+      <div class="month">de ${escapeHtml(ti.monthName)}</div>
       <div class="hero-divider"></div>
     </div>
 
-    <div class="section-title">${escapeHtml(t('todaySection'))}</div>
+    <div class="section-title">${escapeHtml(ptText('todaySection'))}</div>
     ${saintHtml}
 
-    <div class="section-title">${escapeHtml(t('dailyPrayerSection'))}</div>
+    <div class="section-title">${escapeHtml(ptText('dailyPrayerSection'))}</div>
     <div class="card fade-in">
       <div class="toggle-row">
-        <button class="toggle-btn ${state.angelus==='anjo'?'active':''}" onclick="setAngelus('anjo')">${escapeHtml(t('anjoLabel'))}</button>
-        <button class="toggle-btn ${state.angelus==='rainha'?'active':''}" onclick="setAngelus('rainha')">${escapeHtml(t('rainhaLabel'))}</button>
+        <button class="toggle-btn ${state.angelus==='anjo'?'active':''}" onclick="setAngelus('anjo')">${escapeHtml(ptText('anjoLabel'))}</button>
+        <button class="toggle-btn ${state.angelus==='rainha'?'active':''}" onclick="setAngelus('rainha')">${escapeHtml(ptText('rainhaLabel'))}</button>
       </div>
       <div class="prayer-block">${renderPrayer(dailyPrayerText(state.angelus))}</div>
     </div>
@@ -449,11 +439,11 @@ function viewSantoral(){
   }
   const q = state.search.trim().toLowerCase();
   const filtered = q ? SANTORAL.filter(s => s.title.toLowerCase().includes(q) || s.date.toLowerCase().includes(q)) : SANTORAL;
-  const months = MONTHS_I18N[LANG] || MONTHS_I18N.pt;
+  const months = MONTHS_PT;
 
   let listHtml = '';
   if(!filtered.length){
-    listHtml = `<div class="no-results">${escapeHtml(t('noResults'))} "${escapeHtml(state.search)}".</div>`;
+    listHtml = `<div class="no-results">${escapeHtml(ptText('noResults'))} "${escapeHtml(state.search)}".</div>`;
   } else if(q){
     listHtml = filtered.map(rowHtml).join('');
   } else {
@@ -465,13 +455,12 @@ function viewSantoral(){
   }
 
   return `
-    <div class="section-title">${escapeHtml(t('santoralSection'))}</div>
+    <div class="section-title">${escapeHtml(ptText('santoralSection'))}</div>
     <p style="color:var(--text-muted); font-size:0.9688rem; line-height:1.6; margin:-4px 0 18px;">
-      ${escapeHtml(t('santoralIntro'))}
+      ${escapeHtml(ptText('santoralIntro'))}
     </p>
-    ${langNoteHtml()}
     <div class="search-wrap">
-      <input class="search-input" type="text" placeholder="${escapeHtml(t('searchPlaceholder'))}" value="${escapeHtml(state.search)}" oninput="onSearch(this.value)">
+      <input class="search-input" type="text" placeholder="${escapeHtml(ptText('searchPlaceholder'))}" value="${escapeHtml(state.search)}" oninput="onSearch(this.value)">
     </div>
     ${listHtml}
   `;
@@ -496,11 +485,11 @@ function onSearch(val){ state.search = val; render(true); }
 
 function viewDetail(id){
   const s = SANTORAL.find(x=>x._id===id);
-  if(!s) return `<div class="no-results">${escapeHtml(t('notFound'))}</div>`;
+  if(!s) return `<div class="no-results">${escapeHtml(ptText('notFound'))}</div>`;
   return `
     <button class="back-btn" onclick="closeDetail()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
-      ${escapeHtml(t('back'))}
+      ${escapeHtml(ptText('back'))}
     </button>
     <div class="detail-header fade-in">
       <div class="rank">${escapeHtml(s.rank||'')}</div>
@@ -508,19 +497,18 @@ function viewDetail(id){
       <div class="date-line">${escapeHtml(s.date)}</div>
       <div class="detail-divider"></div>
     </div>
-    ${langNoteHtml()}
     ${saintImageHtml(s, true)}
     <div class="bio-text fade-in">${escapeHtml(s.bio)}</div>
     ${s.prayer ? `
     <div class="prayer-card fade-in">
-      <div class="label">${escapeHtml(t('oracao'))}</div>
+      <div class="label">${escapeHtml(ptText('oracao'))}</div>
       <div class="text">${escapeHtml(s.prayer)}</div>
     </div>` : ''}
     ${s.oficio ? `
-    <div class="section-title" style="margin-top:30px;">${escapeHtml(t('liturgyHours'))}</div>
+    <div class="section-title" style="margin-top:30px;">${escapeHtml(ptText('liturgyHours'))}</div>
     <div class="card fade-in">
       <button class="btn-link" style="width:100%; text-align:center;" onclick="toggleOficio()">
-        ${state.showOficio ? escapeHtml(t('hideOffice')) : escapeHtml(t('showOffice'))}
+        ${state.showOficio ? escapeHtml(ptText('hideOffice')) : escapeHtml(ptText('showOffice'))}
       </button>
       ${state.showOficio ? `<div class="prayer-block" style="margin-top:16px;">${renderOficioTabs(s.oficio)}${s.pdf_transcript?`<details style="margin-top:14px;"><summary class="btn-link">Transcrição completa do PDF</summary><div class="hub-text" style="white-space:pre-wrap;margin-top:10px;">${escapeHtml(s.pdf_transcript)}</div></details>`:''}${s.local_pdf_url?`<a class="btn-link" style="display:block;text-align:center;margin-top:14px;" href="${escapeHtml(s.local_pdf_url)}" target="_blank" rel="noopener">Abrir PDF baixado completo</a>`:''}${s.pdf_url?`<a class="btn-link" style="display:block;text-align:center;margin-top:8px;" href="${escapeHtml(s.pdf_url)}" target="_blank" rel="noopener">Fonte oficial OSM</a>`:''}</div>` : ''}
     </div>` : ''}
@@ -534,14 +522,14 @@ function setFinalAntifona(key){ state.finalAntifona = key; render(); }
 
 function getDevoList(){
   return [
-    { key:'vigilia', title:t('vigiliaTitle'), sub:t('vigiliaSub') },
-    { key:'adoracao', title:t('adoracaoTitle'), sub:t('adoracaoSub') },
-    { key:'antifonas', title:t('antifonasTitle'), sub:t('antifonasSub') },
-    { key:'coroa', title:t('coroaTitle'), sub:t('coroaSub') },
+    { key:'vigilia', title:ptText('vigiliaTitle'), sub:ptText('vigiliaSub') },
+    { key:'adoracao', title:ptText('adoracaoTitle'), sub:ptText('adoracaoSub') },
+    { key:'antifonas', title:ptText('antifonasTitle'), sub:ptText('antifonasSub') },
+    { key:'coroa', title:ptText('coroaTitle'), sub:ptText('coroaSub') },
     { key:'rosario', title:'Rosário — quatro mistérios', sub:'Método de São Luís Maria de Montfort e Mistérios Luminosos' },
-    { key:'stabat', title:t('stabatTitle'), sub:t('stabatSub') },
-    { key:'via_matris', title:t('viaMatrisTitle'), sub:t('viaMatrisSub') },
-    { key:'ladainhas', title:t('ladainhasTitle'), sub:t('ladainhasSub') },
+    { key:'stabat', title:ptText('stabatTitle'), sub:ptText('stabatSub') },
+    { key:'via_matris', title:ptText('viaMatrisTitle'), sub:ptText('viaMatrisSub') },
+    { key:'ladainhas', title:ptText('ladainhasTitle'), sub:ptText('ladainhasSub') },
   ];
 }
 function getVariasList(){
@@ -563,22 +551,21 @@ function viewOracoes(){
   if(state.devo) return viewDevoDetail(state.devo);
 
   return `
-    <div class="section-title">${escapeHtml(t('dailyMarianTitle'))}</div>
+    <div class="section-title">${escapeHtml(ptText('dailyMarianTitle'))}</div>
     <div class="card fade-in">
       <div class="toggle-row">
-        <button class="toggle-btn ${state.angelus==='anjo'?'active':''}" onclick="setAngelus('anjo')">${escapeHtml(t('anjoLabel'))}</button>
-        <button class="toggle-btn ${state.angelus==='rainha'?'active':''}" onclick="setAngelus('rainha')">${escapeHtml(t('rainhaLabel'))}</button>
+        <button class="toggle-btn ${state.angelus==='anjo'?'active':''}" onclick="setAngelus('anjo')">${escapeHtml(ptText('anjoLabel'))}</button>
+        <button class="toggle-btn ${state.angelus==='rainha'?'active':''}" onclick="setAngelus('rainha')">${escapeHtml(ptText('rainhaLabel'))}</button>
       </div>
       <div class="prayer-block">${renderPrayer(dailyPrayerText(state.angelus))}</div>
     </div>
 
-    <div class="section-title">${escapeHtml(t('marianHomageTitle'))}</div>
+    <div class="section-title">${escapeHtml(ptText('marianHomageTitle'))}</div>
     <div class="card fade-in" style="padding:6px 16px;">
       ${getDevoList().map(devoRowHtml).join('')}
     </div>
 
-    <div class="section-title">${escapeHtml(t('variousPrayersTitle'))}</div>
-    ${LANG!=='pt' ? langNoteHtml() : ''}
+    <div class="section-title">${escapeHtml(ptText('variousPrayersTitle'))}</div>
     <div class="card fade-in" style="padding:6px 16px;">
       ${getVariasList().map(devoRowHtml).join('')}
     </div>
@@ -592,19 +579,19 @@ function viewDevoDetail(key){
   if(key.startsWith('varias')){
     const idx = parseInt(key.slice('varias'.length));
     const item = PRAYERS.devotions.variasHome[idx];
-    return simpleTextDetail(item.title, item.sub || '', item.text, null, true);
+    return simpleTextDetail(item.title, item.sub || '', item.text, null);
   }
   if(key === 'coroa') return viewCoroa();
   if(key === 'rosario') return viewRosario();
-  if(key === 'adoracao') return simpleTextDetail(t('adoracaoTitle'), t('adoracaoSub'), PRAYERS.devotions.adoracao, null, true);
-  if(key === 'antifonas') return simpleTextDetail(t('antifonasTitle'), t('antifonasSub'), PRAYERS.devotions.antifonas, null, true);
-  if(key === 'stabat') return simpleTextDetail(t('stabatTitle'), t('stabatSub'), stabatText());
+  if(key === 'adoracao') return simpleTextDetail(ptText('adoracaoTitle'), ptText('adoracaoSub'), PRAYERS.devotions.adoracao, null);
+  if(key === 'antifonas') return simpleTextDetail(ptText('antifonasTitle'), ptText('antifonasSub'), PRAYERS.devotions.antifonas, null);
+  if(key === 'stabat') return simpleTextDetail(ptText('stabatTitle'), ptText('stabatSub'), stabatText());
   if(key === 'vigilia') return viewVigilia();
   if(key === 'sabado') return viewSabado();
   if(key === 'via_matris') return viewViaMatris();
   if(key === 'ladainhas') return viewLadainhas();
   if(key === 'oficio') return viewOficioIndex();
-  return `<div class="no-results">${escapeHtml(t('notFound'))}</div>`;
+  return `<div class="no-results">${escapeHtml(ptText('notFound'))}</div>`;
 }
 
 function openSaintOffice(id){
@@ -615,7 +602,7 @@ function openSaintOffice(id){
 }
 function viewOficioIndex(){
   const items=SANTORAL.filter(s=>s.oficio && (typeof s.oficio==='string' ? s.oficio.trim() : Object.keys(s.oficio||{}).length));
-  return `<button class="back-btn" onclick="backToOracoes()">← ${escapeHtml(t('back')||'Voltar')}</button>
+  return `<button class="back-btn" onclick="backToOracoes()">← ${escapeHtml(ptText('back')||'Voltar')}</button>
     <div class="detail-header fade-in"><h2>Ofício próprio OSM</h2><div class="date-line">Celebrações com textos próprios do Ofício</div><div class="detail-divider"></div></div>
     <div class="card fade-in" style="padding:6px 16px;">${items.length?items.map(s=>`<div class="saint-row" onclick="openSaintOffice(${s._id})"><div class="daynum">${s.day}</div><div class="rowtext"><div class="rowtitle">${escapeHtml(s.title)}</div><div class="rowrank">${escapeHtml(s.date||'')}</div></div><div class="chev">›</div></div>`).join(''):'<div class="no-results">Nenhum Ofício próprio cadastrado.</div>'}</div>`;
 }
@@ -645,7 +632,7 @@ function viewRosario(){
   const set=rosarioCurrent();
   if(state.devoSub==='guided') return viewRosarioGuided();
   const tabs=Object.entries(ROSARIO_MISTERIOS).map(([key,item])=>`<button class="hour-tab-btn ${state.rosarioSet===key?'active':''}" onclick="setRosarioSet('${key}')">${escapeHtml(item.label)}</button>`).join('');
-  return `<button class="back-btn" onclick="backToOracoes()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>${escapeHtml(t('back'))}</button><div class="detail-header fade-in"><h2 style="font-size:1.625rem;">Rosário</h2><div class="date-line">São Luís Maria Grignion de Montfort · Mistérios Luminosos segundo São João Paulo II</div><div class="detail-divider"></div></div><div class="card fade-in"><div class="prayer-block">${renderPrayer('O Rosário é uma oração contemplativa. Escolha o conjunto de mistérios conforme o dia e contemple cada passagem com Maria, rezando as orações com atenção e amor. A sequência segue a forma tradicional do Rosário, com a inclusão dos Mistérios Luminosos propostos por São João Paulo II.')}</div></div><div class="hour-tabs coroa-tabs">${tabs}</div><div class="card fade-in"><div class="rowrank" style="text-align:center;margin-bottom:12px;">${escapeHtml(set.days)}</div><div class="prayer-block">${set.mysteries.map((m,i)=>`<p><strong>${i+1}. ${escapeHtml(m[0])}</strong><br>${escapeHtml(m[1])}</p>`).join('')}</div></div><div class="card fade-in" style="padding:14px 16px;"><button class="hour-tab-btn active" style="width:100%;" onclick="setRosarioGuided('${state.rosarioSet}')">Iniciar modo guiado e animado</button><div class="rowrank" style="text-align:center;margin-top:8px;">Reze passo a passo, contemplando cada mistério.</div></div>`;
+  return `<button class="back-btn" onclick="backToOracoes()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>${escapeHtml(ptText('back'))}</button><div class="detail-header fade-in"><h2 style="font-size:1.625rem;">Rosário</h2><div class="date-line">São Luís Maria Grignion de Montfort · Mistérios Luminosos segundo São João Paulo II</div><div class="detail-divider"></div></div><div class="card fade-in"><div class="prayer-block">${renderPrayer('O Rosário é uma oração contemplativa. Escolha o conjunto de mistérios conforme o dia e contemple cada passagem com Maria, rezando as orações com atenção e amor. A sequência segue a forma tradicional do Rosário, com a inclusão dos Mistérios Luminosos propostos por São João Paulo II.')}</div></div><div class="hour-tabs coroa-tabs">${tabs}</div><div class="card fade-in"><div class="rowrank" style="text-align:center;margin-bottom:12px;">${escapeHtml(set.days)}</div><div class="prayer-block">${set.mysteries.map((m,i)=>`<p><strong>${i+1}. ${escapeHtml(m[0])}</strong><br>${escapeHtml(m[1])}</p>`).join('')}</div></div><div class="card fade-in" style="padding:14px 16px;"><button class="hour-tab-btn active" style="width:100%;" onclick="setRosarioGuided('${state.rosarioSet}')">Iniciar modo guiado e animado</button><div class="rowrank" style="text-align:center;margin-top:8px;">Reze passo a passo, contemplando cada mistério.</div></div>`;
 }
 function setCoroaGuided(formula){
   state.devo = 'coroa';
@@ -737,20 +724,19 @@ function viewCoroa(){
   return `
     <button class="back-btn" onclick="backToOracoes()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
-      ${escapeHtml(t('back'))}
+      ${escapeHtml(ptText('back'))}
     </button>
     <div class="detail-header fade-in">
-      <h2 style="font-size:1.625rem;">${escapeHtml(t('coroaTitle'))}</h2>
-      <div class="date-line">${escapeHtml(t('coroaSub'))}</div>
+      <h2 style="font-size:1.625rem;">${escapeHtml(ptText('coroaTitle'))}</h2>
+      <div class="date-line">${escapeHtml(ptText('coroaSub'))}</div>
       <div class="detail-divider"></div>
     </div>
-    ${langNoteHtml()}
     <div class="card fade-in">
       <div class="prayer-block">${renderPrayer(intro)}</div>
     </div>
     <div class="hour-tabs coroa-tabs">
-      <button class="hour-tab-btn ${activeTab==='formula1'?'active':''}" onclick="openDevo('coroa','formula1')">${escapeHtml(t('formula1'))}</button>
-      <button class="hour-tab-btn ${activeTab==='formula2'?'active':''}" onclick="openDevo('coroa','formula2')">${escapeHtml(t('formula2'))}</button>
+      <button class="hour-tab-btn ${activeTab==='formula1'?'active':''}" onclick="openDevo('coroa','formula1')">${escapeHtml(ptText('formula1'))}</button>
+      <button class="hour-tab-btn ${activeTab==='formula2'?'active':''}" onclick="openDevo('coroa','formula2')">${escapeHtml(ptText('formula2'))}</button>
     </div>
     <div class="card fade-in" style="padding:14px 16px;">
       <button class="hour-tab-btn active" style="width:100%;" onclick="setCoroaGuided('${activeTab}')">Iniciar modo guiado e animado</button>
@@ -764,19 +750,18 @@ function viewCoroa(){
 
 function backToOracoes(){ state.devo=null; state.devoSub=null; render(); window.scrollTo(0,0); }
 
-function simpleTextDetail(title, sub, text, backFn, showNote, useLitanySpacing){
+function simpleTextDetail(title, sub, text, backFn, useLitanySpacing){
   const back = backFn || 'backToOracoes()';
   return `
     <button class="back-btn" onclick="${back}">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
-      ${escapeHtml(t('back'))}
+      ${escapeHtml(ptText('back'))}
     </button>
     <div class="detail-header fade-in">
       <h2 style="font-size:1.625rem;">${escapeHtml(title)}</h2>
       ${sub ? `<div class="date-line">${escapeHtml(sub)}</div>` : ''}
       <div class="detail-divider"></div>
     </div>
-    ${showNote ? langNoteHtml() : ''}
     <div class="card fade-in">
       <div class="prayer-block">${useLitanySpacing ? renderWithLitanySpacing(text) : renderPrayer(text)}</div>
     </div>
@@ -787,27 +772,26 @@ function simpleTextDetail(title, sub, text, backFn, showNote, useLitanySpacing){
 function viewVigilia(){
   if(state.devoSub){
     const f = PRAYERS.devotions.vigilia[state.devoSub];
-    const title = state.devoSub === 'formula1' ? t('formula1') : t('formula2');
-    return simpleTextDetail(title, t('vigiliaOfNS'), f, "openDevo('vigilia')", true);
+    const title = state.devoSub === 'formula1' ? ptText('formula1') : ptText('formula2');
+    return simpleTextDetail(title, ptText('vigiliaOfNS'), f, "openDevo('vigilia')");
   }
   return `
     <button class="back-btn" onclick="backToOracoes()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
-      ${escapeHtml(t('back'))}
+      ${escapeHtml(ptText('back'))}
     </button>
     <div class="detail-header fade-in">
-      <h2 style="font-size:1.625rem;">${escapeHtml(t('vigiliaTitle'))}</h2>
-      <div class="date-line">${escapeHtml(t('vigiliaSub'))}</div>
+      <h2 style="font-size:1.625rem;">${escapeHtml(ptText('vigiliaTitle'))}</h2>
+      <div class="date-line">${escapeHtml(ptText('vigiliaSub'))}</div>
       <div class="detail-divider"></div>
     </div>
-    ${langNoteHtml()}
     <div class="card fade-in" style="padding:6px 16px;">
       <div class="saint-row" onclick="openDevo('vigilia','formula1')">
-        <div class="rowtext"><div class="rowtitle">${escapeHtml(t('formula1'))}</div><div class="rowrank">${escapeHtml(t('formula1Sub'))}</div></div>
+        <div class="rowtext"><div class="rowtitle">${escapeHtml(ptText('formula1'))}</div><div class="rowrank">${escapeHtml(ptText('formula1Sub'))}</div></div>
         <div class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
       </div>
       <div class="saint-row" onclick="openDevo('vigilia','formula2')">
-        <div class="rowtext"><div class="rowtitle">${escapeHtml(t('formula2'))}</div><div class="rowrank">${escapeHtml(t('formula2Sub'))}</div></div>
+        <div class="rowtext"><div class="rowtitle">${escapeHtml(ptText('formula2'))}</div><div class="rowrank">${escapeHtml(ptText('formula2Sub'))}</div></div>
         <div class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
       </div>
     </div>
@@ -831,7 +815,7 @@ function viewViaMatris(){
   const vm = PRAYERS.devotions.via_matris;
   if(state.devoSub !== null){
     const st = vm.stations[state.devoSub];
-    return simpleTextDetail(st.title, t('viaMatrisOfDores'), st.text, "openDevo('via_matris')", true);
+    return simpleTextDetail(st.title, ptText('viaMatrisOfDores'), st.text, "openDevo('via_matris')");
   }
   const rows = vm.stations.map((s,i)=>`
     <div class="saint-row" onclick="openDevo('via_matris', ${i})">
@@ -842,18 +826,17 @@ function viewViaMatris(){
   return `
     <button class="back-btn" onclick="backToOracoes()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
-      ${escapeHtml(t('back'))}
+      ${escapeHtml(ptText('back'))}
     </button>
     <div class="detail-header fade-in">
-      <h2 style="font-size:1.625rem;">${escapeHtml(t('viaMatrisTitle'))}</h2>
-      <div class="date-line">${escapeHtml(t('novenaPerpetua'))}</div>
+      <h2 style="font-size:1.625rem;">${escapeHtml(ptText('viaMatrisTitle'))}</h2>
+      <div class="date-line">${escapeHtml(ptText('novenaPerpetua'))}</div>
       <div class="detail-divider"></div>
     </div>
-    ${langNoteHtml()}
     <div class="card fade-in" style="margin-bottom:14px;">
       <div class="bio-text" style="font-size:1rem;">${escapeHtml(vm.intro.slice(0,420))}…</div>
     </div>
-    <div class="section-title">${escapeHtml(t('sevenSorrows'))}</div>
+    <div class="section-title">${escapeHtml(ptText('sevenSorrows'))}</div>
     <div class="card fade-in" style="padding:6px 16px;">${rows}</div>
   `;
 }
@@ -863,7 +846,7 @@ function viewLadainhas(){
   const list = PRAYERS.devotions.ladainhas;
   if(state.devoSub !== null){
     const l = list[state.devoSub];
-    return simpleTextDetail(l.title, t('ladainhaGenericSub'), l.text, "openDevo('ladainhas')", true, true);
+    return simpleTextDetail(l.title, ptText('ladainhaGenericSub'), l.text, "openDevo('ladainhas')", true);
   }
   const rows = list.map((l,i)=>`
     <div class="saint-row" onclick="openDevo('ladainhas', ${i})">
@@ -873,14 +856,13 @@ function viewLadainhas(){
   return `
     <button class="back-btn" onclick="backToOracoes()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
-      ${escapeHtml(t('back'))}
+      ${escapeHtml(ptText('back'))}
     </button>
     <div class="detail-header fade-in">
-      <h2 style="font-size:1.625rem;">${escapeHtml(t('ladainhasTitle'))}</h2>
-      <div class="date-line">${escapeHtml(t('threeLadainhas'))}</div>
+      <h2 style="font-size:1.625rem;">${escapeHtml(ptText('ladainhasTitle'))}</h2>
+      <div class="date-line">${escapeHtml(ptText('threeLadainhas'))}</div>
       <div class="detail-divider"></div>
     </div>
-    ${langNoteHtml()}
     <div class="card fade-in" style="padding:6px 16px;">${rows}</div>
   `;
 }
@@ -936,43 +918,41 @@ function viewRegra(){
   const r = PRAYERS.regra;
   if(state.regraChapter !== null){
     const isIntro = state.regraChapter === 'intro';
-    const title = isIntro ? t('regraIntroLabel') : `${t('regraChapterLabel')} ${r.chapters[state.regraChapter].roman} — ${r.chapters[state.regraChapter].title}`;
+    const title = isIntro ? ptText('regraIntroLabel') : `${ptText('regraChapterLabel')} ${r.chapters[state.regraChapter].roman} — ${r.chapters[state.regraChapter].title}`;
     const text = isIntro ? r.intro : r.chapters[state.regraChapter].text;
     const reader = isIntro ? `<div class="card fade-in"><div class="prayer-block">${renderPrayer(text)}</div></div>` : `<div class="rule-reader fade-in">${renderRuleArticles(text)}</div>`;
     return `
       <button class="regra-floating-back" onclick="backFromRegra485()" aria-label="Voltar">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
-        ${escapeHtml(t('back'))}
+        ${escapeHtml(ptText('back'))}
       </button>
       <div class="detail-header fade-in">
         <h2 style="font-size:1.375rem;">${escapeHtml(title)}</h2>
         <div class="detail-divider"></div>
       </div>
-      ${langNoteHtml()}
       ${reader}
     `;
   }
   return `
     <button class="regra-floating-back" onclick="backFromRegra485()" aria-label="Voltar">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6l-6 6 6 6"/></svg>
-      <span>${escapeHtml(t('back'))}</span>
+      <span>${escapeHtml(ptText('back'))}</span>
     </button>
     <div class="detail-header fade-in">
-      <h2 style="font-size:1.625rem;">${escapeHtml(t('regraTitle'))}</h2>
-      <div class="date-line">${escapeHtml(t('regraSub'))}</div>
+      <h2 style="font-size:1.625rem;">${escapeHtml(ptText('regraTitle'))}</h2>
+      <div class="date-line">${escapeHtml(ptText('regraSub'))}</div>
       <div class="detail-divider"></div>
     </div>
-    ${langNoteHtml()}
     <div class="card fade-in" style="padding:6px 16px; margin-bottom:16px;">
       <div class="saint-row" onclick="setRegraChapter('intro')">
-        <div class="rowtext"><div class="rowtitle">${escapeHtml(t('regraIntroLabel'))}</div></div>
+        <div class="rowtext"><div class="rowtitle">${escapeHtml(ptText('regraIntroLabel'))}</div></div>
         <div class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
       </div>
     </div>
     <div class="card fade-in" style="padding:6px 16px;">
       ${r.chapters.map((c,i) => `
       <div class="saint-row" onclick="setRegraChapter(${i})">
-        <div class="rowtext"><div class="rowtitle">${escapeHtml(t('regraChapterLabel'))} ${escapeHtml(c.roman)}</div><div class="rowrank">${escapeHtml(c.title)}</div></div>
+        <div class="rowtext"><div class="rowtitle">${escapeHtml(ptText('regraChapterLabel'))} ${escapeHtml(c.roman)}</div><div class="rowrank">${escapeHtml(c.title)}</div></div>
         <div class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
       </div>`).join('')}
     </div>
@@ -981,7 +961,7 @@ function viewRegra(){
 
 function viewSobre(){
   return `
-    <div class="section-title">${escapeHtml(t('aboutSection'))}</div>
+    <div class="section-title">${escapeHtml(ptText('aboutSection'))}</div>
     <div class="card fade-in about-text">
       <p>Esta coletânea de orações e celebrações próprias da Ordem dos Servos de Maria destina-se às comunidades religiosas, às fraternidades leigas da Ordem Secular e a todos os que desejam alimentar sua vida de fé segundo a espiritualidade servita.</p>
       <p>O Santoral reúne a memória litúrgica dos santos, beatos e servos de Deus da Ordem: o hino, a antífona, o salmo comuns, e a breve biografia com a oração própria de cada um deles.</p>
@@ -990,7 +970,7 @@ function viewSobre(){
       "Somos servos da Virgem Gloriosa, de cuja viuvez trazemos o hábito. Procuramos modelar a nossa vida segundo o exemplo dos Santos Apóstolos e viver segundo a regra do santo doutor Agostinho."
       <div style="font-size:0.875rem; margin-top:8px; color:var(--text-muted);">— São Filipe Benizi</div>
     </div>
-    <div class="section-title">${escapeHtml(t('editionSection'))}</div>
+    <div class="section-title">${escapeHtml(ptText('editionSection'))}</div>
     <div class="card fade-in credit-list">
       <div><b>Título original:</b> "Preghiere"</div>
       <div><b>Organização:</b> Consiglio Nazionale OSSM, Roma, 1988</div>
@@ -1000,14 +980,14 @@ function viewSobre(){
       <div><b>Sede:</b> Cúria Provincial dos Servos de Maria, São José dos Campos - SP</div>
       <div><b>Site:</b> servitasbra.org</div>
     </div>
-    <div class="section-title">${escapeHtml(t('socialSection'))}</div>
+    <div class="section-title">${escapeHtml(ptText('socialSection'))}</div>
     <div class="social-links fade-in">
       <a class="social-link" href="https://youtube.com/@savosmbrasil?si=Pcn71bJ212PwwLuY" target="_blank" rel="noopener noreferrer">
         <span class="social-icon">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.5V8.5L15.8 12l-6.2 3.5Z"/></svg>
         </span>
         <span>
-          <div class="social-label">${escapeHtml(t('socialYoutube'))}</div>
+          <div class="social-label">${escapeHtml(ptText('socialYoutube'))}</div>
           <div class="social-sub">@savosmbrasil</div>
         </span>
       </a>
@@ -1016,7 +996,7 @@ function viewSobre(){
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
         </span>
         <span>
-          <div class="social-label">${escapeHtml(t('socialInstagram'))}</div>
+          <div class="social-label">${escapeHtml(ptText('socialInstagram'))}</div>
           <div class="social-sub">@ordem.servitas</div>
         </span>
       </a>
@@ -1049,21 +1029,11 @@ function toggleSettings(){
   else { panel.setAttribute('hidden',''); btn.classList.remove('active'); }
 }
 
-function applyStaticI18n(){
-  document.documentElement.setAttribute('lang', LANG === 'pt' ? 'pt-BR' : LANG);
+function applyPortugueseLabels(){
+  document.documentElement.setAttribute('lang','pt-BR');
   document.querySelectorAll('[data-i18n]').forEach(el=>{
-    el.textContent = t(el.getAttribute('data-i18n'));
+    el.textContent = ptText(el.getAttribute('data-i18n'));
   });
-  document.querySelectorAll('#langGroup .chip').forEach(b=>{
-    b.classList.toggle('active', b.dataset.lang === LANG);
-  });
-}
-
-function setLanguage(lang){
-  LANG = lang;
-  try{ localStorage.setItem('santoral-osm-lang', lang); }catch(e){}
-  applyStaticI18n();
-  render();
 }
 
 function setTheme(theme){
@@ -1103,11 +1073,7 @@ async function initServite(){
   });
   SANTORAL.forEach((s,i)=> s._id = i);
 document.querySelector('.tab-btn[data-tab="hoje"]').classList.add('active');
-try{
-  const savedLang = localStorage.getItem('santoral-osm-lang');
-  if(savedLang && I18N[savedLang]) LANG = savedLang;
-}catch(e){}
-applyStaticI18n();
+applyPortugueseLabels();
 updateThemeChips();
 render();
   window.dispatchEvent(new Event('servite-ready'));

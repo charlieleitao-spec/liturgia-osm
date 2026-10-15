@@ -94,3 +94,9 @@ Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebraç�
 40. Remove o código de tradução da interface que permaneceu sem seletor: `MAIN_I18N`, estado e funções de idioma, além dos ganchos de renderização e retorno. A interface fica em português.
 41. Preserva a preferência de idioma dos recursos servitas no iframe; ela continua salva em `santoral-osm-lang` e deixa de ser apagada ao iniciar o app.
 42. APP_VERSION 4.9.76; cache: `liturgia-osm-v4.9.76-ui45-i18n-removido`.
+
+
+## Décima quinta rodada (4.9.77)
+
+43. Recursos Servitas: removidos o seletor de idioma, as traduções auxiliares em latim, italiano e inglês e o código de persistência. O leitor fica em português; textos e funcionalidades portuguesas foram preservados.
+44. APP_VERSION 4.9.77; cache: `liturgia-osm-v4.9.77-ui46-idiomas-removidos`.
