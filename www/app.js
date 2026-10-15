@@ -272,7 +272,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.82';
+const APP_VERSION = '4.9.84';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -572,8 +572,7 @@ function viewOracoesBase480(){
     <div class="section-title">Recursos de oração servita</div>
     <div class="quick-grid fade-in">
       <button class="quick-card" onclick="openServite('rosario')"><b>Rosário</b><span>Rosário guiado</span></button>
-      <button class="quick-card" onclick="openServite('regra')"><b>Regra OSSM</b><span>Espiritualidade da Ordem Secular</span></button>
-      <button class="quick-card" onclick="openDevo('coroa')"><b>Coroa das Sete Dores</b><span>Oração pelas dores de Maria</span></button>
+      <button class="quick-card" onclick="openDevo('coroa')"><b>Coroa de Nossa Senhora das Dores</b><span>Oração pelas dores de Maria</span></button>
     </div>
 
     <div class="section-title">Orações várias</div>
@@ -1231,10 +1230,9 @@ function updateBackButton(){
   const androidApp=!!window.Capacitor?.isNativePlatform?.()&&(platform==='android'||/Android/i.test(navigator.userAgent));
   const hasDetail=state.detailId!==null&&state.detailId!==undefined;
   const overlay=['serviteOverlay','mainMenuOverlay','dailyLiturgyOverlay'].some(id=>document.getElementById(id)?.classList.contains('open'));
-  const inlineBack=!!document.querySelector('#view .hub-back, #view .back-btn');
   const subpage=hasDetail||!!state.devo||state.devoSub!==null&&state.devoSub!==undefined||!!dailyPrayerOpen480||!!memoriaSelectedDate||!!state.liturgiaDetail;
   const nonHomeTab=state.tab!=='vida'&&state.tab!=='hoje';
-  const visible=!androidApp&&!overlay&&!inlineBack&&(subpage||nonHomeTab);
+  const visible=!androidApp&&!overlay&&(subpage||nonHomeTab);
   button.classList.toggle('show',visible);
   const label=hasDetail?'Voltar à origem':'Voltar para Hoje';
   button.setAttribute('aria-label',label);
@@ -1297,7 +1295,7 @@ if ("serviceWorker" in navigator && !window.Capacitor?.isNativePlatform?.()) {
 
 /* BEGIN SCRIPT BLOCK: serviteIntegrationScript */
 let currentServiteView='';
-const serviteNames={regra:'Regra OSSM',rosario:'Rosário',coroa:'Coroa das Sete Dores',oficio:'Ofício',sabado:'Sábado Mariano',completo:'Recursos OSM'};
+const serviteNames={regra:'Regra OSSM',rosario:'Rosário',coroa:'Coroa de Nossa Senhora das Dores',oficio:'Ofício',sabado:'Sábado Mariano',completo:'Recursos OSM'};
 function serviteUrl(view){return 'servite.html?view='+encodeURIComponent(view||'completo');}
 function serviteAdjustFont(delta){try{const frame=document.getElementById('serviteFrame');const change=frame?.contentWindow?.changeFontSize;if(typeof change==='function')change(delta);}catch(error){console.warn('[Liturgia OSM] Controle de fonte do recurso indisponível.',error);}} function openServite(view){
   currentServiteView=view||'completo';
@@ -1332,6 +1330,7 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
   const menu=document.querySelector('.main-menu');
   if(menu) menu.innerHTML=`<div class="main-menu-head"><h3>Menu</h3><button class="tool-btn" onclick="closeMainMenu()" aria-label="Fechar menu">✕</button></div>
     <div class="menu-section"><div class="menu-label">Leitura</div><div class="menu-row"><button class="menu-action" onclick="adjustFont(-0.08)">A−</button><span class="reader-scale-value">100%</span><button class="menu-action" onclick="adjustFont(0.08)">A+</button><button class="menu-action" onclick="resetFont()">Padrão</button></div><button class="menu-action menu-wide" onclick="toggleTheme()">☼ / ☾ Alternar tema claro ou escuro</button></div>
+    <div class="menu-section"><div class="menu-label">Ordem Secular</div><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('regra')">Regra de Vida da OSSM</button></div>
     <div class="menu-section"><div class="menu-label">Biblioteca</div><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('biblioteca')">Favoritos e recentes</button></div>
     <div class="menu-section"><div class="menu-label">Sobre</div><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('sobre')">Sobre, créditos e redes sociais</button></div>
     <div class="menu-section"><div class="menu-status"><span class="connection-dot"></span><span>Versão ${APP_VERSION} · Missa e Ofício próprios OSM disponíveis offline</span></div></div>`;
