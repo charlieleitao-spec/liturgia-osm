@@ -181,7 +181,7 @@ assert.doesNotMatch(liturgiaOnly,/todayBlock|liturgiaTodayCard/);
 assert.doesNotMatch(app, /Consultar Missa do Dia/);
 assert.doesNotMatch(app, /liturgy-page-intro|Aqui você encontra a Missa do dia|O ofício de hoje está na Paulus\. Os textos próprios da Ordem estão logo abaixo/);
 assert.doesNotMatch(app, /Abrir ofício próprio/);
-assert.match(app, /Missas próprias OSM/);
+assert.match(app, /Missa própria OSM/);
 assert.match(app, /Ofícios próprios OSM/);
 
 assert.doesNotMatch(app, /Hora litúrgica própria/);
