@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.84-ui53-regra-menu-ossm';
+const CACHE = 'liturgia-osm-v4.9.85-ui54-texto-linhas-recompostas';
 const CORE = [
   "./",
   "./index.html",

@@ -150,3 +150,10 @@ Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebraç�
 62. Aba Oração: removido o cartão da Regra OSSM, que é conteúdo de formação e consulta, não uma oração.
 63. Menu: criada a seção “Ordem Secular”, com acesso direto à Regra de Vida da OSSM. O conteúdo, o leitor servita e os dados da Regra foram preservados.
 64. APP_VERSION 4.9.84; cache: `liturgia-osm-v4.9.84-ui53-regra-menu-ossm`.
+
+
+## Vigésima terceira rodada (4.9.85)
+
+65. Textos copiados de PDFs: a exibição recompõe quebras de linha no meio da prosa e remove espaços duplicados e espaços antes da pontuação. Hinos, salmos, antífonas, estrofes e turnos dialogados mantêm suas quebras.
+66. Hífens em fim de linha: a quebra é removida, preservando hífens legítimos em pronomes, palavras compostas e referências numéricas; hifenização tipográfica é recomposta sem hífen.
+67. APP_VERSION 4.9.85; cache: `liturgia-osm-v4.9.85-ui54-texto-linhas-recompostas`.

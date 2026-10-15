@@ -135,45 +135,43 @@ function sharePrayer(title,text){ shareText(title,`${title}\n\n${text}\n\nLiturg
 
 // render a prayer block, coloring "D." / "T." rubrics
 const PRAYER_CONTEXT_HEADINGS = /^(?:Comum|Nas festas marianas|Nas visitas de familiares e amigos|Nos momentos de alegria)$/i;
-const PRAYER_TEXT_HEADINGS = /^(?:Antífona(?: de entrada)?|Salmo(?:\s+[\d,.\-–—]+)?|Hino|Invitatório|Ofício das Leituras|Salmodia|Cântico(?: evangélico)?|Oração(?: própria| sálmica| sobre o cântico| das (?:Nove|Doze|Quinze) Horas)?|Leitura breve|Introdução(?: à leitura| às leituras)?|Absolvição|Primeira leitura|Segunda leitura|Terceira leitura|Responsório(?: breve)?|Preces|Festa|Laudes|Vésperas|Hora Média|Salve Rainha|Oremos|Oração pela Igreja pela Ordem|À VIRGEM DO (?:SIM|\"MAGNIFICAT\"))$/i;
+const PRAYER_TEXT_HEADINGS = /^(?:Antífona(?: de entrada)?|Salmo(?:\s+[\d,.\-–—]+)?|Hino|Canto|Invitatório|Ofício das Leituras|Salmodia|Cântico(?: evangélico)?|Oração(?: própria| sálmica| sobre o cântico| das (?:Nove|Doze|Quinze) Horas)?|Leitura breve|Introdução(?: à leitura| às leituras)?|Absolvição|Primeira leitura|Segunda leitura|Terceira leitura|Evangelho(?: de .+)?|Reflexão|Invocações|Responsório(?: breve)?|Preces|Festa|Laudes|Vésperas|Hora Média|Salve Rainha|Oremos|Oração pela Igreja pela Ordem|À VIRGEM DO (?:SIM|\"MAGNIFICAT\"))$/i;
 function prayerLineHtml(line, vigilia=false){
   let escaped = escapeHtml(line).replace(/^(D\.|T\.|C\.|R\.|V\.|A\.|B\.|L\d?:|L\.)/, '<span class="rubric">$1</span>');
   if(vigilia) escaped = escaped.replace(/^([–—=]\s*)(\d{1,3})(?=[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ])/, '$1<span class="verse-number">$2</span> ');
   return escaped;
 }
-function formatPrayerStanza(lines, vigilia, hymnMode){
-  if(hymnMode) return lines.map(line=>prayerLineHtml(line,vigilia)).join('<br>');
-  if(!vigilia){
-    const structural=/^(?:[–—=]\\s*|(?:D|T|C|R|V|A|B|L\\d?)\\.\\s*|\\d{1,3}\\s*[†*]|\\d{1,3}\\s+(?=[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ]))/;
-    if(lines.some(line=>structural.test(line)))return lines.map(line=>prayerLineHtml(line,false)).join('<br>');
-    return lines.map(line=>prayerLineHtml(line,false)).join(' ');
-  }
-  const speaker = /^(?:D\.|T\.|C\.|R\.|V\.|A\.|B\.|L\d?:|L\.)\s*/;
-  if(lines.some(line=>speaker.test(line))){
-    const turns=[];
-    for(const line of lines){
-      if(speaker.test(line) || !turns.length) turns.push([line]);
-      else turns[turns.length-1].push(line);
-    }
-    return turns.map(turn=>turn.map(line=>prayerLineHtml(line,true)).join(' ')).join('<br>');
-  }
-  const verse = /^[–—=]\s*/;
-  if(lines.some(line=>verse.test(line))){
-    const verses=[];
-    for(const line of lines){
-      if(verse.test(line) || !verses.length) verses.push([line]);
-      else verses[verses.length-1].push(line);
-    }
-    return verses.map(group=>group.map(line=>prayerLineHtml(line,true)).join(' ')).join('<br>');
-  }
-  return lines.map(line=>prayerLineHtml(line,true)).join('<br>');
+function normalizeCopiedLineBreaks(value){
+  const source=String(value??'').replace(/\r\n?/g,'\n');
+  const joined=source.replace(/([^\s-]+)-\n[ \t]*([^\s-]+)/g,(match,left,right)=>{
+    const suffix=(right.match(/^[A-Za-zÀ-ÿ]+/)||[''])[0].toLocaleLowerCase('pt-BR');
+    const keepsHyphen=/\d$/.test(left)&&/^\d/.test(right)
+      ||/^(?:a|as|la|las|lhe|lhes|lo|los|me|na|nas|no|nos|se|te|vos|os)$/i.test(suffix)
+      ||/^(?:bem|mal|todo|toda|mestre)$/i.test(left);
+    return left+(keepsHyphen?'-':'')+right;
+  });
+  return joined.split('\n').map(line=>line.replace(/[ \t]+([,.;:!?])/g,'$1').replace(/[ \t]{2,}/g,' ').replace(/[ \t]+$/,'')).join('\n');
 }
-
+function formatPrayerStanza(lines, vigilia, hymnMode){
+  const clean=lines.map(line=>normalizeCopiedLineBreaks(line).trim());
+  if(hymnMode) return clean.map(line=>prayerLineHtml(line,vigilia)).join('<br>');
+  const speaker=/^(?:D\.|T\.|C\.|R\.|V\.|A\.|B\.|L\d?:|L\.)\s*/;
+  const verse=/^(?:[–—=]\s*|\d{1,3}\s*[†*])/;
+  if(clean.some(speaker.test.bind(speaker))){
+    const turns=[];
+    for(const line of clean){
+      if(speaker.test(line)||verse.test(line)||!turns.length)turns.push(line);
+      else turns[turns.length-1]+=' '+line;
+    }
+    return turns.map(line=>prayerLineHtml(line,false)).join('<br>');
+  }
+  if(clean.some(verse.test.bind(verse)))return clean.map(line=>prayerLineHtml(line,false)).join('<br>');
+  return prayerLineHtml(clean.join(' ').replace(/\s+/g,' ').trim(),false);
+}
 function normalizeVigiliaTypography(text){
   // Não unir automaticamente linhas dos salmos: o asterisco e o sinal †
   // marcam a estrutura poética, não uma quebra de linha acidental do PDF.
-  const source=String(text??'').replace(/\r\n?/g,'\n')
-    .replace(/([A-Za-zÀ-ÿ])-\n\s*([a-zà-ÿ])/g,'$1$2')
+  const source=normalizeCopiedLineBreaks(text)
     .replace(/([–—=]\s*\d{1,3})(?=[A-Za-zÀ-ÿ])/g,'$1 ')
     .replace(/(SÚPLICA DOS SERVOS DE MARIA A NOSSA SENHORA)\s+(?=Bondade)/gi,'$1\n');
   const lines=source.split('\n'),out=[];
@@ -199,7 +197,7 @@ function normalizeVigiliaTypography(text){
 
 function renderPrayer(text, options={}){
   const vigilia = options.vigilia === true;
-  let source = String(text ?? '').replace(/<PARSED TEXT FOR PAGE:\s*\d+\s*\/\s*\d+>/gi, '');
+  let source = normalizeCopiedLineBreaks(String(text ?? '').replace(/<PARSED TEXT FOR PAGE:\s*\d+\s*\/\s*\d+>/gi, ''));
   if(vigilia){
     source = normalizeVigiliaTypography(source)
       .replace(/^(Primeira fórmula|Segunda fórmula)\n[ \t]*Santa Maria,?\n[ \t]*(Senhora Dos Seus Servos|Serva Do Senhor)/im,
@@ -239,7 +237,7 @@ function renderPrayer(text, options={}){
     if(PRAYER_TEXT_HEADINGS.test(line) || (vigilia && /^Salmo\b/i.test(line))){
       flushStanza();
       blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
-      hymnMode = /^Hino$/i.test(line);
+      hymnMode = /^(?:Hino|Canto|Salmo|Cântico)/i.test(line);
       pendingPsalmCaption = vigilia && /^Salmo\b/i.test(line);
       continue;
     }
@@ -272,7 +270,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.84';
+const APP_VERSION = '4.9.85';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -635,9 +633,6 @@ function viewDevoDetail(key){
 
 function backToOracoes(){ state.devo=null; state.devoSub=null; render(); window.scrollTo(0,0); }
 
-function normalizeVigiliaLineWraps(text){
-  return String(text ?? '').replace(/([A-Za-zÀ-ÿ])-\n[ \t]*([a-zà-ÿ])/g, '$1-$2');
-}
 function simpleTextDetail(title, sub, text, backFn, readingClass){
   pendingSharePrayer={title,text};
   const back = backFn || 'backToOracoes()';
@@ -838,8 +833,8 @@ function viewVida(){
   return tabs+(current==='calendario'?viewCalendario():viewHoje());
 }
 function cleanMassText(text){
-  return String(text||'')
-    .replace(/^[ \t]*copyright\b[^\r\n]*(?:\r?\n|$)/gim,'')
+  return normalizeCopiedLineBreaks(String(text||''))
+    .replace(/^[ \t]*copyright\b[^\r\n]*(?:\n|$)/gim,'')
     .replace(/\r\n?/g,'\n')
     .replace(/\n[ \t]*\n(?:[ \t]*\n)+/g,'\n\n')
     .trim();

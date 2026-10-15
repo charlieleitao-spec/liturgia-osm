@@ -70,14 +70,23 @@ function escapeHtml(str){
   return (str||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
+function normalizeServiteLineBreaks(value){
+  const source=String(value||'').replace(/\r\n?/g,'\n');
+  const joined=source.replace(/([^\s-]+)-\n[ \t]*([^\s-]+)/g,(match,left,right)=>{
+    const suffix=(right.match(/^[A-Za-zÀ-ÿ]+/)||[''])[0].toLocaleLowerCase('pt-BR');
+    const keepsHyphen=/\d$/.test(left)&&/^\d/.test(right)
+      ||/^(?:a|as|la|las|lhe|lhes|lo|los|me|na|nas|no|nos|se|te|vos|os)$/i.test(suffix)
+      ||/^(?:bem|mal|todo|toda|mestre)$/i.test(left);
+    return left+(keepsHyphen?'-':'')+right;
+  });
+  return joined.split('\n').map(line=>line.replace(/[ \t]+([,.;:!?])/g,'$1').replace(/[ \t]{2,}/g,' ').replace(/[ \t]+$/,'')).join('\n');
+}
+
 // Preserva integralmente a composição do texto-fonte.
 // Estrofes são separadas somente pelas linhas em branco já existentes;
 // *, †, hífens e outros sinais litúrgicos nunca são usados para reconstruí-las.
 function formatLiturgicalStanzas(value){
-  return String(value || '')
-    .replace(/\r\n?/g, '\n')
-    .replace(/[ \t]+\n/g, '\n')
-    .trim();
+  return normalizeServiteLineBreaks(value).trim();
 }
 function formatLitanyStanzas(value){
   return formatLiturgicalStanzas(value);
@@ -88,15 +97,38 @@ function renderWithLitanySpacing(text){
 // render a prayer block, separating paragraphs while preserving line breaks inside each paragraph
 function renderPrayer(text){
   const formatted = formatLiturgicalStanzas(text);
-  const paragraphs = formatted
-    .split(/\n[ \t]*\n+/)
-    .map(paragraph => paragraph.trim())
-    .filter(Boolean);
-  return paragraphs.map(paragraph => {
-    const esc = escapeHtml(paragraph);
-    const marked = esc.replace(/^(D\.|T\.|C\.|L\.\d?|L\.|V\.|R\.|\u2123\.|\u211f\.)/gm, '<span class="rubric">$1</span>');
-    return `<p class="prayer-paragraph">${marked}</p>`;
-  }).join('');
+  const lines=formatted.split('\n'),blocks=[];
+  const heading=/^(?:HINO|CANTO|SALMO(?:\s+\d+)?|SALMODIA|INTRODUÇÃO|REFLEXÃO|EVANGELHO(?:\s+DE .+)?|ORAÇÃO|INVOCAÇÕES|CÂNTICO(?: EVANGÉLICO)?|LEITURA BREVE|RESPONSÓRIO BREVE|PRECES|DESPEDIDA)$/i;
+  let paragraph=[],poetry=false;
+  const flush=()=>{
+    if(!paragraph.length)return;
+    const clean=paragraph.map(line=>normalizeServiteLineBreaks(line).trim()).filter(Boolean);
+    const speaker=/^(?:D\.|T\.|C\.|R\.|V\.|A\.|B\.|L\d?:|L\.)\s*/;
+    const verse=/^(?:[–—=]\s*|\d{1,3}\s*[†*])/;
+    let joined;
+    if(poetry)joined=clean.map(escapeHtml).join('<br>');
+    else if(clean.some(speaker.test.bind(speaker))){
+      const turns=[];
+      for(const line of clean){if(speaker.test(line)||verse.test(line)||!turns.length)turns.push(line);else turns[turns.length-1]+=' '+line;}
+      joined=turns.map(escapeHtml).join('<br>');
+    }else if(clean.some(verse.test.bind(verse)))joined=clean.map(escapeHtml).join('<br>');
+    else joined=escapeHtml(clean.join(' ').replace(/\s+/g,' ').trim());
+    const marked=joined.replace(/^(D\.|T\.|C\.|L\.\d?|L\.|V\.|R\.|\u2123\.|\u211f\.)/gm,'<span class="rubric">$1</span>');
+    blocks.push(`<p class="prayer-paragraph">${marked}</p>`);paragraph=[];
+  };
+  for(const raw of lines){
+    const line=normalizeServiteLineBreaks(raw).trim();
+    if(!line){flush();continue;}
+    if(heading.test(line)){
+      flush();
+      poetry=/^(?:HINO|CANTO|SALMO|CÂNTICO)/i.test(line);
+      blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
+      continue;
+    }
+    paragraph.push(line);
+  }
+  flush();
+  return blocks.join('');
 }
 
 const LITURGICAL_HEAD_RE = /^(?:\d+[.)-]?\s*)?(HINO|SALMODIA|PRIMEIRA LEITURA|SEGUNDA LEITURA|LEITURA BREVE|RESPONS[ÓO]RIO(?: BREVE)?(?:\s+.*)?|C[ÂA]NTICO EVANG[ÉE]LICO|PRECES|PAI[- ]NOSSO|ORA[ÇC][ÃA]O|CONCLUS[ÃA]O)\s*[:.-]?\s*$/i;
@@ -111,6 +143,8 @@ function renderLiturgicalHourContent(text){
   let currentHead = '';
   let stanza = null;
   let precesCount = 0;
+  let proseNode = null;
+  let proseClass = '';
 
   function startBlock(label){
     block = document.createElement('section');
@@ -118,6 +152,7 @@ function renderLiturgicalHourContent(text){
     currentHead = String(label || '').replace(/^\d+[.)-]?\s*/, '').replace(/\s*[:.-]?\s*$/, '').toUpperCase();
     precesCount = 0;
     stanza = null;
+    proseNode = null; proseClass = '';
     if(label){
       const heading = document.createElement('div');
       heading.className = 'litheading';
@@ -127,6 +162,7 @@ function renderLiturgicalHourContent(text){
     root.appendChild(block);
   }
   function add(value, className='littext', target=block){
+    if(!['reading-body','liturgical-prayer','littext','preces-intro','preces-intention'].includes(className)){proseNode=null;proseClass='';}
     if(!target){ startBlock(''); target = block; }
     const node = document.createElement('div');
     node.className = className;
@@ -134,7 +170,14 @@ function renderLiturgicalHourContent(text){
     target.appendChild(node);
     return node;
   }
+  function addProse(value,className='littext') {
+    if(!block)startBlock('');
+    const text=String(value||'').trim();
+    if(proseNode&&proseNode.parentNode===block&&proseClass===className){proseNode.textContent+=' '+text;return proseNode;}
+    proseNode=add(text,className);proseClass=className;return proseNode;
+  }
   function addStanzaLine(line){
+    proseNode=null;proseClass='';
     if(!stanza){
       stanza = document.createElement('div');
       stanza.className = currentHead === 'HINO' ? 'hymn-stanza' : 'psalm-stanza';
@@ -146,7 +189,7 @@ function renderLiturgicalHourContent(text){
     const match = line.match(/^((?:cf\.\s*)?(?:[1-3]\s*)?[A-ZÁÉÍÓÚÂÊÔÃÕÇ][A-Za-zÁ-ú.]*\s+\d{1,3}[,.:]\d{1,3}[a-z]?(?:[-–]\d{1,3}[a-z]?)?(?:\.\d{1,3}[a-z]?(?:[-–]\d{1,3}[a-z]?)?)*(?:\s*;\s*(?:\d{1,3}[,.:])?\d{1,3}[a-z]?(?:[-–]\d{1,3}[a-z]?)?)*)\s+(.*)$/i);
     if(!match) return false;
     add(match[1].trim(), 'reading-ref');
-    add(match[2].trim(), 'reading-body');
+    addProse(match[2].trim(), 'reading-body');
     return true;
   }
   function addPrecesLine(line){
@@ -159,6 +202,7 @@ function renderLiturgicalHourContent(text){
   lines.forEach(raw => {
     if(!raw.trim()){
       stanza = null;
+      proseNode = null; proseClass = '';
       return;
     }
     const line = raw.trim().replace(/^[•▪◦]\s*/, '');
@@ -174,7 +218,7 @@ function renderLiturgicalHourContent(text){
       const rest = match[2].trim();
       if(rest){
         if(/^LEITURA/i.test(match[1])){
-          if(!splitReadingLine(rest)) add(rest, 'reading-body');
+          if(!splitReadingLine(rest)) addProse(rest, 'reading-body');
         }else{
           add(rest, /^RESPONS/i.test(match[1]) ? 'response' : 'rubric');
         }
@@ -202,7 +246,7 @@ function renderLiturgicalHourContent(text){
     if(/^(PRIMEIRA LEITURA|SEGUNDA LEITURA|LEITURA BREVE)$/.test(currentHead)){
       if(splitReadingLine(line)) return;
       if(/^(Da|Do|Dos|Das)\s+/.test(line) && line.length < 180) add(line,'reading-ref');
-      else add(line,'reading-body');
+      else addProse(line,'reading-body');
       return;
     }
     if(currentHead==='HINO' || currentHead==='SALMODIA'){
@@ -210,14 +254,15 @@ function renderLiturgicalHourContent(text){
       return;
     }
     if(currentHead==='PRECES'){
-      addPrecesLine(line);
+      if(/^(?:Pastor eterno|Senhor Jesus|Cristo(?: ressuscitado)?),/i.test(line))proseNode=null;
+      addProse(line,precesCount++===0?'preces-intro':'preces-intention');
       return;
     }
     if(/^(ORAÇÃO|PAI[- ]NOSSO|CONCLUSÃO)$/.test(currentHead)){
-      add(line,'liturgical-prayer');
+      addProse(line,'liturgical-prayer');
       return;
     }
-    add(line);
+    addProse(line);
   });
   // O invólucro carrega o escopo visual canônico do Hoje na Família Servita.
   // Devolver somente innerHTML descartava essa classe e reativava o cartão antigo.
@@ -892,7 +937,7 @@ function backFromRegra485(){
   window.scrollTo(0,0);
 }
 function renderRuleArticles(text){
-  const source=String(text||'').replace(/\r\n?/g,'\n').trim();
+  const source=formatLiturgicalStanzas(text).trim();
   const starts=[...source.matchAll(/(^|\n)(\d+)\.\s+/g)];
   if(!starts.length){
     return source.split(/\n[ \t]*\n+/).map(paragraph=>paragraph.split('\n').map(line=>line.trim()).filter(Boolean).join(' ')).filter(Boolean)
