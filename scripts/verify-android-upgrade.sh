@@ -9,7 +9,7 @@ adb wait-for-device
 adb install baseline/Liturgia-OSM-4.9.85.apk
 trap 'adb logcat -d > validation-results/logcat.txt; adb exec-out screencap -p > validation-results/after.png' EXIT
 TEST_APK=android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk
-adb install "$TEST_APK"
+adb install -t "$TEST_APK"
 adb shell am instrument -w -e phase seed com.liturgia_osm.app.test/com.liturgia_osm.validation.UpgradeInstrumentation | tee validation-results/seed.txt
 grep -q 'validation=PASS' validation-results/seed.txt
 adb shell am force-stop "$PACKAGE"
