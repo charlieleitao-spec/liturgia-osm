@@ -146,6 +146,7 @@ jobs:
           p = Path('android/app/build.gradle')
           s = p.read_text()
           import re
+          s = re.sub(r'^.*androidTestImplementation.*\n', '', s, flags=re.M)
           s = re.sub(r'testInstrumentationRunner "[^"]+"', 'testInstrumentationRunner "com.liturgia_osm.validation.UpgradeInstrumentation"', s)
           s = s.replace('android {', "android {\n    testBuildType 'release'", 1)
           p.write_text(s)
