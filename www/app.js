@@ -143,10 +143,11 @@ function prayerLineHtml(line, vigilia=false){
 }
 function normalizeCopiedLineBreaks(value){
   const source=String(value??'').replace(/\r\n?/g,'\n');
-  const joined=source.replace(/([^\s-]+)-\n[ \t]*([^\s-]+)/g,(match,left,right)=>{
+  const joined=source.replace(/([^\s-]+)-\n[ \t]*([^\s-]+)/g,(match,left,right,offset,whole)=>{
     const suffix=(right.match(/^[A-Za-zÀ-ÿ]+/)||[''])[0].toLocaleLowerCase('pt-BR');
     const keepsHyphen=/\d$/.test(left)&&/^\d/.test(right)
-      ||/^(?:a|as|la|las|lhe|lhes|lo|los|me|na|nas|no|nos|se|te|vos|os)$/i.test(suffix)
+      ||/^(?:o|a|as|la|las|lhe|lhes|lo|los|me|na|nas|no|nos|se|te|vos|os)$/i.test(suffix)
+      ||whole[offset-1]==='-'&&/^(?:ei|ás|á|emos|eis|ão|ia|ias|íamos|íeis|iam)$/i.test(suffix)
       ||/^(?:bem|mal|todo|toda|mestre)$/i.test(left);
     return left+(keepsHyphen?'-':'')+right;
   });
@@ -270,7 +271,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.85';
+const APP_VERSION = '4.9.86';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();

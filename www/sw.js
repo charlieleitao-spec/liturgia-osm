@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.85-ui54-texto-linhas-recompostas';
+const CACHE = 'liturgia-osm-v4.9.86-ui55-hifen-pronomes-mesoclise';
 const CORE = [
   "./",
   "./index.html",

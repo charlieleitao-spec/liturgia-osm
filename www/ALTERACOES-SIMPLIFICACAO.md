@@ -157,3 +157,10 @@ Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebraç�
 65. Textos copiados de PDFs: a exibição recompõe quebras de linha no meio da prosa e remove espaços duplicados e espaços antes da pontuação. Hinos, salmos, antífonas, estrofes e turnos dialogados mantêm suas quebras.
 66. Hífens em fim de linha: a quebra é removida, preservando hífens legítimos em pronomes, palavras compostas e referências numéricas; hifenização tipográfica é recomposta sem hífen.
 67. APP_VERSION 4.9.85; cache: `liturgia-osm-v4.9.85-ui54-texto-linhas-recompostas`.
+
+
+## Vigésima quarta rodada (4.9.86)
+
+68. Correção na junção de hífens da 4.9.85 (`app.js` e `servite-3.js`): o pronome “o” em fim de linha (“chamou-/o”) virava “chamouo”, e a mesóclise (“Louvar-te-/ei”, “dar-te-/ei”) virava “louvar-teei”. Agora “-o” e as terminações de mesóclise (ei, ás, á, emos, eis, ão, ia, ias, íamos, íeis, iam) mantêm o hífen.
+69. APP_VERSION 4.9.86; cache: `liturgia-osm-v4.9.86-ui55-hifen-pronomes-mesoclise`.
+
