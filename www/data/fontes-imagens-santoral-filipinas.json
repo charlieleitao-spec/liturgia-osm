@@ -1,0 +1,33 @@
+{
+  "descricao": "Fontes institucionais OSM para obtenção e conferência de imagens ainda ausentes no Santoral",
+  "origem": "Vicariato das Filipinas — Ordem dos Servos de Maria",
+  "pagina_indice": "https://servantsofmary.ph/category/servite-saints-blesseds/",
+  "fontes": [
+    {
+      "celebracao": "Boaventura de Forlì",
+      "url": "https://servantsofmary.ph/september-6-blessed-bonaventura-of-forli/",
+      "status": "pagina_identificada_imagem_a_conferir"
+    },
+    {
+      "celebracao": "André de Sansepolcro",
+      "url": "https://servantsofmary.ph/august-31-blessed-andrew-of-borgo-san-sepolcro/",
+      "status": "pagina_identificada_imagem_a_conferir"
+    },
+    {
+      "celebracao": "João Ângelo de Milão",
+      "url": "https://servantsofmary.ph/october-25-blessed-john-angelo-porro/",
+      "status": "pagina_identificada_imagem_a_conferir"
+    },
+    {
+      "celebracao": "Jerônimo de Sant'Angelo in Vado",
+      "url": "https://servantsofmary.ph/december-10-blessed-jerome-of-sant-angelo-in-vado/",
+      "status": "pagina_identificada_imagem_a_conferir"
+    }
+  ],
+  "orientacoes": [
+    "Conferir URLs exatas e autoria da imagem em cada página",
+    "Não usar imagem ilustrativa genérica como retrato",
+    "Solicitar ou verificar autorização institucional e eventuais direitos de terceiros",
+    "Após conferência converter a WebP e vincular ao Santoral"
+  ]
+}
