@@ -35,7 +35,7 @@ assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
 assert.doesNotMatch(css,/\.topbar-tools \.tool-btn:first-child\{display:none\}/,'O menu deve permanecer visível em telas estreitas.');
 assert.doesNotMatch(serviteCss,/Cinzel|EB Garamond|Cormorant Garamond|system-ui,-apple-system,sans-serif/,'Fontes da interface e recursos servitas devem estar harmonizadas.');
-assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.72-ui40-menu-liturgia-propria/);
+assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.72-ui41-oficio-proprio-unificado/);
 assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
 
