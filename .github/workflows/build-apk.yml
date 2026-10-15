@@ -139,6 +139,7 @@ jobs:
           test -f android/app/src/main/res/mipmap-mdpi/ic_launcher_monochrome.png
       - name: Preparar instrumentação de validação da versão release
         run: |
+          find android/app/src/androidTest -name ExampleInstrumentedTest.java -delete
           mkdir -p android/app/src/androidTest/java/com/liturgia_osm/validation
           cp scripts/android-validation/UpgradeInstrumentation.java android/app/src/androidTest/java/com/liturgia_osm/validation/
           python3 - <<'PYTEST'
