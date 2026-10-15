@@ -225,6 +225,7 @@ function renderLiturgicalHourContent(text){
     }
     const line = raw.trim().replace(/^[•▪◦]\s*/, '');
     let match;
+    if(/^(?:[IV]+\s+)?(?:Laudes|Vésperas|Hora Média|Ofício das Leituras|Invitatório)$/i.test(line)){if(!block)startBlock('');add(line,'liturgical-hour-heading');return;}
 
     if((match = line.match(/^(ORA[ÇC][ÃA]O|C[ÂA]NTICO EVANG[ÉE]LICO)\s*(\([^)]*\))\s*$/i))){
       startBlock(match[1]);
@@ -398,7 +399,8 @@ function renderOficioTabs(oficioData){
   const canticleText = active.key === 'laudes' ? BENEDICTUS_TEXT : (active.key === 'vesperas' ? MAGNIFICAT_TEXT : null);
   const body = segs.map(s => {
     const txt = active.key === 'invitatorio' ? `${s.text}\n\n${INVITATORIO_SALMO}` : (canticleText ? insertCanticleAfterAntiphon(s.text, canticleText) : s.text);
-    return `<div class="liturgical-hour-heading">${escapeHtml(s.label || active.title)}</div><div>${renderLiturgicalHourContent(txt)}</div>`;
+    const sourceHasHour=/^(?:[IV]+\s+)?(?:Laudes|Vésperas|Hora Média|Ofício das Leituras|Invitatório)$/i.test(txt.trim().split('\n')[0].trim());
+    return `${sourceHasHour?'':'<div class="liturgical-hour-heading">'+escapeHtml(s.label || active.title)+'</div>'}<div>${renderLiturgicalHourContent(txt)}</div>`;
   }).join('<div class="hour-divider"></div>');
   const finalAntifona = active.key === 'vesperas' ? renderFinalAntifonaBlock() : '';
   return `

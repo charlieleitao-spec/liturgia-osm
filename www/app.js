@@ -262,7 +262,7 @@ function renderPrayer(text, options={}){
     }
     if(PRAYER_TEXT_HEADINGS.test(line) || (vigilia && /^Salmo\b/i.test(line))){
       flushStanza();
-      blocks.push('<h4 class="prayer-text-heading'+(/^(?:Laudes|Vésperas|Ofício das Leituras|Hora Média|Invitatório)$/i.test(line)?' liturgical-hour-heading':/^Salmo/i.test(line)?' liturgical-psalm-heading':'')+'">'+escapeHtml(line)+'</h4>');
+      blocks.push('<h4 class="prayer-text-heading'+(/^(?:Laudes|Vésperas|Ofício das Leituras|Hora Média|Invitatório)$/i.test(line)?' liturgical-hour-heading':/^Salmo(?:\s|$)/i.test(line)?' liturgical-psalm-heading':'')+'">'+escapeHtml(line)+'</h4>');
       hymnMode = /^(?:Hino|Canto)$/i.test(line)?'hymn':/^(?:Salmo|Cântico)/i.test(line)?'psalm':false;
       precesMode = /^Preces$/i.test(line);
       pendingPsalmCaption = vigilia && /^Salmo\b/i.test(line);

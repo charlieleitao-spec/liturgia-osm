@@ -1,6 +1,6 @@
 /* Padrão litúrgico: referência visual aprovada em 15/10/2026. */
 :root{--liturgical-paper:#fcf3d5;--liturgical-ink:#15120d;--liturgical-red:#b3221c}
-html[data-theme="dark"],body.liturgical-page:not(.light-mode):has(.brand-tag){--liturgical-paper:#101c29;--liturgical-ink:#f5eedc;--liturgical-red:#ef9a90}
+html[data-theme="dark"],body:not(.light-mode):has(.brand-tag){--liturgical-paper:#101c29;--liturgical-ink:#f5eedc;--liturgical-red:#ef9a90}
 body.liturgical-page,body.liturgical-page #app,body.liturgical-page main#view{background:var(--liturgical-paper)!important;color:var(--liturgical-ink)!important}
 body.liturgical-page .ambient{display:none}
 body.liturgical-page #app #view .card:has(.prayer-block),body.liturgical-page #app #view .card:has(.today-servita-reader),body.liturgical-page #app #view .hour-tab-content{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important}
@@ -36,3 +36,10 @@ body.liturgical-page #app #view .prayer-formula-title{font:inherit!important;fon
 body.liturgical-page #app #view .liturgical-psalm-quote{font:inherit!important;font-style:italic!important;text-align:left!important;margin:0 0 1em!important}
 
 body.liturgical-page #app #view .mass-psalm-stanza{font:inherit!important;line-height:inherit!important;margin:0 0 1.1em!important;text-align:left!important}
+
+body.liturgical-page #app #view .prayer-block{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0!important}
+body.liturgical-page #app #view .prayer-text-heading:not(.liturgical-psalm-heading):not(.liturgical-hour-heading){text-align:left!important}
+#dailyLiturgyOverlay .daily-liturgy-body{background:var(--liturgical-paper)!important;color:var(--liturgical-ink)!important}
+#dailyLiturgyOverlay .daily-reading{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:var(--liturgical-ink)!important}
+#dailyLiturgyOverlay .daily-reading p{font-family:Georgia,'Times New Roman',serif!important;font-size:calc(1.25rem * var(--reader-scale,1))!important;line-height:1.5!important;color:var(--liturgical-ink)!important;text-align:left!important}
+#dailyLiturgyOverlay .daily-reading h3,#dailyLiturgyOverlay .daily-reading h4,#dailyLiturgyOverlay .daily-reading .verse-number{color:var(--liturgical-red)!important}
