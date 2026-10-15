@@ -272,7 +272,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.78';
+const APP_VERSION = '4.9.79';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -563,12 +563,9 @@ function viewOracoesBase480(){
   return `
     
     <div class="section-title">Práticas marianas diárias</div>
-    <div class="card fade-in">
-      <div class="toggle-row">
-        <button class="toggle-btn ${state.angelus==='anjo'?'active':''}" onclick="openDailyPrayer480('anjo')">O Anjo do Senhor</button>
-        <button class="toggle-btn ${state.angelus==='rainha'?'active':''}" onclick="openDailyPrayer480('rainha')">Rainha do Céu</button>
-      </div>
-      <div class="prayer-block">${renderPrayer(state.angelus==='anjo' ? PRAYERS.daily.anjo : PRAYERS.daily.rainha)}</div>
+    <div class="quick-grid fade-in">
+      <button class="quick-card" onclick="openDailyPrayer480('anjo')"><b>O Anjo do Senhor</b><span>Oração mariana diária</span></button>
+      <button class="quick-card" onclick="openDailyPrayer480('rainha')"><b>Rainha do Céu</b><span>Tempo Pascal</span></button>
     </div>
 
     <div class="section-title">Homenagens marianas</div>
@@ -626,7 +623,6 @@ function viewOracoes(){
 }
 
 
-function setAngelus(which){ state.angelus = which; render(); }
 
 // ---- devotion detail router ----
 function viewDevoDetail(key){

@@ -107,3 +107,9 @@ Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebraç�
 45. Calendário: separa categoria da pessoa (santo, beato, servo de Deus) do grau litúrgico (solenidade, festa, memória, memória facultativa, comemoração); os dois filtros podem ser combinados.
 46. Simplifica o marcador do calendário para uma única cor e remove a legenda de cores por categoria.
 47. APP_VERSION 4.9.78; cache: `liturgia-osm-v4.9.78-ui47-calendario-categorias`.
+
+
+## Décima sétima rodada (4.9.79)
+
+48. Aba Oração: substitui a exibição inline com seletor do Anjo do Senhor/Rainha do Céu por dois acessos compactos que abrem cada texto em sua própria tela. A oração diária de Hoje continua abrindo a oração selecionada.
+49. APP_VERSION 4.9.79; cache: `liturgia-osm-v4.9.79-ui48-oracao-atalhos`.
