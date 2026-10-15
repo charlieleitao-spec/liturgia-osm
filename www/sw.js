@@ -1,9 +1,10 @@
-const CACHE = 'liturgia-osm-v4.9.86-ui55-hifen-pronomes-mesoclise';
+const CACHE = 'liturgia-osm-v4.9.87-ui56-padrao-liturgico';
 const CORE = [
   "./",
   "./index.html",
   "./causas-beatos.html",
   "./app.css",
+  "./liturgical-reader.css",
   "./app.js",
   "./servite.html",
   "./servite.css",

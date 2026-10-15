@@ -86,6 +86,22 @@ function normalizeServiteLineBreaks(value){
 // Preserva integralmente a composição do texto-fonte.
 // Estrofes são separadas somente pelas linhas em branco já existentes;
 // *, †, hífens e outros sinais litúrgicos nunca são usados para reconstruí-las.
+function liturgicalLineHtml(value, verse=false){
+  let text=String(value??'').trim();
+  let prefix='';
+  if(verse){
+    const mark=text.match(/^([–—=])\s*/);
+    if(mark){prefix='<span class="liturgical-marker">'+escapeHtml(mark[1])+'</span>';text=text.slice(mark[0].length);}
+    const number=text.match(/^(\d{1,3})(?=\s*[A-Za-zÀ-ÿ“"«])/);
+    if(number){prefix+='<sup class="verse-number">'+number[1]+'</sup> ';text=text.slice(number[0].length).trimStart();}
+  }
+  let html=escapeHtml(text);
+  html=html.replace(/^((?:\d+ª\s*)?(?:Ant\.(?:\s*\d+)?|Antífona)|D\.|T\.|C\.|R\.|V\.|A\.|B\.|L\d?:|L\.|℣\.?|℟\.?)(?=\s|[A-Za-zÀ-ÿ]|$)\s*/, '<span class="rubric">$1</span> ');
+  // Rubric signs remain with the following word when the screen wraps.
+  html=html.replace(/(<span class="rubric">[^<]+<\/span>) ([^\s<]+)/g,'<span class="liturgical-cue">$1 $2</span>');
+  return prefix+html;
+}
+
 function formatLiturgicalStanzas(value){
   return normalizeServiteLineBreaks(value).trim();
 }
@@ -167,14 +183,14 @@ function renderLiturgicalHourContent(text){
     if(!target){ startBlock(''); target = block; }
     const node = document.createElement('div');
     node.className = className;
-    node.textContent = value;
+    node.innerHTML = liturgicalLineHtml(value, className==='psalm-verse');
     target.appendChild(node);
     return node;
   }
   function addProse(value,className='littext') {
     if(!block)startBlock('');
     const text=String(value||'').trim();
-    if(proseNode&&proseNode.parentNode===block&&proseClass===className){proseNode.textContent+=' '+text;return proseNode;}
+    if(proseNode&&proseNode.parentNode===block&&proseClass===className){proseNode.innerHTML=liturgicalLineHtml(proseNode.textContent+' '+text);return proseNode;}
     proseNode=add(text,className);proseClass=className;return proseNode;
   }
   function addStanzaLine(line){
@@ -226,6 +242,7 @@ function renderLiturgicalHourContent(text){
       }
       return;
     }
+    if(/^Oração sálmica$/i.test(line)){startBlock(line);return;}
     if(LITURGICAL_HEAD_RE.test(line)){
       startBlock(line);
       return;
@@ -239,7 +256,7 @@ function renderLiturgicalHourContent(text){
     if(!block) startBlock('');
 
     if(/^(?:Ant\.|Antífona)\s*\d*/i.test(line)){ stanza=null; add(line,'antiphon'); return; }
-    if(/^(Salmo|Cântico|C[âa]ntico)\s+/i.test(line)){ stanza=null; add(line,'psalm-title'); return; }
+    if(/^(Salmo|Cântico|C[âa]ntico)\s+/i.test(line)){ stanza=null; currentHead='SALMODIA'; add(line,'psalm-title'); return; }
     if(/^(V\.|R\.|℣\.|℟\.)\s*/.test(line)){ stanza=null; add(line, currentHead==='PRECES'?'preces-response':'response'); return; }
     if(/^(Escolhe-se|Salmos? do|Salmos? e cântico|Como no (?:Comum|Ordinário|Próprio)|Do Comum|Quando esta memória|Antífona e salmos|Salmodia complementar)/i.test(line)){
       stanza=null; add(line,'rubric'); return;
@@ -250,7 +267,7 @@ function renderLiturgicalHourContent(text){
       else addProse(line,'reading-body');
       return;
     }
-    if(currentHead==='HINO' || currentHead==='SALMODIA'){
+    if(currentHead==='HINO' || currentHead==='SALMODIA' || currentHead==='CÂNTICO EVANGÉLICO' || currentHead==='CANTICO EVANGELICO'){
       addStanzaLine(line);
       return;
     }
@@ -259,7 +276,7 @@ function renderLiturgicalHourContent(text){
       addProse(line,precesCount++===0?'preces-intro':'preces-intention');
       return;
     }
-    if(/^(ORAÇÃO|PAI[- ]NOSSO|CONCLUSÃO)$/.test(currentHead)){
+    if(/^(ORAÇÃO(?: SÁLMICA)?|PAI[- ]NOSSO|CONCLUSÃO)$/.test(currentHead)){
       addProse(line,'liturgical-prayer');
       return;
     }
@@ -380,7 +397,7 @@ function renderOficioTabs(oficioData){
   const canticleText = active.key === 'laudes' ? BENEDICTUS_TEXT : (active.key === 'vesperas' ? MAGNIFICAT_TEXT : null);
   const body = segs.map(s => {
     const txt = active.key === 'invitatorio' ? `${s.text}\n\n${INVITATORIO_SALMO}` : (canticleText ? insertCanticleAfterAntiphon(s.text, canticleText) : s.text);
-    return `${s.label ? `<div class="hour-sublabel">${escapeHtml(s.label)}</div>` : ''}<div>${renderLiturgicalHourContent(txt)}</div>`;
+    return `<div class="liturgical-hour-heading">${escapeHtml(s.label || active.title)}</div><div>${renderLiturgicalHourContent(txt)}</div>`;
   }).join('<div class="hour-divider"></div>');
   const finalAntifona = active.key === 'vesperas' ? renderFinalAntifonaBlock() : '';
   return `
@@ -1060,6 +1077,7 @@ function render(){
   else if(state.tab === 'regra') html = viewRegra();
   else if(state.tab === 'sobre') html = viewSobre();
   view.innerHTML = html;
+  document.body.classList.toggle('liturgical-page',!!view.querySelector('.today-servita-reader,.prayer-block'));
 }
 
 document.querySelectorAll('.tab-btn').forEach(b=>{
