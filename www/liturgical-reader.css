@@ -43,3 +43,4 @@ body.liturgical-page #app #view .prayer-text-heading:not(.liturgical-psalm-headi
 #dailyLiturgyOverlay .daily-reading{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:var(--liturgical-ink)!important}
 #dailyLiturgyOverlay .daily-reading p{font-family:Georgia,'Times New Roman',serif!important;font-size:calc(1.25rem * var(--reader-scale,1))!important;line-height:1.5!important;color:var(--liturgical-ink)!important;text-align:left!important}
 #dailyLiturgyOverlay .daily-reading h3,#dailyLiturgyOverlay .daily-reading h4,#dailyLiturgyOverlay .daily-reading .verse-number{color:var(--liturgical-red)!important}
+body.liturgical-page #app #view .card:has(.today-servita-reader)::before,body.liturgical-page #app #view .card:has(.prayer-block)::before{display:none!important}
