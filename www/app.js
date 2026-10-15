@@ -149,6 +149,7 @@ function liturgicalLineHtml(value, verse=false){
   html=html.replace(/^((?:\d+ª\s*)?(?:Ant\.(?:\s*\d+)?|Antífona)|D\.|T\.|C\.|R\.|V\.|A\.|B\.|L\d?:|L\.|℣\.?|℟\.?)(?=\s|[A-Za-zÀ-ÿ]|$)\s*/, '<span class="rubric">$1</span> ');
   // Rubric signs remain with the following word when the screen wraps.
   html=html.replace(/(<span class="rubric">[^<]+<\/span>) ([^\s<]+)/g,'<span class="liturgical-cue">$1 $2</span>');
+  html=html.replace(/([^\s<>]+)\s+([*†])(?=\s|$)/g,'<span class="liturgical-cue">$1 $2</span>');
   return prefix+html;
 }
 function prayerLineHtml(line, vigilia=false){
@@ -222,6 +223,11 @@ function renderPrayer(text, options={}){
   let hymnMode = false;
   let pendingPsalmCaption = false;
   let precesMode = false;
+  let psalmQuote = [];
+  const flushPsalmQuote = () => {
+    if(psalmQuote.length) blocks.push('<p class="liturgical-psalm-quote">'+escapeHtml(psalmQuote.join(' '))+'</p>');
+    psalmQuote=[];
+  };
   const flushStanza = () => {
     if(!stanza.length) return;
     blocks.push('<p class="prayer-stanza'+(hymnMode==='hymn'?' liturgical-hymn-stanza':'')+'">'+formatPrayerStanza(stanza,vigilia,hymnMode,precesMode)+'</p>');
@@ -229,7 +235,12 @@ function renderPrayer(text, options={}){
   };
   for(const rawLine of source.replace(/\r\n?/g,'\n').split('\n')){
     const line = rawLine.trim();
-    if(!line){ flushStanza(); continue; }
+    if(!line){ flushPsalmQuote(); flushStanza(); continue; }
+    if(psalmQuote.length){
+      if(/^[–—=]\s*|^(?:\d+ª\s*)?Ant\.|^Salmo\b/i.test(line)) flushPsalmQuote();
+      else {psalmQuote.push(line);continue;}
+    }
+    if(hymnMode==='psalm' && !stanza.length && /^[“"«]/.test(line)){psalmQuote.push(line);continue;}
     if(vigilia && pendingPsalmCaption){
       flushStanza();
       blocks.push('<h5 class="prayer-psalm-caption">'+escapeHtml(line)+'</h5>');
@@ -261,6 +272,7 @@ function renderPrayer(text, options={}){
     if(vigilia && /^(?:SÚPLICA DOS SERVOS DE MARIA|Despedida$)/i.test(line)){flushStanza();hymnMode=false;blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');continue;}
     stanza.push(line);
   }
+  flushPsalmQuote();
   flushStanza();
   return blocks.join('');
 }
