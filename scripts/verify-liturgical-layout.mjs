@@ -37,6 +37,7 @@ try{
   const saintId=await page.evaluate(()=>SANTORAL.find(s=>s.month===2&&s.day===17)._id);
   await page.goto(`http://127.0.0.1:8766/servite.html?view=oficio:${saintId}:vesperas`);
   await page.waitForSelector('.today-servita-reader .psalm-verse');
+  await page.waitForFunction(()=>getComputedStyle(document.body).backgroundColor==='rgb(252, 243, 213)');
   const office=await page.evaluate(()=>{
     const root=document.querySelector('.today-servita-reader');
     const style=selector=>{const n=root.querySelector(selector);if(!n)return null;const s=getComputedStyle(n);return {color:s.color,align:s.textAlign,background:s.backgroundColor,border:s.borderTopWidth,weight:s.fontWeight};};
@@ -50,7 +51,7 @@ try{
   await page.setViewportSize({width:390,height:844});
   await page.screenshot({path:out+'/vesperas.png',fullPage:true});
   await page.evaluate(()=>document.documentElement.setAttribute('data-theme','dark'));
-  assert.equal(await page.locator('.today-servita-reader').evaluate(n=>getComputedStyle(n).color),'rgb(245, 238, 220)');
+  await page.waitForFunction(()=>getComputedStyle(document.querySelector('.today-servita-reader')).color==='rgb(245, 238, 220)');
   await page.screenshot({path:out+'/vesperas-dark.png',fullPage:true});
   // Match plain text of every actual office line before and after DOM decoration.
   const content=JSON.parse(await readFile('www/data/oficios-osm.json','utf8'));
