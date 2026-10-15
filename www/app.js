@@ -272,7 +272,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.75';
+const APP_VERSION = '4.9.76';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1136,7 +1136,6 @@ function render(){
   });
   const share=document.getElementById('sharePrayerBtn');
   if(share&&pendingSharePrayer) share.onclick=function(){sharePrayer(pendingSharePrayer.title,pendingSharePrayer.text);};
-  if(typeof applyMainLanguage==='function') applyMainLanguage();
   if(typeof updateBackButton==='function') updateBackButton();
   if(typeof window.updateCelebrationButton==='function') window.updateCelebrationButton();
 }
@@ -1247,53 +1246,13 @@ function viewBiblioteca(){
     <div class="section-title">Favoritos</div>${favorites.length?resultRows(favorites):'<div class="empty-state">Toque na estrela de uma oração ou celebração para guardá-la aqui.</div>'}
     <div class="section-title">Últimos acessados</div>${recent.length?resultRows(recent):'<div class="empty-state">Os conteúdos consultados aparecerão aqui.</div>'}`;
 }
-const MAIN_I18N={
- pt:{today:'Hoje',calendar:'Calendário',sanctoral:'Santoral',prayers:'Orações',library:'Biblioteca',resources:'Recursos Servitas',languages:'Idiomas',title:'Idioma',close:'Fechar'},
- la:{today:'Hodie',calendar:'Calendarium',sanctoral:'Sanctorale',prayers:'Preces',library:'Bibliotheca',resources:'Instrumenta Servorum Mariae',languages:'Lingua',title:'Lingua',close:'Claudere'},
- it:{today:'Oggi',calendar:'Calendario',sanctoral:'Santorale',prayers:'Preghiere',library:'Biblioteca',resources:'Risorse dei Servi di Maria',languages:'Lingue',title:'Lingua',close:'Chiudi'},
- en:{today:'Today',calendar:'Calendar',sanctoral:'Sanctoral',prayers:'Prayers',library:'Library',resources:'Servite Resources',languages:'Languages',title:'Language',close:'Close'}
-};
-try{localStorage.removeItem('santoral-osm-lang');}catch(e){}
-let MAIN_LANG='pt';
-if(!MAIN_I18N[MAIN_LANG]) MAIN_LANG='pt';
-function applyMainLanguage(){
-  const d=MAIN_I18N[MAIN_LANG];
-  const labels={pt:['Vida','Liturgia','Oração'],la:['Vita','Liturgia','Oratio'],it:['Vita','Liturgia','Preghiera'],en:['Life','Liturgy','Prayer']};
-  const selected=labels[MAIN_LANG]||labels.pt;
-  document.querySelectorAll('#tabbar .tab-btn span').forEach((el,i)=>{if(selected[i])el.textContent=selected[i]});
-  document.querySelectorAll('.language-option').forEach(b=>b.classList.toggle('active',b.dataset.mainLang===MAIN_LANG));
-  const a=document.getElementById('languageTitle'); if(a)a.textContent=d.title;
-  const c=document.querySelector('.language-close'); if(c)c.textContent=d.close;
-  document.querySelectorAll('.section-title').forEach(el=>{
-    if(['Recursos Servitas','Instrumenta Servorum Mariae','Risorse dei Servi di Maria','Servite Resources'].includes(el.textContent.trim())) el.textContent=d.resources;
-  });
-  document.querySelectorAll('.quick-card b').forEach(el=>{
-    if(['Idiomas','Lingua','Lingue','Languages'].includes(el.textContent.trim())) el.textContent=d.languages;
-  });
-}
-function openLanguagePanel(){
-  const o=document.getElementById('languageOverlay'); if(!o)return;
-  applyMainLanguage(); o.classList.add('open'); o.setAttribute('aria-hidden','false');
-}
-function closeLanguagePanel(){
-  const o=document.getElementById('languageOverlay'); if(!o)return;
-  o.classList.remove('open'); o.setAttribute('aria-hidden','true');
-}
-function setMainLanguage(lang){
-  if(!MAIN_I18N[lang])return;
-  MAIN_LANG=lang;
-  localStorage.setItem('santoral-osm-lang',lang);
-  applyMainLanguage();
-}
-
-
 let APP_NAV_STACK=[];
 let APP_LAST_TAB=state && state.tab ? state.tab : 'hoje';
 function updateBackButton(){
   const button=document.getElementById('floatingBack');
   if(!button) return;
   const hasDetail=state.detailId!==null&&state.detailId!==undefined;
-  const overlay=['serviteOverlay','languageOverlay','mainMenuOverlay','dailyLiturgyOverlay'].some(id=>document.getElementById(id)?.classList.contains('open'));
+  const overlay=['serviteOverlay','mainMenuOverlay','dailyLiturgyOverlay'].some(id=>document.getElementById(id)?.classList.contains('open'));
   const inlineBack=!!document.querySelector('#view .hub-back, #view .back-btn');
   const needsBack=!!state.devo||state.devoSub!==null&&state.devoSub!==undefined||!!dailyPrayerOpen480;
   const visible=needsBack&&!inlineBack&&!overlay&&!hasDetail;
@@ -1304,11 +1263,9 @@ function updateBackButton(){
 
 function smartBack(){
   const menu=document.getElementById('mainMenuOverlay');
-  const language=document.getElementById('languageOverlay');
   const servite=document.getElementById('serviteOverlay');
   const mass=document.getElementById('dailyLiturgyOverlay');
   if(menu&&menu.classList.contains('open')){closeMainMenu();return true;}
-  if(language&&language.classList.contains('open')){closeLanguagePanel();return true;}
   if(servite&&servite.classList.contains('open')){if(typeof closeServite==='function')closeServite();else servite.classList.remove('open');updateBackButton();return true;}
   if(mass&&mass.classList.contains('open')&&typeof window.closeDailyLiturgy==='function'){window.closeDailyLiturgy();updateBackButton();return true;}
   if(state.liturgiaDetail){closeLiturgiaDetail();return true;}

@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.75-ui44-missa-hoje-idioma';
+const CACHE = 'liturgia-osm-v4.9.76-ui45-i18n-removido';
 const CORE = [
   "./",
   "./index.html",
