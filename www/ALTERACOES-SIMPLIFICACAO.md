@@ -113,3 +113,25 @@ Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebraç�
 
 48. Aba Oração: substitui a exibição inline com seletor do Anjo do Senhor/Rainha do Céu por dois acessos compactos que abrem cada texto em sua própria tela. A oração diária de Hoje continua abrindo a oração selecionada.
 49. APP_VERSION 4.9.79; cache: `liturgia-osm-v4.9.79-ui48-oracao-atalhos`.
+
+
+## Décima oitava rodada (4.9.80)
+
+50. Ficha da celebração, bloco Oração: as quatro a cinco linhas de fonte separadas viram uma única linha “Fontes”, com a mesma informação. Quando não há Memória Litúrgica, deixa de repetir dois avisos de ausência: mostra a oração do Santoral com sua fonte ou uma só mensagem.
+51. Ficha da celebração, bloco Liturgia: nota da Missa do dia mais curta, sem mudar o botão nem a regra de cópia offline.
+52. APP_VERSION 4.9.80; cache: `liturgia-osm-v4.9.80-ui49-ficha-simplificada`.
+
+
+## Décima nona rodada (4.9.81)
+
+53. Ficha da celebração: Vida continua aberta; Liturgia e Oração ficam recolhidas e abrem ao toque. Os atalhos Vida/Liturgia/Oração de Hoje abrem a seção escolhida antes de rolar até ela. O estado aberto/fechado sobrevive a novas renderizações da mesma ficha e volta ao padrão ao trocar de celebração.
+54. Setas e botões “Voltar” removidos do app principal: botão flutuante ←, “‹ Voltar a…” da ficha e dos Ofícios/Missas próprios, ← da Oração diária e da Memória Litúrgica, e “Voltar” dos detalhes de oração e devoção. Fica apenas o botão Voltar do Android (`smartBack`), que já cobre menu, leitor servita, Missa do dia, Ofícios/Missas próprios, oração diária, Memória Litúrgica, devoções, ficha e abas (qualquer aba volta a Hoje; em Hoje sai do app). Os botões de fechar dos painéis sobrepostos e o voltar interno do leitor servita foram mantidos.
+55. APP_VERSION 4.9.81; cache: `liturgia-osm-v4.9.81-ui50-sem-setas-secoes-recolhidas`.
+
+
+
+## Vigésima rodada (4.9.82)
+
+56. Ficha da celebração: Liturgia e Oração continuam recolhidas inicialmente; os atalhos de Hoje abrem e levam à seção escolhida. Vida permanece aberta.
+57. Retorno: um botão contextual flutuante fica disponível no navegador e no iPhone em telas secundárias e abas internas, executando a mesma sequência de retorno do Android. Ele se oculta somente no app Android, onde o botão nativo já atende à navegação; no navegador e no iPhone, inclusive em app nativo, permanece disponível. Em painéis com botão de fechar, fica oculto para evitar duplicação.
+58. APP_VERSION 4.9.82; cache: `liturgia-osm-v4.9.82-ui51-voltar-web-secoes-recolhidas`.

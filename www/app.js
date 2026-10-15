@@ -272,7 +272,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.79';
+const APP_VERSION = '4.9.82';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -520,10 +520,6 @@ function viewDetail(id){
   const s = SANTORAL.find(x=>x._id===id);
   if(!s) return `<div class="no-results">Não encontrado.</div>`;
   return `
-    <button class="back-btn" onclick="closeDetail()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
-      Voltar
-    </button>
     ${saintImageHtml(s,true)}
     <div class="detail-header fade-in">
       ${saintRankSubtitle(s)?`<div class="rank">${escapeHtml(saintRankSubtitle(s))}</div>`:''}
@@ -610,7 +606,6 @@ function viewDailyPrayer480(which){
   const text = isRegina ? PRAYERS.daily.rainha : PRAYERS.daily.anjo;
   return `
     <div class="detail-header fade-in">
-      <button class="back-btn" onclick="closeDailyPrayer480()">←</button>
       <div><div class="detail-title">${title}</div><div class="detail-date">${isRegina?'Tempo Pascal':'Prática mariana diária'}</div></div>
     </div>
     <div class="card fade-in">
@@ -650,10 +645,6 @@ function simpleTextDetail(title, sub, text, backFn, readingClass){
   const readerClass = readingClass === 'vigilia-reader' ? ' vigilia-reader' : '';
   const renderedText = readingClass === 'vigilia-reader' ? normalizeVigiliaTypography(text) : text;
   return `
-    <button class="back-btn" onclick="${back}">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
-      Voltar
-    </button>
     <div class="detail-header fade-in" style="position:relative;">${favButton('prayer',state.devo||title)}
       <h2 style="font-size:26px;">${escapeHtml(title)}</h2>
       ${sub ? `<div class="date-line">${escapeHtml(sub)}</div>` : ''}
@@ -674,10 +665,6 @@ function viewVigilia(){
     return simpleTextDetail(title, 'Vigília de Nossa Senhora', f, "openDevo('vigilia')", 'vigilia-reader');
   }
   return `
-    <button class="back-btn" onclick="backToOracoes()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
-      Voltar
-    </button>
     <div class="detail-header fade-in">
       <h2 style="font-size:26px;">Vigília de Nossa Senhora</h2>
       <div class="date-line">Uma das homenagens mais antigas dos Servos a Santa Maria</div>
@@ -710,10 +697,6 @@ function viewViaMatris(){
       <div class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
     </div>`).join('');
   return `
-    <button class="back-btn" onclick="backToOracoes()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
-      Voltar
-    </button>
     <div class="detail-header fade-in">
       <h2 style="font-size:26px;">Via Matris</h2>
       <div class="date-line">Novena perpétua de Nossa Senhora das Dores</div>
@@ -740,10 +723,6 @@ function viewLadainhas(){
       <div class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
     </div>`).join('');
   return `
-    <button class="back-btn" onclick="backToOracoes()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
-      Voltar
-    </button>
     <div class="detail-header fade-in">
       <h2 style="font-size:26px;">Ladainhas Marianas</h2>
       <div class="date-line">Três ladainhas próprias da espiritualidade servita</div>
@@ -837,8 +816,7 @@ function viewMemoriaLiturgica(){
     const textBlock=(title,text)=>text?`<div class="section-title">${title}</div><div class="card fade-in"><div class="prayer-block" style="white-space:pre-wrap;">${escapeHtml(text)}</div></div>`:'';
     const commonSource=`<p class="reader-note">Fonte dos textos comuns: ${escapeHtml(data.source)}.</p>`;
     const prayerSource=item?.oracao_propria?'Livro de Oração dos Servos de Maria, seção Memória Litúrgica.':'Santoral da Ordem.';
-    return `<button class="back-btn" onclick="closeMemoriaLiturgica()">← Voltar à Memória Litúrgica</button>
-      <div class="detail-header fade-in"><h2>${escapeHtml(heading)}</h2><div class="date-line">${escapeHtml(saint.date)}</div></div>
+    return `<div class="detail-header fade-in"><h2>${escapeHtml(heading)}</h2><div class="date-line">${escapeHtml(saint.date)}</div></div>
       ${textBlock('Hino',data.common.hino)}${textBlock('Antífona',data.common.antifona)}${textBlock('Salmo 111',data.common.salmo)}
       ${commonSource}${(item?.source_note||data.editorial_notes?.[memoriaSelectedDate])?`<p class="reader-note">Nota da fonte: ${escapeHtml(item?.source_note||data.editorial_notes[memoriaSelectedDate])}</p>`:''}${textBlock(item?.breve_vida?'Breve vida':'Apresentação',life)}
       ${textBlock('Oração própria',prayer)}<p class="reader-note">Fonte da oração: ${escapeHtml(prayerSource)}</p>`;
@@ -1061,8 +1039,7 @@ function renderLiturgiaDetail(tipo,reference){
     const hours=saint&&saintHasOffice(saint)?officeHoursForSaint(saint):[];
     if(!saint||!hours.length){state.liturgiaDetail=null;return '';}
     const rank=celebrationGradeLabel(saint.grau);
-    return '<button class="hub-back" onclick="closeLiturgiaDetail()">‹ Voltar aos Ofícios próprios</button>'+
-      '<div class="section-title">Ofícios próprios OSM</div><div class="hub-card"><div class="hub-card-title">'+celebrationNameHtml(saint.title,saint)+'</div>'+
+    return '<div class="section-title">Ofícios próprios OSM</div><div class="hub-card"><div class="hub-card-title">'+celebrationNameHtml(saint.title,saint)+'</div>'+
       '<p class="reader-note">'+escapeHtml(saint.date)+(rank?' · '+escapeHtml(rank):'')+'</p>'+
       '<p class="hub-card-note">'+escapeHtml(officeClassificationForSaint(saint))+'</p><div class="office-hours-grid">'+
       hours.map(pair=>officeHourButtonHtml(saint,pair)).join('')+'</div></div>';
@@ -1074,8 +1051,7 @@ function renderLiturgiaDetail(tipo,reference){
     const saint=SANTORAL.find(s=>String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')===item.date)||{};
     const title=celebrationTitleText(saint.title||item.title||'Missa própria',saint);
     const date=item.display_date||saint.date||item.date_label||item.date||'Data móvel';
-    return '<button class="hub-back" onclick="closeLiturgiaDetail()">‹ Voltar às Missas próprias</button>'+
-      '<div class="section-title">Missa própria OSM</div><div class="proper-mass-reader"><div class="hub-card-title">'+escapeHtml(title)+'</div>'+
+    return '<div class="section-title">Missa própria OSM</div><div class="proper-mass-reader"><div class="hub-card-title">'+escapeHtml(title)+'</div>'+
       '<p class="reader-note">'+escapeHtml(date)+(item.rank?' · '+escapeHtml(item.rank):'')+'</p>'+
       ((item.pdf_url||item.local_pdf_url)?'<p><a class="reader-note" href="'+escapeHtml(item.pdf_url||item.local_pdf_url)+'" target="_blank" rel="noopener">PDF oficial OSM</a></p>':'')+renderProperMassContent(item)+'<p class="hub-source">Fonte: '+escapeHtml(item.source||'fonte não informada')+'</p></div>';
   }
@@ -1251,14 +1227,18 @@ let APP_LAST_TAB=state && state.tab ? state.tab : 'hoje';
 function updateBackButton(){
   const button=document.getElementById('floatingBack');
   if(!button) return;
+  const platform=window.Capacitor?.getPlatform?.()||'';
+  const androidApp=!!window.Capacitor?.isNativePlatform?.()&&(platform==='android'||/Android/i.test(navigator.userAgent));
   const hasDetail=state.detailId!==null&&state.detailId!==undefined;
   const overlay=['serviteOverlay','mainMenuOverlay','dailyLiturgyOverlay'].some(id=>document.getElementById(id)?.classList.contains('open'));
   const inlineBack=!!document.querySelector('#view .hub-back, #view .back-btn');
-  const needsBack=!!state.devo||state.devoSub!==null&&state.devoSub!==undefined||!!dailyPrayerOpen480;
-  const visible=needsBack&&!inlineBack&&!overlay&&!hasDetail;
+  const subpage=hasDetail||!!state.devo||state.devoSub!==null&&state.devoSub!==undefined||!!dailyPrayerOpen480||!!memoriaSelectedDate||!!state.liturgiaDetail;
+  const nonHomeTab=state.tab!=='vida'&&state.tab!=='hoje';
+  const visible=!androidApp&&!overlay&&!inlineBack&&(subpage||nonHomeTab);
   button.classList.toggle('show',visible);
-  button.setAttribute('aria-label',hasDetail?'Voltar à origem':'Voltar para Hoje');
-  button.title=hasDetail?'Voltar à origem':'Voltar para Hoje';
+  const label=hasDetail?'Voltar à origem':'Voltar para Hoje';
+  button.setAttribute('aria-label',label);
+  button.title=label;
 }
 
 function smartBack(){
@@ -1570,7 +1550,7 @@ loadCanonicalSantoral();
     const date=massDate(s);
     const mass=ownMass?properMassBlock(ownMass):
       '<div class="hub-card"><div class="hub-card-title">Missa do dia</div>'+
-      '<p class="hub-card-note">Não há Missa própria cadastrada. A consulta da data de '+escapeHtml(s.date)+' exige internet; a cópia consultada fica disponível offline por até 30 dias.</p>'+
+      '<p class="hub-card-note">Sem Missa própria cadastrada. Consulta de '+escapeHtml(s.date)+' online; fica offline por até 30 dias.</p>'+
       '<button class="hub-action" onclick="openDailyLiturgy(\''+date+'\')">Consultar Missa desta data <span>›</span></button></div>';
     let office='';
     const hours=saintHasOffice(s)?officeHoursForSaint(s):[];
@@ -1599,7 +1579,7 @@ loadCanonicalSantoral();
     const data=MEMORIA_LITURGICA||{},date=dateKey(s);
     const item=Array.isArray(data.celebrations)?data.celebrations.find(entry=>entry.date===date):null;
     const covered=(Array.isArray(data.memory_dates)&&data.memory_dates.includes(date))||!!item;
-    if(!covered)return (s.prayer?hubText('Oração própria do Santoral',s.prayer)+'<p class="hub-source">Fonte da oração: Santoral da Ordem.</p>':hubEmpty('O Santoral não traz oração própria cadastrada.'))+hubEmpty('O Livro de Oração não traz Memória Litúrgica cadastrada para esta celebração.');
+    if(!covered)return s.prayer?hubText('Oração própria',s.prayer)+'<p class="hub-source">Fonte: Santoral da Ordem.</p>':hubEmpty('Não há oração própria nem Memória Litúrgica cadastradas para esta celebração.');
     const common=data.common||{};
     const life=item?.breve_vida||item?.apresentacao||'';
     const compact=value=>String(value||'').replace(/\s+/g,' ').trim();
@@ -1607,15 +1587,15 @@ loadCanonicalSantoral();
     const prayer=item?.oracao_propria||s.prayer||'',sourceNote=item?.source_note||data.editorial_notes?.[date]||'';
     const prayerSource=item?.oracao_propria?'Livro de Oração dos Servos de Maria, 3ª edição revisada (2024), seção Memória Litúrgica.':'Santoral da Ordem.';
     const lifeSource=distinctLife?'Livro de Oração dos Servos de Maria, 3ª edição revisada (2024), seção Memória Litúrgica.':'Santoral da Ordem.';
+    const sources=['textos comuns: '+(data.source||'Livro de Oração dos Servos de Maria, seção Memória Litúrgica.')];
+    if(prayer)sources.push('oração: '+prayerSource);
+    if(distinctLife)sources.push('vida breve: '+lifeSource);
+    if(sourceNote)sources.push('nota: '+sourceNote);
     return hubText('Hino',common.hino)+hubText('Antífona',common.antifona)+
       hubText('Salmo 111',common.salmo)+
       hubText(item?.breve_vida?'Breve vida':'Apresentação',distinctLife)+
-      '<p class="hub-source">Fonte dos textos comuns: '+escapeHtml(data.source||'Livro de Oração dos Servos de Maria, seção Memória Litúrgica.')+'</p>'+ 
       hubText('Oração própria',prayer)+
-      (prayer?'<p class="hub-source">Fonte da oração: '+escapeHtml(prayerSource)+'</p>':'')+
-      (distinctLife?'<p class="hub-source">Fonte da vida breve: '+escapeHtml(lifeSource)+'</p>':'')+
-      (sourceNote?'<p class="hub-source">Nota da fonte: '+escapeHtml(sourceNote)+'</p>':'')+
-      '<p class="hub-source">Memória Litúrgica do Livro de Oração; distinta da Liturgia das Horas.</p>';
+      '<p class="hub-source">Fontes — '+sources.map(escapeHtml).join('; ')+'. Memória Litúrgica do Livro de Oração, distinta da Liturgia das Horas.</p>';
   }
   function orderedCelebrations(){
     return SANTORAL.slice().sort(function(a,b){
@@ -1633,28 +1613,31 @@ loadCanonicalSantoral();
       '<button class="hub-action" aria-label="Próxima celebração" onclick="openSaint('+next._id+')"><span class="hub-action-direction">Próxima ›</span></button>'+
       '<button class="hub-action hub-share" onclick="shareSaint('+s._id+')"><span class="hub-action-direction">Compartilhar celebração</span><span class="hub-share-icon">↗</span></button></nav>';
   }
+  let hubOpenState={id:null,liturgia:false,oracao:false};
+  document.addEventListener('toggle',function(event){const el=event.target;if(el&&el.classList&&el.classList.contains('hub-collapsible')&&el.dataset.sec)hubOpenState[el.dataset.sec]=el.open;},true);
   window.renderCelebrationHub=function(id){
     const saint=SANTORAL.find(item=>item._id===id||item.id===id);
     if(!saint)return '<div class="empty-state">Celebração não encontrada.</div>';
-    const origin=state.detailOriginTab||'santoral';
-    const backLabel=origin==='calendario'?'Voltar ao Calendário':origin==='hoje'?'Voltar a Hoje':origin==='liturgia'?'Voltar à Liturgia':origin==='oracoes'?'Voltar a Oração':'Voltar ao Santoral';
+    if(hubOpenState.id!==saint._id)hubOpenState={id:saint._id,liturgia:false,oracao:false};
     const life='<div class="hub-life">'+saintImageHtml(saint,true)+
       (saintRankSubtitle(saint)?'<div class="rank">'+escapeHtml(saintRankSubtitle(saint))+'</div>':'')+
       '<h1 class="hub-life-title">'+escapeHtml(saint.title)+'</h1>'+
       '<div class="hub-life-meta">'+escapeHtml(saint.date)+'</div>'+
       '<div class="hub-life-bio">'+escapeHtml(saint.bio||'Biografia não cadastrada.')+'</div></div>';
-    return '<div class="hub-top-actions"><button class="hub-back" onclick="closeDetail()">‹ '+backLabel+'</button></div>'+
-      '<div class="saint-hub">'+
+    return '<div class="saint-hub">'+
       '<section class="hub-block" id="hub-vida"><div class="hub-block-title">Vida</div>'+life+'</section>'+
-      '<section class="hub-block" id="hub-liturgia"><div class="hub-block-title">Liturgia</div>'+liturgyBlock(saint)+'</section>'+
-      '<section class="hub-block" id="hub-oracao"><div class="hub-block-title">Oração</div>'+prayerBlock(saint)+'</section>'+
+      '<details class="hub-block hub-collapsible" id="hub-liturgia" data-sec="liturgia"'+(hubOpenState.liturgia?' open':'')+'><summary class="hub-block-title">Liturgia</summary>'+liturgyBlock(saint)+'</details>'+
+      '<details class="hub-block hub-collapsible" id="hub-oracao" data-sec="oracao"'+(hubOpenState.oracao?' open':'')+'><summary class="hub-block-title">Oração</summary>'+prayerBlock(saint)+'</details>'+
       '<section class="hub-block hub-block-plain" id="hub-navegacao">'+navigationBlock(saint)+'</section>'+
       '</div>';
   };
   window.openSaintSection=function(id,section){
+    const target0=SANTORAL.find(item=>item._id===id||item.id===id);
+    if(target0&&(section==='liturgia'||section==='oracao'))hubOpenState={id:target0._id,liturgia:section==='liturgia',oracao:section==='oracao'};
     openDetail(id);
     requestAnimationFrame(function(){
       const target=document.getElementById('hub-'+section);
+      if(target&&target.tagName==='DETAILS')target.open=true;
       if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
     });
   };
@@ -1743,7 +1726,7 @@ loadCanonicalSantoral();
     else if(event.deltaY < -2) show();
   }, {passive:true, capture:true});
   document.addEventListener('click', function(event){
-    if(event.target && event.target.closest && event.target.closest('.tabbar, #floatingBack, #celebrationToggle')) show();
+    if(event.target && event.target.closest && event.target.closest('.tabbar, #celebrationToggle')) show();
   }, true);
 })();
 

@@ -1186,3 +1186,10 @@ body:not(.celebration-mode):not(.servite-open):has(#view .vigilia-reader) main#v
 /* O controle único permanece acessível sobre a consulta da Missa. */
 body:has(#dailyLiturgyOverlay.open):not(.celebration-mode) .celebration-toggle{left:auto;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));}
 body.scroll-controls-hidden:has(#dailyLiturgyOverlay.open) .celebration-toggle{transform:none!important;opacity:1!important;pointer-events:auto!important}
+
+/* Ficha da celebração: seções recolhíveis (4.9.81) */
+.hub-collapsible>summary{display:flex;align-items:center;justify-content:space-between;min-height:44px;margin:0;cursor:pointer;list-style:none}
+.hub-collapsible>summary::-webkit-details-marker{display:none}
+.hub-collapsible>summary::after{content:'›';font-size:20px;line-height:1;transition:transform .15s}
+.hub-collapsible[open]>summary::after{transform:rotate(90deg)}
+.hub-collapsible>summary:focus-visible{outline:2px solid var(--gold-soft);outline-offset:2px}

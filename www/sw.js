@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.79-ui48-oracao-atalhos';
+const CACHE = 'liturgia-osm-v4.9.82-ui51-voltar-web-secoes-recolhidas';
 const CORE = [
   "./",
   "./index.html",
