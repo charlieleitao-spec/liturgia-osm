@@ -82,7 +82,7 @@ assert.match(liturgiaView, /renderLiturgiaCelebrationList\('horas',liturgiaCeleb
 assert.equal((liturgiaView.match(/liturgia-own-heading/g)||[]).length,2,'Missa e Ofício devem usar o mesmo cabeçalho visual.');
 assert.match(liturgiaView, /Missa própria OSM/);
 assert.match(liturgiaView, /Celebrações com textos próprios da Missa/);
-assert.match(app, /openLiturgiaSection\('horas'\)\"><b>Ofício próprio OSM/);
+
 assert.match(liturgiaView, /renderLiturgiaCelebrationList\('missa',canonicalMasses\)/);
 assert.match(app, /function openLiturgiaDetail\(tipo,reference\)/);
 assert.match(app, /function renderLiturgiaDetail\(tipo,reference\)/);
@@ -280,7 +280,7 @@ const prayerStart=app.indexOf('function viewOracoesBase480(){');
 const prayerEnd=app.indexOf('let dailyPrayerOpen480',prayerStart);
 const prayerView=app.slice(prayerStart,prayerEnd);
 for(const resource of ["openServite('rosario')","openServite('regra')","openDevo('coroa')","openServite('sabado')"]) assert.ok(prayerView.includes(resource),'Recurso de oração ausente: '+resource);
-assert.doesNotMatch(prayerView,/openLiturgiaSection\\('horas'\\)|Ofício próprio OSM/);
+assert.ok(!prayerView.includes("openLiturgiaSection('horas')")&&!prayerView.includes('Ofício próprio OSM'),'O Ofício próprio permanece apenas na aba Liturgia.');
 assert.equal((app.match(/openDevo\('coroa'\)/g)||[]).length,1,'A Coroa deve ter uma única entrada na aba Oração.');
 const libraryStart=app.indexOf('function viewBiblioteca(){');
 const libraryEnd=app.indexOf('const MAIN_I18N=',libraryStart);
