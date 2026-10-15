@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.74-ui43-sabado-mariano-unificado';
+const CACHE = 'liturgia-osm-v4.9.75-ui44-missa-hoje-idioma';
 const CORE = [
   "./",
   "./index.html",

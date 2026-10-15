@@ -272,7 +272,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.74';
+const APP_VERSION = '4.9.75';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -387,6 +387,7 @@ function viewHoje(){
   const prayer=dailyPrayerSuggestion();
   return '<section class="liturgical-hero home-hero fade-in"><div class="liturgical-kicker">Ordem dos Servos de Maria</div><div class="home-date-line"><strong>'+today.day+'</strong><span>'+escapeHtml(MONTHS[today.month-1])+'</span></div><div class="liturgical-sub">'+escapeHtml(today.weekday)+'</div></section>'+
     '<div class="section-title home-heading">Celebração Servita</div>'+celebrationCard+
+    '<div class="section-title home-heading">Missa de hoje</div><div class="home-prayer-card card fade-in"><div><h3>Missa do dia</h3><p>Leituras e orações da data; consulta online, com cópia offline.</p></div><button class="action-btn" onclick="openDailyLiturgy()">Abrir</button></div>'+
     '<div class="section-title home-heading">Oração diária</div><div class="home-prayer-card card fade-in"><div><span class="rank">'+escapeHtml(prayer.label)+'</span><h3>'+(state.angelus==='rainha'?'Rainha do Céu':'O Anjo do Senhor')+'</h3><p>'+escapeHtml(prayer.note)+'</p></div><button class="action-btn" onclick="openDailyPrayer480(\''+escapeHtml(state.angelus)+'\')">Rezar</button></div>'+
     '';
 }
@@ -1252,7 +1253,8 @@ const MAIN_I18N={
  it:{today:'Oggi',calendar:'Calendario',sanctoral:'Santorale',prayers:'Preghiere',library:'Biblioteca',resources:'Risorse dei Servi di Maria',languages:'Lingue',title:'Lingua',close:'Chiudi'},
  en:{today:'Today',calendar:'Calendar',sanctoral:'Sanctoral',prayers:'Prayers',library:'Library',resources:'Servite Resources',languages:'Languages',title:'Language',close:'Close'}
 };
-let MAIN_LANG=localStorage.getItem('santoral-osm-lang')||'pt';
+try{localStorage.removeItem('santoral-osm-lang');}catch(e){}
+let MAIN_LANG='pt';
 if(!MAIN_I18N[MAIN_LANG]) MAIN_LANG='pt';
 function applyMainLanguage(){
   const d=MAIN_I18N[MAIN_LANG];

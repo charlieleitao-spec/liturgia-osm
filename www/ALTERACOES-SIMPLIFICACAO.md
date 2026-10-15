@@ -75,3 +75,15 @@ Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebraç�
 33. Harmoniza os cabeçalhos e as linhas das páginas Missa própria OSM e Ofício próprio OSM, com datas, graus litúrgicos e dias do mês no mesmo padrão.
 34. Remove de Oração o atalho para Ofício próprio, já acessível na aba Liturgia.
 35. Remove do menu os atalhos de Missa do dia e idioma da interface; a consulta da Missa datada permanece na tela Hoje. Atualiza o status e o cache.
+
+
+## Décima segunda rodada (4.9.74, revisão)
+
+36. Sábado Mariano: os cinco formulários passam a viver só em Liturgia › Ofício OSM; removidos `data/devocoes/sabado-mariano.json` e sua entrada no cache offline. Seletor de idioma da interface retirado do `index.html`. Verificado: sintaxe dos JS e JSON íntegros, sem manipuladores `onclick` sem função.
+
+## Décima terceira rodada (4.9.75)
+
+37. Missa do dia: a 4.9.73 tirou o atalho do menu e a 4.9.68 já havia tirado o cartão de Hoje, deixando a consulta da data de hoje acessível só pela ficha de uma celebração. Hoje ganha uma única linha “Missa do dia” → Abrir, que abre direto a leitura de hoje.
+38. Idioma: sem o seletor, quem havia escolhido outro idioma ficava preso nele. A interface agora inicia sempre em português e o valor salvo é apagado.
+39. APP_VERSION 4.9.75; cache: `liturgia-osm-v4.9.75-ui44-missa-hoje-idioma`.
+
