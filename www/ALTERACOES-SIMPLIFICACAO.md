@@ -135,3 +135,18 @@ Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebraç�
 56. Ficha da celebração: Liturgia e Oração continuam recolhidas inicialmente; os atalhos de Hoje abrem e levam à seção escolhida. Vida permanece aberta.
 57. Retorno: um botão contextual flutuante fica disponível no navegador e no iPhone em telas secundárias e abas internas, executando a mesma sequência de retorno do Android. Ele se oculta somente no app Android, onde o botão nativo já atende à navegação; no navegador e no iPhone, inclusive em app nativo, permanece disponível. Em painéis com botão de fechar, fica oculto para evitar duplicação.
 58. APP_VERSION 4.9.82; cache: `liturgia-osm-v4.9.82-ui51-voltar-web-secoes-recolhidas`.
+
+
+## Vigésima primeira rodada (4.9.83)
+
+59. Limpeza: removido do `app.css` o estilo das setas de voltar que já não existem (`.back-btn`, `.hub-back`, `.hub-top-actions`) e a verificação de “botão de voltar na tela” do botão flutuante, que não tinha mais o que verificar. O botão flutuante (navegador e iPhone) foi mantido.
+60. Oração: o atalho passa a se chamar “Coroa de Nossa Senhora das Dores” (antes “Coroa das Sete Dores”), igual ao título do texto e do leitor servita; mesmo nome no título do painel servita.
+61. APP_VERSION 4.9.83; cache: `liturgia-osm-v4.9.83-ui52-css-limpo-coroa`.
+
+
+
+## Vigésima segunda rodada (4.9.84)
+
+62. Aba Oração: removido o cartão da Regra OSSM, que é conteúdo de formação e consulta, não uma oração.
+63. Menu: criada a seção “Ordem Secular”, com acesso direto à Regra de Vida da OSSM. O conteúdo, o leitor servita e os dados da Regra foram preservados.
+64. APP_VERSION 4.9.84; cache: `liturgia-osm-v4.9.84-ui53-regra-menu-ossm`.
