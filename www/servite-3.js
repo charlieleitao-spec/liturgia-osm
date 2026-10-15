@@ -535,7 +535,6 @@ function setFinalAntifona(key){ state.finalAntifona = key; render(); }
 function getDevoList(){
   return [
     { key:'vigilia', title:t('vigiliaTitle'), sub:t('vigiliaSub') },
-    { key:'sabado', title:t('sabadoTitle'), sub:t('sabadoSub') },
     { key:'adoracao', title:t('adoracaoTitle'), sub:t('adoracaoSub') },
     { key:'antifonas', title:t('antifonasTitle'), sub:t('antifonasSub') },
     { key:'coroa', title:t('coroaTitle'), sub:t('coroaSub') },

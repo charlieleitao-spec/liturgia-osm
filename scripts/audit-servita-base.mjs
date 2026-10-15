@@ -50,7 +50,7 @@ assert.equal(memory.schema_version, 2);
 assert.equal(memory.memory_dates?.length, 25);
 assert.ok(memory.celebrations?.length > 0 && memory.celebrations.length <= memory.memory_dates.length);
 assert.ok(offices.celebracoes['10-03']?.material?.horas?.textos_proprios?.oracao, 'oração deve permanecer como campo separado no esquema 3');
-const devotionalFiles = ['load-devotions.js','devocoes/oracoes-diarias.json','devocoes/regra.json','devocoes/rosario.json','devocoes/vigilia.json','devocoes/coroa.json','devocoes/stabat-mater.json','devocoes/via-matris.json','devocoes/ladainhas.json','devocoes/sabado-mariano.json','devocoes/adoracao.json','devocoes/antifonas.json','devocoes/oracoes-varias.json'];
+const devotionalFiles = ['load-devotions.js','devocoes/oracoes-diarias.json','devocoes/regra.json','devocoes/rosario.json','devocoes/vigilia.json','devocoes/coroa.json','devocoes/stabat-mater.json','devocoes/via-matris.json','devocoes/ladainhas.json','devocoes/adoracao.json','devocoes/antifonas.json','devocoes/oracoes-varias.json'];
 for (const file of devotionalFiles) assert.ok(fs.existsSync(path.join(root, 'www/data', file)), 'Arquivo de oração ausente: ' + file);
 
 const core = [...sw.matchAll(/["']\.\/(.*?)["']/g)].map(match => match[1]);
