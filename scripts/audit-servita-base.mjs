@@ -16,10 +16,10 @@ const masses = json('www/data/missas-osm.json');
 const variousPrayers = json('www/data/devocoes/oracoes-varias.json');
 const dataReadme = read('www/data/README.md');
 
-assert.equal(pkg.version, '4.9.73', 'package.json deve identificar a versão 4.9.73');
+assert.equal(pkg.version, '4.9.74', 'package.json deve identificar a versão 4.9.74');
 assert.equal(pkg.dependencies['@capacitor/app'], '8.1.2', 'Plugin nativo do botão Voltar deve fazer parte do app.');
-assert.match(appJs, /const APP_VERSION = ['"]4\.9\.73['"]/);
-assert.match(sw, /liturgia-osm-v4\.9\.73-ui42-missa-oficio-harmonizados/);
+assert.match(appJs, /const APP_VERSION = ['"]4\.9\.74['"]/);
+assert.match(sw, /liturgia-osm-v4\.9\.74-ui43-sabado-mariano-unificado/);
 assert.match(html, /app\.js/);
 assert.match(html, /app\.css/);
 assert.match(appJs, /function openSantoralOfficeHour/);
@@ -92,3 +92,4 @@ assert.ok(!fs.existsSync(path.join(root, 'www/cordova.js')));
 assert.ok(!fs.existsSync(path.join(root, 'www/cordova_plugins.js')));
 
 console.log(JSON.stringify({ status: 'ok', version: pkg.version, santoral: santoral.length, oficios: Object.keys(offices.celebracoes).length, memoria: memory.memory_dates.length, memoriaComTexto: memory.celebrations.length, core: core.length }, null, 2));
+

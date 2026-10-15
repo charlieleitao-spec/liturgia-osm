@@ -272,7 +272,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.73';
+const APP_VERSION = '4.9.74';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -580,7 +580,7 @@ function viewOracoesBase480(){
       <button class="quick-card" onclick="openServite('rosario')"><b>Rosário</b><span>Rosário guiado</span></button>
       <button class="quick-card" onclick="openServite('regra')"><b>Regra OSSM</b><span>Espiritualidade da Ordem Secular</span></button>
       <button class="quick-card" onclick="openDevo('coroa')"><b>Coroa das Sete Dores</b><span>Oração pelas dores de Maria</span></button>
-      <button class="quick-card" onclick="openServite('sabado')"><b>Sábado Mariano</b><span>Ofícios e devoções marianas</span></button>
+      <button class="quick-card" onclick="openMarianSaturdayOffices()"><b>Santa Maria no Sábado</b><span>Cinco formulários próprios do Tempo Comum</span></button>
     </div>
 
     <div class="section-title">Orações várias</div>
@@ -934,6 +934,15 @@ function closeLiturgiaDetail(){state.liturgiaDetail=null;render();window.scrollT
 window.openLiturgiaDetail=openLiturgiaDetail;
 window.closeLiturgiaDetail=closeLiturgiaDetail;
 function setLiturgiaSection(section){state.liturgiaSection=section;if(state.liturgiaDetail?.tipo!==section)state.liturgiaDetail=null;render();window.scrollTo(0,0);}
+function openMarianSaturdayOffices(){
+  state.tab='liturgia';state.liturgiaSection='horas';state.liturgiaDetail=null;state.devo=null;state.devoSub=null;
+  localStorage.setItem('osmLastTab','liturgia');
+  render();
+  requestAnimationFrame(function(){
+    const section=document.getElementById('marianSaturdayOfficeCommon');
+    if(section){section.open=true;section.scrollIntoView({behavior:'smooth',block:'start'});}
+  });
+}
 function movableOfficeDate(item){
   if(item.date_rule==='sexta-feira_depois_do_v_domingo_da_quaresma'){
     const date=easterSunday(new Date().getFullYear());
@@ -942,8 +951,8 @@ function movableOfficeDate(item){
   }
   return item.date_label||'Data móvel';
 }
-function liturgiaResourceRow(title,subtitle,content,subtitleUrl){
-  return '<details class="liturgia-resource-detail"><summary class="liturgia-celebration-row liturgia-resource-row"><span class="rowtext"><span class="rowtitle">'+escapeHtml(title)+'</span><span class="rowrank">'+(subtitleUrl?'<a href="'+escapeHtml(subtitleUrl)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">'+escapeHtml(subtitle)+'</a>':escapeHtml(subtitle))+'</span></span><span class="chev" aria-hidden="true">›</span></summary><div class="liturgia-resource-content">'+content+'</div></details>';
+function liturgiaResourceRow(title,subtitle,content,subtitleUrl,id){
+  return '<details class="liturgia-resource-detail"'+(id?' id="'+escapeHtml(id)+'"':'')+'><summary class="liturgia-celebration-row liturgia-resource-row"><span class="rowtext"><span class="rowtitle">'+escapeHtml(title)+'</span><span class="rowrank">'+(subtitleUrl?'<a href="'+escapeHtml(subtitleUrl)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">'+escapeHtml(subtitle)+'</a>':escapeHtml(subtitle))+'</span></span><span class="chev" aria-hidden="true">›</span></summary><div class="liturgia-resource-content">'+content+'</div></details>';
 }
 function liturgiaResourceAction(label,url){
   return url?'<a class="action-btn" href="'+escapeHtml(url)+'" target="_blank" rel="noopener">'+escapeHtml(label)+'</a>':'';
@@ -1005,6 +1014,31 @@ function renderMarianOfficeTranscript(text, season){
   flush();
   return blocks.join('');
 }
+function marianSaturdayCommonForms(item){
+  const source=normalizeMarianOfficeTranscript(item.pdf_transcript||'','Tempo Comum')
+    .split('\n').filter(line=>!/^Copyright © CURIA GENERALIZIA OSM/i.test(line.trim())).join('\n');
+  const titles=[
+    'SANTA MARIA DOS SEUS SERVOS',
+    'MARIA E A IGREJA',
+    'MARIA, MULHER NOVA',
+    'MARIA, RAINHA DA MISERICÓRDIA',
+    'SANTA MARIA DAS AMÉRICAS'
+  ];
+  const roman=['I','II','III','IV','V'];
+  const displayTitles=['Santa Maria dos seus Servos','Maria e a Igreja','Maria, Mulher Nova','Maria, Rainha da Misericórdia','Santa Maria das Américas'];
+  const starts=titles.map(title=>source.indexOf(title));
+  if(starts.some(index=>index<0))return '<p class="reader-note">Os cinco formulários completos estão no PDF oficial.</p>';
+  const intro=source.slice(0,starts[0]).trim();
+  const introHtml=intro?'<div class="marian-saturday-intro">'+renderMarianOfficeTranscript(intro,'Tempo Comum')+'</div>':'';
+  const forms=titles.map((title,index)=>{
+    const start=starts[index]+title.length;
+    const end=index<titles.length-1?starts[index+1]:source.length;
+    const body=source.slice(start,end).replace(/^\s*(?:I|II|III|IV|V)\s*/,'').trim();
+    const content='<div class="liturgical-reading hub-text saturday-pdf-transcript">'+renderMarianOfficeTranscript(body,'Tempo Comum')+'</div>';
+    return liturgiaResourceRow(roman[index]+' — '+displayTitles[index],'Ofício próprio OSM',content,null,'marianSaturdayForm'+(index+1));
+  }).join('');
+  return introHtml+forms;
+}
 function marianSaturdayOfficeBlocks(){
   const items=Array.isArray(OFICIOS_OSM?.sabados_marianos_pdf)?OFICIOS_OSM.sabados_marianos_pdf:[];
   if(!items.length)return '';
@@ -1012,11 +1046,16 @@ function marianSaturdayOfficeBlocks(){
     const originalTitle=item.title||'Ofício de Santa Maria no Sábado';
     const title='Santa Maria no Sábado';
     const subtitle=(originalTitle.match(/Tempo (?:do Advento|do Natal|Pascal|Comum)/i)||[])[0]||originalTitle;
-    const pdfUrl=item.pdf_url||item.local_pdf_url||'';
-    const pdfAction=liturgiaResourceAction('Consultar PDF oficial OSM',pdfUrl);
-    const transcript=item.pdf_transcript?'<details class="liturgia-resource-disclosure"><summary class="action-btn">Ler texto completo</summary><div class="liturgical-reading hub-text saturday-pdf-transcript">'+renderMarianOfficeTranscript(item.pdf_transcript,subtitle)+'</div></details>':'';
-    const content=(pdfAction?'<div class="liturgia-resource-actions">'+pdfAction+'</div>':'')+transcript;
-    return liturgiaResourceRow(title,subtitle,content);
+    const pdfUrl=item.local_pdf_url||item.pdf_url||'';
+    const pdfAction=liturgiaResourceAction('Abrir PDF oficial OSM',pdfUrl);
+    let reading='';
+    if(item.id==='tempo-comum'&&item.pdf_transcript){
+      reading=marianSaturdayCommonForms(item);
+    }else if(item.pdf_transcript){
+      reading='<details class="liturgia-resource-disclosure"><summary class="action-btn">Ler texto completo</summary><div class="liturgical-reading hub-text saturday-pdf-transcript">'+renderMarianOfficeTranscript(item.pdf_transcript,subtitle)+'</div></details>';
+    }
+    const content=(pdfAction?'<div class="liturgia-resource-actions">'+pdfAction+'</div>':'')+reading;
+    return liturgiaResourceRow(title,subtitle,content,null,item.id==='tempo-comum'?'marianSaturdayOfficeCommon':null);
   }).join('');
   return '<div class="section-title">Ofícios de Santa Maria no Sábado</div><div class="card fade-in liturgia-resource-list">'+rows+'</div>';
 }
@@ -1748,3 +1787,4 @@ loadCanonicalSantoral();
     if(event.target && event.target.closest && event.target.closest('.tabbar, #floatingBack, #celebrationToggle')) show();
   }, true);
 })();
+

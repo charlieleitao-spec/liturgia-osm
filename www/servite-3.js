@@ -817,49 +817,14 @@ function viewVigilia(){
 
 // ---- Santa Maria no Sábado (5 formularies) ----
 function viewSabado(){
-  const s = PRAYERS.devotions.sabado;
-  const formKeys = ['form1','form2','form3','form4','form5'];
-  if(state.devoSub){
-    const body = s[state.devoSub];
-    const title = s[state.devoSub + 'Title'];
-    return `
-      <button class="back-btn" onclick="openDevo('sabado')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
-        ${escapeHtml(t('back'))}
-      </button>
-      <div class="detail-header fade-in">
-        <h2 style="font-size:1.375rem;">${escapeHtml(title)}</h2>
-        <div class="date-line">${escapeHtml(t('sabadoTitle'))}</div>
-        <div class="detail-divider"></div>
-      </div>
-      ${langNoteHtml()}
-      <div class="card fade-in">
-        <div class="prayer-block">${renderOficioTabs(body)}</div>
-      </div>
-    `;
-  }
-  return `
-    <button class="back-btn" onclick="backToOracoes()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
-      ${escapeHtml(t('back'))}
-    </button>
-    <div class="detail-header fade-in">
-      <h2 style="font-size:1.625rem;">${escapeHtml(t('sabadoTitle'))}</h2>
-      <div class="date-line">${escapeHtml(t('sabadoSub'))}</div>
-      <div class="detail-divider"></div>
-    </div>
-    ${langNoteHtml()}
-    <div class="card fade-in" style="margin-bottom:16px;">
-      <div class="prayer-block">${renderPrayer(s.intro)}</div>
-    </div>
-    <div class="card fade-in" style="padding:6px 16px;">
-      ${formKeys.map((k,i) => `
-      <div class="saint-row" onclick="openDevo('sabado','${k}')">
-        <div class="rowtext"><div class="rowtitle">${escapeHtml(['I','II','III','IV','V'][i])} — ${escapeHtml(s[k+'Title'])}</div></div>
-        <div class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
-      </div>`).join('')}
-    </div>
-  `;
+  try{
+    if(window.parent&&window.parent!==window&&typeof window.parent.openMarianSaturdayOffices==='function'){
+      window.parent.closeServite();
+      window.parent.openMarianSaturdayOffices();
+      return '';
+    }
+  }catch(error){}
+  return '<div class="card"><p>Os cinco formulários de Santa Maria no Sábado estão reunidos em Liturgia › Ofício.</p></div>';
 }
 
 // ---- Via Matris (intro + 7 stations) ----
@@ -1149,3 +1114,4 @@ render();
   window.dispatchEvent(new Event('servite-ready'));
 }
 initServite().catch(error=>{document.getElementById('view').innerHTML='<div class="empty-note">Não foi possível carregar os textos offline.</div>';console.error(error);});
+
