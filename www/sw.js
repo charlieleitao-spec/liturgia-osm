@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.88-ui57-hifen-silabas-cache-imagens';
+const CACHE = 'liturgia-osm-v4.9.89-ui58-dados-revisados';
 const CORE = [
   "./",
   "./index.html",

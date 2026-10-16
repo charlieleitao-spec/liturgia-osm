@@ -298,7 +298,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.88';
+const APP_VERSION = '4.9.89';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1517,7 +1517,7 @@ async function loadCanonicalOffices(){
     if(!response.ok)throw new Error('Ofícios indisponíveis');
     const source=await response.json();
     const dates=source?.celebracoes;
-    if(source.schema_version!==3||!dates||Object.keys(dates).length!==32)throw new Error('Base de Ofícios incompleta.');
+    if(source.schema_version!==3||!dates||Object.keys(dates).length!==SANTORAL.length)throw new Error('Base de Ofícios incompleta.');
     for(const saint of SANTORAL){
       const key=officeDateKey(saint),record=dates[key];
       if(!record||Number(record.id)!==Number(saint.id)||!['oficio_proprio','textos_proprios','sem_material_proprio'].includes(record.tipo_material))throw new Error('Ofício divergente em '+key);
