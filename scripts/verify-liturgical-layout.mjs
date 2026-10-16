@@ -122,6 +122,23 @@ try{
   await page.evaluate(()=>{lightMode=true;applyPreferences();});
   await page.screenshot({path:out+'/calendario-light.png',animations:'disabled'});
 
+  await page.evaluate(()=>{state.detailId=null;state.tab='hoje';render();});
+  for(const light of [false,true]){
+    await page.evaluate(value=>{lightMode=value;applyPreferences();},light);
+    for(const width of [320,390,768]){
+      await page.setViewportSize({width,height:844});
+      assert.equal(await page.locator('.home-end-ornament').count(),1);
+      const emblem=await page.locator('.home-hero').evaluate(el=>{
+        const before=getComputedStyle(el,'::before'),after=getComputedStyle(el,'::after');
+        return {circle:before.content,mask:after.maskImage||after.webkitMaskImage,width:after.width};
+      });
+      assert.equal(emblem.circle,'none');assert.match(emblem.mask,/emblema-osm\.svg/);
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+      await page.screenshot({path:out+`/inicio-${light?'light':'dark'}-${width}.png`,fullPage:true,animations:'disabled'});
+    }
+  }
+  assert.equal((await page.request.get('http://127.0.0.1:8766/media/emblema-osm.svg')).status(),200);
+
   // Use an actual proper office and the full reader in servite.html.
   const saintId=await page.evaluate(()=>SANTORAL.find(s=>s.month===2&&s.day===17)._id);
   await page.goto(`http://127.0.0.1:8766/servite.html?view=oficio:${saintId}:vesperas`);
