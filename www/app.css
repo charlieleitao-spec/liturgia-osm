@@ -429,13 +429,7 @@ main#view{position:relative;z-index:1;flex:1;padding:18px 18px 100px;padding-lef
 .social-link::after{content:'Requer internet';margin-left:auto;color:var(--text-faint);font-size:10px;white-space:nowrap}
 @media(max-width:370px){.connection-strip span:last-child{display:none}}
 /* Revisão, calendário e modo celebração 4.9.1 */
-.calendar-filters{display:flex;gap:7px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
-.calendar-filters::-webkit-scrollbar{display:none}
-.calendar-filter{white-space:nowrap;border:1px solid var(--line);background:var(--bg-panel);color:var(--text-muted);border-radius:999px;padding:8px 11px;font-size:12px}
-.calendar-filter.active{border-color:var(--gold);color:var(--gold-soft);background:rgba(196,154,74,.12)}
 .calendar-month-select{width:100%;margin:0 0 12px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:var(--bg-panel);color:var(--paper);font-family:var(--font-app);font-size:15px}
-.calendar-category-label,.calendar-grade-label{display:block;margin:2px 0 6px;color:var(--text-muted);font-size:12px}
-.calendar-grade-select{margin-top:0}
 .cal-day.has-feast .cal-dot{background:var(--gold-soft)}
 .calendar-celebration-row{display:block;padding:12px 0;border-bottom:1px solid var(--line)}
 .calendar-celebration-row:last-child{border-bottom:0}
@@ -894,8 +888,6 @@ body.light-mode .crest{border-color:#b89a5b}
 #view,.topbar-inner,.topbar-text,.home-actions,.presidency-grid,.office-hours-card,.office-hours-grid,.saint-row-hours,.hub-navigation-grid{box-sizing:border-box;min-width:0}
 #view>.toggle-row{width:100%;box-sizing:border-box}
 #view .calendar-month-select{display:block;width:100%;min-height:44px;box-sizing:border-box;margin:0 0 10px}
-#view .calendar-filters{max-width:100%;overscroll-behavior-inline:contain}
-#view .calendar-category-label,#view .calendar-grade-label{margin-top:8px}
 #view .calendar-toolbar{display:grid;grid-template-columns:42px minmax(0,1fr) 42px;align-items:center;gap:8px}
 #view .calendar-title{min-width:0;text-align:center;overflow-wrap:anywhere}
 #view .calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));width:100%;gap:clamp(3px,1.4vw,6px)}
@@ -1192,12 +1184,6 @@ body.scroll-controls-hidden:has(#dailyLiturgyOverlay.open) .celebration-toggle{t
 #view .calendar-simple .calendar-month-select{margin:0;border:0;background:transparent;border-radius:6px;min-height:44px;padding:6px;color:var(--paper);font-size:16px;}
 #view .calendar-simple .cal-nav{width:36px;min-height:44px;padding:0;border:0;background:transparent;box-shadow:none;font-size:24px;}
 #view .calendar-simple .today-chip{margin:0;padding:6px 8px;min-height:44px;border:0;background:transparent;font-size:13px;text-transform:none;letter-spacing:normal;}
-#view .calendar-filter-panel{margin:0 0 12px;border-bottom:1px solid var(--line);}
-#view .calendar-filter-panel summary{padding:10px 4px;min-height:44px;box-sizing:border-box;cursor:pointer;color:var(--text-muted);font-size:14px;}
-#view .calendar-filter-fields{padding:0 4px 12px;display:grid;gap:6px;}
-#view .calendar-filter-fields label{font-size:14px;color:var(--text-muted);}
-#view .calendar-filter-fields .calendar-month-select{border:1px solid var(--line);background:var(--bg-panel);margin-bottom:6px;}
-#view .calendar-clear{justify-self:start;background:transparent;color:var(--gold-soft);border:0;padding:8px 0;min-height:44px;font:inherit;cursor:pointer;}
 #view .calendar-simple .cal-day{border:0;border-radius:8px;background:transparent;min-height:36px;font-size:15px;}
 #view .calendar-simple .cal-day.empty{visibility:hidden;}
 #view .calendar-simple .cal-day.has-feast{background:rgba(184,148,72,.10);}
@@ -1206,13 +1192,9 @@ body:has(.calendar-simple) main#view{padding-bottom:calc(120px + env(safe-area-i
 body:has(.calendar-simple){scroll-padding-bottom:calc(110px + env(safe-area-inset-bottom));}
 @media(max-width:340px){#view .calendar-simple .calendar-toolbar{grid-template-columns:30px minmax(0,1fr) 30px auto;}#view .calendar-simple .cal-nav{width:30px;}#view .calendar-simple .calendar-month-select{font-size:14px;}}
 
-/* Acabamento discreto da página inicial. */
-.home-end-ornament{display:flex;align-items:center;justify-content:center;gap:12px;width:80%;max-width:300px;margin:34px auto 28px;color:var(--gold);opacity:.65;pointer-events:none}
-.home-end-ornament::before,.home-end-ornament::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,transparent,currentColor)}
-.home-end-ornament::after{transform:scaleX(-1)}
-.home-end-ornament>span{display:block;width:5px;height:5px;flex:0 0 5px;background:currentColor;transform:rotate(45deg)}
-
-/* Emblema servita estilizado ao lado da data. */
-.home-hero::before,body.light-mode .home-hero::before{content:none}
-.home-hero::after,body.light-mode .home-hero::after{content:"";position:absolute;right:25px;top:50%;width:94px;height:118px;transform:translateY(-50%);background:var(--gold-soft);-webkit-mask:url("./media/emblema-osm.svg") center/contain no-repeat;mask:url("./media/emblema-osm.svg") center/contain no-repeat;opacity:.28;pointer-events:none}
-@media(max-width:380px){.home-hero::after,body.light-mode .home-hero::after{right:18px;width:68px;height:85px;opacity:.24}}
+/* Acabamento ornamental clássico da página inicial — revisão 4.9.92. */
+.home-end-ornament{display:flex;align-items:center;justify-content:center;width:min(84%,340px);height:34px;margin:32px auto 28px;pointer-events:none;opacity:.8;background:url("./media/ornamento-final.svg") center/contain no-repeat}
+.home-end-ornament::before,.home-end-ornament::after,.home-end-ornament>span{display:none}
+/* O antigo desenho do emblema era uma interpretação não oficial.
+   Desativado até a incorporação de uma reprodução fiel do símbolo da Ordem. */
+.home-hero::before,.home-hero::after,body.light-mode .home-hero::before,body.light-mode .home-hero::after{content:none!important;display:none!important}
