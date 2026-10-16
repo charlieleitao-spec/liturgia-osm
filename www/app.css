@@ -1192,9 +1192,11 @@ body:has(.calendar-simple) main#view{padding-bottom:calc(120px + env(safe-area-i
 body:has(.calendar-simple){scroll-padding-bottom:calc(110px + env(safe-area-inset-bottom));}
 @media(max-width:340px){#view .calendar-simple .calendar-toolbar{grid-template-columns:30px minmax(0,1fr) 30px auto;}#view .calendar-simple .cal-nav{width:30px;}#view .calendar-simple .calendar-month-select{font-size:14px;}}
 
-/* Acabamento ornamental clássico da página inicial — revisão 4.9.92. */
-.home-end-ornament{display:flex;align-items:center;justify-content:center;width:min(84%,340px);height:34px;margin:32px auto 28px;pointer-events:none;opacity:.8;background:url("./media/ornamento-final.svg") center/contain no-repeat}
+/* Emblema baseado no cabeçalho Somos Servos, com proporções preservadas. */
+.home-hero::before,body.light-mode .home-hero::before{content:none;display:none}
+.home-hero::after,body.light-mode .home-hero::after{content:"";position:absolute;right:24px;top:50%;width:82px;height:120px;transform:translateY(-50%);background:url("./media/emblema-osm.svg") center/contain no-repeat;border:0;border-radius:0;box-shadow:none;opacity:.8;pointer-events:none}
+.home-hero .liturgical-kicker{max-width:calc(100% - 86px);line-height:1.6}
+@media(max-width:380px){.home-hero::after,body.light-mode .home-hero::after{right:16px;width:64px;height:96px}.home-hero .liturgical-kicker{max-width:calc(100% - 66px);font-size:8px;letter-spacing:.12em}}
+/* Acabamento ornamental clássico da página inicial. */
+.home-end-ornament{display:block;width:min(84%,340px);height:34px;margin:32px auto 28px;pointer-events:none;opacity:.85;background:url("./media/ornamento-final.svg") center/contain no-repeat}
 .home-end-ornament::before,.home-end-ornament::after,.home-end-ornament>span{display:none}
-/* O antigo desenho do emblema era uma interpretação não oficial.
-   Desativado até a incorporação de uma reprodução fiel do símbolo da Ordem. */
-.home-hero::before,.home-hero::after,body.light-mode .home-hero::before,body.light-mode .home-hero::after{content:none!important;display:none!important}

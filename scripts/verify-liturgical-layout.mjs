@@ -133,9 +133,9 @@ try{
       assert.equal(await page.locator('.home-end-ornament').count(),1);
       const emblem=await page.locator('.home-hero').evaluate(el=>{
         const before=getComputedStyle(el,'::before'),after=getComputedStyle(el,'::after');
-        return {circle:before.content,emblem:after.content};
+        return {circle:before.content,emblem:after.backgroundImage};
       });
-      assert.equal(emblem.circle,'none');assert.equal(emblem.emblem,'none');
+      assert.equal(emblem.circle,'none');assert.match(emblem.emblem,/emblema-osm\.svg/);
       assert.match(await page.locator('.home-end-ornament').evaluate(el=>getComputedStyle(el).backgroundImage),/ornamento-final\.svg/);
       assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
       await page.screenshot({path:out+`/inicio-${light?'light':'dark'}-${width}.png`,fullPage:true,animations:'disabled'});
