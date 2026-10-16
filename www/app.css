@@ -1185,3 +1185,23 @@ body.scroll-controls-hidden:has(#dailyLiturgyOverlay.open) .celebration-toggle{t
 .hub-collapsible>summary::after{content:'›';font-size:20px;line-height:1;transition:transform .15s}
 .hub-collapsible[open]>summary::after{transform:rotate(90deg)}
 .hub-collapsible>summary:focus-visible{outline:2px solid var(--gold-soft);outline-offset:2px}
+
+/* Calendário simplificado — 4.9.91 */
+#view .calendar-simple{margin:12px 0 20px;}
+#view .calendar-simple .calendar-toolbar{grid-template-columns:36px minmax(0,1fr) 36px auto;gap:4px;margin-bottom:8px;}
+#view .calendar-simple .calendar-month-select{margin:0;border:0;background:transparent;border-radius:6px;min-height:44px;padding:6px;color:var(--paper);font-size:16px;}
+#view .calendar-simple .cal-nav{width:36px;min-height:44px;padding:0;border:0;background:transparent;box-shadow:none;font-size:24px;}
+#view .calendar-simple .today-chip{margin:0;padding:6px 8px;min-height:44px;border:0;background:transparent;font-size:13px;text-transform:none;letter-spacing:normal;}
+#view .calendar-filter-panel{margin:0 0 12px;border-bottom:1px solid var(--line);}
+#view .calendar-filter-panel summary{padding:10px 4px;min-height:44px;box-sizing:border-box;cursor:pointer;color:var(--text-muted);font-size:14px;}
+#view .calendar-filter-fields{padding:0 4px 12px;display:grid;gap:6px;}
+#view .calendar-filter-fields label{font-size:14px;color:var(--text-muted);}
+#view .calendar-filter-fields .calendar-month-select{border:1px solid var(--line);background:var(--bg-panel);margin-bottom:6px;}
+#view .calendar-clear{justify-self:start;background:transparent;color:var(--gold-soft);border:0;padding:8px 0;min-height:44px;font:inherit;cursor:pointer;}
+#view .calendar-simple .cal-day{border:0;border-radius:8px;background:transparent;min-height:36px;font-size:15px;}
+#view .calendar-simple .cal-day.empty{visibility:hidden;}
+#view .calendar-simple .cal-day.has-feast{background:rgba(184,148,72,.10);}
+#view .calendar-simple .cal-day.today{box-shadow:inset 0 0 0 1px var(--wine);}
+body:has(.calendar-simple) main#view{padding-bottom:calc(120px + env(safe-area-inset-bottom));}
+body:has(.calendar-simple){scroll-padding-bottom:calc(110px + env(safe-area-inset-bottom));}
+@media(max-width:340px){#view .calendar-simple .calendar-toolbar{grid-template-columns:30px minmax(0,1fr) 30px auto;}#view .calendar-simple .cal-nav{width:30px;}#view .calendar-simple .calendar-month-select{font-size:14px;}}
