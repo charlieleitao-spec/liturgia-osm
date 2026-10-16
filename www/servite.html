@@ -23,6 +23,7 @@
 
 
 
+<link rel="stylesheet" href="liturgical-reader.css">
 </head>
 <body>
 
@@ -52,15 +53,6 @@
     </div>
 
     <div class="settings-panel" id="settingsPanel" hidden>
-      <div class="settings-row">
-        <span class="settings-label" data-i18n="settingsLanguage">Idioma</span>
-        <div class="chip-group" id="langGroup">
-          <button class="chip" data-lang="pt" onclick="setLanguage('pt')">Português</button>
-          <button class="chip" data-lang="la" onclick="setLanguage('la')">Latina</button>
-          <button class="chip" data-lang="it" onclick="setLanguage('it')">Italiano</button>
-          <button class="chip" data-lang="en" onclick="setLanguage('en')">English</button>
-        </div>
-      </div>
       <div class="settings-row">
         <span class="settings-label" data-i18n="settingsTheme">Tema</span>
         <div class="chip-group">
@@ -136,7 +128,6 @@ window.addEventListener('servite-ready', function(){
     }
     else if(q==='oficio' && typeof setTab==='function' && typeof openDevo==='function'){setTab('oracoes');openDevo('oficio');}
     else if(q==='sabado' && typeof setTab==='function' && typeof openDevo==='function'){setTab('oracoes');openDevo('sabado');}
-    else if(q==='idioma') { if(typeof setTab==='function') setTab('sobre'); setTimeout(function(){var p=document.getElementById('settingsPanel'); var b=document.getElementById('settingsBtn'); if(p){p.removeAttribute('hidden');} if(b){b.classList.add('active');}},60); }
   }catch(e){}
 });
 </script>

@@ -16,10 +16,10 @@ const masses = json('www/data/missas-osm.json');
 const variousPrayers = json('www/data/devocoes/oracoes-varias.json');
 const dataReadme = read('www/data/README.md');
 
-assert.equal(pkg.version, '4.9.63', 'package.json deve identificar a versão 4.9.63');
+assert.equal(pkg.version, '4.9.88', 'package.json deve identificar a versão 4.9.88');
 assert.equal(pkg.dependencies['@capacitor/app'], '8.1.2', 'Plugin nativo do botão Voltar deve fazer parte do app.');
-assert.match(appJs, /const APP_VERSION = ['"]4\.9\.56['"]/);
-assert.match(sw, /liturgia-osm-v4\.9\.56-ui\d+/);
+assert.match(appJs, /const APP_VERSION = ['"]4\.9\.88['"]/);
+assert.match(sw, /liturgia-osm-v4\.9\.88-ui57-hifen-silabas-cache-imagens/);
 assert.match(html, /app\.js/);
 assert.match(html, /app\.css/);
 assert.match(appJs, /function openSantoralOfficeHour/);
@@ -50,7 +50,7 @@ assert.equal(memory.schema_version, 2);
 assert.equal(memory.memory_dates?.length, 25);
 assert.ok(memory.celebrations?.length > 0 && memory.celebrations.length <= memory.memory_dates.length);
 assert.ok(offices.celebracoes['10-03']?.material?.horas?.textos_proprios?.oracao, 'oração deve permanecer como campo separado no esquema 3');
-const devotionalFiles = ['load-devotions.js','devocoes/oracoes-diarias.json','devocoes/regra.json','devocoes/rosario.json','devocoes/vigilia.json','devocoes/coroa.json','devocoes/stabat-mater.json','devocoes/via-matris.json','devocoes/ladainhas.json','devocoes/sabado-mariano.json','devocoes/adoracao.json','devocoes/antifonas.json','devocoes/oracoes-varias.json'];
+const devotionalFiles = ['load-devotions.js','devocoes/oracoes-diarias.json','devocoes/regra.json','devocoes/rosario.json','devocoes/vigilia.json','devocoes/coroa.json','devocoes/stabat-mater.json','devocoes/via-matris.json','devocoes/ladainhas.json','devocoes/adoracao.json','devocoes/antifonas.json','devocoes/oracoes-varias.json'];
 for (const file of devotionalFiles) assert.ok(fs.existsSync(path.join(root, 'www/data', file)), 'Arquivo de oração ausente: ' + file);
 
 const core = [...sw.matchAll(/["']\.\/(.*?)["']/g)].map(match => match[1]);
@@ -77,7 +77,7 @@ assert.match(appJs, /function marianSaturdayOfficeBlocks/);
 assert.match(appJs, /Array\.isArray\(item\.sections\)/);
 assert.match(appJs, /item\.santoral_id!==undefined/);
 assert.match(appJs, /PDF oficial OSM/);
-assert.match(appJs, /paulus\.com\.br\/portal\/liturgia-diaria-das-horas/);
+assert.doesNotMatch(appJs, /paulus\.com\.br\/portal\/liturgia-diaria-das-horas/);
 assert.match(read('www/servite-3.js'), /Transcrição completa do PDF/);
 assert.match(appJs, /pruneDailyMassCache\(\);/);
 assert.match(appJs, /não há cópia local para esta data/i);
@@ -92,3 +92,9 @@ assert.ok(!fs.existsSync(path.join(root, 'www/cordova.js')));
 assert.ok(!fs.existsSync(path.join(root, 'www/cordova_plugins.js')));
 
 console.log(JSON.stringify({ status: 'ok', version: pkg.version, santoral: santoral.length, oficios: Object.keys(offices.celebracoes).length, memoria: memory.memory_dates.length, memoriaComTexto: memory.celebrations.length, core: core.length }, null, 2));
+
+
+const offlineCore = new Set(core);
+for (const saint of santoral.filter(s => s.image && !/^https?:/.test(s.image))) {
+  assert.ok(offlineCore.has(saint.image.replace(/^\.\//,'')), 'Saint image missing from pre-cache: '+saint.image);
+}

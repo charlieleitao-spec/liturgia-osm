@@ -1,9 +1,10 @@
-const CACHE = 'liturgia-osm-v4.9.56-ui31';
+const CACHE = 'liturgia-osm-v4.9.88-ui57-hifen-silabas-cache-imagens';
 const CORE = [
   "./",
   "./index.html",
   "./causas-beatos.html",
   "./app.css",
+  "./liturgical-reader.css",
   "./app.js",
   "./servite.html",
   "./servite.css",
@@ -26,7 +27,6 @@ const CORE = [
   "./data/devocoes/oracoes-varias.json",
   "./data/devocoes/regra.json",
   "./data/devocoes/rosario.json",
-  "./data/devocoes/sabado-mariano.json",
   "./data/devocoes/stabat-mater.json",
   "./data/devocoes/via-matris.json",
   "./data/devocoes/vigilia.json",
@@ -54,6 +54,27 @@ const CORE = [
   "./media/fonts/eb-garamond-normal-latin-ext.woff2",
   "./media/fonts/eb-garamond-normal-latin.woff2",
   "./media/servite-13.webp",
+  "./media/andre-sansepolcro.webp",
+  "./media/benincasa-montepulciano.webp",
+  "./media/boaventura-de-pistoia.webp",
+  "./media/boaventura-forli.webp",
+  "./media/defuntos-da-ordem.webp",
+  "./media/fernando-maria-baccilieri.webp",
+  "./media/francisco-de-sena.webp",
+  "./media/frei-egidio-moscini.webp",
+  "./media/frei-paulino-baldassarri.webp",
+  "./media/isabel-picenardi.webp",
+  "./media/jeronimo-sant-angelo-in-vado.webp",
+  "./media/joao-angelo-porro.webp",
+  "./media/joaquim-de-sena.webp",
+  "./media/maria-mae-medianeira.webp",
+  "./media/monte-senario-basilica.webp",
+  "./media/nossa-senhora-das-dores.webp",
+  "./media/santa-clelia-barbieri.webp",
+  "./media/santo-agostinho.webp",
+  "./media/tiago-citta-della-pieve.webp",
+  "./media/tiago-filipe-de-faenza.webp",
+  "./media/ubaldo-de-sansepolcro.webp",
   "./data/pdfs/missal/adviento.pdf",
   "./data/pdfs/missal/agustin.pdf",
   "./data/pdfs/missal/andres.pdf",
@@ -122,3 +143,4 @@ const CORE = [
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('liturgia-osm-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));});
 self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;const url=new URL(event.request.url);if(url.origin!==self.location.origin)return;event.respondWith(caches.match(event.request).then(cached=>cached||fetch(event.request).then(response=>{if(response.ok)caches.open(CACHE).then(cache=>cache.put(event.request,response.clone()));return response;})));});
+

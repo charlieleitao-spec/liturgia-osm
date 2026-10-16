@@ -1,0 +1,46 @@
+/* Padrão litúrgico: referência visual aprovada em 15/10/2026. */
+:root{--liturgical-paper:#fcf3d5;--liturgical-ink:#15120d;--liturgical-red:#b3221c}
+html[data-theme="dark"],body:not(.light-mode):has(.brand-tag){--liturgical-paper:#101c29;--liturgical-ink:#f5eedc;--liturgical-red:#ef9a90}
+body.liturgical-page,body.liturgical-page #app,body.liturgical-page main#view{background:var(--liturgical-paper)!important;color:var(--liturgical-ink)!important}
+body.liturgical-page .ambient{display:none}
+body.liturgical-page #app #view .card:has(.prayer-block),body.liturgical-page #app #view .card:has(.today-servita-reader),body.liturgical-page #app #view .hour-tab-content{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important}
+body.liturgical-page #app #view .liturgical-reading,body.liturgical-page #app #view .prayer-block,body.liturgical-page #app #view .today-servita-reader,body.liturgical-page #app #view .proper-mass-reader{font-family:Georgia,'Times New Roman',serif!important;font-size:calc(1.25rem * var(--reader-scale,1))!important;line-height:1.5!important;color:var(--liturgical-ink)!important;text-align:left!important;hyphens:none!important;word-break:normal!important;overflow-wrap:break-word!important;white-space:normal!important;letter-spacing:normal!important}
+body.liturgical-page #app #view .liturgical-reading{padding:0!important}
+body.liturgical-page #app #view .today-servita-reader .litblock{border:0!important;padding:0!important;margin:0 0 1.5em!important}
+body.liturgical-page #app #view .prayer-stanza,body.liturgical-page #app #view .prayer-paragraph,body.liturgical-page #app #view .littext,body.liturgical-page #app #view .reading-body,body.liturgical-page #app #view .liturgical-prayer,body.liturgical-page #app #view .preces-intro,body.liturgical-page #app #view .preces-intention,body.liturgical-page #app #view .marian-office-prose,body.liturgical-page #app #view .proper-mass-prose{font:inherit!important;white-space:normal!important;text-align:left!important;margin:0 0 1.1em!important;line-height:inherit!important}
+body.liturgical-page #app #view .rubric,body.liturgical-page #app #view .verse-number,body.liturgical-page #app #view .reading-ref,body.liturgical-page #app #view .liturgical-reference{color:var(--liturgical-red)!important;font-weight:400!important;font-style:normal!important}
+body.liturgical-page #app #view .rubric{display:inline;margin:0!important;padding:0!important;line-height:inherit!important}
+body.liturgical-page #app #view div.rubric{display:block;margin:0 0 .8em!important;text-align:left!important}
+body.liturgical-page #app #view .verse-number{font-size:.65em!important;line-height:0!important;vertical-align:super!important;margin-right:.12em!important}
+body.liturgical-page #app #view .liturgical-cue{white-space:nowrap}
+body.liturgical-page #app #view .prayer-text-heading,body.liturgical-page #app #view .litheading,body.liturgical-page #app #view .prayer-context-heading,body.liturgical-page #app #view .section-title{display:block;margin:1.4em 0 .6em!important;padding:0!important;border:0!important;background:transparent!important;color:var(--liturgical-red)!important;font-family:Georgia,'Times New Roman',serif!important;font-size:1em!important;line-height:1.4!important;font-weight:400!important;letter-spacing:normal!important;text-transform:none!important;text-align:left!important}
+body.liturgical-page #app #view .proper-mass-reader .section-title{font-size:calc(1.25rem * var(--reader-scale,1))!important}
+body.liturgical-page #app #view .liturgical-hour-heading{color:var(--liturgical-ink)!important;font-family:Georgia,'Times New Roman',serif!important;font-weight:700!important;font-size:1.1em!important;text-align:center!important;margin:1.4em 0 1.2em!important;line-height:1.3!important}
+body.liturgical-page #app #view .detail-header h2{color:var(--liturgical-ink)!important;text-transform:uppercase!important;font-size:calc(1.25rem * var(--reader-scale,1))!important;font-weight:400!important;text-align:center!important;line-height:1.3!important}
+body.liturgical-page #app #view .detail-header .date-line{color:var(--liturgical-red)!important;text-align:center!important}
+body.liturgical-page #app #view .psalm-title,body.liturgical-page #app #view .liturgical-psalm-heading{color:var(--liturgical-red)!important;font:inherit!important;text-align:center!important;margin:1.1em 0 .4em!important}
+body.liturgical-page #app #view .prayer-psalm-caption{font:inherit!important;font-weight:700!important;text-align:center!important;color:var(--liturgical-ink)!important;margin:0 0 .8em!important}
+body.liturgical-page #app #view .antiphon,body.liturgical-page #app #view .prayer-antiphon{font:inherit!important;color:var(--liturgical-ink)!important;text-align:left!important;background:transparent!important;border:0!important;border-radius:0!important;padding:0!important;margin:.6em 0 1.1em!important;white-space:normal!important}
+body.liturgical-page #app #view .hymn-stanza,body.liturgical-page #app #view .liturgical-hymn-stanza,body.liturgical-page #app #view .mass-hymn-stanza,body.liturgical-page #app #view .marian-office-hymn{font:inherit!important;text-align:left!important;white-space:normal!important;padding:0!important;margin:0 1.15em 1.1em!important}
+body.liturgical-page #app #view .psalm-stanza{font:inherit!important;text-align:left!important;padding:0!important;margin:0 0 1.1em!important}
+body.liturgical-page #app #view .hymn-stanza-line,body.liturgical-page #app #view .liturgical-hymn-line{display:block;font:inherit!important;white-space:normal!important;text-align:left!important}
+body.liturgical-page #app #view .psalm-verse,body.liturgical-page #app #view .liturgical-verse-line{display:block;position:relative;padding-left:1.3em!important;font:inherit!important;text-align:left!important;white-space:normal!important;line-height:inherit!important}
+body.liturgical-page #app #view .liturgical-marker{position:absolute;left:0;top:0;width:1em;text-align:left}
+body.liturgical-page #app #view .liturgical-turn{display:block}
+body.liturgical-page #app #view .response,body.liturgical-page #app #view .preces-response{font:inherit!important;white-space:normal!important;text-align:left!important;padding:0!important;border:0!important;margin:.6em 0 1.1em!important;background:transparent!important}
+body.liturgical-page #app #view .preces-response,body.liturgical-page #app #view .liturgical-response{font-weight:700!important}
+body.liturgical-page #app #view .liturgical-reference{font-family:Georgia,'Times New Roman',serif!important;text-align:right!important;font-size:calc(1.25rem * var(--reader-scale,1))!important;margin:0 0 .5em!important}
+@media(max-width:380px){body.liturgical-page #app #view .hymn-stanza,body.liturgical-page #app #view .liturgical-hymn-stanza,body.liturgical-page #app #view .mass-hymn-stanza{margin-inline:.65em!important}}
+
+body.liturgical-page #app #view .prayer-formula-title{font:inherit!important;font-weight:700!important;color:var(--liturgical-ink)!important;text-align:center!important;letter-spacing:normal!important;margin:1em 0!important}
+body.liturgical-page #app #view .liturgical-psalm-quote{font:inherit!important;font-style:italic!important;text-align:left!important;margin:0 0 1em!important}
+
+body.liturgical-page #app #view .mass-psalm-stanza{font:inherit!important;line-height:inherit!important;margin:0 0 1.1em!important;text-align:left!important}
+
+body.liturgical-page #app #view .prayer-block{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0!important}
+body.liturgical-page #app #view .prayer-text-heading:not(.liturgical-psalm-heading):not(.liturgical-hour-heading){text-align:left!important}
+#dailyLiturgyOverlay .daily-liturgy-body{background:var(--liturgical-paper)!important;color:var(--liturgical-ink)!important}
+#dailyLiturgyOverlay .daily-reading{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:var(--liturgical-ink)!important}
+#dailyLiturgyOverlay .daily-reading p{font-family:Georgia,'Times New Roman',serif!important;font-size:calc(1.25rem * var(--reader-scale,1))!important;line-height:1.5!important;color:var(--liturgical-ink)!important;text-align:left!important}
+#dailyLiturgyOverlay .daily-reading h3,#dailyLiturgyOverlay .daily-reading h4,#dailyLiturgyOverlay .daily-reading .verse-number{color:var(--liturgical-red)!important}
+body.liturgical-page #app #view .card:has(.today-servita-reader)::before,body.liturgical-page #app #view .card:has(.prayer-block)::before{display:none!important}

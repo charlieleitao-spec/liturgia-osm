@@ -11,6 +11,7 @@
 <title>Liturgia OSM — Servos de Maria</title>
 <link rel="stylesheet" href="./app.css">
 
+<link rel="stylesheet" href="liturgical-reader.css">
 </head>
 <body>
 <a class="skip-link" href="#view">Ir para o conteúdo</a>
@@ -27,17 +28,13 @@
       <div class="topbar-text">
         <h1>Liturgia <span class="brand-tag">OSM</span></h1>
       </div>
-      <div class="topbar-tools" aria-label="Controles de leitura">
-        <button class="tool-btn" onclick="adjustFont(-0.08)" aria-label="Diminuir texto">A−</button>
-        <button class="tool-btn" onclick="adjustFont(0.08)" aria-label="Aumentar texto">A+</button>
-        <button class="tool-btn" onclick="toggleTheme()" aria-label="Alternar modo claro e escuro" id="themeBtn">☼</button>
+      <div class="topbar-tools" aria-label="Menu">
 <button class="tool-btn" onclick="openMainMenu()" aria-label="Abrir menu" id="menuBtn">☰</button>
       </div>
     </div>
   </header>
-
-  <button id="floatingBack" class="floating-back" onclick="smartBack()" aria-label="Voltar">←</button>
 <main id="view" tabindex="-1" aria-live="polite"></main>
+  <button id="floatingBack" class="floating-back" onclick="smartBack()" aria-label="Voltar" title="Voltar">←</button>
 
   <nav class="tabbar" id="tabbar" aria-label="Navegação principal">
     <button class="tab-btn" data-tab="vida"><svg viewBox="0 0 24 24"><path d="M12 3 L14.2 9.2 L21 9.5 L15.6 13.6 L17.4 20.2 L12 16.4 L6.6 20.2 L8.4 13.6 L3 9.5 L9.8 9.2 Z"/></svg><span>Vida</span></button>
@@ -48,62 +45,12 @@
 </div>
 
 <div id="mainMenuOverlay" class="main-menu-overlay" aria-hidden="true" onclick="if(event.target===this)closeMainMenu()">
- <aside class="main-menu">
-  <div class="main-menu-head"><h3>Menu</h3><button class="tool-btn" onclick="closeMainMenu()">✕</button></div>
-  <div class="menu-section">
-   <div class="menu-label">Tamanho do texto</div>
-   <div class="menu-row">
-    <button class="menu-action" onclick="adjustFont(-0.08)">A−</button>
-    <span class="reader-scale-value">100%</span>
-    <button class="menu-action" onclick="adjustFont(0.08)">A+</button>
-    <button class="menu-action" onclick="resetFont()">100%</button>
-   </div>
-  </div>
-  <div class="menu-section">
-   <div class="menu-label">Aparência</div>
-   <button class="menu-action menu-wide" onclick="toggleTheme()">☼ / ☾ Alternar tema claro/escuro</button>
-  </div>
-  <div class="menu-section">
-   <div class="menu-label">Idioma</div>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();openLanguagePanel()">Alterar idioma</button>
-  </div>
-  <div class="menu-section">
-   <div class="menu-label">Recursos Servitas</div>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();openServite('regra')">Regra OSSM</button>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();openServite('rosario')">Rosário</button>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();openServite('coroa')">Coroa das Sete Dores</button>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();openServite('oficio')">Ofício</button>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();openServite('sabado')">Sábado Mariano</button>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();location.href='./causas-beatos.html'">Causas e Beatos servitas</button>
-  </div>
-  <div class="menu-section">
-   <div class="menu-label">Biblioteca</div>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();setTab('biblioteca')">Favoritos, recentes e pesquisa</button>
-  </div>
-  <div class="menu-section">
-   <div class="menu-label">Aplicativo</div>
-   <button class="menu-action menu-wide" onclick="closeMainMenu();setTab('sobre')">Sobre, créditos e redes sociais</button>
-  </div>
- </aside>
-</div>
-
-<div id="languageOverlay" class="language-overlay" aria-hidden="true" onclick="if(event.target===this)closeLanguagePanel()">
-  <div class="language-sheet">
-    <h3 id="languageTitle">Idioma</h3>
-    <p id="languageNote">Escolha o idioma da interface. Os textos litúrgicos permanecem na língua em que estão disponíveis.</p>
-    <div class="language-options">
-      <button class="language-option" data-main-lang="pt" onclick="setMainLanguage('pt')">Português</button>
-      <button class="language-option" data-main-lang="la" onclick="setMainLanguage('la')">Latina</button>
-      <button class="language-option" data-main-lang="it" onclick="setMainLanguage('it')">Italiano</button>
-      <button class="language-option" data-main-lang="en" onclick="setMainLanguage('en')">English</button>
-    </div>
-    <button class="language-close" onclick="closeLanguagePanel()">Fechar</button>
-  </div>
+ <aside class="main-menu"></aside>
 </div>
 
 <div id="serviteOverlay" class="servite-overlay" aria-hidden="true">
   <div class="servite-head">
-    <button class="servite-back" onclick="closeServite()" aria-label="Voltar">‹</button>
+    <button class="servite-close" onclick="closeServite()" aria-label="Fechar recurso">✕</button>
     <div class="servite-title" id="serviteTitle">Recurso OSM</div>
     <div class="mini-tools"><button onclick="serviteAdjustFont(-1)" aria-label="Diminuir fonte">A−</button><button onclick="serviteAdjustFont(1)" aria-label="Aumentar fonte">A+</button><button onclick="serviteReload()" aria-label="Recarregar">↻</button></div>
   </div>
@@ -113,7 +60,7 @@
 <button id="celebrationToggle" class="celebration-toggle" onclick="toggleCelebrationMode()">Modo celebração</button>
 
 <div id="dailyLiturgyOverlay" class="daily-liturgy-overlay" aria-hidden="true">
-  <div class="daily-liturgy-head"><button onclick="closeDailyLiturgy()" aria-label="Voltar">‹</button><div><b>Missa do dia</b><small>Consulta online; cópias locais por até 30 dias</small></div><button onclick="toggleCelebrationMode()" aria-label="Modo celebração">◉</button></div>
+  <div class="daily-liturgy-head"><button onclick="closeDailyLiturgy()" aria-label="Voltar">‹</button><div><b>Missa do dia</b><small>Consulta online; cópias locais por até 30 dias</small></div><span aria-hidden="true"></span></div>
   <div class="daily-liturgy-body"><div class="daily-date-nav"><button onclick="moveDailyDate(-1)" aria-label="Dia anterior">‹</button><div class="daily-date-field"><span id="dailyLiturgyDateDisplay" class="daily-date-display" aria-hidden="true"></span><span class="daily-date-chevron" aria-hidden="true">⌄</span><input id="dailyLiturgyDate" type="date" aria-label="Selecionar data da liturgia" onchange="loadDailyLiturgy(this.value)"></div><button onclick="moveDailyDate(1)" aria-label="Dia seguinte">›</button></div><div id="dailyLiturgyContent"></div></div>
 </div>
 
