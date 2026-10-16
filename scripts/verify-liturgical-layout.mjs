@@ -78,7 +78,12 @@ try{
   report.push({santoralMemoryCards:memoryChecks});
   await page.setViewportSize({width:390,height:844});
   await page.evaluate(()=>{openSaintSection(SANTORAL.find(s=>MEMORIA_LITURGICA.memory_dates.includes(String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')))._id,'oracao');});
-  await page.screenshot({path:out+'/santoral-memoria.png',fullPage:true});
+  await page.waitForTimeout(500);
+  await page.screenshot({path:out+'/santoral-memoria.png',fullPage:true,animations:'disabled'});
+  await page.evaluate(()=>document.querySelector('#hub-oracao .liturgical-verse-line').scrollIntoView({behavior:'instant',block:'start'}));
+  await page.waitForTimeout(250);
+  report.push({memoryPsalmStyle:await page.evaluate(()=>Array.from(document.querySelectorAll('#hub-oracao .liturgical-verse-line')).map(n=>{const s=getComputedStyle(n);return {text:n.textContent,color:s.color,visibility:s.visibility,opacity:s.opacity,height:n.getBoundingClientRect().height};}))});
+  await page.screenshot({path:out+'/santoral-salmo.png',animations:'disabled'});
 
   // Use an actual proper office and the full reader in servite.html.
   const saintId=await page.evaluate(()=>SANTORAL.find(s=>s.month===2&&s.day===17)._id);
