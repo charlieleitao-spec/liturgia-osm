@@ -16,10 +16,10 @@ const masses = json('www/data/missas-osm.json');
 const variousPrayers = json('www/data/devocoes/oracoes-varias.json');
 const dataReadme = read('www/data/README.md');
 
-assert.equal(pkg.version, '4.9.87', 'package.json deve identificar a versão 4.9.87');
+assert.equal(pkg.version, '4.9.88', 'package.json deve identificar a versão 4.9.88');
 assert.equal(pkg.dependencies['@capacitor/app'], '8.1.2', 'Plugin nativo do botão Voltar deve fazer parte do app.');
-assert.match(appJs, /const APP_VERSION = ['"]4\.9\.87['"]/);
-assert.match(sw, /liturgia-osm-v4\.9\.87-ui56-padrao-liturgico/);
+assert.match(appJs, /const APP_VERSION = ['"]4\.9\.88['"]/);
+assert.match(sw, /liturgia-osm-v4\.9\.88-ui57-hifen-silabas-cache-imagens/);
 assert.match(html, /app\.js/);
 assert.match(html, /app\.css/);
 assert.match(appJs, /function openSantoralOfficeHour/);
@@ -93,3 +93,8 @@ assert.ok(!fs.existsSync(path.join(root, 'www/cordova_plugins.js')));
 
 console.log(JSON.stringify({ status: 'ok', version: pkg.version, santoral: santoral.length, oficios: Object.keys(offices.celebracoes).length, memoria: memory.memory_dates.length, memoriaComTexto: memory.celebrations.length, core: core.length }, null, 2));
 
+
+const offlineCore = new Set(core);
+for (const saint of santoral.filter(s => s.image && !/^https?:/.test(s.image))) {
+  assert.ok(offlineCore.has(saint.image.replace(/^\.\//,'')), 'Saint image missing from pre-cache: '+saint.image);
+}

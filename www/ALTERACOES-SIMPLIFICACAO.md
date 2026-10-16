@@ -164,3 +164,11 @@ Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebraç�
 68. Correção na junção de hífens da 4.9.85 (`app.js` e `servite-3.js`): o pronome “o” em fim de linha (“chamou-/o”) virava “chamouo”, e a mesóclise (“Louvar-te-/ei”, “dar-te-/ei”) virava “louvar-teei”. Agora “-o” e as terminações de mesóclise (ei, ás, á, emos, eis, ão, ia, ias, íamos, íeis, iam) mantêm o hífen.
 69. APP_VERSION 4.9.86; cache: `liturgia-osm-v4.9.86-ui55-hifen-pronomes-mesoclise`.
 
+
+
+## Vigésima quinta rodada (4.9.87, registro retroativo) e vigésima sexta (4.9.88)
+
+70. 4.9.87: padrão litúrgico (`liturgical-reader.css`, papel/tinta/vermelho litúrgicos, tema escuro por padrão). Não constava no changelog.
+71. Hífens (`app.js` e `servite-3.js`): o pronome em fim de linha só mantém o hífen se a parte da esquerda parecer forma verbal (4 letras ou mais, ou termina em vogal acentuada, r, s, z ou u). Antes, sílabas como “no-/me”, “pe-/na”, “se-/te”, “fa-/la” viravam “no-me”, “pe-na”, “se-te”, “fa-la”. As 20 ocorrências reais dos dados continuam corretas (“dar-nos”, “dá-lhe”, “faça-a”, “uniu-se”).
+72. Cache offline: 21 imagens de santos (`media/*.webp`) eram usadas pelo app mas não estavam na lista de pré-cache; só funcionavam offline se já tivessem sido abertas antes. Agora estão em `CORE`.
+73. APP_VERSION 4.9.88; cache: `liturgia-osm-v4.9.88-ui57-hifen-silabas-cache-imagens`.

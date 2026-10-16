@@ -24,7 +24,7 @@ for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data
 assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
-assert.match(app, /const APP_VERSION = ['"]4\.9\.87['"]/);
+assert.match(app, /const APP_VERSION = ['"]4\.9\.88['"]/);
 assert.match(app, /section-title home-heading/);
 assert.match(app, /onclick="openDailyLiturgy/);
 assert.doesNotMatch(app, /MAIN_I18N|MAIN_LANG|applyMainLanguage|openLanguagePanel|closeLanguagePanel|setMainLanguage|languageOverlay/);
@@ -35,13 +35,13 @@ assert.match(app, /Consultar Missa desta data/);
 assert.doesNotMatch(app, /onclick="closeMainMenu\(\);openDailyLiturgy\(\)">Missa do dia/);
 assert.doesNotMatch(app, /menu-nav-grid|Encontrar uma celebração|Aplicativo disponível|offline-note/);
 assert.doesNotMatch(app, /hub-block-title\">Navegação/);
-assert.match(workflow, /Build APK Liturgia OSM 4\.9\.87/);
-assert.match(workflow, /versionCode 40991/);
+assert.match(workflow, /Build APK Liturgia OSM 4\.9\.88/);
+assert.match(workflow, /versionCode 40992/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
 assert.doesNotMatch(css,/\.topbar-tools \.tool-btn:first-child\{display:none\}/,'O menu deve permanecer visível em telas estreitas.');
 assert.doesNotMatch(serviteCss,/Cinzel|EB Garamond|Cormorant Garamond|system-ui,-apple-system,sans-serif/,'Fontes da interface e recursos servitas devem estar harmonizadas.');
-assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.87-ui56-padrao-liturgico/);
+assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.88-ui57-hifen-silabas-cache-imagens/);
 assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
 
@@ -208,6 +208,14 @@ const normalizeCopiedStart = app.indexOf('function normalizeCopiedLineBreaks(val
 const normalizeCopiedEnd = app.indexOf('function formatPrayerStanza(', normalizeCopiedStart);
 const normalizeCopiedSource = app.slice(normalizeCopiedStart, normalizeCopiedEnd);
 const normalizeCopied = new Function(normalizeCopiedSource + '; return normalizeCopiedLineBreaks;')();
+// Regression cases for PDF syllables that resemble enclitic pronouns, in both readers.
+const serviteNormalizer = serviteScript.slice(serviteScript.indexOf('function normalizeServiteLineBreaks(value){'),serviteScript.indexOf('function ',serviteScript.indexOf('function normalizeServiteLineBreaks(value){')+10));
+const normalizeServiteRegression = new Function(serviteNormalizer+';return normalizeServiteLineBreaks;')();
+for (const normalize of [normalizeCopied, normalizeServiteRegression]) {
+  for (const [input, expected] of [['no-\nme','nome'],['pe-\nna','pena'],['se-\nte','sete'],['fa-\nla','fala'],['dar-\nnos','dar-nos'],['dá-\nlhe','dá-lhe'],['faça-\na','faça-a'],['uniu-\nse','uniu-se']]) {
+    assert.equal(normalize(input), expected, 'PDF hyphen regression: '+input);
+  }
+}
 assert.equal(normalizeCopied('composi-\nção'), 'composição', 'Hifenização de PDF deve recompor a palavra.');
 assert.equal(normalizeCopied('perdê-\nla'), 'perdê-la', 'Hífen de pronome deve ser preservado ao recompor a linha.');
 assert.equal(normalizeCopied('bem-\naventurada'), 'bem-aventurada', 'Composto com hífen deve permanecer íntegro.');
