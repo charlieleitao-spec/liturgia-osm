@@ -298,7 +298,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.89';
+const APP_VERSION = '4.9.90';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1560,7 +1560,10 @@ loadCanonicalSantoral();
   function hubEmpty(text){return '<div class="hub-empty">'+escapeHtml(text)+'</div>';}
   function hubText(title,text){
     if(!text)return '';
-    return '<div class="section-title">'+escapeHtml(title)+'</div><div class="liturgical-reading hub-text">'+escapeHtml(text)+'</div>';
+    const content=/^(?:Hino|Salmo)/i.test(title)
+      ?renderPrayer(title+'\n\n'+text).replace(/^<h4[^>]*>[^<]*<\/h4>/,'')
+      :renderPrayer(text);
+    return '<div class="section-title">'+escapeHtml(title)+'</div><div class="liturgical-reading hub-text">'+content+'</div>';
   }
   function properMassFor(s){
     const records=window.MISSAS_OSM&&Array.isArray(window.MISSAS_OSM.celebrations)?window.MISSAS_OSM.celebrations:[];

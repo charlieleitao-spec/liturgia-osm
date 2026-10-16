@@ -38,6 +38,48 @@ try{
     return {lines:n.querySelectorAll('.liturgical-verse-line').length,rubric:n.querySelector('.rubric')?.textContent,text:n.textContent};
   });
   assert.equal(massPsalm.lines,3);assert.equal(massPsalm.rubric,'R/');report.push({massPsalm});
+  // Exercise the actual Santoral cards, not only the standalone prayer reader.
+  await page.waitForFunction(()=>santoralReady&&oficiosReady&&MEMORIA_LITURGICA.memory_dates?.length);
+  const memoryChecks=[];
+  for(const width of [320,390,768]){
+    await page.setViewportSize({width,height:844});
+    for(const theme of ['light','dark']){
+      const checked=await page.evaluate(theme=>{
+        lightMode=theme==='light';applyPreferences();
+        const compact=s=>s.replace(/\s+/g,'').normalize('NFC');
+        const all=SANTORAL.map(s=>({id:s._id,date:String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')}));
+        let covered=0;
+        for(const saint of all){
+          state.detailId=saint.id;render();
+          const root=document.querySelector('#hub-oracao');root.open=true;
+          if(!MEMORIA_LITURGICA.memory_dates.includes(saint.date))continue;
+          covered++;
+          const block=title=>Array.from(root.querySelectorAll('.section-title')).find(n=>n.textContent===title)?.nextElementSibling;
+          for(const [title,field,selector] of [['Hino','hino','.liturgical-hymn-line'],['Salmo 111','salmo','.liturgical-verse-line']]){
+            const container=block(title);if(!container)throw new Error(saint.date+': missing '+title);
+            const lines=Array.from(container.querySelectorAll(selector));
+            const source=MEMORIA_LITURGICA.common[field].split('\n').filter(line=>line.trim());
+            if(lines.length!==source.length)throw new Error(saint.date+': collapsed '+title);
+            for(let i=0;i<source.length;i++){
+              if(compact(lines[i].textContent)!==compact(source[i]))throw new Error(saint.date+': source altered '+title);
+              if(getComputedStyle(lines[i]).display!=='block')throw new Error(saint.date+': inline verse '+title);
+              if(i&&lines[i].getBoundingClientRect().top<=lines[i-1].getBoundingClientRect().top)throw new Error(saint.date+': verses share a row '+title);
+            }
+          }
+          const prayer=block('Oração própria');
+          if(prayer?.querySelector('.liturgical-verse-line,.liturgical-hymn-line'))throw new Error(saint.date+': prayer treated as poetry');
+          if(document.documentElement.scrollWidth>innerWidth)throw new Error(saint.date+': overflow');
+        }
+        state.detailId=null;render();return {celebrations:all.length,memoryDates:covered};
+      },theme);
+      assert.equal(checked.celebrations,32);assert.equal(checked.memoryDates,25);memoryChecks.push({width,theme,...checked});
+    }
+  }
+  report.push({santoralMemoryCards:memoryChecks});
+  await page.setViewportSize({width:390,height:844});
+  await page.evaluate(()=>{openSaintSection(SANTORAL.find(s=>MEMORIA_LITURGICA.memory_dates.includes(String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')))._id,'oracao');});
+  await page.screenshot({path:out+'/santoral-memoria.png',fullPage:true});
+
   // Use an actual proper office and the full reader in servite.html.
   const saintId=await page.evaluate(()=>SANTORAL.find(s=>s.month===2&&s.day===17)._id);
   await page.goto(`http://127.0.0.1:8766/servite.html?view=oficio:${saintId}:vesperas`);

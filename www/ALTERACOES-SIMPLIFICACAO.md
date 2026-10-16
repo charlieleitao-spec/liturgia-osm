@@ -181,3 +181,10 @@ Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebraç�
 76. Normalizados espaços horizontais duplicados na Memória Litúrgica.
 77. A validação do número de Ofícios acompanha o tamanho do Santoral; mantida a conferência individual das datas, IDs e tipos de material.
 78. APP_VERSION 4.9.89; cache: `liturgia-osm-v4.9.89-ui58-dados-revisados`. Excluídos apenas os dois arquivos Cordova vazios gerados pelo build. A carga dos transcritos permanece integral.
+
+
+## Vigésima oitava rodada (4.9.90)
+
+79. As fichas de todas as celebrações do Santoral usam o renderizador litúrgico para hino, salmo, antífona e oração da Memória Litúrgica. O caminho anterior escapava o texto sem estruturar suas linhas; o CSS de prosa acabava unindo versos e hemistíquios.
+80. Verificação visual inclui todas as 25 datas da Memória Litúrgica nas fichas reais, preservação de palavras e sinais, prosa contínua e telas pequenas.
+81. APP_VERSION 4.9.90; cache `liturgia-osm-v4.9.90-ui59-santoral-versos`; Android versionCode 40994; atualização validada sobre a 4.9.89.
