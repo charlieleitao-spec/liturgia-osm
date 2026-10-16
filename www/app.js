@@ -761,6 +761,14 @@ function viewSobre(){
       <p><b>Liturgia OSM</b> reúne conteúdos próprios da Ordem dos Servos de Maria, favorecendo a oração, a memória litúrgica, a espiritualidade mariana e o acesso aos principais recursos servitas.</p>
     </div>
 
+
+    <div class="section-title">Recursos da família servita</div>
+    <div class="social-links fade-in">
+      <a class="social-link" href="https://charlieleitao-spec.github.io/somos-servos-app/recursos.html" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event, this.href)">
+        <span><div class="social-label">Oração, formação e memória</div><div class="social-sub">Liturgia OSM · Hoje na Família Servita · Somos Servos</div></span>
+      </a>
+    </div>
+
     <div class="section-title">Criação do aplicativo</div>
     <div class="card fade-in credit-list app-creator-card">
       <div><b>Criação:</b> WENDEL MASSAYUKI SANTOS OKUYAMA</div>
