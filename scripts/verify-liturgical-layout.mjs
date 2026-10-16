@@ -85,36 +85,39 @@ try{
   report.push({memoryPsalmStyle:await page.evaluate(()=>Array.from(document.querySelectorAll('#hub-oracao .liturgical-verse-line')).map(n=>{const s=getComputedStyle(n);return {text:n.textContent,color:s.color,visibility:s.visibility,opacity:s.opacity,height:n.getBoundingClientRect().height};}))});
   await page.screenshot({path:out+'/santoral-salmo.png',animations:'disabled'});
 
-  // Calendar navigation and filters on the actual mobile interface.
+  // Calendar without category or grade filters on the actual mobile interface.
   await page.evaluate(()=>{state.detailId=null;setTab('calendario');calDate=new Date(2026,9,1);selectedCalDate=null;render();});
   const calendarChecks=[];
   for(const width of [320,390,768]){
     await page.setViewportSize({width,height:844});
     assert.equal(await page.locator('.calendar-toolbar select').count(),1);
-    assert.equal(await page.locator('.calendar-filter-panel').getAttribute('open'),null);
+    assert.equal(await page.locator('.calendar-filter-panel,#calendar-category,#calendar-grade').count(),0);
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Calendar overflow ${width}`);
     await page.getByRole('button',{name:'Próximo mês',exact:true}).click();
     assert.match(await page.locator('.calendar-toolbar select').innerText(),/Novembro 2026/);
     assert.equal(await page.locator('.calendar-toolbar select').inputValue(),'10');
     await page.getByRole('button',{name:'Mês anterior',exact:true}).click();
     assert.equal(await page.locator('.calendar-toolbar select').inputValue(),'9');
-    await page.locator('.calendar-filter-panel summary').click();
-    await page.locator('#calendar-category').selectOption('beato');
-    await page.locator('#calendar-grade').selectOption('memoria');
-    assert.match(await page.locator('.calendar-filter-panel summary').innerText(),/Filtrar \(2\)/);
-    assert.notEqual(await page.locator('.calendar-filter-panel').getAttribute('open'),null);
-    await page.getByRole('button',{name:'Limpar filtros'}).click();
-    assert.equal(await page.locator('#calendar-category').inputValue(),'todos');
-    assert.equal(await page.locator('#calendar-grade').inputValue(),'todos');
-    await page.locator('.calendar-filter-panel summary').click();
     await page.locator('.today-chip').click();
     assert.equal(await page.locator('.cal-day.today.selected').count(),1);
     await page.locator('.calendar-grid').scrollIntoViewIfNeeded();
     const bounds=await page.locator('.calendar-grid').boundingBox();
     const nav=await page.locator('.tabbar').boundingBox();
     if(width<=390)assert.ok(bounds.y+bounds.height<nav.y,`Calendar covered by bottom bar ${width}`);
-    calendarChecks.push({width,filters:true,navigation:true,today:true});
+    calendarChecks.push({width,filtersAbsent:true,navigation:true,today:true});
   }
+  const calendarCategories=await page.evaluate(()=>{
+    const checked=[];
+    for(const category of ['santo','beato','servo_de_deus']){
+      const saint=SANTORAL.find(s=>s.categoria===category);if(!saint)continue;
+      calDate=new Date(2026,saint.month-1,1);selectCalendarDay(2026,saint.month-1,saint.day);
+      const expected=SANTORAL.filter(s=>s.month===saint.month&&s.day===saint.day).length;
+      if(document.querySelectorAll('.calendar-celebration-link').length!==expected)throw Error('Calendar hid celebrations for '+category);
+      checked.push(category);
+    }
+    goCalendarToday();return checked;
+  });
+  report.push({calendarCategories});
   report.push({calendarChecks});
   await page.setViewportSize({width:390,height:844});
   await page.evaluate(()=>{scrollTo(0,0);lightMode=false;applyPreferences();});
@@ -130,14 +133,15 @@ try{
       assert.equal(await page.locator('.home-end-ornament').count(),1);
       const emblem=await page.locator('.home-hero').evaluate(el=>{
         const before=getComputedStyle(el,'::before'),after=getComputedStyle(el,'::after');
-        return {circle:before.content,mask:after.maskImage||after.webkitMaskImage,width:after.width};
+        return {circle:before.content,emblem:after.content};
       });
-      assert.equal(emblem.circle,'none');assert.match(emblem.mask,/emblema-osm\.svg/);
+      assert.equal(emblem.circle,'none');assert.equal(emblem.emblem,'none');
+      assert.match(await page.locator('.home-end-ornament').evaluate(el=>getComputedStyle(el).backgroundImage),/ornamento-final\.svg/);
       assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
       await page.screenshot({path:out+`/inicio-${light?'light':'dark'}-${width}.png`,fullPage:true,animations:'disabled'});
     }
   }
-  assert.equal((await page.request.get('http://127.0.0.1:8766/media/emblema-osm.svg')).status(),200);
+  assert.equal((await page.request.get('http://127.0.0.1:8766/media/ornamento-final.svg')).status(),200);
 
   // Use an actual proper office and the full reader in servite.html.
   const saintId=await page.evaluate(()=>SANTORAL.find(s=>s.month===2&&s.day===17)._id);

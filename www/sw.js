@@ -1,6 +1,6 @@
-const CACHE = 'liturgia-osm-v4.9.92-calendario-simples-emblema';
+const CACHE = 'liturgia-osm-v4.9.93-calendario-sem-filtros';
 const CORE = [
-  "./media/emblema-osm.svg",
+  "./media/ornamento-final.svg",
   "./",
   "./index.html",
   "./causas-beatos.html",
