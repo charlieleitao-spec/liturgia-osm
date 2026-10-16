@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200">
+<title>Emblema estilizado dos Servos de Maria</title>
+<g fill="none" stroke="#b89448" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+<!-- Coroa mariana com sete florões. -->
+<path d="M36 56Q80 42 124 56L132 28L114 39L105 19L94 35L80 12L66 35L55 19L46 39L28 28Z"/>
+<path d="M38 63Q80 50 122 63"/>
+<!-- M mariano em hastes curvas, entrelaçado pelo S servita. -->
+<path d="M20 171Q40 176 42 153L42 91Q27 77 20 96Q15 116 34 120M42 91Q57 72 80 110Q103 72 118 91L118 153Q120 176 140 171M118 91Q133 77 140 96Q145 116 126 120"/>
+<path d="M75 82L75 176M85 82L85 176" stroke-width="4"/>
+<path d="M102 107C99 87 57 89 57 114C57 134 105 125 105 149C105 175 61 177 55 154" stroke-width="8"/>
+<path d="M70 183L80 193L90 183" stroke-width="3"/>
+</g>
+<g fill="#b89448"><circle cx="28" cy="24" r="3.5"/><circle cx="55" cy="15" r="3.5"/><circle cx="80" cy="7" r="3.5"/><circle cx="105" cy="15" r="3.5"/><circle cx="132" cy="24" r="3.5"/><circle cx="44" cy="34" r="3"/><circle cx="116" cy="34" r="3"/></g>
+</svg>

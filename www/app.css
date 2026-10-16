@@ -1205,3 +1205,14 @@ body.scroll-controls-hidden:has(#dailyLiturgyOverlay.open) .celebration-toggle{t
 body:has(.calendar-simple) main#view{padding-bottom:calc(120px + env(safe-area-inset-bottom));}
 body:has(.calendar-simple){scroll-padding-bottom:calc(110px + env(safe-area-inset-bottom));}
 @media(max-width:340px){#view .calendar-simple .calendar-toolbar{grid-template-columns:30px minmax(0,1fr) 30px auto;}#view .calendar-simple .cal-nav{width:30px;}#view .calendar-simple .calendar-month-select{font-size:14px;}}
+
+/* Acabamento discreto da página inicial. */
+.home-end-ornament{display:flex;align-items:center;justify-content:center;gap:12px;width:80%;max-width:300px;margin:34px auto 28px;color:var(--gold);opacity:.65;pointer-events:none}
+.home-end-ornament::before,.home-end-ornament::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,transparent,currentColor)}
+.home-end-ornament::after{transform:scaleX(-1)}
+.home-end-ornament>span{display:block;width:5px;height:5px;flex:0 0 5px;background:currentColor;transform:rotate(45deg)}
+
+/* Emblema servita estilizado ao lado da data. */
+.home-hero::before,body.light-mode .home-hero::before{content:none}
+.home-hero::after,body.light-mode .home-hero::after{content:"";position:absolute;right:25px;top:50%;width:94px;height:118px;transform:translateY(-50%);background:var(--gold-soft);-webkit-mask:url("./media/emblema-osm.svg") center/contain no-repeat;mask:url("./media/emblema-osm.svg") center/contain no-repeat;opacity:.28;pointer-events:none}
+@media(max-width:380px){.home-hero::after,body.light-mode .home-hero::after{right:18px;width:68px;height:85px;opacity:.24}}
