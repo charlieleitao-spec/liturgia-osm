@@ -172,3 +172,12 @@ Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebraç�
 71. Hífens (`app.js` e `servite-3.js`): o pronome em fim de linha só mantém o hífen se a parte da esquerda parecer forma verbal (4 letras ou mais, ou termina em vogal acentuada, r, s, z ou u). Antes, sílabas como “no-/me”, “pe-/na”, “se-/te”, “fa-/la” viravam “no-me”, “pe-na”, “se-te”, “fa-la”. As 20 ocorrências reais dos dados continuam corretas (“dar-nos”, “dá-lhe”, “faça-a”, “uniu-se”).
 72. Cache offline: 21 imagens de santos (`media/*.webp`) eram usadas pelo app mas não estavam na lista de pré-cache; só funcionavam offline se já tivessem sido abertas antes. Agora estão em `CORE`.
 73. APP_VERSION 4.9.88; cache: `liturgia-osm-v4.9.88-ui57-hifen-silabas-cache-imagens`.
+
+
+## Vigésima sétima rodada (4.9.89)
+
+74. Removidos 16 marcadores de páginas de PDF dos Ofícios; recompostas duas frases interrompidas nas leituras de 17/02 e de Nossa Senhora das Dores com data móvel. As demais divisões de estrofes foram preservadas.
+75. Recompostos 34 hífens legítimos de fim de linha nos dados, preservando pronomes, compostos e intervalos numéricos também ao copiar e compartilhar.
+76. Normalizados espaços horizontais duplicados na Memória Litúrgica.
+77. A validação do número de Ofícios acompanha o tamanho do Santoral; mantida a conferência individual das datas, IDs e tipos de material.
+78. APP_VERSION 4.9.89; cache: `liturgia-osm-v4.9.89-ui58-dados-revisados`. Excluídos apenas os dois arquivos Cordova vazios gerados pelo build. A carga dos transcritos permanece integral.
