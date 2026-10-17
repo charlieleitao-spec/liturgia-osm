@@ -26,6 +26,30 @@ try{
   }
   await page.setViewportSize({width:390,height:844});
   await page.screenshot({path:out+'/vigilia.png',fullPage:true});
+  // Regression: PDF line/page breaks must not merge Vigil headings with prayers.
+  const vigilTypography=await page.evaluate(async()=>{
+    const formulas=await (await fetch('data/devocoes/vigilia.json')).json();
+    return Object.entries(formulas).map(([key,text])=>{
+      const node=document.createElement('div');node.innerHTML=renderPrayer(text,{vigilia:true});
+      const headings=[...node.querySelectorAll('h3,h4')].map(n=>n.textContent);
+      const paragraphs=[...node.querySelectorAll('p')].map(n=>n.textContent);
+      const words=s=>s.toLocaleLowerCase('pt-BR').replace(/[^\p{L}\p{N}]+/gu,'');
+      return {key,headings,paragraphs,preserved:words(node.textContent)===words(text),verses:node.querySelectorAll('.liturgical-verse-line').length};
+    });
+  });
+  for(const item of vigilTypography){
+    assert.ok(item.verses>20);assert.ok(item.preserved,'Vigil text must be preserved: '+item.key);
+    for(const heading of ['Primeira leitura','Segunda leitura','Terceira leitura','Responsório'])assert.ok(item.headings.includes(heading));
+    assert.ok(!item.headings.some(h=>/Bondade|Nós vos agradecemos|Do nascer/.test(h)));
+    if(item.key==='formula2'){
+      for(const heading of ['Oração sálmica','À VIRGEM DO SIM','À VIRGEM DO "MAGNIFICAT"','À VIRGEM AO PÉ DA CRUZ','SÚPLICA DOS SERVOS DE MARIA A NOSSA SENHORA'])assert.ok(item.headings.includes(heading),heading);
+      for(const phrase of ['cumprir com amor os vossos preceitos','nos sofrimentos e nas alegrias da criação','Bondade, que nos abres o infinito tesouro da graça'])assert.ok(item.paragraphs.some(p=>p.includes(phrase)),phrase);
+    }
+  }
+  report.push({vigilTypography});
+  await page.evaluate(()=>openDevo('vigilia','formula2'));
+  await page.waitForTimeout(300);
+  await page.screenshot({path:out+'/vigilia-formula2.png',fullPage:true});
   // Ensure decoration preserves every source word and liturgical sign.
   const preserved=await page.evaluate(()=>{
     const source='Salmo 62\n\n– 1 Bendito seja o Senhor, meu rochedo, †\nque adestrou minhas mãos para a luta, *\n\nPreces\n\nR. Ouvi-nos, Senhor!\n\nOração\nÓ Deus, que nos amais,\nconcedei-nos a paz.';

@@ -135,7 +135,7 @@ function sharePrayer(title,text){ shareText(title,`${title}\n\n${text}\n\nLiturg
 
 // render a prayer block, coloring "D." / "T." rubrics
 const PRAYER_CONTEXT_HEADINGS = /^(?:Comum|Nas festas marianas|Nas visitas de familiares e amigos|Nos momentos de alegria)$/i;
-const PRAYER_TEXT_HEADINGS = /^(?:Antífona(?: de entrada)?|Salmo(?:\s+[\d,.\-–—]+)?|Hino|Canto|Invitatório|Ofício das Leituras|Salmodia|Cântico(?: evangélico)?|Oração(?: própria| sálmica| sobre o cântico| das (?:Nove|Doze|Quinze) Horas)?|Leitura breve|Introdução(?: à leitura| às leituras)?|Absolvição|Primeira leitura|Segunda leitura|Terceira leitura|Evangelho(?: de .+)?|Reflexão|Invocações|Responsório(?: breve)?|Preces|Festa|Laudes|Vésperas|Hora Média|Salve Rainha|Oremos|Oração pela Igreja pela Ordem|À VIRGEM DO (?:SIM|\"MAGNIFICAT\"))$/i;
+const PRAYER_TEXT_HEADINGS = /^(?:Antífona(?: de entrada)?|Salmo(?:\s+[\d,.\-–—]+)?|Hino|Canto|Invitatório|Ofício das Leituras|Salmodia|Cântico(?: evangélico)?|Oração(?: própria| sálmica| sobre o cântico| das (?:Nove|Doze|Quinze) Horas)?|Leitura breve|Introdução(?: à leitura| às leituras)?|Absolvição|Primeira leitura|Segunda leitura|Terceira leitura|Evangelho(?: de .+)?|Reflexão|Invocações|Responsório(?: breve)?|Preces|Festa|Laudes|Vésperas|Hora Média|Salve Rainha|Oremos|Oração pela Igreja pela Ordem|À VIRGEM (?:DO (?:SIM|\"MAGNIFICAT\")|AO PÉ DA CRUZ))$/i;
 function liturgicalLineHtml(value, verse=false){
   let text=String(value??'').trim();
   let prefix='';
@@ -188,24 +188,30 @@ function normalizeVigiliaTypography(text){
   // marcam a estrutura poética, não uma quebra de linha acidental do PDF.
   const source=normalizeCopiedLineBreaks(text)
     .replace(/([–—=]\s*\d{1,3})(?=[A-Za-zÀ-ÿ])/g,'$1 ')
-    .replace(/(SÚPLICA DOS SERVOS DE MARIA A NOSSA SENHORA)\s+(?=Bondade)/gi,'$1\n');
+    .replace(/SÚPLICA DOS SERVOS DE MARIA\s+A NOSSA SENHORA\s+(?=Bondade)/gi,'SÚPLICA DOS SERVOS DE MARIA A NOSSA SENHORA\n');
   const lines=source.split('\n'),out=[];
-  const structural=/^(?:[–—=]\s*|[DTC RVABL]\d?\.|[123]ª\s*Ant\.|SALMO\s+\d+|Salmodia$|Hino$|Oração sálmica$|Primeira leitura$|Segunda leitura$|Despedida$|Introdução às leituras$|Absolvição$|SÚPLICA DOS SERVOS|Oração pela Igreja|Primeira fórmula$|Segunda fórmula$)/i;
-  let inPsalm=false;
+  const isHeading=line=>PRAYER_TEXT_HEADINGS.test(line)
+    || /^(?:Despedida|SÚPLICA DOS SERVOS DE MARIA A NOSSA SENHORA|Primeira fórmula|Segunda fórmula)$/i.test(line);
+  const structural=line=>isHeading(line)
+    || /^(?:[–—=]\s*|[DTC RVABL]\d?\.|[123]ª\s*Ant\.|SALMO\s+\d+)/i.test(line);
+  let inPsalm=false, inHymn=false, blank=false;
   for(const raw of lines){
     const line=raw.trim();
-    if(!line){if(out.length&&out[out.length-1]!=='')out.push('');continue;}
-    if(/^SALMO\s+\d+/i.test(line))inPsalm=true;
-    else if(/^[123]ª\s*Ant\.|^(?:Hino|Primeira leitura|Segunda leitura|Oração sálmica|Despedida|SÚPLICA DOS SERVOS)/i.test(line))inPsalm=false;
+    if(!line){blank=true;continue;}
+    if(/^SALMO\s+\d+/i.test(line)){inPsalm=true;inHymn=false;}
+    else if(isHeading(line)||/^[123]ª\s*Ant\./i.test(line)){
+      inPsalm=false;inHymn=/^(?:Hino|Canto)$/i.test(line);
+    }
     const previous=out[out.length-1]||'';
-    // Apenas a prosa e as antífonas quebradas na extração do PDF são recompostas.
-    // Versos dos salmos e estrofes de hinos permanecem em linhas distintas.
-    const joinAntiphon=/^[123]ª\s*Ant\./i.test(previous)&&!structural.test(line);
-    const joinProse=!inPsalm&&!structural.test(line)&&previous
-      &&!/^(?:[–—=]|SALMO|Salmodia|Hino|Primeira fórmula|Segunda fórmula|Santa Maria,)/i.test(previous)
-      &&!/[.!?:;]$/.test(previous)&&!/^["“]/.test(line);
+    // A heading always occupies its own block. Blank PDF page breaks inside
+    // unfinished prose may be joined, while psalm and hymn stanzas stay intact.
+    const prose=!inPsalm&&!inHymn&&!structural(line)&&previous&&!isHeading(previous)
+      &&!/^(?:[–—=]|SALMO|Santa Maria,?$)/i.test(previous);
+    const joinAntiphon=prose&&/^[123]ª\s*Ant\./i.test(previous);
+    const joinProse=prose&&(!blank||!/[.!?:;]$/.test(previous))&&!/^['"“]/.test(line);
     if(joinAntiphon||joinProse)out[out.length-1]=previous+' '+line;
-    else out.push(line);
+    else {if(blank&&out.length)out.push('');out.push(line);}
+    blank=false;
   }
   return out.join('\n').replace(/([.!?])\s+(?=[123]ª\s*Ant\.)/g,'$1\n');
 }
@@ -298,7 +304,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.96';
+const APP_VERSION = '4.9.97';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
