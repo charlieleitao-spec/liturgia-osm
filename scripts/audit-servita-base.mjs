@@ -14,12 +14,12 @@ const offices = json('www/data/oficios-osm.json');
 const memory = json('www/data/memoria-liturgica.json');
 const masses = json('www/data/missas-osm.json');
 const variousPrayers = json('www/data/devocoes/oracoes-varias.json');
-const dataReadme = read('www/data/README.md');
+const dataReadme = read('docs/dados-apoio/data/README.md');
 
-assert.equal(pkg.version, '4.9.102', 'package.json deve identificar a versão 4.9.102');
+assert.equal(pkg.version, '4.9.103', 'package.json deve identificar a versão 4.9.103');
 assert.equal(pkg.dependencies['@capacitor/app'], '8.1.2', 'Plugin nativo do botão Voltar deve fazer parte do app.');
-assert.match(appJs, /const APP_VERSION = ['"]4\.9\.102['"]/);
-assert.match(sw, /liturgia-osm-v4\.9\.102-calendario-apresentacao/);
+assert.match(appJs, /const APP_VERSION = ['"]4\.9\.103['"]/);
+assert.match(sw, /liturgia-osm-v4\.9\.103-revisao-texto-css-fontes/);
 assert.match(html, /app\.js/);
 assert.match(html, /app\.css/);
 assert.match(appJs, /function openSantoralOfficeHour/);
@@ -27,7 +27,7 @@ assert.match(appJs, /detail-navigation/);
 assert.match(appJs, /office-hour-choice/);
 assert.match(appJs, /office-hours-grid/);
 assert.match(read('www/app.css'), /\.detail-navigation\{/);
-assert.match(read('www/app.css'), /\.office-hour-choice\{[^}]*min-height:66px/s);
+assert.match(read('www/app.css'), /\.office-hour-choice\{[^}]*min-height:54px/s);
 assert.equal(santoral.length, 32);
 assert.equal(offices.schema_version, 3);
 assert.equal(Object.keys(offices.celebracoes || {}).length, 32);
@@ -68,7 +68,7 @@ assert.match(read('www/data/devocoes/vigilia.json'), /Pouco abaixo de Deus o fiz
 assert.doesNotMatch(read('www/data/devocoes/vigilia.json'), /Pouco abaixo de um deus o fizestes/i);
 assert.match(read('www/data/devocoes/vigilia.json'), /tem o seu trono/);
 assert.doesNotMatch(read('www/data/devocoes/vigilia.json'), /temo seu trono/);
-assert.match(read('www/data/README.md'), /edição brasileira em quatro volumes publicada pela Paulus/i);
+assert.match(read('docs/dados-apoio/data/README.md'), /edição brasileira em quatro volumes publicada pela Paulus/i);
 
 assert.match(appJs, /function saintFallbackMonogram/);
 assert.match(appJs, /class="saint-thumb saint-thumb--fallback"/);
@@ -88,8 +88,8 @@ const missingImageTitles = santoral.filter(x => !x.image).map(x => x.title);
 const noImageSection = dataReadme.split('## Celebrações sem imagem própria')[1]?.split('\n## ')[0] || '';
 const listedMissingImageTitles = [...noImageSection.matchAll(/^- (.+)$/gm)].map(match => match[1]);
 assert.deepEqual(listedMissingImageTitles, missingImageTitles, 'README deve listar exatamente as celebrações sem imagem.');
-assert.ok(!fs.existsSync(path.join(root, 'www/cordova.js')));
-assert.ok(!fs.existsSync(path.join(root, 'www/cordova_plugins.js')));
+assert.equal(read('www/cordova.js'), '', 'Placeholder Cordova deve permanecer vazio');
+assert.equal(read('www/cordova_plugins.js'), '', 'Placeholder Cordova deve permanecer vazio');
 
 console.log(JSON.stringify({ status: 'ok', version: pkg.version, santoral: santoral.length, oficios: Object.keys(offices.celebracoes).length, memoria: memory.memory_dates.length, memoriaComTexto: memory.celebrations.length, core: core.length }, null, 2));
 
