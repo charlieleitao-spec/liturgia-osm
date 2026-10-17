@@ -2,6 +2,15 @@ name: Gerar base derivada OSM
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - "www/data/santoral.json"
+      - "www/data/oficios-osm.json"
+      - "www/data/memoria-liturgica.json"
+      - "scripts/gerar-servita.js"
+      - "scripts/validar-base-derivada.js"
+      - ".github/workflows/gerar-base-derivada.yml"
   push:
     branches: [main]
     paths:
@@ -9,6 +18,8 @@ on:
       - "www/data/oficios-osm.json"
       - "www/data/memoria-liturgica.json"
       - "scripts/gerar-servita.js"
+      - "scripts/validar-base-derivada.js"
+      - ".github/workflows/gerar-base-derivada.yml"
 
 permissions:
   contents: write
@@ -22,26 +33,11 @@ jobs:
       - name: Gerar a partir das fontes canônicas
         run: node scripts/gerar-servita.js derived/servita.generated.json
 
-      - name: Validar resultado
-        run: |
-          node - <<'NODE'
-          const fs=require('fs');
-          const x=JSON.parse(fs.readFileSync('derived/servita.generated.json','utf8'));
-          if(Object.keys(x).length!==32) throw new Error('Santoral derivado incompleto');
-          const memoria=Object.values(x).filter(item=>item.memoria_liturgica);
-          if(memoria.length!==25) throw new Error('Memória Litúrgica incompleta');
-          for(const item of memoria){
-            const m=item.memoria_liturgica;
-            if((!m.breve_vida && !m.apresentacao) || !m.oracao_propria || !m.date) throw new Error('Registro da Memória Litúrgica incompleto: '+item.data);
-          }
-          if(x['12-14'] || !x['12-15']) throw new Error('Calendário de Boaventura inválido');
-          for(const [k,v] of Object.entries(x)){
-            if(!v.data || !v.titulo || !v.nome_original) throw new Error('Registro incompleto: '+k);
-          }
-          console.log('Base derivada validada:',Object.keys(x).length,'celebrações');
-          NODE
+      - name: Validar resultado contra as fontes
+        run: node scripts/validar-base-derivada.js derived/servita.generated.json
 
       - name: Publicar no Hoje na Família Servita
+        if: github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ secrets.HOJE_FAMILIA_SERVITA_TOKEN }}
         run: |
@@ -51,13 +47,15 @@ jobs:
           fi
           git clone https://x-access-token:${GH_TOKEN}@github.com/charlieleitao-spec/hoje-familia-servita.git target
           cp derived/servita.generated.json target/servita.json
+          cp www/data/santoral.json target/santoral.json
           cd target
-          if git diff --quiet -- servita.json; then
-            echo "Base derivada já está atualizada."
+          if git diff --quiet -- servita.json santoral.json; then
+            echo "Base diária e santoral local já estão atualizados."
             exit 0
           fi
+          node scripts/check-web.cjs
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add servita.json
-          git commit -m "Atualiza base derivada a partir do Liturgia OSM"
+          git add servita.json santoral.json
+          git commit -m "Atualiza base diária e santoral local a partir do Liturgia OSM"
           git push
