@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.103-revisao-texto-css-fontes';
+const CACHE = 'liturgia-osm-v4.9.104-lembrete';
 const CORE = [
   "./media/emblema-osm.svg",
   "./media/ornamento-final.svg",
@@ -9,6 +9,7 @@ const CORE = [
   "./liturgical-reader.css",
   "./typography.css",
   "./app.js",
+  "./reminders.js",
   "./servite.html",
   "./servite.css",
   "./servite-1.js",
