@@ -7,7 +7,8 @@ alterar o horário. Desligar cancela os lembretes deste recurso. O toque abre a
 ficha pelo ID canônico, inclusive quando recebido antes do carregamento dos dados.
 Dados litúrgicos preservados. Plugin fixado em @capacitor/local-notifications 8.3.1.
 Manifesto gerado por patch, removendo permissões de alarmes exatos inclusive da
-mesclagem do manifesto do plugin. O plugin inclui receptor de reinicialização.
+mesclagem do manifesto do plugin. O plugin inclui receptor de reinicialização. O patch também impede entrega de
+celebrações vencidas após reiniciar ou após atraso do Android.
 
 ## Conferência
 

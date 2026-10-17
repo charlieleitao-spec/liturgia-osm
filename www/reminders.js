@@ -12,7 +12,7 @@
         const label=s.categoria==='beato'?(s.genero==='f'?'Beata':'Beato'):s.categoria==='servo_de_deus'?(s.genero==='f'?'Serva de Deus':'Servo de Deus'):s.categoria==='santo'?(s.genero==='f'?'Santa':'Santo'):'';
         if(s.exibir_selo!==false&&label&&!/^(São|Santo|Santa|Santos|Santas|Beato|Beata|Servo de Deus|Serva de Deus)\b/i.test(name))name=label+' '+name.replace(/^B(?:\.A)?\.\s*/i,'');
         const grade={solenidade:'Solenidade',festa:'Festa',memoria:'Memória',memoria_facultativa:'Memória facultativa',comemoracao:'Comemoração'}[s.grau]||'';
-        notifications.push({id:BASE+s.id,title:'Hoje na Família Servita',body:name+(grade?' · '+grade:''),channelId:CHANNEL,schedule:{at,allowWhileIdle:false},isExactNotification:false,extra:{celebrationId:s.id,source:KEY}});
+        notifications.push({id:BASE+s.id,title:'Hoje na Família Servita',body:name+(grade?' · '+grade:''),channelId:CHANNEL,schedule:{at,allowWhileIdle:false},isExactNotification:false,extra:{celebrationId:s.id,source:KEY,celebrationDate:`${at.getFullYear()}-${String(at.getMonth()+1).padStart(2,'0')}-${String(at.getDate()).padStart(2,'0')}`}});
       }
     }
     return notifications;

@@ -12,3 +12,36 @@ for(const permission of ['SCHEDULE_EXACT_ALARM','USE_EXACT_ALARM']){
 }
 fs.writeFileSync(file,xml);
 console.log('Notificações opcionais; permissões de alarmes exatos removidas.');
+// Plugin 8.3.1 restores missed one-shot alarms on boot. Expire our previous-day
+// celebrations both during restore and delivery (including delays from Doze).
+const native='node_modules/@capacitor/local-notifications/android/src/main/kotlin/com/capacitorjs/plugins/localnotifications/';
+fs.writeFileSync(native+'ServitaNotificationGuard.kt',`package com.capacitorjs.plugins.localnotifications
+
+internal object ServitaNotificationGuard {
+    fun expired(notification: org.json.JSONObject?): Boolean {
+        val extra = notification?.optJSONObject("extra") ?: return false
+        if (extra.optString("source") != "osmDailyReminder") return false
+        val date = extra.optString("celebrationDate")
+        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
+        return date.isNotEmpty() && date < today
+    }
+}
+`);
+for(const [name,anchor,addition] of [
+ ['LocalNotificationRestoreReceiver.kt','            val notification = storage.getSavedNotification(id) ?: continue',`            if (ServitaNotificationGuard.expired(storage.getSavedNotificationAsJSObject(id))) {
+                storage.deleteNotification(id)
+                continue
+            }
+`],
+ ['TimedNotificationPublisher.kt','        LocalNotificationsPlugin.fireReceived(notificationJson)',`        if (ServitaNotificationGuard.expired(notificationJson)) {
+            storage.deleteNotification(id.toString())
+            return
+        }
+`]
+]){
+ const path=native+name;let source=fs.readFileSync(path,'utf8');
+ if(!source.includes('ServitaNotificationGuard.expired')){
+  if(!source.includes(anchor))throw new Error('Plugin alterado: revisar patch '+name);
+  source=source.replace(anchor,addition+anchor);fs.writeFileSync(path,source);
+ }
+}
