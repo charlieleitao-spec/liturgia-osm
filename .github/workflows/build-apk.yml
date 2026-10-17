@@ -191,13 +191,14 @@ jobs:
           AAPT="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/aapt"
           APK=Liturgia-OSM-4.9.97.apk
           PREVIOUS=baseline/Liturgia-OSM-4.9.96.apk
-          echo "24596aaf4e742b51e8acd303232bf1fd548fe01ad6cc9d6f967800255c304f4e  $PREVIOUS" | sha256sum -c -
+          echo "a3188c5f2f2ded7c0c2b850ead801b31e5b0da3fffe1c475e90b1231b317edb8  $PREVIOUS" | sha256sum -c -
           "$APKSIGNER" verify --verbose --print-certs "$APK" > atual.txt
           "$APKSIGNER" verify --verbose --print-certs "$PREVIOUS" > anterior.txt
           cat atual.txt
           ATUAL_CERT=$(sed -n 's/.*certificate SHA-256 digest: //p' atual.txt | head -1)
           ANTERIOR_CERT=$(sed -n 's/.*certificate SHA-256 digest: //p' anterior.txt | head -1)
           test -n "$ATUAL_CERT" && test "$ATUAL_CERT" = "$ANTERIOR_CERT"
+          test "$ATUAL_CERT" = 5b2b3319cc9f9bb61a14fb8a30e63044db225f7b930fca9568c82854f38b4fe0
           ATUAL_BADGING=$("$AAPT" dump badging "$APK" | head -1)
           ANTERIOR_BADGING=$("$AAPT" dump badging "$PREVIOUS" | head -1)
           ATUAL_CODE=$(echo "$ATUAL_BADGING" | sed -n "s/.*versionCode='\\([^']*\\)'.*/\\1/p")
