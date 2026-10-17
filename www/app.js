@@ -318,6 +318,7 @@ function applyPreferences(){
   document.body.classList.toggle('light-mode', lightMode);
   document.documentElement.style.colorScheme = lightMode ? 'light' : 'dark';
   const themeMeta=document.querySelector('meta[name=theme-color]'); if(themeMeta) themeMeta.content=lightMode?'#f7f4ed':'#0c1827';
+  document.querySelectorAll('.menu-theme').forEach(button=>button.setAttribute('aria-pressed',String(!lightMode)));
   const b=document.getElementById('themeBtn'); if(b) b.textContent = lightMode ? '☾' : '☼'; document.querySelectorAll('.reader-scale-value').forEach(rv=>rv.textContent=Math.round(readerScale*100)+'%');
 }
 function adjustFont(delta){
@@ -1429,7 +1430,7 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
 
   const menu=document.querySelector('.main-menu');
   if(menu) menu.innerHTML=`<div class="main-menu-head"><h3 id="mainMenuTitle">Menu</h3><button class="tool-btn" onclick="closeMainMenu()" aria-label="Fechar menu">✕</button></div>
-    <div class="menu-section"><div class="menu-label">Leitura</div><div class="menu-row"><button class="menu-action" onclick="adjustFont(-0.08)" aria-label="Diminuir tamanho do texto">A−</button><span class="reader-scale-value" role="status" aria-label="Tamanho do texto">100%</span><button class="menu-action" onclick="adjustFont(0.08)" aria-label="Aumentar tamanho do texto">A+</button><button class="menu-action" onclick="resetFont()" aria-label="Restaurar tamanho padrão do texto">Padrão</button></div><button class="menu-action menu-wide" onclick="toggleTheme()">☼ / ☾ Alternar tema claro ou escuro</button></div>
+    <div class="menu-section"><div class="menu-label">Leitura</div><div class="menu-row"><button class="menu-action" onclick="adjustFont(-0.08)" aria-label="Diminuir tamanho do texto">A−</button><span class="reader-scale-value" role="status" aria-label="Tamanho do texto">100%</span><button class="menu-action" onclick="adjustFont(0.08)" aria-label="Aumentar tamanho do texto">A+</button><button class="menu-action" onclick="resetFont()" aria-label="Restaurar tamanho padrão do texto">Padrão</button></div><button class="menu-action menu-wide menu-theme" aria-label="Tema escuro" aria-pressed="false" onclick="toggleTheme()">☼ / ☾ Alternar tema claro ou escuro</button></div>
     <div class="menu-section"><div class="menu-label">Ordem Secular</div><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('regra')">Regra de Vida da OSSM</button></div>
     <div class="menu-section"><div class="menu-label">Biblioteca</div><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('biblioteca')">Favoritos e recentes</button></div>
     <div class="menu-section"><div class="menu-label">Sobre</div><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('sobre')">Sobre, créditos e redes sociais</button></div>
