@@ -1092,6 +1092,7 @@ function toggleSettings(){
   const panel = document.getElementById('settingsPanel');
   const btn = document.getElementById('settingsBtn');
   const isHidden = panel.hasAttribute('hidden');
+  btn.setAttribute('aria-expanded',String(isHidden));
   if(isHidden){ panel.removeAttribute('hidden'); btn.classList.add('active'); }
   else { panel.setAttribute('hidden',''); btn.classList.remove('active'); }
 }
@@ -1112,8 +1113,8 @@ function updateThemeChips(){
   const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
   const lightChip = document.getElementById('themeChipLight');
   const darkChip = document.getElementById('themeChipDark');
-  if(lightChip) lightChip.classList.toggle('active', current === 'light');
-  if(darkChip) darkChip.classList.toggle('active', current === 'dark');
+  if(lightChip){lightChip.classList.toggle('active', current === 'light');lightChip.setAttribute('aria-pressed',String(current==='light'));}
+  if(darkChip){darkChip.classList.toggle('active', current === 'dark');darkChip.setAttribute('aria-pressed',String(current==='dark'));}
 }
 
 // ===================== font size control =====================
