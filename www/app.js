@@ -304,7 +304,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.99';
+const APP_VERSION = '4.9.100';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -313,7 +313,7 @@ let state = { tab: 'hoje', angelus:dailySuggestion.key, detailId:null, search:''
 let readerScale = parseFloat(localStorage.getItem('osmReaderScale') || '1');
 let lightMode = localStorage.getItem('osmTheme') !== 'dark';
 function applyPreferences(){
-  readerScale = Math.max(.76, Math.min(1.56, readerScale));
+  readerScale = Number.isFinite(readerScale)?Math.max(.76, Math.min(2, readerScale)):1;
   document.documentElement.style.setProperty('--reader-scale', readerScale.toFixed(2));
   document.body.classList.toggle('light-mode', lightMode);
   document.documentElement.style.colorScheme = lightMode ? 'light' : 'dark';
@@ -321,13 +321,51 @@ function applyPreferences(){
   const b=document.getElementById('themeBtn'); if(b) b.textContent = lightMode ? '☾' : '☼'; document.querySelectorAll('.reader-scale-value').forEach(rv=>rv.textContent=Math.round(readerScale*100)+'%');
 }
 function adjustFont(delta){
-  readerScale=Math.max(.76,Math.min(1.56,readerScale+delta));
+  readerScale=Math.max(.76,Math.min(2,readerScale+delta));
   localStorage.setItem('osmReaderScale',readerScale);
   applyPreferences();
 }
 function resetFont(){readerScale=1;localStorage.setItem('osmReaderScale',readerScale);applyPreferences();}
-function openMainMenu(){const o=document.getElementById('mainMenuOverlay');if(o){o.classList.add('open');o.setAttribute('aria-hidden','false');applyPreferences();if(typeof updateBackButton==='function')updateBackButton();}}
-function closeMainMenu(){const o=document.getElementById('mainMenuOverlay');if(o){o.classList.remove('open');o.setAttribute('aria-hidden','true');if(typeof updateBackButton==='function')updateBackButton();}}
+// Keep background content out of keyboard and screen-reader navigation while a dialog is open.
+const dialogOrigins = new Map();
+const dialogBackground = new Map();
+function dialogControls(dialog){
+  return [...dialog.querySelectorAll('button, [href], input, select, textarea, iframe, [tabindex]')]
+    .filter(node=>!node.disabled && node.tabIndex>=0 && node.getClientRects().length);
+}
+function openAccessibleDialog(id){
+  const dialog=document.getElementById(id);
+  if(dialog.classList.contains('open'))return;
+  dialogOrigins.set(id,document.activeElement);
+  if(id==='dailyLiturgyOverlay')dialog.append(document.getElementById('celebrationToggle'));
+  dialog.classList.add('open');dialog.setAttribute('aria-hidden','false');
+  const background=[...document.body.children].filter(node=>node!==dialog && !['SCRIPT','STYLE'].includes(node.tagName));
+  dialogBackground.set(id,background.map(node=>[node,node.inert]));
+  background.forEach(node=>node.inert=true);
+  (dialogControls(dialog)[0]||dialog).focus();
+}
+function closeAccessibleDialog(id){
+  const dialog=document.getElementById(id);
+  if(!dialog.classList.contains('open'))return;
+  for(const [node,inert] of dialogBackground.get(id)||[])node.inert=inert;
+  dialogBackground.delete(id);
+  if(id==='dailyLiturgyOverlay')dialog.before(document.getElementById('celebrationToggle'));
+  const origin=dialogOrigins.get(id);dialogOrigins.delete(id);
+  const target=origin?.isConnected && !origin.closest('[inert]')?origin:document.getElementById('menuBtn');
+  target?.focus();
+  dialog.classList.remove('open');dialog.setAttribute('aria-hidden','true');
+}
+document.addEventListener('keydown',event=>{
+  if(event.key!=='Tab')return;
+  const dialog=document.querySelector('[role="dialog"].open');if(!dialog)return;
+  const controls=dialogControls(dialog),first=controls[0],last=controls.at(-1);
+  if(!first){event.preventDefault();dialog.focus();return;}
+  if(event.shiftKey && (document.activeElement===first||document.activeElement===dialog)){
+    event.preventDefault();last.focus();
+  }else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first.focus();}
+});
+function openMainMenu(){openAccessibleDialog('mainMenuOverlay');document.getElementById('menuBtn').setAttribute('aria-expanded','true');applyPreferences();if(typeof updateBackButton==='function')updateBackButton();}
+function closeMainMenu(){closeAccessibleDialog('mainMenuOverlay');document.getElementById('menuBtn').setAttribute('aria-expanded','false');if(typeof updateBackButton==='function')updateBackButton();}
 function toggleTheme(){ lightMode=!lightMode; localStorage.setItem('osmTheme', lightMode?'light':'dark'); applyPreferences(); const frame=document.getElementById('serviteFrame'); try{frame?.contentDocument?.documentElement?.setAttribute('data-theme',lightMode?'light':'dark');}catch(e){} }
 function getCapacitorPlugin(name){
   const capacitor=window.Capacitor;
@@ -1349,10 +1387,10 @@ function serviteAdjustFont(delta){try{const frame=document.getElementById('servi
   const ov=document.getElementById('serviteOverlay'),fr=document.getElementById('serviteFrame');
   document.getElementById('serviteTitle').textContent=serviteNames[currentServiteView]||'Recursos OSM';
   fr.src=serviteUrl(currentServiteView);
-  ov.classList.add('open');ov.setAttribute('aria-hidden','false');document.body.classList.add('servite-open');
+  openAccessibleDialog('serviteOverlay');document.body.classList.add('servite-open');
   if(!history.state?.serviteOverlay) history.pushState({...history.state,serviteOverlay:true},'');
 }
-function closeServite(fromHistory=false){const ov=document.getElementById('serviteOverlay'),fr=document.getElementById('serviteFrame');const wasOpen=ov?.classList.contains('open');ov.classList.remove('open');ov.setAttribute('aria-hidden','true');document.body.classList.remove('servite-open');fr.src='about:blank';if(wasOpen&&!fromHistory&&history.state?.serviteOverlay)history.back();}
+function closeServite(fromHistory=false){const ov=document.getElementById('serviteOverlay'),fr=document.getElementById('serviteFrame');const wasOpen=ov?.classList.contains('open');closeAccessibleDialog('serviteOverlay');readerScale=parseFloat(localStorage.getItem('osmReaderScale')||'1');applyPreferences();document.body.classList.remove('servite-open');fr.src='about:blank';if(wasOpen&&!fromHistory&&history.state?.serviteOverlay)history.back();}
 function serviteReload(){if(currentServiteView)document.getElementById('serviteFrame').src=serviteUrl(currentServiteView)+'&reload='+Date.now();}
 window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverlay')?.classList.contains('open'))closeServite(true);});
 /* END SCRIPT BLOCK: serviteIntegrationScript */
@@ -1375,8 +1413,8 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
   
 
   const menu=document.querySelector('.main-menu');
-  if(menu) menu.innerHTML=`<div class="main-menu-head"><h3>Menu</h3><button class="tool-btn" onclick="closeMainMenu()" aria-label="Fechar menu">✕</button></div>
-    <div class="menu-section"><div class="menu-label">Leitura</div><div class="menu-row"><button class="menu-action" onclick="adjustFont(-0.08)">A−</button><span class="reader-scale-value">100%</span><button class="menu-action" onclick="adjustFont(0.08)">A+</button><button class="menu-action" onclick="resetFont()">Padrão</button></div><button class="menu-action menu-wide" onclick="toggleTheme()">☼ / ☾ Alternar tema claro ou escuro</button></div>
+  if(menu) menu.innerHTML=`<div class="main-menu-head"><h3 id="mainMenuTitle">Menu</h3><button class="tool-btn" onclick="closeMainMenu()" aria-label="Fechar menu">✕</button></div>
+    <div class="menu-section"><div class="menu-label">Leitura</div><div class="menu-row"><button class="menu-action" onclick="adjustFont(-0.08)" aria-label="Diminuir tamanho do texto">A−</button><span class="reader-scale-value" role="status" aria-label="Tamanho do texto">100%</span><button class="menu-action" onclick="adjustFont(0.08)" aria-label="Aumentar tamanho do texto">A+</button><button class="menu-action" onclick="resetFont()" aria-label="Restaurar tamanho padrão do texto">Padrão</button></div><button class="menu-action menu-wide" onclick="toggleTheme()">☼ / ☾ Alternar tema claro ou escuro</button></div>
     <div class="menu-section"><div class="menu-label">Ordem Secular</div><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('regra')">Regra de Vida da OSSM</button></div>
     <div class="menu-section"><div class="menu-label">Biblioteca</div><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('biblioteca')">Favoritos e recentes</button></div>
     <div class="menu-section"><div class="menu-label">Sobre</div><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('sobre')">Sobre, créditos e redes sociais</button></div>
@@ -1484,8 +1522,8 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
       const data=await response.json();saveCache(selectedDate,data);target.innerHTML=renderMass({savedAt:new Date().toISOString(),data},false);
     }catch(error){if(!cached){const message=error?.message==='Liturgia não encontrada'?'Não há texto da Missa disponível para esta data.':error?.name==='AbortError'?'O serviço da Missa não respondeu no prazo e não há cópia local para esta data.':'O serviço da Missa está indisponível e não há cópia local para esta data. Verifique a conexão e tente novamente.';target.innerHTML=`<div class="daily-error">${safe(message)}<br><button class="daily-retry" onclick="loadDailyLiturgy('${safe(selectedDate)}')">Tentar novamente</button></div>`;}}
   };
-  window.openDailyLiturgy=function(date){document.getElementById('dailyLiturgyOverlay').classList.add('open');document.getElementById('dailyLiturgyOverlay').setAttribute('aria-hidden','false');if(window.updateCelebrationButton)window.updateCelebrationButton();loadDailyLiturgy(date||localISO());};
-  window.closeDailyLiturgy=function(){document.getElementById('dailyLiturgyOverlay').classList.remove('open');document.getElementById('dailyLiturgyOverlay').setAttribute('aria-hidden','true');if(document.body.classList.contains('celebration-mode'))toggleCelebrationMode();if(window.updateCelebrationButton)window.updateCelebrationButton();};
+  window.openDailyLiturgy=function(date){openAccessibleDialog('dailyLiturgyOverlay');if(window.updateCelebrationButton)window.updateCelebrationButton();loadDailyLiturgy(date||localISO());};
+  window.closeDailyLiturgy=function(){closeAccessibleDialog('dailyLiturgyOverlay');if(document.body.classList.contains('celebration-mode'))toggleCelebrationMode();if(window.updateCelebrationButton)window.updateCelebrationButton();};
   window.moveDailyDate=function(amount){const date=new Date(selectedDate+'T12:00:00');date.setDate(date.getDate()+amount);loadDailyLiturgy(localISO(date));};
   
   const menu=document.querySelector('.main-menu');

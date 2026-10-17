@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.99-calendario-apresentacao';
+const CACHE = 'liturgia-osm-v4.9.100-calendario-apresentacao';
 const CORE = [
   "./media/emblema-osm.svg",
   "./media/ornamento-final.svg",

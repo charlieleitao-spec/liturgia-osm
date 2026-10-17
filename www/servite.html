@@ -8,11 +8,11 @@
     var t = localStorage.getItem('osmTheme') || localStorage.getItem('santoral-osm-theme') || 'light';
     document.documentElement.setAttribute('data-theme', t);
     var scale = parseFloat(localStorage.getItem('osmReaderScale') || '1');
-    if(isFinite(scale)){ document.documentElement.style.fontSize = (16*scale) + 'px'; }
+    if(isFinite(scale)){ document.documentElement.style.fontSize = (16*Math.max(.76,Math.min(2,scale))) + 'px'; }
   }catch(e){}
 })();</script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Santoral OSM — Servos de Maria</title>
 <link rel="stylesheet" href="media/fonts/fonts.css">
 <link rel="stylesheet" href="servite.css">

@@ -1117,7 +1117,7 @@ function updateThemeChips(){
 }
 
 // ===================== font size control =====================
-const FONT_MIN = 13, FONT_MAX = 22, FONT_STEP = 1;
+const FONT_MIN = 13, FONT_MAX = 32, FONT_STEP = 1;
 function changeFontSize(dir){
   const current = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
   let next = Math.round(current + dir * FONT_STEP);

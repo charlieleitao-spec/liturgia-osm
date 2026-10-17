@@ -1231,3 +1231,6 @@ body:has(.calendar-simple){scroll-padding-bottom:calc(110px + env(safe-area-inse
 /* Acabamento ornamental clássico da página inicial. */
 .home-end-ornament{display:block;width:min(100%,380px);height:auto;aspect-ratio:720/136;margin:32px auto 28px;pointer-events:none;opacity:var(--home-decoration-opacity);background:url("./media/ornamento-final.svg") center/contain no-repeat}
 .home-end-ornament::before,.home-end-ornament::after,.home-end-ornament>span{display:none}
+
+/* An inactive floating control must not cover an open dialog. */
+.celebration-toggle[inert]{visibility:hidden}

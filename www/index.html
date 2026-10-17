@@ -29,7 +29,7 @@
         <h1>Liturgia <span class="brand-tag">OSM</span></h1>
       </div>
       <div class="topbar-tools" aria-label="Menu">
-<button class="tool-btn" onclick="openMainMenu()" aria-label="Abrir menu" id="menuBtn">☰</button>
+<button class="tool-btn" onclick="openMainMenu()" aria-label="Abrir menu" id="menuBtn" aria-expanded="false" aria-controls="mainMenuOverlay" aria-haspopup="dialog">☰</button>
       </div>
     </div>
   </header>
@@ -44,11 +44,11 @@
 
 </div>
 
-<div id="mainMenuOverlay" class="main-menu-overlay" aria-hidden="true" onclick="if(event.target===this)closeMainMenu()">
+<div id="mainMenuOverlay" role="dialog" aria-modal="true" aria-labelledby="mainMenuTitle" tabindex="-1" class="main-menu-overlay" aria-hidden="true" onclick="if(event.target===this)closeMainMenu()">
  <aside class="main-menu"></aside>
 </div>
 
-<div id="serviteOverlay" class="servite-overlay" aria-hidden="true">
+<div id="serviteOverlay" role="dialog" aria-modal="true" aria-labelledby="serviteTitle" tabindex="-1" class="servite-overlay" aria-hidden="true">
   <div class="servite-head">
     <button class="servite-close" onclick="closeServite()" aria-label="Fechar recurso">✕</button>
     <div class="servite-title" id="serviteTitle">Recurso OSM</div>
@@ -59,8 +59,8 @@
 
 <button id="celebrationToggle" class="celebration-toggle" onclick="toggleCelebrationMode()">Modo celebração</button>
 
-<div id="dailyLiturgyOverlay" class="daily-liturgy-overlay" aria-hidden="true">
-  <div class="daily-liturgy-head"><button onclick="closeDailyLiturgy()" aria-label="Voltar">‹</button><div><b>Missa do dia</b><small>Consulta online; cópias locais por até 30 dias</small></div><span aria-hidden="true"></span></div>
+<div id="dailyLiturgyOverlay" role="dialog" aria-modal="true" aria-labelledby="dailyLiturgyTitle" tabindex="-1" class="daily-liturgy-overlay" aria-hidden="true">
+  <div class="daily-liturgy-head"><button onclick="closeDailyLiturgy()" aria-label="Voltar">‹</button><div><b id="dailyLiturgyTitle">Missa do dia</b><small>Consulta online; cópias locais por até 30 dias</small></div><span aria-hidden="true"></span></div>
   <div class="daily-liturgy-body"><div class="daily-date-nav"><button onclick="moveDailyDate(-1)" aria-label="Dia anterior">‹</button><div class="daily-date-field"><span id="dailyLiturgyDateDisplay" class="daily-date-display" aria-hidden="true"></span><span class="daily-date-chevron" aria-hidden="true">⌄</span><input id="dailyLiturgyDate" type="date" aria-label="Selecionar data da liturgia" onchange="loadDailyLiturgy(this.value)"></div><button onclick="moveDailyDate(1)" aria-label="Dia seguinte">›</button></div><div id="dailyLiturgyContent"></div></div>
 </div>
 
