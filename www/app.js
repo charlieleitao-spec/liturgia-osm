@@ -351,7 +351,7 @@ function closeAccessibleDialog(id){
   dialogBackground.delete(id);
   if(id==='dailyLiturgyOverlay')dialog.before(document.getElementById('celebrationToggle'));
   const origin=dialogOrigins.get(id);dialogOrigins.delete(id);
-  const target=origin?.isConnected && !origin.closest('[inert]')?origin:document.getElementById('menuBtn');
+  const target=origin?.isConnected && origin.matches('button, [href], input, select, textarea, [tabindex]') && !origin.closest('[inert]')?origin:document.getElementById('menuBtn');
   target?.focus();
   dialog.classList.remove('open');dialog.setAttribute('aria-hidden','true');
 }
@@ -1391,6 +1391,21 @@ function serviteAdjustFont(delta){try{const frame=document.getElementById('servi
   if(!history.state?.serviteOverlay) history.pushState({...history.state,serviteOverlay:true},'');
 }
 function closeServite(fromHistory=false){const ov=document.getElementById('serviteOverlay'),fr=document.getElementById('serviteFrame');const wasOpen=ov?.classList.contains('open');closeAccessibleDialog('serviteOverlay');readerScale=parseFloat(localStorage.getItem('osmReaderScale')||'1');applyPreferences();document.body.classList.remove('servite-open');fr.src='about:blank';if(wasOpen&&!fromHistory&&history.state?.serviteOverlay)history.back();}
+// Keyboard events inside the embedded document do not bubble to the parent.
+document.getElementById('serviteFrame').addEventListener('load',()=>{
+  const frame=document.getElementById('serviteFrame');
+  try{frame.contentDocument.addEventListener('keydown',event=>{
+    if(!document.getElementById('serviteOverlay').classList.contains('open'))return;
+    if(event.key==='Escape'){event.preventDefault();closeServite();return;}
+    if(event.key!=='Tab')return;
+    const controls=dialogControls(frame.contentDocument),active=frame.contentDocument.activeElement;
+    if(event.shiftKey && active===controls[0]){
+      event.preventDefault();document.querySelector('.servite-head .mini-tools button:last-child').focus();
+    }else if(!event.shiftKey && active===controls.at(-1)){
+      event.preventDefault();document.querySelector('.servite-close').focus();
+    }
+  });}catch(error){console.warn('[Liturgia OSM] Foco do recurso indisponível.',error);}
+});
 function serviteReload(){if(currentServiteView)document.getElementById('serviteFrame').src=serviteUrl(currentServiteView)+'&reload='+Date.now();}
 window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverlay')?.classList.contains('open'))closeServite(true);});
 /* END SCRIPT BLOCK: serviteIntegrationScript */

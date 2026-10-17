@@ -34,7 +34,8 @@ try{
   await frame.locator('#view').waitFor();
   assert.doesNotMatch(await frame.locator('meta[name=viewport]').getAttribute('content'),/user-scalable=no|maximum-scale=1/);
   assert.equal(await frame.locator('html').evaluate(n=>getComputedStyle(n).fontSize),'32px');
-  await resource.getByRole('button',{name:'Fechar recurso'}).click();
+  await frame.locator('button').first().focus();
+  await page.keyboard.press('Escape');
   assert.equal(await menu.evaluate(n=>n===document.activeElement),true);
   await page.evaluate(()=>{setTab('oracoes');openDevo('vigilia','formula1');});
   await page.waitForSelector('.prayer-stanza');
