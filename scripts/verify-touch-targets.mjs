@@ -37,7 +37,9 @@ try{
       await targets(page.locator('#mainMenuOverlay button'),'Reading menu');
       await page.getByRole('button',{name:'Regra de Vida da OSSM',exact:true}).click();
       await targets(page.locator('.servite-head button'),'Embedded reader toolbar');
-      const frame=page.frameLocator('#serviteFrame');
+      // The embedded resource deliberately hides its own header; test standalone settings separately.
+      const frame=await browser.newPage({viewport:{width,height:844},serviceWorkers:'block'});
+      await frame.goto('http://127.0.0.1:8768/servite.html?view=regra');
       await frame.locator('#settingsBtn').waitFor();
       await frame.locator('#view .card').first().waitFor();
       await targets(frame.locator('.header-controls button,#tabbar button'),'Embedded navigation');
@@ -48,6 +50,7 @@ try{
       assert.equal(await frame.getByRole('button',{name:'Escuro',exact:true}).getAttribute('aria-pressed'),'true');
       await frame.getByRole('button',{name:'Claro',exact:true}).click();
       assert.equal(await frame.getByRole('button',{name:'Escuro',exact:true}).getAttribute('aria-pressed'),'false');
+      await frame.close();
       await page.getByRole('button',{name:'Fechar recurso',exact:true}).click();
       await page.evaluate(()=>{openSaint(SANTORAL[0]._id);});
       await targets(page.locator('.favorite-btn'),'Favorite');
