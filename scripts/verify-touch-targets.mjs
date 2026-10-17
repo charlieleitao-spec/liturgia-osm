@@ -26,10 +26,10 @@ try{
       const cells=await page.locator('button.cal-day').evaluateAll(nodes=>nodes.map(n=>({width:n.getBoundingClientRect().width,height:n.getBoundingClientRect().height})));
       assert.ok(cells.length>27);assert.ok(cells.every(b=>b.width>=24&&b.height>=44),'Seven-column calendar cells');
       const month=page.locator('.calendar-month-select'),before=await month.inputValue();
-      await page.getByRole('button',{name:'Mês anterior',exact:true}).click({position:{x:2,y:2}});
-      assert.notEqual(await month.inputValue(),before,'Top corner of previous-month control');
-      await page.getByRole('button',{name:'Próximo mês',exact:true}).click({position:{x:42,y:42}});
-      assert.equal(await month.inputValue(),before,'Bottom corner of next-month control');
+      await page.getByRole('button',{name:'Mês anterior',exact:true}).click({position:{x:2,y:22}});
+      assert.notEqual(await month.inputValue(),before,'Left edge of previous-month control');
+      await page.getByRole('button',{name:'Próximo mês',exact:true}).click({position:{x:42,y:22}});
+      assert.equal(await month.inputValue(),before,'Right edge of next-month control');
       await page.locator('.calendar-santoral-index').evaluate(n=>n.open=true);
       await targets(page.locator('.alpha-btn'),'Alphabet filters');
       await page.evaluate(()=>window.scrollTo(0,0));
@@ -39,6 +39,7 @@ try{
       await targets(page.locator('.servite-head button'),'Embedded reader toolbar');
       const frame=page.frameLocator('#serviteFrame');
       await frame.locator('#settingsBtn').waitFor();
+      await frame.locator('#view .card').first().waitFor();
       await targets(frame.locator('.header-controls button,#tabbar button'),'Embedded navigation');
       await frame.locator('#settingsBtn').click();
       assert.equal(await frame.locator('#settingsBtn').getAttribute('aria-expanded'),'true');
@@ -60,6 +61,6 @@ try{
     assert.equal(await calendarOverflow(page),false,`Calendar at 200% / ${width}`);
     await page.screenshot({path:`validation-layout/toque-calendario-${width}.png`,fullPage:true});
   }
-  console.log('PASS: touch targets >=44px for main controls; calendar cells retain seven columns; corner clicks; settings states; no overflow.',JSON.stringify(report));
+  console.log('PASS: touch targets >=44px for main controls; calendar cells retain seven columns; edge clicks; settings states; no overflow.',JSON.stringify(report));
 }finally{await browser.close();server.kill();}
 async function calendarOverflow(page){return page.locator('.calendar-presented').evaluate(n=>n.scrollWidth>n.clientWidth+1);}

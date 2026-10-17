@@ -622,5 +622,5 @@ body.embedded-resource-mode #app{min-height:100vh}
   min-width:44px;min-height:44px;
 }
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{
-  outline:2px solid var(--gold);outline-offset:2px;
+  outline:2px solid var(--text);outline-offset:2px;
 }
