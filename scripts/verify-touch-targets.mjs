@@ -46,7 +46,7 @@ try{
       await frame.locator('.regra-floating-back').waitFor();
       await targets(frame.locator('.regra-floating-back'),'Resource return control');
       await page.getByRole('button',{name:'Fechar recurso',exact:true}).click();
-      await page.evaluate(()=>{openSaint(SANTORAL[0]._id);});
+      await page.evaluate(()=>openDevo('stabat'));
       await targets(page.locator('.favorite-btn'),'Favorite');
       await page.evaluate(()=>openDailyLiturgy());
       await targets(page.locator('.daily-liturgy-head button,.daily-date-nav button,.daily-date-field'),'Daily Mass navigation');
