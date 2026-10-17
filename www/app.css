@@ -1178,19 +1178,48 @@ body.scroll-controls-hidden:has(#dailyLiturgyOverlay.open) .celebration-toggle{t
 .hub-collapsible[open]>summary::after{transform:rotate(90deg)}
 .hub-collapsible>summary:focus-visible{outline:2px solid var(--gold-soft);outline-offset:2px}
 
-/* Calendário simplificado — 4.9.91 */
-#view .calendar-simple{margin:12px 0 20px;}
-#view .calendar-simple .calendar-toolbar{grid-template-columns:36px minmax(0,1fr) 36px auto;gap:4px;margin-bottom:8px;}
-#view .calendar-simple .calendar-month-select{margin:0;border:0;background:transparent;border-radius:6px;min-height:44px;padding:6px;color:var(--paper);font-size:16px;}
-#view .calendar-simple .cal-nav{width:36px;min-height:44px;padding:0;border:0;background:transparent;box-shadow:none;font-size:24px;}
-#view .calendar-simple .today-chip{margin:0;padding:6px 8px;min-height:44px;border:0;background:transparent;font-size:13px;text-transform:none;letter-spacing:normal;}
-#view .calendar-simple .cal-day{border:0;border-radius:8px;background:transparent;min-height:36px;font-size:15px;}
-#view .calendar-simple .cal-day.empty{visibility:hidden;}
-#view .calendar-simple .cal-day.has-feast{background:rgba(184,148,72,.10);}
-#view .calendar-simple .cal-day.today{box-shadow:inset 0 0 0 1px var(--wine);}
+/* Calendário: mês em destaque, dias legíveis e agenda mensal (4.9.98). */
+#view .calendar-presented{margin:16px 0 18px;padding:12px;border:1px solid var(--line);border-radius:16px;background:var(--bg-panel);}
+#view .calendar-presented .calendar-toolbar{grid-template-columns:32px minmax(0,1fr) 32px auto;gap:4px;margin:0 0 16px;}
+#view .calendar-presented .calendar-month-select{margin:0;padding:8px 2px;border:0;border-radius:6px;background:transparent;color:var(--paper);min-height:44px;font-size:20px;letter-spacing:0;}
+#view .calendar-presented .cal-nav{width:32px;min-height:44px;padding:0;background:transparent;border:0;box-shadow:none;font-size:26px;color:var(--gold);}
+#view .calendar-presented .today-chip{margin:0;padding:6px 10px;min-height:38px;border:1px solid var(--line);border-radius:20px;background:transparent;color:var(--gold);font-size:13px;letter-spacing:0;text-transform:none;}
+#view .calendar-presented .calendar-grid{gap:4px;}
+#view .calendar-presented .cal-head{padding:0 0 8px;text-align:center;font-size:11px;letter-spacing:0;text-transform:none;color:var(--text-muted);}
+#view .calendar-presented .cal-head:first-child{color:var(--gold);}
+#view .calendar-presented .cal-day{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;height:clamp(42px,11vw,50px);min-height:42px;aspect-ratio:auto;padding:0;border:0;border-radius:8px;background:transparent;box-shadow:none;color:var(--paper);font-size:16px;outline:none;}
+#view .calendar-presented .cal-number{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;border:1px solid transparent;}
+#view .calendar-presented .cal-day.today .cal-number{border-color:var(--gold);color:var(--gold);}
+#view .calendar-presented .cal-day.selected .cal-number{border-color:var(--gold);background:var(--gold);color:#102238;}
+#view .calendar-presented .cal-day .cal-dot{position:static;transform:none;display:block;flex:none;width:4px;height:4px;margin:3px 0 0;border-radius:50%;background:var(--gold);}
+#view .calendar-presented .cal-day.empty{visibility:hidden;}
+#view .calendar-presented .cal-day:focus-visible,#view .calendar-presented .cal-nav:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
+#view .calendar-key{display:flex;align-items:center;justify-content:flex-end;gap:6px;padding-top:10px;margin-top:4px;border-top:1px solid var(--line);color:var(--text-muted);font-size:11px;}
+#view .calendar-key>span{width:4px;height:4px;border-radius:50%;background:var(--gold);}
+#view .calendar-selection{margin:0 0 24px;padding:2px 4px 16px;border-bottom:1px solid var(--line);}
+#view .calendar-selection h2{margin:0 0 8px;font-size:15px;line-height:1.5;font-weight:normal;color:var(--gold);}
+#view .calendar-selection h2::first-letter{text-transform:uppercase;}
+#view .calendar-selection p{margin:0;font-size:14px;line-height:1.6;color:var(--text-muted);}
+#view .calendar-selection .calendar-celebration-row{padding:4px 0;border:0;}
+#view .calendar-selection .calendar-celebration-link{font-size:16px;line-height:1.5;color:var(--paper);}
+#view .calendar-selection .calendar-celebration-day{display:none;}
+#view .calendar-agenda-heading{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:4px;}
+#view .calendar-agenda-heading h2{margin:0;font-size:18px;font-weight:normal;color:var(--paper);}
+#view .calendar-agenda-heading>span{font-size:12px;color:var(--text-muted);}
+#view .calendar-month-entry{display:flex;align-items:center;gap:12px;min-height:72px;padding:12px 2px;text-decoration:none;border-bottom:1px solid var(--line);color:var(--paper);}
+#view .calendar-month-entry time{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:0 0 38px;gap:3px;color:var(--gold);}
+#view .calendar-month-entry time b{font-size:25px;line-height:1;font-weight:normal;font-variant-numeric:tabular-nums;}
+#view .calendar-month-entry time small{font-size:10px;color:var(--text-muted);}
+#view .calendar-entry-name{flex:1;min-width:0;font-size:16px;line-height:1.45;overflow-wrap:anywhere;}
+#view .calendar-entry-name>small{display:block;margin-top:3px;color:var(--text-muted);font-size:12px;}
+#view .calendar-entry-arrow{flex:none;color:var(--gold);font-size:20px;}
+#view .calendar-month-empty{margin:14px 0;font-size:14px;line-height:1.6;color:var(--text-muted);}
+#view .calendar-santoral-index{margin:24px 0 8px;}
+#view .calendar-santoral-index>summary{min-height:44px;padding:12px 0;cursor:pointer;font-size:14px;color:var(--gold);}
+#view .calendar-santoral-index[open]>summary{margin-bottom:10px;}
 body:has(.calendar-simple) main#view{padding-bottom:calc(120px + env(safe-area-inset-bottom));}
 body:has(.calendar-simple){scroll-padding-bottom:calc(110px + env(safe-area-inset-bottom));}
-@media(max-width:340px){#view .calendar-simple .calendar-toolbar{grid-template-columns:30px minmax(0,1fr) 30px auto;}#view .calendar-simple .cal-nav{width:30px;}#view .calendar-simple .calendar-month-select{font-size:14px;}}
+@media(max-width:360px){#view .calendar-presented{padding:10px;}#view .calendar-presented .calendar-toolbar{grid-template-columns:26px minmax(0,1fr) 26px auto;gap:2px;}#view .calendar-presented .cal-nav{width:26px;}#view .calendar-presented .calendar-month-select{font-size:17px;}#view .calendar-presented .today-chip{padding:6px 8px;font-size:12px;}#view .calendar-presented .calendar-grid{gap:3px;}}
 
 /* Emblema e ornamento usam o mesmo dourado #b89448 e a mesma intensidade. */
 :root{--home-decoration-opacity:.85}
