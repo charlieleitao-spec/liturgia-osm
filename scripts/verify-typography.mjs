@@ -65,6 +65,8 @@ try{
   await causes.addInitScript(()=>localStorage.setItem('osmReaderScale','2'));
   await causes.goto('http://127.0.0.1:8769/causas-beatos.html');
   await causes.locator('.person').first().waitFor();
+  const names=await causes.locator('.person h2').allTextContents();
+  assert.ok(names.some(n=>n.includes('Paulino'))&&names.some(n=>n.includes('Egídio')),'Both causes must remain visible');
   await size(causes,'.intro',32);
   await size(causes,'.person h2',36);
   await fits(causes,'.intro,.person,.person h2');
