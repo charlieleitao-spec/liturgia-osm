@@ -1,0 +1,58 @@
+/* Shared text roles. Apply A+/A− once, with absolute rem sizes rather than nested em scales.
+   The embedded reader scales its root font; the main app uses --reader-scale. */
+:root{
+  --type-body:calc(1rem * var(--reader-scale,1));
+  --type-card-title:calc(1.125rem * var(--reader-scale,1));
+  --type-page-title:calc(1.375rem * var(--reader-scale,1));
+  --type-meta:calc(.8125rem * var(--reader-scale,1));
+  --type-section:calc(.8125rem * var(--reader-scale,1));
+}
+#view .card,#view .about-text,#view .credit-list,#view .bio-text,
+#view .hub-life-bio,#view .hub-card-note,#view .office-hours-intro,#view .empty-note,#view .rule-reader{
+  font-size:var(--type-body)!important;line-height:1.55;
+  overflow-wrap:anywhere;hyphens:none;
+}
+/* A paragraph inherits its container's final size; it never multiplies that size again. */
+#view .card p,#view .card li,#view .card blockquote,
+#view .about-text p,#view .credit-list>div{
+  font-size:inherit!important;line-height:inherit;
+}
+#view .about-text p:last-child{margin-bottom:0}
+#view .credit-list>div+div{margin-top:.35em}
+#view .section-title,#view .hub-block-title{
+  font-size:var(--type-section);line-height:1.4;letter-spacing:.08em;
+  overflow-wrap:anywhere;
+}
+#view .detail-header h2,#view .hub-life-title,#view .liturgical-title{
+  font-size:var(--type-page-title)!important;line-height:1.3;overflow-wrap:anywhere;
+}
+#view .rowtitle,#view .saint-row .rowtitle,#view .liturgia-celebration-row .rowtitle,
+#view .social-label,#view .hub-card-title,#view .home-action b,
+#view .home-celebration-text h2,#view .home-prayer-card h3,#view .continue-text b,
+#view .office-hour-copy strong,#view .calendar-entry-name,#view .calendar-agenda-heading h2{
+  font-size:var(--type-card-title)!important;line-height:1.35;overflow-wrap:anywhere;
+}
+#view .rowrank,#view .saint-row .rowrank,#view .liturgia-celebration-row .rowrank,
+#view .social-sub,#view .date-line,#view .hub-life-meta,#view .hub-source,
+#view .home-action small,#view .continue-text span,#view .office-hour-note,
+#view .calendar-entry-name>small,#view .calendar-agenda-heading>span{
+  font-size:var(--type-meta)!important;line-height:1.4;overflow-wrap:anywhere;
+}
+#view .social-link{
+  display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;
+}
+#view .social-link>span:not(.social-icon){min-width:0;overflow-wrap:anywhere}
+#view .social-link>.social-icon{grid-row:1/3}
+#view .social-link::after{
+  grid-column:2;margin-left:0;justify-self:start;white-space:normal;
+  font-size:var(--type-meta);line-height:1.4;
+}
+#view .social-link:not(:has(>.social-icon)){grid-template-columns:minmax(0,1fr)}
+#view .social-link:not(:has(>.social-icon))::after{grid-column:1}
+/* The separate causes page shares the same body, heading and metadata sizes. */
+body.causes-page{font-family:Georgia,'Times New Roman',serif;font-size:var(--type-body);line-height:1.55}
+.causes-page h1{font-size:var(--type-page-title)}
+.causes-page .person h2{font-size:var(--type-card-title);line-height:1.35}
+.causes-page .meta,.causes-page .status,.causes-page .subhead,.causes-page footer{font-size:var(--type-meta);line-height:1.4}
+.causes-page .intro,.causes-page .bio{font-size:var(--type-body);line-height:1.55;overflow-wrap:anywhere;hyphens:none}
+.causes-page .prayer{font-size:calc(1.25rem * var(--reader-scale,1));line-height:1.5;overflow-wrap:anywhere}
