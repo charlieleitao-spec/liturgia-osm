@@ -1234,3 +1234,20 @@ body:has(.calendar-simple){scroll-padding-bottom:calc(110px + env(safe-area-inse
 
 /* An inactive floating control must not cover an open dialog. */
 .celebration-toggle[inert]{visibility:hidden}
+
+/* Áreas de toque maiores; os ícones e a tipografia mantêm o tamanho aprovado. */
+.tool-btn,.favorite-btn,.alpha-btn,.servite-close,.menu-action,.toggle-btn,
+.hub-action,.tab-btn,.action-btn,.daily-retry,
+.servite-overlay .mini-tools button,.daily-liturgy-head button,.daily-date-nav button{
+  min-width:44px;min-height:44px;
+}
+.servite-close,.servite-overlay .mini-tools{flex-shrink:0}
+.daily-date-field{min-height:44px}
+#view .calendar-presented .calendar-toolbar{grid-template-columns:44px minmax(0,1fr) 44px auto}
+#view .calendar-presented .cal-nav{width:44px;min-width:44px;min-height:44px}
+#view .calendar-presented .today-chip{min-width:44px;min-height:44px}
+#view .calendar-presented .cal-day{min-height:44px}
+@media(max-width:400px){
+  #view .calendar-presented .calendar-toolbar{grid-template-columns:44px minmax(0,1fr) 44px;gap:4px}
+  #view .calendar-presented .today-chip{grid-column:1/-1;justify-self:end}
+}

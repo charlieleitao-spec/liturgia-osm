@@ -615,3 +615,12 @@ body.embedded-resource-mode .topbar,
 body.embedded-resource-mode .tabbar{display:none!important}
 body.embedded-resource-mode main#view{padding-top:16px!important;padding-bottom:28px!important}
 body.embedded-resource-mode #app{min-height:100vh}
+
+/* Controles compactos com área de toque ampliada. */
+.theme-toggle,.settings-btn,.home-return,.font-btn,.chip,.toggle-btn,
+.back-btn,.btn-link,.regra-floating-back,.hour-tab-btn,.tab-btn{
+  min-width:44px;min-height:44px;
+}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{
+  outline:2px solid var(--text);outline-offset:2px;
+}
