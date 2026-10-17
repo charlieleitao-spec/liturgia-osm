@@ -188,3 +188,14 @@ Na primeira rodada, ficaram sem alteração: estrutura das abas, modo celebraç�
 79. As fichas de todas as celebrações do Santoral usam o renderizador litúrgico para hino, salmo, antífona e oração da Memória Litúrgica. O caminho anterior escapava o texto sem estruturar suas linhas; o CSS de prosa acabava unindo versos e hemistíquios.
 80. Verificação visual inclui todas as 25 datas da Memória Litúrgica nas fichas reais, preservação de palavras e sinais, prosa contínua e telas pequenas.
 81. APP_VERSION 4.9.90; cache `liturgia-osm-v4.9.90-ui59-santoral-versos`; Android versionCode 40994; atualização validada sobre a 4.9.89.
+
+
+## Vigésima nona rodada (4.9.103)
+
+82. Registro: as rodadas 4.9.91 a 4.9.102 não foram anotadas neste arquivo.
+83. Missas: faltava espaço depois da vírgula em três textos (08/05 “Cristo, nosso”, 30/05 “perfeita, conversão”, 19/06 “Senhor, ao celebrarmos”).
+84. Grafia do Brasil nos Ofícios e transcrições: “unigênito” (14), “primogênito” (7) e “colônia” (2); corrigida a vírgula fora do lugar em “abram, à oração” (19/06). “Génitrix” (latim) permanece.
+85. CSS: removidas 132 declarações de `app.css` e 55 de `servite.css` que eram totalmente sobrescritas por regra posterior do mesmo seletor (19 e 2 regras ficaram vazias e saíram). O valor efetivo de cada propriedade foi conferido por script e não mudou; blocos `@media` não foram tocados.
+86. Fora do pacote www (sem uso pelo app): 12 `fontes-imagens-santoral*.json` e `data/README.md` foram movidos para a pasta `fora-do-www`.
+87. APP_VERSION 4.9.103; cache `liturgia-osm-v4.9.103-revisao-texto-css-fontes`. Android versionCode: aumentar como de costume.
+88. Fontes: nenhum texto fica abaixo de 11 px. Rótulos da barra inferior (8 e 10 px), `.eyebrow` (7,5 a 9 px), cabeçalho do calendário (8,5 px), selos, kickers e chips (9 a 10,5 px) passaram para 11 px; botões `.action-btn`, `.daily-actions button` e `.alpha-btn` (9 a 10 px) passaram para 12 px. Em `servite.css`: `.tab-btn`, `.eyebrow`, `.saint-card .rank`, `.detail-header .rank` e `.guided-crown-kicker` para 11 px. Numeração de versículos (em `em`) não foi alterada.

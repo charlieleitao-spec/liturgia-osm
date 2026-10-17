@@ -1,34 +1,4 @@
-:root{
-  --bg-deep:#f7f4ed;
-  --bg-panel:#fff;
-  --bg-panel-2:#fff;
-  --line:#e1d9ca;
-  --gold:#b89448;
-  --gold-soft:var(--gold);
-  --wine:#8b2635;
-  --wine-soft:#8b2635;
-  --paper:#2f2b27;
-  --paper-dim:#3b3631;
-  --text:#2f2b27;
-  --text-muted:#6c655b;
-  --text-faint:#8a8379;
-  --shadow: 0 10px 22px -14px rgba(47,43,39,.22);
-  --topbar-bg1: rgba(247,244,237,.96);
-  --topbar-bg2: rgba(247,244,237,.72);
-  --tabbar-bg: rgba(247,244,237,.96);
-  --card-corner: rgba(184,148,72,.28);
-  --prayer-card-bg1: rgba(139,38,53,.09);
-  --prayer-card-bg2: rgba(139,38,53,.03);
-  --prayer-card-border: rgba(139,38,53,.25);
-  --ambient-1: rgba(139,38,53,.04);
-  --ambient-2: rgba(184,148,72,.08);
-  --ambient-3: rgba(139,38,53,.03);
-  --ambient-bg: linear-gradient(180deg, #f7f4ed 0%, #f7f4ed 45%, #f2eee6 100%);
-  --noise-color:0.36, 0.29, 0.13;
-  --noise-opacity:.5;
-  --noise-blend:multiply;
-  --rank-text:#F6EAD2;
-}
+:root{--prayer-card-bg1: rgba(139,38,53,.09);--prayer-card-bg2: rgba(139,38,53,.03);--prayer-card-border: rgba(139,38,53,.25);--noise-color:0.36, 0.29, 0.13;--noise-opacity:.5;--noise-blend:multiply;}
 
 [data-theme="dark"]{
   --bg-deep:#0B1626;
@@ -65,23 +35,9 @@
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
 html{font-size:16px;}
 html,body{margin:0;padding:0;}
-body{
-  background:var(--bg-deep);
-  color:var(--text);
-  font-family:Georgia,'Times New Roman',serif;
-  min-height:100vh;
-  overflow-x:hidden;
-  transition:background .25s ease, color .25s ease;
-}
+body{background:var(--bg-deep);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .25s ease, color .25s ease;}
 
-#app{
-  position:relative;
-  max-width:560px;
-  margin:0 auto;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-}
+#app{position:relative;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
 
 /* ===== ambient background ===== */
 .ambient{position:fixed;inset:0;pointer-events:none;z-index:0;
@@ -101,40 +57,22 @@ body{
 }
 
 /* ===== header ===== */
-.topbar{
-  position:relative; z-index:2;
-  padding:22px 20px 16px;
-  border-bottom:1px solid var(--line);
-  background:linear-gradient(180deg, var(--topbar-bg1), var(--topbar-bg2));
-  backdrop-filter: blur(6px);
-}
-.topbar-inner{display:flex; align-items:center; gap:10px;}
+.topbar{z-index:2;border-bottom:1px solid var(--line);background:linear-gradient(180deg, var(--topbar-bg1), var(--topbar-bg2));backdrop-filter: blur(6px);}
+.topbar-inner{display:flex;align-items:center;}
 .topbar-text{ min-width:0; flex:1 1 auto; }
 .topbar-text .eyebrow, .topbar-text h1{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.crest{flex:none; width:38px; height:38px; display:flex; align-items:center; justify-content:center;}
-.crest img{width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 1px 2px rgba(47,43,39,.22));}
-.eyebrow{
-  margin:0 0 2px; font-family:Georgia,'Times New Roman',serif; font-size:10px; letter-spacing:.14em;
-  text-transform:uppercase; color:var(--wine-soft); font-weight:600;
-}
-.topbar h1{
-  margin:0; font-family:Georgia,'Times New Roman',serif; font-size:18px; font-weight:600;
-  color:var(--gold-soft); letter-spacing:.02em; line-height:1.15;
-}
+.crest{flex:none;display:flex;align-items:center;justify-content:center;}
+.crest img{object-fit:contain;filter:drop-shadow(0 1px 2px rgba(47,43,39,.22));}
+.eyebrow{margin:0 0 2px;font-family:Georgia,'Times New Roman',serif;letter-spacing:.14em;text-transform:uppercase;color:var(--wine-soft);font-weight:600;}
+.topbar h1{margin:0;font-family:Georgia,'Times New Roman',serif;font-weight:600;color:var(--gold-soft);letter-spacing:.02em;line-height:1.15;}
 .theme-toggle{
   flex:none; width:36px; height:36px; border-radius:50%;
   border:1px solid var(--line); background:var(--bg-panel); color:var(--gold-soft);
   display:flex; align-items:center; justify-content:center; cursor:pointer;
 }
-.header-controls{ margin-left:auto; display:flex; align-items:center; gap:6px; flex:none; }
-.font-toggle{
-  display:flex; align-items:center; border:1px solid var(--line); border-radius:20px;
-  overflow:hidden; background:var(--bg-panel);
-}
-.font-btn{
-  border:none; background:none; color:var(--gold-soft); cursor:pointer;
-  font-family:Georgia,'Times New Roman',serif; font-size:11px; font-weight:600; padding:8px 9px; line-height:1;
-}
+.header-controls{margin-left:auto;display:flex;align-items:center;flex:none;}
+.font-toggle{display:flex;align-items:center;border:1px solid var(--line);overflow:hidden;background:var(--bg-panel);}
+.font-btn{border:none;background:none;color:var(--gold-soft);cursor:pointer;font-family:Georgia,'Times New Roman',serif;font-size:11px;font-weight:600;line-height:1;}
 .font-btn:first-child{ border-right:1px solid var(--line); }
 .font-btn:active{ background:rgba(184,148,72,.14); }
 
@@ -172,28 +110,13 @@ body{
 [data-theme="dark"] .theme-toggle .icon-moon{ display:block; }
 
 /* ===== main view ===== */
-main#view{
-  position:relative; z-index:1;
-  flex:1;
-  padding:18px 18px 100px;
-}
+main#view{position:relative;z-index:1;flex:1;}
 
-.section-title{
-  font-family:Georgia,'Times New Roman',serif; font-size:0.75rem; letter-spacing:.15em; text-transform:uppercase;
-  color:var(--gold-soft); margin:26px 0 10px; padding-left:2px;
-}
+.section-title{font-family:Georgia,'Times New Roman',serif;letter-spacing:.15em;text-transform:uppercase;margin:26px 0 10px;padding-left:2px;}
 .section-title:first-child{margin-top:0;}
 
 /* ===== cards ===== */
-.card{
-  background:linear-gradient(180deg, var(--bg-panel-2), var(--bg-panel));
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:20px;
-  margin-bottom:16px;
-  box-shadow:var(--shadow);
-  position:relative;
-}
+.card{background:linear-gradient(180deg, var(--bg-panel-2), var(--bg-panel));border:1px solid var(--line);padding:20px;margin-bottom:16px;box-shadow:var(--shadow);position:relative;}
 .card::before{
   content:"";
   position:absolute; inset:0; border-radius:14px; padding:1px;
@@ -227,7 +150,7 @@ main#view{
 
 /* ---- saint of the day card ---- */
 .saint-card .rank{
-  display:inline-block; font-family:Georgia,'Times New Roman',serif; font-size:0.625rem; letter-spacing:.14em;
+  display:inline-block; font-family:Georgia,'Times New Roman',serif; font-size:11px; letter-spacing:.14em;
   text-transform:uppercase; color:var(--rank-text); background:var(--wine);
   padding:3px 9px; border-radius:20px; margin-bottom:10px; font-weight:600;
 }
@@ -260,15 +183,8 @@ main#view{
 }
 .toggle-btn.active{ background:rgba(184,148,72,.14); border-color:var(--gold); color:var(--gold-soft); }
 
-.prayer-block{
-  font-family:Georgia,'Times New Roman',serif; font-size:1.0625rem; line-height:1.72; color:var(--text);
-  white-space:normal;
-}
-.prayer-block .prayer-paragraph{
-  margin:0 0 1.15em;
-  line-height:1.72;
-  white-space:pre-wrap;
-}
+.prayer-block{font-family:Georgia,'Times New Roman',serif;font-size:1.0625rem;line-height:1.72;color:var(--text);white-space:normal;}
+.prayer-block .prayer-paragraph{margin:0 0 1.15em;line-height:1.72;white-space:pre-wrap;}
 .prayer-block .prayer-paragraph:last-child{ margin-bottom:0; }
 /* Liturgia das Horas: o espaço entre estrofes e salmos segue o modelo dos documentos litúrgicos fornecidos. */
 .prayer-block .prayer-paragraph + .prayer-paragraph{ margin-top:0.18em; }
@@ -280,7 +196,7 @@ main#view{
 .guided-crown-visual figcaption{ margin:9px 4px 0; color:var(--text-faint); font-size:.86rem; line-height:1.45; text-align:center; }
 @media(max-width:560px){ .guided-crown-visual{ padding:6px; } .guided-crown-visual img{ max-height:300px; } .guided-crown-visual figcaption{ font-size:.78rem; } }
 .guided-crown-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
-.guided-crown-kicker{ font-family:Georgia,'Times New Roman',serif; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); }
+.guided-crown-kicker{ font-family:Georgia,'Times New Roman',serif; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); }
 .guided-crown-progress{ height:6px; border-radius:999px; background:rgba(184,148,72,.14); overflow:hidden; margin:10px 0 18px; }
 .guided-crown-progress > span{ display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,var(--wine),var(--gold)); transition:width .45s ease; }
 .guided-crown-step{ animation:guidedCrownIn .42s ease both; }
@@ -289,21 +205,14 @@ main#view{
 .guided-crown-actions{ display:flex; justify-content:space-between; gap:10px; margin-top:20px; }
 .guided-crown-actions button{ flex:1; }
 .guided-crown-dot{ display:inline-flex; width:28px; height:28px; align-items:center; justify-content:center; border-radius:50%; background:rgba(184,148,72,.13); color:var(--wine); font-family:Georgia,'Times New Roman',serif; margin-right:8px; }
-.hour-tabs{
-  display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;
-  border-bottom:1px solid var(--line); padding-bottom:14px;
-}
-.hour-tab-btn{
-  min-height:42px; font-family:Georgia,'Times New Roman',serif; font-size:0.75rem; letter-spacing:.04em; text-transform:none;
-  color:var(--text-muted); background:var(--bg-panel); border:1px solid var(--line);
-  border-radius:12px; padding:9px 13px; cursor:pointer; transition:all .2s ease;
-}
+.hour-tabs{flex-wrap:wrap;gap:8px;margin-bottom:16px;border-bottom:1px solid var(--line);padding-bottom:14px;}
+.hour-tab-btn{font-family:Georgia,'Times New Roman',serif;font-size:0.75rem;letter-spacing:.04em;text-transform:none;color:var(--text-muted);background:var(--bg-panel);border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:all .2s ease;}
 .hour-tab-btn:hover,.hour-tab-btn:focus-visible{ color:var(--wine); border-color:var(--gold); outline:none; }
 .hour-tab-btn.active{
   color:#fff; background:#173b67; border-color:#173b67; font-weight:600;
 }
 .hour-tab-btn.small{ min-height:38px; font-size:0.7rem; padding:7px 10px; }
-.hour-tab-content{}
+
 .hour-sublabel{
   font-family:Georgia,'Times New Roman',serif; font-size:0.6875rem; letter-spacing:.08em; text-transform:uppercase;
   color:var(--text-faint); margin:12px 0 4px;
@@ -357,7 +266,7 @@ main#view{
 }
 .detail-header{ text-align:center; padding:6px 6px 22px; }
 .detail-header .rank{
-  display:inline-block; font-family:Georgia,'Times New Roman',serif; font-size:0.6562rem; letter-spacing:.16em;
+  display:inline-block; font-family:Georgia,'Times New Roman',serif; font-size:11px; letter-spacing:.16em;
   text-transform:uppercase; color:var(--wine); margin-bottom:10px; font-weight:600;
 }
 .detail-header h2{
@@ -383,12 +292,7 @@ main#view{
   font-family:Georgia,'Times New Roman',serif; font-size:0.6875rem; letter-spacing:.16em; text-transform:uppercase;
   color:var(--wine-soft); margin-bottom:10px;
 }
-.prayer-card .text{
-  font-family:Georgia,'Times New Roman',serif; font-style:normal; font-size:1.02rem; line-height:1.58; color:var(--text);
-  white-space:normal;
-  overflow-wrap:break-word;
-  word-break:normal;
-}
+.prayer-card .text{font-family:Georgia,'Times New Roman',serif;color:var(--text);overflow-wrap:break-word;word-break:normal;}
 
 /* ===== about ===== */
 .about-text{ font-size:1.0625rem; line-height:1.75; color:var(--paper); }
@@ -415,27 +319,15 @@ main#view{
 .social-link .social-sub{ font-size:0.8125rem; color:var(--text-muted); }
 
 /* ===== tabbar ===== */
-.tabbar{
-  position:fixed; left:0; right:0; bottom:0; z-index:5;
-  max-width:560px; margin:0 auto;
-  display:flex;
-  background:var(--tabbar-bg); backdrop-filter:blur(10px);
-  border-top:1px solid var(--line);
-  padding:8px 6px calc(8px + env(safe-area-inset-bottom));
-}
-.tab-btn{
-  flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;
-  background:none; border:none; color:var(--text-faint); cursor:pointer;
-  padding:6px 2px; font-family:Georgia,'Times New Roman',serif; font-size:10px; letter-spacing:.04em;
-}
-.tab-btn svg{ width:21px; height:21px; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
-.tab-btn.active{ color:var(--gold-soft); }
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;margin:0 auto;backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:8px 6px calc(8px + env(safe-area-inset-bottom));}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;color:var(--text-faint);cursor:pointer;padding:6px 2px;font-family:Georgia,'Times New Roman',serif;letter-spacing:.04em;}
+.tab-btn svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+
 .tab-btn.active svg{ fill:rgba(184,148,72,.16); }
 
 /* ===== fade transition ===== */
 .fade-in{ animation:fadeIn .28s ease; }
 @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
-
 
 /* ===== Harmonização visual com Liturgia OSM ===== */
 :root{
@@ -458,9 +350,9 @@ main#view{
 body{font-family:Georgia,'Times New Roman',serif;}
 .eyebrow,.topbar h1,.section-title,.settings-label,.font-btn,.tab-btn,.chip{font-family:Georgia,'Times New Roman',serif;}
 .topbar{position:sticky;top:0;padding:14px 16px 12px;}
-.topbar h1{font-size:17px}.eyebrow{font-size:9px}.topbar-inner{gap:11px}.crest{width:30px;height:30px}.crest img{width:30px;height:30px}
-main#view{padding:14px 18px 100px}.card{border-radius:14px}.section-title{font-size:.72rem;color:var(--text-faint)}
-.tabbar{background:var(--tabbar-bg);padding-left:2px;padding-right:2px}.tab-btn{font-size:9.5px}.tab-btn svg{width:19px;height:19px}.tab-btn.active{color:var(--gold-soft)}
+.topbar h1{font-size:17px}.eyebrow{font-size:11px}.topbar-inner{gap:11px}.crest{width:30px;height:30px}.crest img{width:30px;height:30px}
+main#view{padding:14px 18px 100px;}.card{border-radius:14px;}.section-title{font-size:.72rem;color:var(--text-faint)}
+.tabbar{background:var(--tabbar-bg);padding-left:2px;padding-right:2px;}.tab-btn{font-size:11px;}.tab-btn svg{width:19px;height:19px}.tab-btn.active{color:var(--gold-soft)}
 .theme-toggle,.settings-btn,.home-return{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--bg-panel);color:var(--gold-soft);display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:Georgia,'Times New Roman',serif;font-size:15px}
 .home-return:active,.theme-toggle:active,.settings-btn:active{transform:scale(.96);background:rgba(184,148,72,.12)}
 .font-toggle{border-radius:9px}.font-btn{padding:8px 8px}.header-controls{gap:6px}
@@ -468,8 +360,8 @@ main#view{padding:14px 18px 100px}.card{border-radius:14px}.section-title{font-s
 .primary-btn,.back-btn,.btn-link{font-family:Georgia,'Times New Roman',serif}
 @media(max-width:380px){.home-return{display:flex}.topbar h1{font-size:16px}}
 
-html,body{background:transparent!important} .topbar{display:none!important} .tabbar{display:none!important}
-#app{padding-top:0!important} main#view{padding-top:12px!important;padding-bottom:24px!important;min-height:auto!important}
+html,body{background:transparent!important;} .topbar{display:none!important} .tabbar{display:none!important;}
+#app{padding-top:0!important;} main#view{padding-top:12px!important;padding-bottom:24px!important;min-height:auto!important}
 
 /* id="directOfficeMode470" */
 body.direct-office-view .detail-header,
@@ -480,9 +372,9 @@ body.direct-office-view .section-title,
 body.direct-office-view .back-btn,
 body.direct-office-view .hour-tabs,
 body.direct-office-view .btn-link[onclick="toggleOficio()"]{display:none!important}
-body.direct-office-view main#view{padding-top:0!important}
-body.direct-office-view .card{margin-top:0!important}
-body.direct-office-view .hour-tab-content{padding-top:0!important}
+body.direct-office-view main#view{padding-top:0!important;}
+body.direct-office-view .card{margin-top:0!important;}
+body.direct-office-view .hour-tab-content{padding-top:0!important;}
 body.direct-office-view .prayer-block{margin-top:0!important}
 
 /* id="leitorServitaCanonico4912" */
@@ -538,7 +430,6 @@ body.direct-office-view .hour-tab-content{padding:0!important;border:0!important
 .prayer-block .prayer-paragraph{text-align:center}
 .today-servita-reader .reading-ref,.today-servita-reader .reading-title,.today-servita-reader .reading-body{text-align:center}
 @media(min-width:480px){.office-hours-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}}
-
 
 /* id="regraFloatingBack486" */
 .regra-floating-back{

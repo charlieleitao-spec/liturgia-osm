@@ -3,7 +3,7 @@ import path from 'node:path';
 import assert from 'node:assert/strict';
 
 const santoral = JSON.parse(fs.readFileSync('www/data/santoral.json', 'utf8'));
-const fontes = JSON.parse(fs.readFileSync('www/data/fontes-imagens-santoral-lote4.json', 'utf8'));
+const fontes = JSON.parse(fs.readFileSync('docs/dados-apoio/data/fontes-imagens-santoral-lote4.json', 'utf8'));
 for (const [title, filename] of [
   ['Joaquim de Sena', 'joaquim-de-sena.webp'],
   ['Tiago Filipe de Faenza', 'tiago-filipe-de-faenza.webp'],
@@ -24,7 +24,7 @@ for (const [title, filename] of [
   console.log('Imagem, referência e créditos válidos:', title);
 }
 
-const fontesLavello = JSON.parse(fs.readFileSync('www/data/fontes-imagens-santoral-lote5.json', 'utf8'));
+const fontesLavello = JSON.parse(fs.readFileSync('docs/dados-apoio/data/fontes-imagens-santoral-lote5.json', 'utf8'));
 for (const [title, filename] of [
   ['Francisco de Sena', 'francisco-de-sena.webp'],
   ['Boaventura de Pistoia', 'boaventura-de-pistoia.webp'],
