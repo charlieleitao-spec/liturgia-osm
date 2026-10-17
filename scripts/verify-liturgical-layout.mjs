@@ -5,7 +5,7 @@ import {spawn} from 'node:child_process';
 const out='validation-layout';await mkdir(out,{recursive:true});
 const server=spawn('python3',['-m','http.server','8766','--directory','www'],{stdio:'ignore'});
 const browser=await chromium.launch({executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
-const context=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block'});
+const context=await browser.newContext({viewport:{width:390,height:844},timezoneId:'America/Sao_Paulo',serviceWorkers:'block'});
 const page=await context.newPage();
 const report=[];
 try{
@@ -142,12 +142,41 @@ try{
     goCalendarToday();return checked;
   });
   report.push({calendarCategories});
+  const monthAgenda=await page.evaluate(()=>{
+    calDate=new Date(2026,9,1);selectedCalDate=null;render();
+    const expected=SANTORAL.filter(s=>s.month===10).length;
+    if(document.querySelectorAll('.calendar-month-entry').length!==expected)throw Error('Monthly agenda omitted celebrations');
+    if(!document.querySelector('.calendar-santoral-index')||document.querySelector('.calendar-santoral-index').open)throw Error('Full Santoral should start collapsed');
+    if([...document.querySelectorAll('.cal-head')].map(n=>n.textContent).join(',')!=='Dom,Seg,Ter,Qua,Qui,Sex,Sáb')throw Error('Weekday labels');
+    calDate=new Date(2028,1,1);selectedCalDate=null;render();
+    if(document.querySelectorAll('button.cal-day').length!==29)throw Error('Leap year');
+    calDate=new Date(2026,9,1);render();return {monthlyCelebrations:expected,leapYear:true};
+  });
+  report.push({monthAgenda});
+  await page.locator('.calendar-santoral-index summary').click();
+  const search=page.getByRole('searchbox',{name:'Buscar no Santoral'});
+  await search.fill('Filipe');
+  assert.equal(await search.inputValue(),'Filipe');
+  assert.equal(await search.evaluate(el=>el===document.activeElement),true);
+  assert.notEqual(await page.locator('.calendar-santoral-index').getAttribute('open'),null);
+  await search.fill('');
+  await page.locator('.calendar-santoral-index summary').click();
+  await page.locator('.calendar-month-entry').first().click();
+  assert.equal(await page.evaluate(()=>state.detailId!==null),true);
+  await page.evaluate(()=>{state.detailId=null;setTab('calendario');goCalendarToday();});
   report.push({calendarChecks});
   await page.setViewportSize({width:390,height:844});
   await page.evaluate(()=>{scrollTo(0,0);lightMode=false;applyPreferences();});
   await page.screenshot({path:out+'/calendario-dark.png',animations:'disabled'});
   await page.evaluate(()=>{lightMode=true;applyPreferences();});
   await page.screenshot({path:out+'/calendario-light.png',animations:'disabled'});
+  for(const [width,month,name] of [[320,8,'setembro'],[390,7,'agosto']]){
+    await page.setViewportSize({width,height:844});
+    await page.evaluate(m=>{calDate=new Date(2026,m,1);selectedCalDate=null;render();scrollTo(0,0);},month);
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+    await page.screenshot({path:out+`/calendario-${name}-${width}.png`,animations:'disabled'});
+  }
+
 
   await page.evaluate(()=>{state.detailId=null;state.tab='hoje';render();});
   for(const light of [false,true]){

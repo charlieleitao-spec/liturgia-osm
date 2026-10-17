@@ -24,7 +24,7 @@ for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data
 assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
-assert.match(app, /const APP_VERSION = ['"]4\.9\.97['"]/);
+assert.match(app, /const APP_VERSION = ['"]4\.9\.98['"]/);
 assert.match(app, /section-title home-heading/);
 assert.match(app, /onclick="openDailyLiturgy/);
 assert.doesNotMatch(app, /MAIN_I18N|MAIN_LANG|applyMainLanguage|openLanguagePanel|closeLanguagePanel|setMainLanguage|languageOverlay/);
@@ -35,13 +35,13 @@ assert.match(app, /Consultar Missa desta data/);
 assert.doesNotMatch(app, /onclick="closeMainMenu\(\);openDailyLiturgy\(\)">Missa do dia/);
 assert.doesNotMatch(app, /menu-nav-grid|Encontrar uma celebração|Aplicativo disponível|offline-note/);
 assert.doesNotMatch(app, /hub-block-title\">Navegação/);
-assert.match(workflow, /Build APK Liturgia OSM 4\.9\.97/);
-assert.match(workflow, /versionCode 41001/);
+assert.match(workflow, /Build APK Liturgia OSM 4\.9\.98/);
+assert.match(workflow, /versionCode 41002/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
 assert.doesNotMatch(css,/\.topbar-tools \.tool-btn:first-child\{display:none\}/,'O menu deve permanecer visível em telas estreitas.');
 assert.doesNotMatch(serviteCss,/Cinzel|EB Garamond|Cormorant Garamond|system-ui,-apple-system,sans-serif/,'Fontes da interface e recursos servitas devem estar harmonizadas.');
-assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.97-calendario-sem-filtros/);
+assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.98-calendario-apresentacao/);
 assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
 
@@ -277,11 +277,11 @@ const calendarStart = app.indexOf('function viewCalendario(){');
 const calendarEnd = app.indexOf('function resolveStored', calendarStart);
 const calendarView = app.slice(calendarStart, calendarEnd);
 for (const part of ['calendar-month-select', 'calendar-toolbar', 'calendar-grid']) assert.ok(calendarView.includes(part), 'Calendário/Santoral incompleto: ' + part);
-assert.ok(!calendarView.includes('Celebrações do mês'), 'A lista mensal repetida deve sair.');
+assert.ok(calendarView.includes('calendar-month-agenda'), 'O calendário deve apresentar as celebrações do mês.');
 
-assert.ok(calendarView.includes('${viewSantoralIndex()}'), 'O Santoral visual deve aparecer depois do calendário.');
+assert.ok(calendarView.includes('calendar-santoral-index') && calendarView.includes('${viewSantoralIndex(false)}'), 'O Santoral completo deve permanecer disponível em consulta recolhível, sem duplicar a agenda mensal.');
 
-assert.ok(app.includes('function viewSantoralIndex()'));
+assert.ok(app.includes('function viewSantoralIndex(showTitle=true)'));
 assert.ok(app.includes('data-live-search="santoral'), 'A busca precisa permanecer no Santoral.');
 assert.ok(app.includes('alpha-index') && app.includes('Santoral</div>'), 'O índice visual do Santoral deve ser mantido.');
 assert.ok(app.includes('function liveCalendarSearch(input)'));

@@ -304,7 +304,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.97';
+const APP_VERSION = '4.9.98';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1160,6 +1160,7 @@ document.querySelectorAll('.tab-btn').forEach(b=>{
 // ===================== Liturgia OSM 4.2 =====================
 let calDate = new Date();
 let selectedCalDate = null;
+let calendarIndexOpen = false;
 let calendarSearch = '';
 let prayerCategory = null;
 const FAV_KEY='osmFavoritesV4', RECENT_KEY='osmRecentV4';
@@ -1218,7 +1219,7 @@ function liveCalendarSearch(input){
     if(next){next.focus({preventScroll:true});try{next.setSelectionRange(start,end);}catch(e){}}
   });
 }
-function viewSantoralIndex(){
+function viewSantoralIndex(showTitle=true){
   const letters=[...new Set(SANTORAL.map(s=>String(s.title||'').replace(/^(SANTO|SANTA|B\.|BEATO|BEATA)\s+/i,'').trim()[0]?.toLocaleUpperCase('pt-BR')).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
   const alpha=state.alpha||'';
   const query=String(state.search||'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR');
@@ -1228,20 +1229,32 @@ function viewSantoralIndex(){
     return (!query||hay.includes(query))&&(!alpha||name.startsWith(alpha));
   });
   const rows=list.map(s=>`<div class="saint-row" onclick="openSaint(${s._id})">${saintImageHtml(s,false)}<div class="daynum">${s.day}</div><div class="rowtext"><div class="rowtitle">${celebrationNameHtml(s.title,s)}</div><div class="rowrank">${escapeHtml(celebrationSubtitle(s))}</div></div><div class="chev">›</div></div>`).join('');
-  return `<div class="section-title">Santoral</div><div class="search-wrap"><input class="search-input" type="search" data-live-search="santoral" placeholder="Buscar santo, beato ou data…" value="${escapeHtml(state.search||'')}" oninput="liveSearchRender('santoral',this)" aria-label="Buscar no Santoral"></div><div class="alpha-index"><button class="alpha-btn ${!alpha?'active':''}" onclick="state.alpha='';render()" aria-label="Todas as letras">•</button>${letters.map(l=>`<button class="alpha-btn ${alpha===l?'active':''}" onclick="state.alpha='${l}';render()">${l}</button>`).join('')}</div>${list.length?`<div class="card fade-in" style="padding:6px 16px;">${rows}</div>`:'<div class="empty-state">Nenhum nome encontrado.</div>'}`;
+  return `${showTitle?'<div class="section-title">Santoral</div>':''}<div class="search-wrap"><input class="search-input" type="search" data-live-search="santoral" placeholder="Buscar santo, beato ou data…" value="${escapeHtml(state.search||'')}" oninput="liveSearchRender('santoral',this)" aria-label="Buscar no Santoral"></div><div class="alpha-index"><button class="alpha-btn ${!alpha?'active':''}" onclick="state.alpha='';render()" aria-label="Todas as letras">•</button>${letters.map(l=>`<button class="alpha-btn ${alpha===l?'active':''}" onclick="state.alpha='${l}';render()">${l}</button>`).join('')}</div>${list.length?`<div class="card fade-in" style="padding:6px 16px;">${rows}</div>`:'<div class="empty-state">Nenhum nome encontrado.</div>'}`;
 }
 function viewCalendario(){
   const y=calDate.getFullYear(),m=calDate.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),today=new Date();
+  const monthSaints=SANTORAL.filter(s=>s.month===m+1).sort((a,b)=>a.day-b.day);
+  const weekdays=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
   let cells='';
-  for(let i=0;i<first;i++)cells+='<div class="cal-day empty"></div>';
+  for(let i=0;i<first;i++)cells+='<div class="cal-day empty" aria-hidden="true"></div>';
   for(let d=1;d<=days;d++){
-    const ss=SANTORAL.filter(s=>s.month===m+1&&s.day===d),isT=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d,isSel=selectedCalDate&&selectedCalDate.getFullYear()===y&&selectedCalDate.getMonth()===m&&selectedCalDate.getDate()===d;
-    cells+=`<button class="cal-day ${ss.length?'has-feast':''} ${isT?'today':''} ${isSel?'selected':''}" onclick="selectCalendarDay(${y},${m},${d})" aria-label="${d} de ${MONTHS[m]}${ss.length?', com celebração OSM':''}">${d}${ss.length?'<span class="cal-dot"></span>':''}</button>`;
+    const ss=monthSaints.filter(s=>s.day===d),isT=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d,isSel=selectedCalDate&&selectedCalDate.getFullYear()===y&&selectedCalDate.getMonth()===m&&selectedCalDate.getDate()===d;
+    cells+=`<button class="cal-day ${ss.length?'has-feast':''} ${isT?'today':''} ${isSel?'selected':''}" onclick="selectCalendarDay(${y},${m},${d})" aria-pressed="${!!isSel}" ${isT?'aria-current="date"':''} aria-label="${d} de ${MONTHS[m]}${ss.length?', '+ss.map(s=>escapeHtml(s.title)).join('; '):''}"><span class="cal-number">${d}</span>${ss.length?'<span class="cal-dot" aria-hidden="true"></span>':''}</button>`;
   }
   let dayBlock='';
-  if(selectedCalDate&&selectedCalDate.getFullYear()===y&&selectedCalDate.getMonth()===m){const d=selectedCalDate.getDate(),selected=SANTORAL.filter(s=>s.month===m+1&&s.day===d);dayBlock=`<div class="section-title">${d} de ${MONTHS[m]}</div>${selected.length?`<div class="card fade-in" style="padding:6px 16px;">${selected.map(calendarCelebrationRow).join('')}</div>`:'<div class="empty-state">Não há celebração OSM neste dia.</div>'}`;}
-  return `<section class="calendar-simple" aria-label="Calendário de celebrações"><div class="calendar-toolbar"><button class="cal-nav" onclick="calDate=new Date(${y},${m-1},1);selectedCalDate=null;render()" aria-label="Mês anterior">‹</button><select class="calendar-month-select" aria-label="Selecionar mês" onchange="setCalendarMonth(this.value)">${MONTHS.map((n,i)=>`<option value="${i}" ${i===m?'selected':''}>${n[0].toUpperCase()+n.slice(1)} ${y}</option>`).join('')}</select><button class="cal-nav" onclick="calDate=new Date(${y},${m+1},1);selectedCalDate=null;render()" aria-label="Próximo mês">›</button><button class="today-chip" onclick="goCalendarToday()">Hoje</button></div><div class="calendar-grid">${['D','S','T','Q','Q','S','S'].map(x=>`<div class="cal-head">${x}</div>`).join('')}${cells}</div></section>${dayBlock}${viewSantoralIndex()}`;
+  if(selectedCalDate&&selectedCalDate.getFullYear()===y&&selectedCalDate.getMonth()===m){
+    const d=selectedCalDate.getDate(),selected=monthSaints.filter(s=>s.day===d);
+    const dateLabel=selectedCalDate.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+    dayBlock=`<section class="calendar-selection" aria-label="Dia selecionado"><h2>${escapeHtml(dateLabel)}</h2>${selected.length?`<div class="calendar-selected-entries">${selected.map(calendarCelebrationRow).join('')}</div>`:'<p>Sem celebração própria OSM neste dia.</p>'}</section>`;
+  }
+  const monthRows=monthSaints.map(s=>{
+    const weekday=weekdays[new Date(y,m,s.day).getDay()];
+    return `<a class="calendar-month-entry" href="?celebracao=${s._id}" onclick="event.preventDefault();openSaint(${s._id})"><time datetime="${y}-${String(m+1).padStart(2,'0')}-${String(s.day).padStart(2,'0')}"><b>${String(s.day).padStart(2,'0')}</b><small>${weekday}</small></time><span class="calendar-entry-name">${celebrationNameHtml(s.title,s)}<small>${escapeHtml(celebrationGradeLabel(s.grau))}</small></span><span class="calendar-entry-arrow" aria-hidden="true">›</span></a>`;
+  }).join('');
+  const indexOpen=calendarIndexOpen||state.tab==='santoral'||!!(state.search||state.alpha);
+  return `<section class="calendar-simple calendar-presented" aria-label="Calendário de celebrações"><div class="calendar-toolbar"><button class="cal-nav" onclick="calDate=new Date(${y},${m-1},1);selectedCalDate=null;render()" aria-label="Mês anterior">‹</button><select class="calendar-month-select" aria-label="Selecionar mês" onchange="setCalendarMonth(this.value)">${MONTHS.map((n,i)=>`<option value="${i}" ${i===m?'selected':''}>${n[0].toUpperCase()+n.slice(1)} ${y}</option>`).join('')}</select><button class="cal-nav" onclick="calDate=new Date(${y},${m+1},1);selectedCalDate=null;render()" aria-label="Próximo mês">›</button><button class="today-chip" onclick="goCalendarToday()">Hoje</button></div><div class="calendar-grid">${weekdays.map(x=>`<div class="cal-head">${x}</div>`).join('')}${cells}</div><div class="calendar-key"><span aria-hidden="true"></span>Celebração OSM</div></section>${dayBlock}<section class="calendar-month-agenda" aria-label="Celebrações do mês"><div class="calendar-agenda-heading"><h2>Neste mês</h2><span>${monthSaints.length} ${monthSaints.length===1?'celebração':'celebrações'}</span></div>${monthRows||'<p class="calendar-month-empty">Sem celebrações próprias OSM neste mês.</p>'}</section><details class="calendar-santoral-index" ${indexOpen?'open':''}><summary onclick="calendarIndexOpen=!this.parentElement.open">Consultar todo o Santoral</summary>${viewSantoralIndex(false)}</details>`;
 }
+
 function resolveStored(k){let [type,key]=k.split(':');if(type==='saint'){let s=SANTORAL.find(x=>String(x._id)===key);if(s)return {kind:'Santoral',title:s.title,sub:s.date,action:`openSaint(${s._id})`}}else{let p=allPrayerEntries().find(x=>x.key===key);if(p)return {kind:'Oração',title:p.title,sub:p.sub,action:prayerActionForKey(key)}}return null}
 function prayerActionForKey(key){
  if(key==='daily-anjo') return "openDailyPrayer480('anjo')";
