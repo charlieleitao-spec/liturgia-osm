@@ -33,6 +33,7 @@ try{
       await fits(page,'.about-text,.credit-list,.social-link,.social-label,.social-sub');
       if(theme==='light'&&(width===390&&scale===1||width===320&&scale===2)){
         await page.evaluate(()=>window.scrollTo(0,0));
+        await page.waitForFunction(()=>[...document.querySelectorAll('.fade-in')].every(n=>Number(getComputedStyle(n).opacity)>.999));
         await page.screenshot({path:`validation-layout/sobre-fontes-${width}-${scale}.png`,fullPage:true});
       }
       await page.evaluate(()=>setTab('vida'));
