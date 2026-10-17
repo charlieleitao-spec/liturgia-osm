@@ -184,6 +184,12 @@ try{
     for(const width of [320,390,768]){
       await page.setViewportSize({width,height:844});
       assert.equal(await page.locator('.home-end-ornament').count(),1);
+      const headerGold=await page.locator('.brand-tag').evaluate(el=>({color:getComputedStyle(el).color,background:getComputedStyle(el).backgroundColor}));
+      assert.equal(headerGold.color,'rgb(184, 148, 72)');
+      assert.equal(headerGold.background,'rgba(0, 0, 0, 0)');
+      const ornamentSize=await page.locator('.home-end-ornament').boundingBox();
+      assert.ok(Math.abs(ornamentSize.width/ornamentSize.height-720/136)<.02);
+
       const emblem=await page.locator('.home-hero').evaluate(el=>{
         const before=getComputedStyle(el,'::before'),after=getComputedStyle(el,'::after');
         return {circle:before.content,emblem:after.backgroundImage};
