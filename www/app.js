@@ -304,7 +304,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.103';
+const APP_VERSION = '4.9.105';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1433,9 +1433,11 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
     <div class="menu-section"><div class="menu-label">Leitura</div><div class="menu-row"><button class="menu-action" onclick="adjustFont(-0.08)" aria-label="Diminuir tamanho do texto">A−</button><span class="reader-scale-value" role="status" aria-label="Tamanho do texto">100%</span><button class="menu-action" onclick="adjustFont(0.08)" aria-label="Aumentar tamanho do texto">A+</button><button class="menu-action" onclick="resetFont()" aria-label="Restaurar tamanho padrão do texto">Padrão</button></div><button class="menu-action menu-wide menu-theme" aria-label="Tema escuro" aria-pressed="false" onclick="toggleTheme()">☼ / ☾ Alternar tema claro ou escuro</button></div>
     <div class="menu-section"><div class="menu-label">Ordem Secular</div><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('regra')">Regra de Vida da OSSM</button></div>
     <div class="menu-section"><div class="menu-label">Biblioteca</div><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('biblioteca')">Favoritos e recentes</button></div>
+    <div id="reminderSettings" class="menu-section" hidden><div class="menu-label">Lembrete de celebrações</div><label class="menu-row"><input id="reminderEnabled" type="checkbox" role="switch" disabled> Ativar lembrete</label><label class="menu-row" for="reminderTime">Horário <input id="reminderTime" type="time" value="07:00" required disabled></label><p id="reminderStatus" role="status">Desligado. Apenas nos dias com celebração própria.</p></div>
     <div class="menu-section"><div class="menu-label">Sobre</div><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('sobre')">Sobre, créditos e redes sociais</button></div>
     <div class="menu-section"><div class="menu-status"><span class="connection-dot"></span><span>Versão ${APP_VERSION} · Missa e Ofício próprios OSM disponíveis offline</span></div></div>`;
 
+  try{window.OSMReminders?.init();}catch(error){console.warn('[Lembrete OSM] Inicialização indisponível.',error);const status=document.getElementById('reminderStatus');if(status)status.textContent='Lembrete indisponível. Feche e abra o aplicativo para tentar novamente.';}
   window.addEventListener('online',()=>{if(state.tab==='hoje')render();});
   window.addEventListener('offline',()=>{if(state.tab==='hoje')render();});
   applyPreferences(); render();
@@ -1570,6 +1572,7 @@ async function loadCanonicalSantoral(){
     const requestedCelebration=new URLSearchParams(window.location.search).get('celebracao');
     if(requestedCelebration!==null&&SANTORAL.some(item=>Number(item.id)===Number(requestedCelebration))){state.tab='santoral';state.detailOriginTab='santoral';state.detailId=Number(requestedCelebration);}
     santoralReady=true;
+    window.OSMReminders?.setData(SANTORAL,id=>{closeMainMenu();openDetail(id);});
   }catch(error){
     santoralReady=false;
     santoralLoadError=true;

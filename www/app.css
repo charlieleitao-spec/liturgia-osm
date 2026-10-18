@@ -1174,3 +1174,9 @@ body:has(.calendar-simple){scroll-padding-bottom:calc(110px + env(safe-area-inse
   #view .calendar-presented .calendar-toolbar{grid-template-columns:44px minmax(0,1fr) 44px;gap:4px}
   #view .calendar-presented .today-chip{grid-column:1/-1;justify-self:end}
 }
+
+#reminderSettings[hidden]{display:none}
+#reminderSettings label{min-height:48px;gap:12px}
+#reminderTime{font:inherit;color:inherit;background:transparent;min-height:48px;max-width:150px}
+#reminderEnabled{width:24px;height:24px}
+#reminderStatus{font-size:0.9em;line-height:1.5}

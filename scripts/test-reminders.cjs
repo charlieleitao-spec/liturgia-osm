@@ -1,0 +1,36 @@
+const assert=require('node:assert/strict');
+const {buildNotifications}=require('../www/reminders.js');
+const saints=require('../www/data/santoral.json');
+const january=buildNotifications(saints,'07:00',new Date(2026,0,1));
+assert.match(january.find(n=>n.extra.celebrationId===1).body,/^Beato Tiago/);
+assert.equal(january.filter(n=>n.schedule.at.getMonth()===2).length,0);
+const september=buildNotifications(saints,'07:00',new Date(2026,8,1));
+assert.match(september.find(n=>n.schedule.at.getDate()===15&&n.schedule.at.getMonth()===8).body,/^Nossa Senhora das Dores/);
+for(const n of [...january,...september]){assert.equal(n.isExactNotification,false);assert.equal(n.schedule.at.getHours(),7);assert.ok(Number.isInteger(n.extra.celebrationId));}
+const sample={id:0,month:12,day:31,title:'Teste',categoria:'beato',grau:'memoria',exibir_selo:false};
+assert.equal(buildNotifications([sample],'07:00',new Date(2026,11,31,8)).length,0);
+assert.equal(buildNotifications([sample],'07:00',new Date(2026,11,1))[0].body,'Teste · Memória');
+assert.ok(buildNotifications(saints,'07:00',new Date(2026,11,20)).some(n=>n.schedule.at.getFullYear()===2027));
+assert.throws(()=>buildNotifications(saints,'25:00'));
+console.log('Lembretes: datas, texto, virada do ano, selo e agendamento inexato OK.');
+const vm=require('node:vm'),fs=require('node:fs');
+(async()=>{
+ const elements=Object.fromEntries(['reminderSettings','reminderEnabled','reminderTime','reminderStatus'].map(id=>[id,{addEventListener(type,fn){this.handler=fn;}}]));
+ let requests=0,scheduled=[],cancelled=[],listeners={},storage={},opened=null,permission='granted';
+ const plugin={async getPending(){return {notifications:scheduled}},async cancel({notifications}){cancelled.push(...notifications);scheduled=[]},async checkPermissions(){return {display:permission}},async requestPermissions(){requests++;return {display:permission}},async createChannel(){},async schedule({notifications}){scheduled=notifications},addListener(type,fn){listeners[type]=fn;return {remove:async()=>{}}}};
+ const root={document:{getElementById:id=>elements[id]},Capacitor:{getPlatform:()=> 'android'},confirm:()=>true};
+ const context={window:root,document:root.document,console,localStorage:{getItem:k=>storage[k],setItem:(k,v)=>storage[k]=v},getCapacitorPlugin:()=>plugin};
+ vm.runInNewContext(fs.readFileSync('www/reminders.js','utf8'),context);
+ const tick=()=>new Promise(resolve=>setImmediate(resolve));
+ root.OSMReminders.init();
+ listeners.localNotificationActionPerformed({notification:{extra:{source:'osmDailyReminder',celebrationId:0}}});
+ root.OSMReminders.setData(saints,id=>opened=id);await tick();
+ assert.equal(opened,0);assert.equal(requests,0);assert.equal(scheduled.length,0);assert.equal(elements.reminderEnabled.checked,false);
+ await elements.reminderEnabled.handler({target:{checked:true}});await tick();
+ assert.equal(requests,1);assert.equal(elements.reminderEnabled.checked,true);
+ await elements.reminderEnabled.handler({target:{checked:false}});await tick();
+ assert.equal(scheduled.length,0);assert.equal(elements.reminderEnabled.checked,false);
+ permission='denied';await elements.reminderEnabled.handler({target:{checked:true}});await tick();
+ assert.equal(elements.reminderEnabled.checked,false);assert.equal(scheduled.length,0);
+ console.log('Ciclo com plugin simulado: padrão desligado, permissão, cancelamento, recusa e toque antes dos dados OK.');
+})().catch(e=>{console.error(e);process.exitCode=1});

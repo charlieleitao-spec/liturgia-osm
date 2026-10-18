@@ -1,17 +1,18 @@
 {
   "name": "liturgia-osm",
-  "version": "4.9.103",
+  "version": "4.9.105",
   "private": true,
   "scripts": {
     "android:add": "npx cap add android",
     "sync": "npx cap sync android",
-    "test": "node scripts/audit-servita-base.mjs && node scripts/audit-navigation.mjs && node scripts/check-image-sizes.mjs && node scripts/audit-historical-santoral-images.mjs"
+    "test": "node scripts/audit-servita-base.mjs && node scripts/audit-navigation.mjs && node scripts/check-image-sizes.mjs && node scripts/audit-historical-santoral-images.mjs && node scripts/test-reminders.cjs"
   },
   "dependencies": {
     "@capacitor/android": "8.5.1",
     "@capacitor/app": "8.1.2",
     "@capacitor/browser": "8.0.2",
-    "@capacitor/core": "8.5.1"
+    "@capacitor/core": "8.5.1",
+    "@capacitor/local-notifications": "8.3.1"
   },
   "devDependencies": {
     "@capacitor/cli": "8.5.1"
