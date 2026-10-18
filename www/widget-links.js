@@ -10,8 +10,8 @@
  function flush(){if(open&&ids.has(pending)){const id=pending;pending=null;open(id);}}
  root.OSMWidgetLinks={
    setData(saints,callback){ids=new Set(saints.map(s=>Number(s.id)));open=callback;flush();},
-   init(){if(started||root.Capacitor?.getPlatform?.()!=='android')return;started=true;
-     const app=root.Capacitor?.Plugins?.App;if(!app)return;
+   init(){if(started||root.Capacitor?.getPlatform?.()!=='android')return;
+     const app=getCapacitorPlugin('App');if(!app)return;started=true;
      try{Promise.resolve(app.addListener('appUrlOpen',e=>receive(e.url))).catch(console.warn);
        Promise.resolve(app.getLaunchUrl()).then(e=>{if(e?.url)receive(e.url);}).catch(console.warn);
      }catch(error){console.warn('[Widget OSM]',error);}
