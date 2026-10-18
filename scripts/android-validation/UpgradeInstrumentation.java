@@ -92,7 +92,7 @@ public final class UpgradeInstrumentation extends Instrumentation {
                     if("true".equals(evaluate("state.detailId===23"))){opened=true;break;}
                     Thread.sleep(500);
                 }
-                if(!opened)throw new Exception("Widget intent did not open the celebration: " + evaluate("JSON.stringify({probe:window.widgetProbe,detail:state.detailId,ready:santoralReady,widget:typeof window.OSMWidgetLinks,source:window.OSMWidgetLinks?.init.toString()})"));
+                if(!opened)throw new Exception("Widget intent did not open the celebration: " + evaluate("JSON.stringify({probe:window.widgetProbe,detail:state.detailId,ready:santoralReady,widget:typeof window.OSMWidgetLinks,diagnostics:window.OSMWidgetLinks?.diagnostics(),parsed:(()=>{try{const u=new URL('liturgiaosm://celebracao/23');return [u.protocol,u.hostname,u.pathname]}catch(e){return String(e)}})()})"));
                 String controls = evaluate("(()=>{const t=document.getElementById('reminderEnabled');return !!t && !t.disabled && !t.checked && !document.getElementById('reminderSettings').hidden})()");
                 if (!"true".equals(controls)) throw new Exception("Reminder controls not ready: " + evaluate("document.body.innerText"));
                 // Native plugin on the signed APK; Android permission granted by the test shell.
