@@ -304,7 +304,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.105';
+const APP_VERSION = '4.9.106';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1572,6 +1572,7 @@ async function loadCanonicalSantoral(){
     const requestedCelebration=new URLSearchParams(window.location.search).get('celebracao');
     if(requestedCelebration!==null&&SANTORAL.some(item=>Number(item.id)===Number(requestedCelebration))){state.tab='santoral';state.detailOriginTab='santoral';state.detailId=Number(requestedCelebration);}
     santoralReady=true;
+    window.OSMWidgetLinks?.setData(SANTORAL,id=>{closeMainMenu();openDetail(id);});
     window.OSMReminders?.setData(SANTORAL,id=>{closeMainMenu();openDetail(id);});
   }catch(error){
     santoralReady=false;
@@ -1601,6 +1602,7 @@ async function loadCanonicalOffices(){
   render();
 }
 window.loadCanonicalOffices=loadCanonicalOffices;
+window.OSMWidgetLinks?.init();
 loadCanonicalSantoral();
 /* END SCRIPT BLOCK: canonicalSantoral495 */
 
