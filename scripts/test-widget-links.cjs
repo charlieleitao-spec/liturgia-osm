@@ -1,8 +1,9 @@
 const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
 (async()=>{
  let listener,opened=[];
- const window={Capacitor:{getPlatform:()=> 'android',Plugins:{App:{addListener:(name,fn)=>{listener=fn;return {remove(){}};},getLaunchUrl:async()=>({url:'liturgiaosm://celebracao/23'})}}}};
- vm.runInNewContext(fs.readFileSync('www/widget-links.js','utf8'),{window,URL,console});
+ const app={addListener:(name,fn)=>{listener=fn;return {remove(){}};},getLaunchUrl:async()=>({url:'liturgiaosm://celebracao/23'})};
+ const window={Capacitor:{getPlatform:()=> 'android',registerPlugin:name=>{assert.equal(name,'App');return app;}}};
+ vm.runInNewContext(fs.readFileSync('www/widget-links.js','utf8'),{window,URL,console,getCapacitorPlugin:name=>window.Capacitor.Plugins?.[name]||window.Capacitor.registerPlugin(name)});
  window.OSMWidgetLinks.init();await new Promise(r=>setImmediate(r));
  assert.equal(opened.length,0);
  window.OSMWidgetLinks.setData([{id:23},{id:3}],id=>opened.push(id));assert.deepEqual(opened,[23]);
