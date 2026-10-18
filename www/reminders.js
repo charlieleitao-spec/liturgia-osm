@@ -64,12 +64,12 @@
       const section=document.getElementById('reminderSettings');section.hidden=false;
       document.getElementById('reminderEnabled').addEventListener('change',e=>change(e.target.checked,preferences.time));
       document.getElementById('reminderTime').addEventListener('change',e=>{if(e.target.validity.valid&&e.target.value)change(preferences.enabled,e.target.value);});
-      plugin.addListener('localNotificationActionPerformed',action=>{
+      Promise.resolve(plugin.addListener('localNotificationActionPerformed',action=>{
         const id=action.notification?.extra?.celebrationId;
         if(action.notification?.extra?.source!==KEY||!Number.isInteger(id))return;
         pendingId=id;api.openPending();
-      }).catch(error=>console.warn('[Lembrete OSM]',error));
-      getCapacitorPlugin('App')?.addListener('appStateChange',({isActive})=>{if(isActive)sync().catch(()=>status('Não foi possível renovar os avisos. Abra o app novamente.'));});
+      })).catch(error=>console.warn('[Lembrete OSM]',error));
+      Promise.resolve(getCapacitorPlugin('App')?.addListener('appStateChange',({isActive})=>{if(isActive)sync().catch(()=>status('Não foi possível renovar os avisos. Abra o app novamente.'));})).catch(error=>console.warn('[Lembrete OSM]',error));
       refresh();
     },
     setData(data,opener){saints=data;open=opener;ready=true;refresh();api.openPending();sync().catch(()=>status('Não foi possível renovar os avisos. Abra o app novamente.'));},

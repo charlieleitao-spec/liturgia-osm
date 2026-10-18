@@ -17,7 +17,7 @@ const vm=require('node:vm'),fs=require('node:fs');
 (async()=>{
  const elements=Object.fromEntries(['reminderSettings','reminderEnabled','reminderTime','reminderStatus'].map(id=>[id,{addEventListener(type,fn){this.handler=fn;}}]));
  let requests=0,scheduled=[],cancelled=[],listeners={},storage={},opened=null,permission='granted';
- const plugin={async getPending(){return {notifications:scheduled}},async cancel({notifications}){cancelled.push(...notifications);scheduled=[]},async checkPermissions(){return {display:permission}},async requestPermissions(){requests++;return {display:permission}},async createChannel(){},async schedule({notifications}){scheduled=notifications},async addListener(type,fn){listeners[type]=fn}};
+ const plugin={async getPending(){return {notifications:scheduled}},async cancel({notifications}){cancelled.push(...notifications);scheduled=[]},async checkPermissions(){return {display:permission}},async requestPermissions(){requests++;return {display:permission}},async createChannel(){},async schedule({notifications}){scheduled=notifications},addListener(type,fn){listeners[type]=fn;return {remove:async()=>{}}}};
  const root={document:{getElementById:id=>elements[id]},Capacitor:{getPlatform:()=> 'android'},confirm:()=>true};
  const context={window:root,document:root.document,console,localStorage:{getItem:k=>storage[k],setItem:(k,v)=>storage[k]=v},getCapacitorPlugin:()=>plugin};
  vm.runInNewContext(fs.readFileSync('www/reminders.js','utf8'),context);

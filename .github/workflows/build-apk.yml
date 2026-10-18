@@ -1,4 +1,4 @@
-name: Build APK Liturgia OSM 4.9.104
+name: Build APK Liturgia OSM 4.9.105
 
 on:
   workflow_dispatch:
@@ -55,7 +55,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v5
         with:
-          name: layout-liturgico-4.9.104
+          name: layout-liturgico-4.9.105
           path: validation-layout/
           if-no-files-found: warn
 
@@ -96,8 +96,8 @@ jobs:
 
       - name: Definir versão e segurança
         run: |
-          sed -i 's/versionCode [0-9][0-9]*/versionCode 41008/' android/app/build.gradle
-          sed -i 's/versionName "[^"]*"/versionName "4.9.104"/' android/app/build.gradle
+          sed -i 's/versionCode [0-9][0-9]*/versionCode 41009/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "4.9.105"/' android/app/build.gradle
           python3 - <<'PY'
           from pathlib import Path
           p = Path('android/app/build.gradle')
@@ -181,7 +181,7 @@ jobs:
           ./gradlew assembleRelease assembleReleaseAndroidTest
 
       - name: Nomear APK
-        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.104.apk
+        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.105.apk
 
       - name: Recuperar APK 4.9.102 fornecido como referência
         uses: actions/download-artifact@v5
@@ -195,7 +195,7 @@ jobs:
         run: |
           APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
           AAPT="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/aapt"
-          APK=Liturgia-OSM-4.9.104.apk
+          APK=Liturgia-OSM-4.9.105.apk
           PREVIOUS=baseline/Liturgia-OSM-4.9.102.apk
           "$APKSIGNER" verify --verbose --print-certs "$APK" > atual.txt
           "$APKSIGNER" verify --verbose --print-certs "$PREVIOUS" > anterior.txt
@@ -210,7 +210,7 @@ jobs:
           ANTERIOR_CODE=$(echo "$ANTERIOR_BADGING" | sed -n "s/.*versionCode='\\([^']*\\)'.*/\\1/p")
           echo "$ATUAL_BADGING"
           echo "Baseline: $ANTERIOR_BADGING"
-          test "$ATUAL_CODE" = 41008
+          test "$ATUAL_CODE" = 41009
           test "$ANTERIOR_CODE" = 41006
           test "$ATUAL_CODE" -gt "$ANTERIOR_CODE"
           "$AAPT" dump resources "$APK" > apk-resources.txt
@@ -223,7 +223,7 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Validar atualização 4.9.102 para 4.9.104 e preservação de dados
+      - name: Validar atualização 4.9.102 para 4.9.105 e preservação de dados
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
@@ -237,7 +237,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v5
         with:
-          name: validacao-android-4.9.104
+          name: validacao-android-4.9.105
           path: |
             validation-results/
             atual.txt
@@ -247,23 +247,23 @@ jobs:
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.9.104
-          path: Liturgia-OSM-4.9.104.apk
+          name: Liturgia-OSM-4.9.105
+          path: Liturgia-OSM-4.9.105.apk
           if-no-files-found: error
 
       - name: Disponibilizar lock atualizado (temporário)
         uses: actions/upload-artifact@v5
         with:
-          name: lock-temporario-4.9.104
+          name: lock-temporario-4.9.105
           path: package-lock.json
           if-no-files-found: error
 
-      - name: Publicar versão 4.9.104
+      - name: Publicar versão 4.9.105
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v4.9.104
-          name: Liturgia OSM 4.9.104
+          tag_name: v4.9.105
+          name: Liturgia OSM 4.9.105
           generate_release_notes: true
           overwrite_files: true
-          files: Liturgia-OSM-4.9.104.apk
+          files: Liturgia-OSM-4.9.105.apk

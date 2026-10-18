@@ -304,7 +304,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.104';
+const APP_VERSION = '4.9.105';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1437,7 +1437,7 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
     <div class="menu-section"><div class="menu-label">Sobre</div><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('sobre')">Sobre, créditos e redes sociais</button></div>
     <div class="menu-section"><div class="menu-status"><span class="connection-dot"></span><span>Versão ${APP_VERSION} · Missa e Ofício próprios OSM disponíveis offline</span></div></div>`;
 
-  window.OSMReminders?.init();
+  try{window.OSMReminders?.init();}catch(error){console.warn('[Lembrete OSM] Inicialização indisponível.',error);const status=document.getElementById('reminderStatus');if(status)status.textContent='Lembrete indisponível. Feche e abra o aplicativo para tentar novamente.';}
   window.addEventListener('online',()=>{if(state.tab==='hoje')render();});
   window.addEventListener('offline',()=>{if(state.tab==='hoje')render();});
   applyPreferences(); render();
