@@ -3,9 +3,8 @@
  let ids=new Set(),open,pending=null,started=false,lastUrl=null,lastError=null;
  function receive(url){
    lastUrl=url;
-   try{const u=new URL(url);if(u.protocol!=='liturgiaosm:'||u.hostname!=='celebracao')return;
-     const value=u.pathname.slice(1);if(!/^\d+$/.test(value))return;
-     pending=Number(value);flush();
+   try{const match=typeof url==='string'&&/^liturgiaosm:\/\/celebracao\/(\d+)$/.exec(url);if(!match)return;
+     pending=Number(match[1]);flush();
    }catch(error){lastError=String(error);console.warn('[Widget OSM] Link não aberto',error);}
  }
  function flush(){if(open&&ids.has(pending)){const id=pending;pending=null;open(id);}}
