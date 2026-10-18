@@ -85,13 +85,14 @@ public final class UpgradeInstrumentation extends Instrumentation {
                     }
                 }
                 android.content.Intent widgetIntent=(android.content.Intent)widget.getMethod("openIntent",android.content.Context.class,int.class).invoke(null,getTargetContext(),23);
+                evaluate("window.widgetProbe={events:[],errors:[],present:!!window.OSMWidgetLinks,platform:window.Capacitor?.getPlatform?.()};window.addEventListener('error',e=>window.widgetProbe.errors.push(e.message));getCapacitorPlugin('App').addListener('appUrlOpen',e=>window.widgetProbe.events.push(e.url));");
                 getTargetContext().startActivity(widgetIntent);
                 boolean opened=false;
                 for(int attempt=0;attempt<20;attempt++){
                     if("true".equals(evaluate("state.detailId===23"))){opened=true;break;}
                     Thread.sleep(500);
                 }
-                if(!opened)throw new Exception("Widget intent did not open the celebration");
+                if(!opened)throw new Exception("Widget intent did not open the celebration: " + evaluate("JSON.stringify({probe:window.widgetProbe,detail:state.detailId,ready:santoralReady,widget:typeof window.OSMWidgetLinks,source:window.OSMWidgetLinks?.init.toString()})"));
                 String controls = evaluate("(()=>{const t=document.getElementById('reminderEnabled');return !!t && !t.disabled && !t.checked && !document.getElementById('reminderSettings').hidden})()");
                 if (!"true".equals(controls)) throw new Exception("Reminder controls not ready: " + evaluate("document.body.innerText"));
                 // Native plugin on the signed APK; Android permission granted by the test shell.
