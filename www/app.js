@@ -1121,7 +1121,7 @@ function renderLiturgiaDetail(tipo,reference){
     const saint=SANTORAL.find(item=>Number(item._id)===Number(reference));
     const hours=saint&&saintHasOffice(saint)?officeHoursForSaint(saint):[];
     if(!saint||!hours.length){state.liturgiaDetail=null;return '';}
-    const rank=celebrationGradeLabel(saint.grau);
+    const rank=saintDisplayGrade(saint);
     return '<div class="section-title">Ofícios próprios OSM</div><div class="hub-card"><div class="hub-card-title">'+celebrationNameHtml(saint.title,saint)+'</div>'+
       '<p class="reader-note">'+escapeHtml(saint.date)+(rank?' · '+escapeHtml(rank):'')+'</p>'+
       '<p class="hub-card-note">'+escapeHtml(officeClassificationForSaint(saint))+'</p><div class="office-hours-grid">'+
