@@ -29,6 +29,10 @@ function celebrationGradeLabel(value){
   const normalized=raw.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR').split(' · ')[0].trim().replace(/\s+/g,'_');
   return CELEBRATION_GRADE_LABELS[normalized]||'';
 }
+function saintDisplayGrade(s){
+  if(s?.categoria==='servo_de_deus')return 'Memória biográfica';
+  return celebrationGradeLabel(s?.grau);
+}
 function celebrationLabel(s){
   if(!s)return '';
   if(s.categoria==='beato')return s.genero==='f'?'Beata':'Beato';
@@ -50,7 +54,7 @@ function celebrationNameHtml(value,s){
 function celebrationDateText(s){return String(s?.date||'').replace(/\s*\(dies natalis\)\s*/ig,'').trim();}
 function celebrationSubtitle(s,gradeOverride=''){
   const date=celebrationDateText(s);
-  const gradeLabel=celebrationGradeLabel(gradeOverride||s?.grau);
+  const gradeLabel=(s?.categoria==='servo_de_deus'?saintDisplayGrade(s):celebrationGradeLabel(gradeOverride||s?.grau));
   return date+(date&&gradeLabel?' · ':'')+gradeLabel;
 }
 function saintRankSubtitle(s){
@@ -539,7 +543,7 @@ function renderLiturgiaCelebrationList(tipo,entries){
     const saint=entry.saint,item=entry.mass;
     const title=celebrationTitleText(saint?.title||item?.title||'Celebração própria',saint);
     const date=saint?.date||item?.display_date||item?.date_label||item?.date||'';
-    const rank=saint?celebrationGradeLabel(saint.grau):(item?.rank||'');
+    const rank=saint?saintDisplayGrade(saint):(item?.rank||'');
     const subtitleParts=[date,rank].map(x=>String(x||'').trim()).filter(Boolean);
     // Nas Missas marianas o grupo já aparece no título da seção: não o repetir no subtítulo.
     const normalizedSubtitleParts=item?.group==='Santa Maria no Sábado'
@@ -1117,7 +1121,7 @@ function renderLiturgiaDetail(tipo,reference){
     const saint=SANTORAL.find(item=>Number(item._id)===Number(reference));
     const hours=saint&&saintHasOffice(saint)?officeHoursForSaint(saint):[];
     if(!saint||!hours.length){state.liturgiaDetail=null;return '';}
-    const rank=celebrationGradeLabel(saint.grau);
+    const rank=saintDisplayGrade(saint);
     return '<div class="section-title">Ofícios próprios OSM</div><div class="hub-card"><div class="hub-card-title">'+celebrationNameHtml(saint.title,saint)+'</div>'+
       '<p class="reader-note">'+escapeHtml(saint.date)+(rank?' · '+escapeHtml(rank):'')+'</p>'+
       '<p class="hub-card-note">'+escapeHtml(officeClassificationForSaint(saint))+'</p><div class="office-hours-grid">'+
@@ -1288,7 +1292,7 @@ function viewCalendario(){
   }
   const monthRows=monthSaints.map(s=>{
     const weekday=weekdays[new Date(y,m,s.day).getDay()];
-    return `<a class="calendar-month-entry" href="?celebracao=${s._id}" onclick="event.preventDefault();openSaint(${s._id})"><time datetime="${y}-${String(m+1).padStart(2,'0')}-${String(s.day).padStart(2,'0')}"><b>${String(s.day).padStart(2,'0')}</b><small>${weekday}</small></time><span class="calendar-entry-name">${celebrationNameHtml(s.title,s)}<small>${escapeHtml(celebrationGradeLabel(s.grau))}</small></span><span class="calendar-entry-arrow" aria-hidden="true">›</span></a>`;
+    return `<a class="calendar-month-entry" href="?celebracao=${s._id}" onclick="event.preventDefault();openSaint(${s._id})"><time datetime="${y}-${String(m+1).padStart(2,'0')}-${String(s.day).padStart(2,'0')}"><b>${String(s.day).padStart(2,'0')}</b><small>${weekday}</small></time><span class="calendar-entry-name">${celebrationNameHtml(s.title,s)}<small>${escapeHtml(saintDisplayGrade(s))}</small></span><span class="calendar-entry-arrow" aria-hidden="true">›</span></a>`;
   }).join('');
   const indexOpen=calendarIndexOpen||state.tab==='santoral'||!!(state.search||state.alpha);
   return `<section class="calendar-simple calendar-presented" aria-label="Calendário de celebrações"><div class="calendar-toolbar"><button class="cal-nav" onclick="calDate=new Date(${y},${m-1},1);selectedCalDate=null;render()" aria-label="Mês anterior">‹</button><select class="calendar-month-select" aria-label="Selecionar mês" onchange="setCalendarMonth(this.value)">${MONTHS.map((n,i)=>`<option value="${i}" ${i===m?'selected':''}>${n[0].toUpperCase()+n.slice(1)} ${y}</option>`).join('')}</select><button class="cal-nav" onclick="calDate=new Date(${y},${m+1},1);selectedCalDate=null;render()" aria-label="Próximo mês">›</button><button class="today-chip" onclick="goCalendarToday()">Hoje</button></div><div class="calendar-grid">${weekdays.map(x=>`<div class="cal-head">${x}</div>`).join('')}${cells}</div><div class="calendar-key"><span aria-hidden="true"></span>Celebração OSM</div></section>${dayBlock}<section class="calendar-month-agenda" aria-label="Celebrações do mês"><div class="calendar-agenda-heading"><h2>Neste mês</h2><span>${monthSaints.length} ${monthSaints.length===1?'celebração':'celebrações'}</span></div>${monthRows||'<p class="calendar-month-empty">Sem celebrações próprias OSM neste mês.</p>'}</section><details class="calendar-santoral-index" ${indexOpen?'open':''}><summary onclick="calendarIndexOpen=!this.parentElement.open">Consultar todo o Santoral</summary>${viewSantoralIndex(false)}</details>`;
