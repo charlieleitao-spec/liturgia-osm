@@ -40,7 +40,7 @@ try{
       await themeButton.click();
       assert.equal(await themeButton.getAttribute('aria-pressed'),String(theme!=='dark'));
       await themeButton.click();
-      await page.getByRole('button',{name:'Regra de Vida da OSSM',exact:true}).click();
+      await page.getByRole('button',{name:'Ordem Secular · Regra de Vida',exact:true}).click();
       await targets(page.locator('.servite-head button'),'Embedded reader toolbar');
       const frame=page.frameLocator('#serviteFrame');
       await frame.locator('.regra-floating-back').waitFor();
