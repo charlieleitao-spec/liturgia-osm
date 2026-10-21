@@ -461,6 +461,10 @@ function viewHoje(){
   }
   const prayer=dailyPrayerSuggestion();
   return '<section class="liturgical-hero home-hero fade-in"><div class="liturgical-kicker">Ordem dos Servos de Maria</div><div class="home-date-line"><strong>'+today.day+'</strong><span>'+escapeHtml(MONTHS[today.month-1])+'</span></div><div class="liturgical-sub">'+escapeHtml(today.weekday)+'</div></section>'+
+    '<div class="section-title home-heading">Acesso rápido</div><div class="hub-shortcuts home-quick-actions" aria-label="Acessos rápidos da liturgia">'+
+    '<button onclick="openDailyLiturgy()" aria-label="Consultar Missa do dia">Missa do dia</button>'+
+    '<button onclick="setTab(\'liturgia\');setLiturgiaSection(\'horas\')" aria-label="Consultar Ofício próprio dos Servos de Maria">Ofício OSM</button>'+
+    '<button onclick="setTab(\'santoral\')" aria-label="Consultar Santoral">Santoral</button></div>'+
     '<div class="section-title home-heading">Celebração Servita</div>'+celebrationCard+
     '<div class="section-title home-heading">Missa de hoje</div><div class="home-prayer-card card fade-in"><div><h3>Missa do dia</h3><p>Leituras e orações da data; consulta online, com cópia offline.</p></div><button class="action-btn" onclick="openDailyLiturgy()">Abrir</button></div>'+
     '<div class="section-title home-heading">Oração diária</div><div class="home-prayer-card card fade-in"><div><span class="rank">'+escapeHtml(prayer.label)+'</span><h3>'+(state.angelus==='rainha'?'Rainha do Céu':'O Anjo do Senhor')+'</h3><p>'+escapeHtml(prayer.note)+'</p></div><button class="action-btn" onclick="openDailyPrayer480(\''+escapeHtml(state.angelus)+'\')">Rezar</button></div>'+
