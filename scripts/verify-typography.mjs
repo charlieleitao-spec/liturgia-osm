@@ -22,15 +22,15 @@ try{
     await page.setViewportSize({width,height:844});
     for(const scale of [.76,1,2])for(const theme of ['light','dark']){
       await page.evaluate(({scale,theme})=>{readerScale=scale;lightMode=theme==='light';applyPreferences();setTab('sobre');}, {scale,theme});
-      await size(page,'.about-text',16*scale);
-      await size(page,'.about-text p',16*scale);
-      await size(page,'.credit-list',16*scale);
-      await size(page,'.credit-list>div',16*scale);
-      await size(page,'.social-label',18*scale);
-      await size(page,'.social-sub',13*scale);
-      const leading=await page.locator('.about-text p').evaluate(n=>{const s=getComputedStyle(n);return parseFloat(s.lineHeight)/parseFloat(s.fontSize)});
+      await size(page,'#app .about-text',16*scale);
+      await size(page,'#app .about-text p',16*scale);
+      await size(page,'#app .credit-list',16*scale);
+      await size(page,'#app .credit-list>div',16*scale);
+      await size(page,'#app .social-label',18*scale);
+      await size(page,'#app .social-sub',13*scale);
+      const leading=await page.locator('#app .about-text p').evaluate(n=>{const s=getComputedStyle(n);return parseFloat(s.lineHeight)/parseFloat(s.fontSize)});
       assert.ok(Math.abs(leading-1.55)<.01,'Paragraph line height must not multiply the scale again');
-      await fits(page,'.about-text,.credit-list,.social-link,.social-label,.social-sub');
+      await fits(page,'#app .about-text,#app .credit-list,#app .social-link,#app .social-label,#app .social-sub');
       if(theme==='light'&&(width===390&&scale===1||width===320&&scale===2)){
         await page.evaluate(()=>window.scrollTo(0,0));
         await page.waitForFunction(()=>[...document.querySelectorAll('.fade-in')].every(n=>Number(getComputedStyle(n).opacity)>.999));
