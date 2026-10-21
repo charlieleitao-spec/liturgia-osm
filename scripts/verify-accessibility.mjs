@@ -17,6 +17,7 @@ try{
   await page.keyboard.press('Shift+Tab');
   assert.equal(await dialog.locator(':focus').count(),1,'Shift+Tab must wrap focus inside the unified menu');
   await page.keyboard.press('Tab');
+  console.log('AFTER_TAB_DIAGNOSTIC',JSON.stringify(await page.evaluate(()=>({active:document.activeElement?.outerHTML?.slice(0,400),controls:[...document.querySelectorAll('#mainMenuOverlay button, #mainMenuOverlay [href], #mainMenuOverlay input, #mainMenuOverlay select, #mainMenuOverlay textarea, #mainMenuOverlay iframe, #mainMenuOverlay [tabindex]')].filter(n=>!n.disabled&&n.tabIndex>=0&&n.getClientRects().length).map(n=>({tag:n.tagName,label:n.getAttribute('aria-label'),text:n.textContent?.trim().slice(0,45)}))}))));
   assert.equal(await page.locator(':focus').getAttribute('aria-label'),'Fechar menu');
   for(let i=0;i<20;i++)await dialog.getByRole('button',{name:'Aumentar tamanho do texto',exact:true}).click();
   assert.equal(await dialog.locator('.reader-scale-value').textContent(),'200%');
