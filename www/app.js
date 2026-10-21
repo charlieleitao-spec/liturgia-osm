@@ -815,13 +815,6 @@ function viewSobre(){
     </div>
 
 
-    <div class="section-title">Recursos da família servita</div>
-    <div class="social-links fade-in">
-      <a class="social-link" href="https://charlieleitao-spec.github.io/somos-servos-app/recursos.html" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event, this.href)">
-        <span><div class="social-label">Oração, formação e memória</div><div class="social-sub">Liturgia OSM · Hoje na Família Servita · Somos Servos</div></span>
-      </a>
-    </div>
-
     <div class="section-title">Criação do aplicativo</div>
     <div class="card fade-in credit-list app-creator-card">
       <div><b>Criação:</b> WENDEL MASSAYUKI SANTOS OKUYAMA</div>
@@ -1439,9 +1432,9 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
   const menu=document.querySelector('.main-menu');
   if(menu) menu.innerHTML=`<div class="main-menu-head"><h3 id="mainMenuTitle">Menu</h3><button class="tool-btn" onclick="closeMainMenu()" aria-label="Fechar menu">✕</button></div>
     <div class="menu-section menu-section-first"><div class="menu-label">Biblioteca</div><button class="menu-action menu-wide menu-entry" onclick="closeMainMenu();setTab('biblioteca')">Favoritos e recentes <span aria-hidden="true">›</span></button></div>
-    <div class="menu-section"><div class="menu-label">Ordem Secular</div><button class="menu-action menu-wide menu-entry" onclick="closeMainMenu();openServite('regra')">Regra de Vida da OSSM <span aria-hidden="true">›</span></button></div>
+    <div class="menu-section"><div class="menu-label">Recursos da família servita</div><button class="menu-action menu-wide menu-entry" onclick="closeMainMenu();openServite('regra')">Ordem Secular · Regra de Vida <span aria-hidden="true">›</span></button><a class="menu-action menu-wide menu-entry menu-resource-link" href="https://charlieleitao-spec.github.io/somos-servos-app/recursos.html" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event,this.href)">Oração, formação e memória <span aria-hidden="true">›</span></a></div>
     <div class="menu-section"><div class="menu-label">Ajustes de leitura</div><div class="menu-row menu-font-controls"><button class="menu-action" onclick="adjustFont(-0.08)" aria-label="Diminuir tamanho do texto">A−</button><span class="reader-scale-value" role="status" aria-label="Tamanho do texto">100%</span><button class="menu-action" onclick="adjustFont(0.08)" aria-label="Aumentar tamanho do texto">A+</button><button class="menu-action" onclick="resetFont()" aria-label="Restaurar tamanho padrão do texto">Padrão</button></div><button class="menu-action menu-wide menu-theme" aria-label="Tema escuro" aria-pressed="false" onclick="toggleTheme()">☼ / ☾ Alternar tema claro ou escuro</button></div>
-    <div id="reminderSettings" class="menu-section" hidden><div class="menu-label">Lembrete de celebrações</div><label class="menu-row"><input id="reminderEnabled" type="checkbox" role="switch" disabled> Ativar lembrete</label><label class="menu-row" for="reminderTime">Horário <input id="reminderTime" type="time" value="07:00" required disabled></label><p id="reminderStatus" role="status">Desligado. Apenas nos dias com celebração própria.</p></div>
+    <div id="reminderSettings" class="menu-section" hidden><div class="menu-label">Lembrete de celebrações</div><div class="reminder-panel"><label class="reminder-switch-row" for="reminderEnabled"><span><strong>Receber lembrete</strong><small>Somente nas celebrações próprias da Ordem</small></span><input id="reminderEnabled" type="checkbox" role="switch" disabled></label><label class="reminder-time-row" for="reminderTime"><span>Horário do lembrete</span><input id="reminderTime" type="time" value="07:00" required disabled></label><p id="reminderStatus" role="status">Desligado. Apenas nos dias com celebração própria.</p></div></div>
     <details class="menu-section menu-about-details"><summary>Sobre, créditos e redes sociais</summary><div class="menu-about-content">${viewSobre()}</div></details>
     <div class="menu-section menu-footer"><div class="menu-status"><span class="connection-dot"></span><span>Versão ${APP_VERSION} · Missa e Ofício próprios OSM disponíveis offline</span></div></div>`;
 
