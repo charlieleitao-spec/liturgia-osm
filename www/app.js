@@ -1438,7 +1438,7 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
     <div class="menu-section"><div class="menu-label">Ordem Secular</div><button class="menu-action menu-wide" onclick="closeMainMenu();openServite('regra')">Regra de Vida da OSSM</button></div>
     <div class="menu-section"><div class="menu-label">Biblioteca</div><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('biblioteca')">Favoritos e recentes</button></div>
     <div id="reminderSettings" class="menu-section" hidden><div class="menu-label">Lembrete de celebrações</div><label class="menu-row"><input id="reminderEnabled" type="checkbox" role="switch" disabled> Ativar lembrete</label><label class="menu-row" for="reminderTime">Horário <input id="reminderTime" type="time" value="07:00" required disabled></label><p id="reminderStatus" role="status">Desligado. Apenas nos dias com celebração própria.</p></div>
-    <div class="menu-section"><div class="menu-label">Sobre</div><button class="menu-action menu-wide" onclick="closeMainMenu();setTab('sobre')">Sobre, créditos e redes sociais</button></div>
+    <div class="menu-section menu-about-content"><div class="menu-label">Sobre, créditos e redes sociais</div>${viewSobre()}</div>
     <div class="menu-section"><div class="menu-status"><span class="connection-dot"></span><span>Versão ${APP_VERSION} · Missa e Ofício próprios OSM disponíveis offline</span></div></div>`;
 
   try{window.OSMReminders?.init();}catch(error){console.warn('[Lembrete OSM] Inicialização indisponível.',error);const status=document.getElementById('reminderStatus');if(status)status.textContent='Lembrete indisponível. Feche e abra o aplicativo para tentar novamente.';}
