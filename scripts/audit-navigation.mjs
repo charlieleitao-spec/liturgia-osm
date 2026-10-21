@@ -309,7 +309,7 @@ assert.ok(menu.includes('menu-label">Biblioteca') && menu.includes('Favoritos e 
 assert.doesNotMatch(menu,/openServite\\('(oficio|regra|rosario|coroa|sabado)'\\)/);
 assert.doesNotMatch(menu,/Idiomas dos recursos servitas/);
 assert.doesNotMatch(menu,/Preferências|openLanguagePanel|Idioma da interface/);
-assert.ok(menu.includes('menu-label">Sobre'));
+assert.ok(menu.includes('menu-about-details') && menu.includes('Sobre, créditos e redes sociais'));
 const prayerStart=app.indexOf('function viewOracoesBase480(){');
 const prayerEnd=app.indexOf('let dailyPrayerOpen480',prayerStart);
 const prayerView=app.slice(prayerStart,prayerEnd);
