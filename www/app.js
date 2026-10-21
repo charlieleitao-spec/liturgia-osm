@@ -369,7 +369,7 @@ document.addEventListener('keydown',event=>{
     event.preventDefault();last.focus();
   }else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first.focus();}
 });
-function openMainMenu(){openAccessibleDialog('mainMenuOverlay');document.getElementById('menuBtn').setAttribute('aria-expanded','true');applyPreferences();if(typeof updateBackButton==='function')updateBackButton();}
+function openMainMenu(){openAccessibleDialog('mainMenuOverlay');document.getElementById('menuBtn').setAttribute('aria-expanded','true');applyPreferences();document.querySelector('#mainMenuOverlay .main-menu-head button')?.focus();if(typeof updateBackButton==='function')updateBackButton();}
 function closeMainMenu(){closeAccessibleDialog('mainMenuOverlay');document.getElementById('menuBtn').setAttribute('aria-expanded','false');if(typeof updateBackButton==='function')updateBackButton();}
 function toggleTheme(){ lightMode=!lightMode; localStorage.setItem('osmTheme', lightMode?'light':'dark'); applyPreferences(); const frame=document.getElementById('serviteFrame'); try{frame?.contentDocument?.documentElement?.setAttribute('data-theme',lightMode?'light':'dark');}catch(e){} }
 function getCapacitorPlugin(name){
