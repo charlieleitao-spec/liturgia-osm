@@ -1213,3 +1213,16 @@ body:has(.calendar-simple){scroll-padding-bottom:calc(110px + env(safe-area-inse
 .main-menu .menu-about-content{padding-top:12px}
 .main-menu .menu-footer{margin-top:auto}
 .main-menu .menu-action:focus-visible,.main-menu summary:focus-visible{outline:2px solid var(--gold-soft);outline-offset:3px}
+
+
+/* Recursos servitas e lembretes: mesma linguagem visual dos cartões do aplicativo. */
+.main-menu .servite-resource-action{width:100%;display:flex;align-items:center;justify-content:space-between;text-align:left;font:inherit;cursor:pointer;color:inherit}
+.main-menu .servite-resource-action:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+#reminderSettings .reminder-panel{background:var(--bg-panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:10px}
+#reminderSettings .reminder-switch-row,#reminderSettings .reminder-time-row{display:flex;justify-content:space-between;align-items:center;gap:14px;min-height:52px}
+#reminderSettings .reminder-switch-row span{display:grid;gap:3px;min-width:0}
+#reminderSettings .reminder-switch-row strong{font-size:14px;color:var(--paper)}
+#reminderSettings .reminder-switch-row small{font-size:12px;color:var(--text-muted);line-height:1.35}
+#reminderSettings .reminder-time-row{border-top:1px solid var(--line);padding-top:10px;font-size:14px}
+#reminderSettings #reminderTime{border:1px solid var(--line);border-radius:10px;background:var(--bg-panel);padding:6px 8px;max-width:120px}
+#reminderSettings #reminderStatus{margin:0;border-top:1px solid var(--line);padding-top:10px;color:var(--text-muted);font-size:12px}
