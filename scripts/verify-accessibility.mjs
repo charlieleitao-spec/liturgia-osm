@@ -26,7 +26,7 @@ try{
   await page.reload();
   await page.waitForFunction(()=>typeof openMainMenu==='function' && !!document.querySelector('#mainMenuOverlay .main-menu-head button'));
   await menu.click();assert.equal(await dialog.locator('.reader-scale-value').textContent(),'200%');
-  await dialog.getByRole('button',{name:'Regra de Vida da OSSM'}).click();
+  await dialog.getByRole('button',{name:'Ordem Secular · Regra de Vida'}).click();
   const resource=page.getByRole('dialog',{name:'Regra OSSM',exact:true});
   await resource.waitFor();
   assert.equal(await resource.locator('button').first().evaluate(n=>n===document.activeElement),true);
