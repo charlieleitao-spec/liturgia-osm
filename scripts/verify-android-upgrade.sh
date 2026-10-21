@@ -14,7 +14,7 @@ adb shell am instrument -w -e phase seed com.liturgia_osm.app.test/com.liturgia_
 grep -q 'validation=PASS' validation-results/seed.txt
 adb shell am force-stop "$PACKAGE"
 adb shell "test -d '$DATA/app_webview/Default/Local Storage/leveldb'"
-adb shell "mkdir -p '$DATA/files'; echo upgrade-4.9.102-to-4.9.106 > '$DATA/files/upgrade-preservation-check.txt'"
+adb shell "mkdir -p '$DATA/files'; echo upgrade-4.9.102-to-4.9.107 > '$DATA/files/upgrade-preservation-check.txt'"
 adb shell "cd '$DATA'; find app_webview/Default/'Local Storage' files shared_prefs -type f -exec sha256sum {} \; | sort" > validation-results/data-before.sha256
 adb shell dumpsys package "$PACKAGE" > validation-results/package-before.txt
 adb pull "$DATA/app_webview/Default/Local Storage" validation-results/storage-before
@@ -23,18 +23,18 @@ from pathlib import Path
 raw=b''.join(p.read_bytes() for p in Path('validation-results/storage-before').rglob('*') if p.is_file())
 assert b'osmReaderScale' in raw or b'santoral-osm-fontsize' in raw, 'Real reading preference missing from WebView storage'
 PY
-adb install -r Liturgia-OSM-4.9.106.apk
+adb install -r Liturgia-OSM-4.9.107.apk
 adb shell pm grant "$PACKAGE" android.permission.POST_NOTIFICATIONS
 adb shell "cd '$DATA'; find app_webview/Default/'Local Storage' files shared_prefs -type f -exec sha256sum {} \; | sort" > validation-results/data-after.sha256
 diff -u validation-results/data-before.sha256 validation-results/data-after.sha256
 adb shell dumpsys package "$PACKAGE" > validation-results/package-after.txt
-grep -q 'versionCode=41010' validation-results/package-after.txt
-grep -q 'versionName=4.9.106' validation-results/package-after.txt
+grep -q 'versionCode=41011' validation-results/package-after.txt
+grep -q 'versionName=4.9.107' validation-results/package-after.txt
 BEFORE_UID=$(sed -n 's/.*userId=\([0-9]*\).*/\1/p' validation-results/package-before.txt | head -1)
 AFTER_UID=$(sed -n 's/.*userId=\([0-9]*\).*/\1/p' validation-results/package-after.txt | head -1)
 test -n "$BEFORE_UID" && test "$BEFORE_UID" = "$AFTER_UID"
 adb logcat -c
 adb shell am instrument -w -e phase verify com.liturgia_osm.app.test/com.liturgia_osm.validation.UpgradeInstrumentation | tee validation-results/verify.txt
 grep -q 'validation=PASS' validation-results/verify.txt
-adb shell "cat '$DATA/files/upgrade-preservation-check.txt'" | tr -d '\r' | grep -qx 'upgrade-4.9.102-to-4.9.106'
-echo 'PASS: signed release upgrade 4.9.102 -> 4.9.106; UID, WebView localStorage, font size, theme, favorites, history and app files preserved; updated app launched.'
+adb shell "cat '$DATA/files/upgrade-preservation-check.txt'" | tr -d '\r' | grep -qx 'upgrade-4.9.102-to-4.9.107'
+echo 'PASS: signed release upgrade 4.9.102 -> 4.9.107; UID, WebView localStorage, font size, theme, favorites, history and app files preserved; updated app launched.'
