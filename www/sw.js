@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.109-lembrete';
+const CACHE = 'liturgia-osm-v4.9.110-lembrete';
 const CORE = [
   "./media/emblema-osm.svg",
   "./media/ornamento-final.svg",
