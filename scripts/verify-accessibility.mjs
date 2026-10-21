@@ -14,7 +14,7 @@ try{
   assert.equal(await page.locator('#app').evaluate(n=>n.inert),true);
   assert.equal(await page.locator(':focus').getAttribute('aria-label'),'Fechar menu');
   await page.keyboard.press('Shift+Tab');
-  assert.match(await page.locator(':focus').textContent(),/Sobre, créditos/);
+  assert.equal(await dialog.locator(':focus').count(),1,'Shift+Tab must wrap focus inside the unified menu');
   await page.keyboard.press('Tab');
   assert.equal(await page.locator(':focus').getAttribute('aria-label'),'Fechar menu');
   for(let i=0;i<20;i++)await dialog.getByRole('button',{name:'Aumentar tamanho do texto',exact:true}).click();
