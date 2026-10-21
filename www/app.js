@@ -308,7 +308,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.109';
+const APP_VERSION = '4.9.110';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
