@@ -35,7 +35,7 @@ assert.match(app, /Consultar Missa desta data/);
 assert.doesNotMatch(app, /onclick="closeMainMenu\(\);openDailyLiturgy\(\)">Missa do dia/);
 assert.doesNotMatch(app, /menu-nav-grid|Encontrar uma celebração|Aplicativo disponível|offline-note/);
 assert.doesNotMatch(app, /hub-block-title\">Navegação/);
-assert.match(workflow, /Build APK Liturgia OSM 4\.9\.108/);
+assert.match(workflow, /Build APK Liturgia OSM 4\.9\.109/);
 assert.match(workflow, /versionCode 41013/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
