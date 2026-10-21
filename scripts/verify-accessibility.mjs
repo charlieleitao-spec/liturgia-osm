@@ -6,7 +6,7 @@ const browser=await chromium.launch({executablePath:process.env.CHROME_BIN||unde
 try{
   const page=await browser.newPage({viewport:{width:320,height:844},serviceWorkers:'block'});
   await page.goto('http://127.0.0.1:8767/');
-  await page.waitForFunction(()=>typeof openMainMenu==='function');
+  await page.waitForFunction(()=>typeof openMainMenu==='function' && !!document.querySelector('#mainMenuOverlay .main-menu-head button'));
   const menu=page.getByRole('button',{name:'Abrir menu',exact:true});
   await menu.click();
   const dialog=page.getByRole('dialog',{name:'Menu',exact:true});
@@ -24,7 +24,7 @@ try{
   assert.equal(await menu.evaluate(n=>n===document.activeElement),true);
   assert.equal(await page.locator('#app').evaluate(n=>n.inert),false);
   await page.reload();
-  await page.waitForFunction(()=>typeof openMainMenu==='function');
+  await page.waitForFunction(()=>typeof openMainMenu==='function' && !!document.querySelector('#mainMenuOverlay .main-menu-head button'));
   await menu.click();assert.equal(await dialog.locator('.reader-scale-value').textContent(),'200%');
   await dialog.getByRole('button',{name:'Regra de Vida da OSSM'}).click();
   const resource=page.getByRole('dialog',{name:'Regra OSSM',exact:true});
