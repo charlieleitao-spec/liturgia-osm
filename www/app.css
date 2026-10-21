@@ -1193,3 +1193,23 @@ body:has(.calendar-simple){scroll-padding-bottom:calc(110px + env(safe-area-inse
 #view .home-quick-actions button{min-width:0;min-height:48px;padding:10px 8px;border:1px solid var(--gold);border-radius:10px;background:transparent;color:inherit;font:inherit;font-size:13px;line-height:1.3;text-align:center;overflow-wrap:anywhere;cursor:pointer}
 #view .home-quick-actions button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
 @media(max-width:350px){#view .home-quick-actions{grid-template-columns:1fr}#view .home-quick-actions button{text-align:left;padding:12px 16px}}
+
+/* Menu: hierarquia e harmonia visual, preservando os controles existentes. */
+.main-menu{display:flex;flex-direction:column;gap:0}
+.main-menu-head{margin-bottom:12px}
+.main-menu .menu-section{padding:15px 0}
+.main-menu .menu-section-first{border-top:0}
+.main-menu .menu-label{font-size:12px;letter-spacing:.055em;font-weight:700;margin-bottom:8px}
+.main-menu .menu-entry{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:0;min-height:48px;font-family:var(--font-app);font-size:15px}
+.main-menu .menu-entry span{font-size:22px;font-weight:400;color:var(--text-muted)}
+.main-menu .menu-font-controls{display:grid;grid-template-columns:minmax(44px,1fr) auto minmax(44px,1fr) minmax(68px,1.3fr);gap:7px}
+.main-menu .menu-font-controls .menu-action{min-height:44px;padding:8px}
+.main-menu .menu-font-controls .reader-scale-value{min-width:45px;text-align:center}
+.main-menu .menu-theme{min-height:48px;font-weight:600}
+.main-menu .menu-about-details summary{list-style:none;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-muted);padding:7px 20px 7px 0;position:relative}
+.main-menu .menu-about-details summary::-webkit-details-marker{display:none}
+.main-menu .menu-about-details summary::after{content:'⌄';position:absolute;right:4px;top:4px;font-size:20px}
+.main-menu .menu-about-details[open] summary::after{transform:rotate(180deg)}
+.main-menu .menu-about-content{padding-top:12px}
+.main-menu .menu-footer{margin-top:auto}
+.main-menu .menu-action:focus-visible,.main-menu summary:focus-visible{outline:2px solid var(--gold-soft);outline-offset:3px}
