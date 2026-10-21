@@ -1180,3 +1180,10 @@ body:has(.calendar-simple){scroll-padding-bottom:calc(110px + env(safe-area-inse
 #reminderTime{font:inherit;color:inherit;background:transparent;min-height:48px;max-width:150px}
 #reminderEnabled{width:24px;height:24px}
 #reminderStatus{font-size:0.9em;line-height:1.5}
+
+/* Informações do aplicativo incorporadas ao menu principal. */
+.main-menu .menu-about-content .section-title{margin:18px 0 10px;font-size:12px;letter-spacing:.08em;}
+.main-menu .menu-about-content .card{margin:0 0 14px;padding:14px;}
+.main-menu .menu-about-content .social-links{margin:0 0 14px;}
+.main-menu .menu-about-content .social-link{min-width:0;overflow-wrap:anywhere;}
+.main-menu .menu-about-content .credit-list{overflow-wrap:anywhere;}
