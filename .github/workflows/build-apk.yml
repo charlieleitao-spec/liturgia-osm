@@ -1,4 +1,4 @@
-name: Build APK Liturgia OSM 4.9.107
+name: Build APK Liturgia OSM 4.9.107 — publicação revisada
 
 on:
   workflow_dispatch:
