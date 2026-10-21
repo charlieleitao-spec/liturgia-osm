@@ -226,7 +226,7 @@
     "rank": "Beato(a)",
     "categoria": "beato",
     "genero": "m",
-    "grau": "memoria",
+    "grau": "memoria_facultativa",
     "grau_confirmado": true,
     "image": "media/fernando-maria-baccilieri.webp"
   },
@@ -360,7 +360,7 @@
     "image": "media/servite-04.webp",
     "categoria": "beato",
     "genero": "f",
-    "grau": "memoria",
+    "grau": "memoria_facultativa",
     "grau_confirmado": true
   },
   {
@@ -409,7 +409,7 @@
     "image": "media/servite-07.webp",
     "categoria": "beato",
     "genero": "f",
-    "grau": "memoria",
+    "grau": "memoria_facultativa",
     "grau_confirmado": true
   },
   {
