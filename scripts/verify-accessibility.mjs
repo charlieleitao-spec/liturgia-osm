@@ -12,6 +12,7 @@ try{
   const dialog=page.getByRole('dialog',{name:'Menu',exact:true});
   await dialog.waitFor();
   assert.equal(await page.locator('#app').evaluate(n=>n.inert),true);
+  console.log('MENU_FOCUS_DIAGNOSTIC',JSON.stringify(await page.evaluate(()=>({activeTag:document.activeElement?.tagName,activeId:document.activeElement?.id,activeLabel:document.activeElement?.getAttribute('aria-label'),activeHtml:document.activeElement?.outerHTML?.slice(0,400),menuOpen:document.getElementById('mainMenuOverlay')?.classList.contains('open'),closeButton:document.querySelector('#mainMenuOverlay .main-menu-head button')?.outerHTML,closeRects:document.querySelector('#mainMenuOverlay .main-menu-head button')?.getClientRects().length,menuHtml:document.querySelector('#mainMenuOverlay .main-menu')?.innerHTML.slice(0,200)}))));
   assert.equal(await page.locator(':focus').getAttribute('aria-label'),'Fechar menu');
   await page.keyboard.press('Shift+Tab');
   assert.equal(await dialog.locator(':focus').count(),1,'Shift+Tab must wrap focus inside the unified menu');
