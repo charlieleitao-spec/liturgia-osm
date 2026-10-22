@@ -78,5 +78,5 @@ for path in sorted((DATA / 'pdfs').rglob('*.pdf')):
 inputs = sorted(p for p in DATA.rglob('*') if p.suffix in ('.json', '.pdf') and p.name != 'search-index.json')
 sources = {p.relative_to(ROOT / 'www').as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}
 result = dict(schema=2, sources=sources, documents=records)
-(DATA / 'search-index.json').write_text(json.dumps(result, ensure_ascii=False, separators=(',', ':')) + '\n')
+(DATA / 'search-index.json').write_text(json.dumps(result, ensure_ascii=False, separators=(',', ':')))
 print(f'{len(records)} entradas; {len(sources)} fontes; {(DATA / "search-index.json").stat().st_size} bytes')
