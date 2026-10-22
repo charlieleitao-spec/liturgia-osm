@@ -1,0 +1,56 @@
+{
+  "documents": 456,
+  "sourceReads": 15,
+  "queries": [
+    {
+      "term": "misericórdia",
+      "results": 112,
+      "identical": true
+    },
+    {
+      "term": "coroa nossa senhora dores",
+      "results": 7,
+      "identical": true
+    },
+    {
+      "term": "Regra Vida Ordem Secular",
+      "results": 1,
+      "identical": true
+    },
+    {
+      "term": "2024",
+      "results": 1,
+      "identical": true
+    },
+    {
+      "term": "Deus",
+      "results": 417,
+      "identical": true
+    },
+    {
+      "term": "Paulino",
+      "results": 1,
+      "identical": true
+    },
+    {
+      "term": "Stabat Mater",
+      "results": 2,
+      "identical": true
+    },
+    {
+      "term": "Maria",
+      "results": 339,
+      "identical": true
+    },
+    {
+      "term": "ressurreição",
+      "results": 44,
+      "identical": true
+    },
+    {
+      "term": "servos",
+      "results": 208,
+      "identical": true
+    }
+  ]
+}

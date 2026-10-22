@@ -23,10 +23,15 @@ def text(value):
     return ''
 
 
-def add(title, category, value, source, **extra):
+def add(title, category, value, source, ref=None, **extra):
     body = text(value).strip()
     if body:
-        records.append(dict(title=title, category=category, text=body, source=source, **extra))
+        record = dict(title=title, category=category, source=source, **extra)
+        if ref is None:
+            record['text'] = body
+        else:
+            record['ref'] = ref
+        records.append(record)
 
 
 def read(name):
@@ -34,18 +39,18 @@ def read(name):
 
 
 saints = read('santoral.json')
-for item in saints:
-    add(item['title'], 'Santoral', item, 'santoral.json')
-for item in read('missas-osm.json')['celebrations']:
-    add(item['title'] + ' · Missa', 'Missas', item, 'missas-osm.json')
+for index, item in enumerate(saints):
+    add(item['title'], 'Santoral', item, 'santoral.json', ref=[index])
+for index, item in enumerate(read('missas-osm.json')['celebrations']):
+    add(item['title'] + ' · Missa', 'Missas', item, 'missas-osm.json', ref=['celebrations', index])
 offices = read('oficios-osm.json')
 for date, item in offices['celebracoes'].items():
     saint = next((s for s in saints if s['id'] == item.get('id')), {})
-    add(saint.get('title', date) + ' · Ofício', 'Ofícios', item, 'oficios-osm.json')
+    add(saint.get('title', date) + ' · Ofício', 'Ofícios', item, 'oficios-osm.json', ref=['celebracoes', date])
 for key in ['celebracoes_moveis', 'sabados_marianos_pdf']:
-    for item in offices[key]:
-        add(item.get('title') or item.get('titulo') or 'Ofício mariano', 'Ofícios', item, 'oficios-osm.json')
-add('Memória Litúrgica · Livro de Oração · 3ª edição revisada, 2024', 'Orações', read('memoria-liturgica.json'), 'memoria-liturgica.json')
+    for index, item in enumerate(offices[key]):
+        add(item.get('title') or item.get('titulo') or 'Ofício mariano', 'Ofícios', item, 'oficios-osm.json', ref=[key, index])
+add('Memória Litúrgica · Livro de Oração · 3ª edição revisada, 2024', 'Orações', read('memoria-liturgica.json'), 'memoria-liturgica.json', ref=[])
 names = {'coroa':'Coroa de Nossa Senhora das Dores', 'stabat-mater':'Stabat Mater',
          'via-matris':'Via Matris', 'regra':'Regra de Vida da Ordem Secular dos Servos de Maria',
          'oracoes-diarias':'Orações diárias', 'oracoes-varias':'Orações diversas',
@@ -55,10 +60,10 @@ for path in sorted((DATA / 'devocoes').glob('*.json')):
     value = json.loads(path.read_text())
     title = names.get(path.stem, path.stem)
     if isinstance(value, list):
-        for item in value:
-            add(item.get('title', title) if isinstance(item, dict) else title, 'Orações', item, str(path.relative_to(DATA)))
+        for index, item in enumerate(value):
+            add(item.get('title', title) if isinstance(item, dict) else title, 'Orações', item, str(path.relative_to(DATA)), ref=[index])
     else:
-        add(title, 'Orações', value, str(path.relative_to(DATA)))
+        add(title, 'Orações', value, str(path.relative_to(DATA)), ref=[])
 
 # Uma entrada por página mantém a referência exata, inclusive entre edições.
 for path in sorted((DATA / 'pdfs').rglob('*.pdf')):
@@ -72,6 +77,6 @@ for path in sorted((DATA / 'pdfs').rglob('*.pdf')):
 
 inputs = sorted(p for p in DATA.rglob('*') if p.suffix in ('.json', '.pdf') and p.name != 'search-index.json')
 sources = {p.relative_to(ROOT / 'www').as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}
-result = dict(schema=1, sources=sources, documents=records)
+result = dict(schema=2, sources=sources, documents=records)
 (DATA / 'search-index.json').write_text(json.dumps(result, ensure_ascii=False, separators=(',', ':')) + '\n')
 print(f'{len(records)} entradas; {len(sources)} fontes; {(DATA / "search-index.json").stat().st_size} bytes')

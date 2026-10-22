@@ -1178,7 +1178,8 @@ function loadGlobalSearch(){
   globalSearchLoading=fetch('./data/search-index.json').then(response=>{
     if(!response.ok)throw new Error('Índice indisponível');
     return response.json();
-  }).then(data=>{globalSearchIndex=OSMSearch.createIndex(data.documents);})
+  }).then(data=>OSMSearch.loadDocuments(data))
+    .then(documents=>{globalSearchIndex=OSMSearch.createIndex(documents);})
     .catch(error=>{globalSearchError=true;console.error('[Busca]',error);})
     .finally(()=>{
       globalSearchLoading=null;

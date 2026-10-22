@@ -1,0 +1,24 @@
+name: Gate otimização offline
+on:
+  pull_request:
+    branches: ['optimize/**']
+permissions:
+  contents: read
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm test
+      - run: node scripts/verify-search-equivalence.cjs
+      - uses: actions/upload-artifact@v5
+        with:
+          name: equivalencia-busca
+          path: validation-results/search-equivalence.json
