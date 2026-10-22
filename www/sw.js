@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.112-lembrete-busca-favoritos-toque';
+const CACHE = 'liturgia-osm-v4.9.113-otimizacao-offline';
 const CORE = [
   "./media/emblema-osm.svg",
   "./media/ornamento-final.svg",

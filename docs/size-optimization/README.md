@@ -36,26 +36,20 @@ O índice foi regenerado apenas para atualizar os 63 hashes dos PDFs: seus 456
 documentos continuam exatamente iguais aos da 4.9.112. `npm test` passou integralmente.
 Não foi executado o CI remoto nem a suíte de navegador nesta etapa.
 
-## Etapas seguintes, pendentes
+## Etapas seguintes
 
-1. Busca: preferir reconstrução do corpus a partir dos JSON locais. Referenciar
-   a fonte e a posição de cada registro; manter o texto das páginas PDF no índice,
-   pois esse texto não está necessariamente nos JSON e o app não tem extrator PDF
-   JavaScript. Não cortar a busca ao título ou trecho. Comparar os 456 textos e,
-   para 10 termos, IDs, ordem, pontuação e trechos dos resultados antes/depois.
-   O carregador atual em `app.js` chama `createIndex(data.documents)` de forma
-   síncrona; é necessário autorizar sua adaptação mínima para aguardar a leitura
-   dos JSON locais. Os textos continuam dentro do APK, inclusive na primeira busca.
-2. Minificar JSON preservando a igualdade estrutural; regenerar hashes do índice.
-3. Atualizar `sw.js` e conferir a lista de arquivos. Esta etapa de PDFs ainda não
-   foi integrada ao cache nem está pronta para distribuição.
-4. Build assinado 4.9.113: preservar a assinatura existente e aplicar versionCode
-   41017 (4.9.112 usa 41016). Remover a publicação automática de release da
-   configuração candidata antes de qualquer merge; distribuir apenas artefato de teste.
+- Etapa 2: referências aos JSON locais, corpus completo reconstruído no primeiro uso
+  e cache opcional em IndexedDB. Ver `search.md` e `search-equivalence.json`.
+- Etapa 3: minificação com igualdade estrutural; ver `json.md` e `json-bytes.csv`.
+- Etapa 4: cache `liturgia-osm-v4.9.113-otimizacao-offline`, todos os arquivos
+  alterados incluídos em CORE. Candidata 4.9.113, versionCode 41017, assinatura
+  estável verificada contra a 4.9.112 (41016). O fluxo não publica releases.
 
-A atualização do repositório pela rede foi bloqueada pela revisão automática
-por causa da instrução de não baixar nada da internet. Não houve tentativa de
-contornar o bloqueio. O ambiente local também não possui SDK Android/Gradle nem
-a chave de assinatura. Para validar CI e compilar com a assinatura existente,
-é preciso autorizar explicitamente a obtenção de código e dependências de build;
-o aplicativo continuará funcionando offline, sem baixar conteúdo.
+O CI da candidata produz `size-report.json` com os bytes reais dos APKs e dos
+arquivos comprimidos por grupo, e verifica a integridade dos JSON e do cache.
+O teste Android instala a 4.9.112, preserva preferências/favoritos/histórico,
+instala a candidata por cima e testa a primeira busca com cache removido,
+redes móveis/Wi-Fi desabilitadas e requisições externas recusadas.
+
+As quatro PRs permanecem em rascunho, sem merge. As estimativas acima são da
+etapa 1 isolada; o resultado final medido está no artefato do CI.
