@@ -1,0 +1,16 @@
+file,before_bytes,after_bytes,saved_bytes
+www/data/devocoes/adoracao.json,9156,9155,1
+www/data/devocoes/antifonas.json,3300,3299,1
+www/data/devocoes/coroa.json,4998,4997,1
+www/data/devocoes/ladainhas.json,5876,5820,56
+www/data/devocoes/oracoes-diarias.json,1510,1500,10
+www/data/devocoes/oracoes-varias.json,5956,5864,92
+www/data/devocoes/regra.json,32992,32537,455
+www/data/devocoes/rosario.json,3950,3188,762
+www/data/devocoes/stabat-mater.json,1654,1653,1
+www/data/devocoes/via-matris.json,25709,25514,195
+www/data/devocoes/vigilia.json,17320,17310,10
+www/data/memoria-liturgica.json,15793,15338,455
+www/data/missas-osm.json,244099,225482,18617
+www/data/oficios-osm.json,812721,805482,7239
+www/data/santoral.json,54019,51041,2978
