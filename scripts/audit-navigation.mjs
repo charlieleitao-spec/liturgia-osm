@@ -36,7 +36,7 @@ assert.doesNotMatch(app, /onclick="closeMainMenu\(\);openDailyLiturgy\(\)">Missa
 assert.doesNotMatch(app, /menu-nav-grid|Encontrar uma celebração|Aplicativo disponível|offline-note/);
 assert.doesNotMatch(app, /hub-block-title\">Navegação/);
 assert.match(workflow, /Build APK Liturgia OSM 4\.9\.111/);
-assert.match(workflow, /versionCode 41014/);
+assert.match(workflow, /versionCode 41015/);
 assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
 assert.doesNotMatch(css,/\.topbar-tools \.tool-btn:first-child\{display:none\}/,'O menu deve permanecer visível em telas estreitas.');
