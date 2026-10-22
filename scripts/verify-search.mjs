@@ -1,9 +1,11 @@
 import {chromium} from 'playwright';
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
+import {mkdir} from 'node:fs/promises';
 const server=spawn('python3',['-m','http.server','8772','--directory','www'],{stdio:'ignore'});
 const browser=await chromium.launch({executablePath:process.env.CHROME_BIN||undefined,headless:true,args:['--no-sandbox']});
 try {
+  await mkdir('validation-layout',{recursive:true});
   const context=await browser.newContext({viewport:{width:390,height:844}});
   const page=await context.newPage();
   await page.goto('http://127.0.0.1:8772/');
@@ -13,8 +15,10 @@ try {
   await page.locator('#globalSearchInput').fill('coroa nossa senhora dores');
   await page.locator('#globalSearchCategory').selectOption('Orações');
   assert.ok(await page.locator('.search-result').count()>0);
+  await page.screenshot({path:'validation-layout/busca-resultados.png',fullPage:true});
   await page.locator('.search-result').first().click();
   assert.ok((await page.locator('.search-document').innerText()).length>100);
+  await page.screenshot({path:'validation-layout/busca-leitura.png',fullPage:true});
   await page.getByRole('button',{name:'← Voltar aos resultados'}).click();
   assert.equal(await page.locator('#globalSearchInput').inputValue(),'coroa nossa senhora dores');
   assert.equal(await page.locator('#globalSearchCategory').inputValue(),'Orações');
