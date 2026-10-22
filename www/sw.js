@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.113-otimizacao-offline';
+const CACHE = 'liturgia-osm-v4.9.114-otimizacao-pdf-offline';
 const CORE = [
   "./media/emblema-osm.svg",
   "./media/ornamento-final.svg",
@@ -11,6 +11,7 @@ const CORE = [
   "./touch-targets.css",
   "./app.js",
   "./search.js",
+  "./pdf-links.js",
   "./data/search-index.json",
   "./reminders.js",
   "./widget-links.js",

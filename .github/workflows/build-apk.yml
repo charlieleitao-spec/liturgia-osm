@@ -1,4 +1,4 @@
-name: Build APK Liturgia OSM 4.9.113 — teste de otimização offline
+name: Build APK Liturgia OSM 4.9.114 — teste de otimização offline
 
 on:
   workflow_dispatch:
@@ -55,7 +55,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v5
         with:
-          name: layout-liturgico-4.9.113
+          name: layout-liturgico-4.9.114
           path: validation-layout/
           if-no-files-found: warn
 
@@ -96,8 +96,8 @@ jobs:
 
       - name: Definir versão e segurança
         run: |
-          sed -i 's/versionCode [0-9][0-9]*/versionCode 41017/' android/app/build.gradle
-          sed -i 's/versionName "[^"]*"/versionName "4.9.113"/' android/app/build.gradle
+          sed -i 's/versionCode [0-9][0-9]*/versionCode 41018/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "4.9.114"/' android/app/build.gradle
           python3 - <<'PY'
           from pathlib import Path
           p = Path('android/app/build.gradle')
@@ -134,6 +134,9 @@ jobs:
       - name: Configurar notificações inexatas
         run: node scripts/patch-android-notifications.mjs
 
+      - name: Integrar leitor PDF Android offline
+        run: node scripts/patch-android-pdf.mjs
+
       - name: Gerar widgets Android
         run: node scripts/patch-android-widget.mjs
 
@@ -165,7 +168,7 @@ jobs:
         run: |
           find android/app/src/androidTest -name ExampleInstrumentedTest.java -delete
           mkdir -p android/app/src/androidTest/java/com/liturgia_osm/validation
-          cp scripts/android-validation/UpgradeInstrumentation.java android/app/src/androidTest/java/com/liturgia_osm/validation/
+          cp scripts/android-validation/*.java android/app/src/androidTest/java/com/liturgia_osm/validation/
           python3 - <<'PYTEST'
           from pathlib import Path
           p = Path('android/app/build.gradle')
@@ -184,13 +187,13 @@ jobs:
           ./gradlew assembleRelease assembleReleaseAndroidTest
 
       - name: Nomear APK
-        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.113.apk
+        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.114.apk
 
-      - name: Recuperar APK 4.9.112 fornecido como referência
+      - name: Recuperar APK 4.9.113 fornecido como referência
         uses: actions/download-artifact@v5
         with:
-          name: Liturgia-OSM-4.9.112
-          run-id: 39762047084
+          name: Liturgia-OSM-4.9.113
+          run-id: 39847047660
           github-token: ${{ github.token }}
           path: baseline
 
@@ -198,8 +201,8 @@ jobs:
         run: |
           APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
           AAPT="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/aapt"
-          APK=Liturgia-OSM-4.9.113.apk
-          PREVIOUS=baseline/Liturgia-OSM-4.9.112.apk
+          APK=Liturgia-OSM-4.9.114.apk
+          PREVIOUS=baseline/Liturgia-OSM-4.9.113.apk
           "$APKSIGNER" verify --verbose --print-certs "$APK" > atual.txt
           "$APKSIGNER" verify --verbose --print-certs "$PREVIOUS" > anterior.txt
           cat atual.txt
@@ -213,8 +216,8 @@ jobs:
           ANTERIOR_CODE=$(echo "$ANTERIOR_BADGING" | sed -n "s/.*versionCode='\\([^']*\\)'.*/\\1/p")
           echo "$ATUAL_BADGING"
           echo "Baseline: $ANTERIOR_BADGING"
-          test "$ATUAL_CODE" = 41017
-          test "$ANTERIOR_CODE" = 41016
+          test "$ATUAL_CODE" = 41018
+          test "$ANTERIOR_CODE" = 41017
           test "$ATUAL_CODE" -gt "$ANTERIOR_CODE"
           "$AAPT" dump resources "$APK" > apk-resources.txt
           for resource in ic_launcher ic_launcher_round ic_launcher_monochrome; do grep -q "mipmap/$resource" apk-resources.txt; done
@@ -226,7 +229,7 @@ jobs:
       - name: Disponibilizar relatório de tamanho
         uses: actions/upload-artifact@v5
         with:
-          name: tamanho-4.9.113
+          name: tamanho-4.9.114
           path: validation-results/size-report.json
 
       - name: Habilitar KVM para teste de atualização
@@ -235,7 +238,7 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Validar atualização 4.9.112 para 4.9.113 e preservação de dados
+      - name: Validar atualização 4.9.113 para 4.9.114 e preservação de dados
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
@@ -249,7 +252,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v5
         with:
-          name: validacao-android-4.9.113
+          name: validacao-android-4.9.114
           path: |
             validation-results/
             atual.txt
@@ -259,14 +262,14 @@ jobs:
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.9.113
-          path: Liturgia-OSM-4.9.113.apk
+          name: Liturgia-OSM-4.9.114
+          path: Liturgia-OSM-4.9.114.apk
           if-no-files-found: error
 
       - name: Disponibilizar lock atualizado (temporário)
         uses: actions/upload-artifact@v5
         with:
-          name: lock-temporario-4.9.113
+          name: lock-temporario-4.9.114
           path: package-lock.json
           if-no-files-found: error
 
