@@ -1229,3 +1229,10 @@ body:has(.calendar-simple){scroll-padding-bottom:calc(110px + env(safe-area-inse
 
 .main-menu .menu-resource-link{display:flex;align-items:center;justify-content:space-between;text-decoration:none;box-sizing:border-box;min-height:48px;color:var(--paper)}
 .main-menu .menu-resource-link:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+
+/* Busca global */
+.search-result { display:block; width:100%; text-align:left; color:inherit; font:inherit; cursor:pointer; }
+.search-result strong,.search-result small,.search-result span { display:block; overflow-wrap:anywhere; }
+.search-result small { margin:8px 0; opacity:.8; }
+.search-document { white-space:pre-wrap; overflow-wrap:anywhere; }
+#globalSearchCategory { margin-bottom:16px; }

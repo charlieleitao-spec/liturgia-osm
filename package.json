@@ -5,7 +5,8 @@
   "scripts": {
     "android:add": "npx cap add android",
     "sync": "npx cap sync android",
-    "test": "node scripts/audit-servita-base.mjs && node scripts/audit-navigation.mjs && node scripts/check-image-sizes.mjs && node scripts/audit-historical-santoral-images.mjs && node scripts/test-reminders.cjs && node scripts/test-widget-links.cjs"
+    "test": "node scripts/audit-servita-base.mjs && node scripts/audit-navigation.mjs && node scripts/check-image-sizes.mjs && node scripts/audit-historical-santoral-images.mjs && node scripts/test-reminders.cjs && node scripts/test-widget-links.cjs && node scripts/test-search.cjs",
+    "search:build": "python3 scripts/gerar-indice-busca.py"
   },
   "dependencies": {
     "@capacitor/android": "8.5.1",

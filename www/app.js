@@ -383,7 +383,7 @@ function getCapacitorPlugin(name){
 
 function setTab(tab){
   if(tab==='vida') tab='hoje';
-  const allowed=['hoje','calendario','santoral','liturgia','oracoes','biblioteca','sobre'];
+  const allowed=['busca','hoje','calendario','santoral','liturgia','oracoes','biblioteca','sobre'];
   if(!allowed.includes(tab)) return;
   state.tab=tab;
   localStorage.setItem('osmLastTab',tab);
@@ -1162,6 +1162,58 @@ function viewLiturgia(){
     (marianSaturdayRows.length?'<div class="section-title">Missas de Santa Maria no Sábado</div>'+renderLiturgiaCelebrationList('missa',marianSaturdayRows):'');
 }
 
+
+// Busca global: corpus empacotado com o aplicativo, sem serviços externos.
+let globalSearchIndex=null, globalSearchLoading=null, globalSearchError=false;
+let globalSearchQuery='', globalSearchCategory='', globalSearchDocument=null, globalSearchLimit=30;
+function loadGlobalSearch(){
+  if(globalSearchIndex||globalSearchLoading)return;
+  globalSearchError=false;
+  globalSearchLoading=fetch('./data/search-index.json').then(response=>{
+    if(!response.ok)throw new Error('Índice indisponível');
+    return response.json();
+  }).then(data=>{globalSearchIndex=OSMSearch.createIndex(data.documents);})
+    .catch(error=>{globalSearchError=true;console.error('[Busca]',error);})
+    .finally(()=>{
+      globalSearchLoading=null;
+      if(state.tab==='busca'){
+        const input=document.getElementById('globalSearchInput');
+        const focused=document.activeElement===input, caret=input?.selectionStart;
+        render();
+        if(focused){const next=document.getElementById('globalSearchInput');next?.focus();if(next&&caret!==null)next.setSelectionRange(caret,caret);}
+      }
+    });
+}
+function openGlobalSearch(){
+  globalSearchDocument=null;setTab('busca');loadGlobalSearch();
+  document.getElementById('globalSearchInput')?.focus();
+}
+function updateGlobalSearch(input){
+  globalSearchQuery=input.value;globalSearchLimit=30;renderGlobalSearchResults();
+}
+function renderGlobalSearchResults(){
+  const target=document.getElementById('globalSearchResults');
+  if(!target)return;
+  if(globalSearchError){target.innerHTML='<p role="alert">Não foi possível carregar a busca.</p><button class="action-btn" onclick="loadGlobalSearch();renderGlobalSearchResults()">Tentar novamente</button>';return;}
+  if(!globalSearchIndex){target.innerHTML='<p role="status">Preparando a busca…</p>';return;}
+  if(!OSMSearch.normalize(globalSearchQuery).match(/[a-z0-9]/)){target.innerHTML='<p>Digite um termo, uma oração, uma data ou uma edição. A busca consulta os textos e PDFs incluídos no aplicativo.</p>';return;}
+  const results=globalSearchIndex.search(globalSearchQuery,globalSearchCategory);
+  target.innerHTML='<p role="status">'+results.length+' resultados'+(results.length>globalSearchLimit?' · mostrando '+globalSearchLimit:'')+'</p>'+results.slice(0,globalSearchLimit).map(result=>
+    '<button class="search-result card" onclick="openSearchDocument('+result.id+')"><strong>'+escapeHtml(result.doc.title)+'</strong><small>'+escapeHtml(result.doc.category+' · '+result.doc.source+(result.doc.page?' · página '+result.doc.page:''))+'</small><span>'+escapeHtml(result.snippet)+'</span></button>').join('')+
+    (results.length>globalSearchLimit?'<button class="action-btn" onclick="globalSearchLimit+=30;renderGlobalSearchResults()">Mostrar mais resultados</button>':'');
+}
+function openSearchDocument(id){globalSearchDocument=id;render();window.scrollTo(0,0);}
+function closeSearchDocument(){globalSearchDocument=null;render();document.getElementById('globalSearchInput')?.focus();}
+function viewGlobalSearch(){
+  const doc=globalSearchIndex?.documents[globalSearchDocument];
+  if(doc){
+    return '<button class="action-btn" onclick="closeSearchDocument()">← Voltar aos resultados</button><h2>'+escapeHtml(doc.title)+'</h2><p>'+escapeHtml(doc.source+(doc.page?' · página '+doc.page:''))+'</p>'+
+      (doc.url?'<p><a class="action-btn" href="'+escapeHtml(doc.url)+'" target="_blank" rel="noopener">Abrir PDF · página '+doc.page+'</a></p>':'')+
+      '<div class="liturgical-reading"><div class="prayer-block search-document">'+escapeHtml(doc.text)+'</div></div>';
+  }
+  return '<h2>Buscar no Liturgia OSM</h2><label for="globalSearchInput">Termo, oração ou edição</label><input id="globalSearchInput" class="search-input" type="search" placeholder="Ex.: Coroa, misericórdia, 2024…" value="'+escapeHtml(globalSearchQuery)+'" oninput="updateGlobalSearch(this)"><label for="globalSearchCategory">Pesquisar em</label><select id="globalSearchCategory" class="search-input" onchange="globalSearchCategory=this.value;globalSearchLimit=30;renderGlobalSearchResults()">'+['','Orações','Missas','Ofícios','Santoral','PDFs'].map(category=>'<option value="'+category+'" '+(category===globalSearchCategory?'selected':'')+'>'+(category||'Todos os conteúdos')+'</option>').join('')+'</select><div id="globalSearchResults"></div>';
+}
+
 function render(){
   const view=document.getElementById('view');
   if(!view) return;
@@ -1177,9 +1229,11 @@ function render(){
   }else if(['vida','hoje','calendario','santoral'].includes(state.tab)) html=viewVida();
   else if(state.tab==='liturgia') html=viewLiturgia();
   else if(state.tab==='oracoes') html=viewOracoes();
+  else if(state.tab==='busca') html=viewGlobalSearch();
   else if(state.tab==='biblioteca') html=viewBiblioteca();
   else html=viewSobre();
   view.innerHTML=html;
+  if(state.tab==='busca'&&globalSearchDocument===null)renderGlobalSearchResults();
   document.body.classList.toggle('liturgical-page',!!view.querySelector('.liturgical-reading,.prayer-block'));
   const activeTab=['vida','hoje','calendario','santoral'].includes(state.tab)?'vida':state.tab;
   document.querySelectorAll('#tabbar .tab-btn').forEach(function(button){
@@ -1333,6 +1387,7 @@ function smartBack(){
   if(menu&&menu.classList.contains('open')){closeMainMenu();return true;}
   if(servite&&servite.classList.contains('open')){if(typeof closeServite==='function')closeServite();else servite.classList.remove('open');updateBackButton();return true;}
   if(mass&&mass.classList.contains('open')&&typeof window.closeDailyLiturgy==='function'){window.closeDailyLiturgy();updateBackButton();return true;}
+  if(state.tab==='busca'&&globalSearchDocument!==null){closeSearchDocument();return true;}
   if(state.liturgiaDetail){closeLiturgiaDetail();return true;}
   if(dailyPrayerOpen480){closeDailyPrayer480();return true;}
   if(memoriaSelectedDate){closeMemoriaLiturgica();return true;}
@@ -1431,7 +1486,7 @@ window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverl
 
   const menu=document.querySelector('.main-menu');
   if(menu) menu.innerHTML=`<div class="main-menu-head"><h3 id="mainMenuTitle">Menu</h3><button class="tool-btn" onclick="closeMainMenu()" aria-label="Fechar menu">✕</button></div>
-    <div class="menu-section menu-section-first"><div class="menu-label">Biblioteca</div><button class="menu-action menu-wide menu-entry" onclick="closeMainMenu();setTab('biblioteca')">Favoritos e recentes <span aria-hidden="true">›</span></button></div>
+    <div class="menu-section menu-section-first"><div class="menu-label">Biblioteca</div><button class="menu-action menu-wide menu-entry" onclick="closeMainMenu();openGlobalSearch()">Buscar textos e documentos <span aria-hidden="true">›</span></button><button class="menu-action menu-wide menu-entry" onclick="closeMainMenu();setTab('biblioteca')">Favoritos e recentes <span aria-hidden="true">›</span></button></div>
     <div class="menu-section"><div class="menu-label">Recursos da família servita</div><button class="menu-action menu-wide menu-entry" onclick="closeMainMenu();openServite('regra')">Ordem Secular · Regra de Vida <span aria-hidden="true">›</span></button><a class="menu-action menu-wide menu-entry menu-resource-link" href="https://charlieleitao-spec.github.io/somos-servos-app/recursos.html" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event,this.href)">Oração, formação e memória <span aria-hidden="true">›</span></a></div>
     <div class="menu-section"><div class="menu-label">Ajustes de leitura</div><div class="menu-row menu-font-controls"><button class="menu-action" onclick="adjustFont(-0.08)" aria-label="Diminuir tamanho do texto">A−</button><span class="reader-scale-value" role="status" aria-label="Tamanho do texto">100%</span><button class="menu-action" onclick="adjustFont(0.08)" aria-label="Aumentar tamanho do texto">A+</button><button class="menu-action" onclick="resetFont()" aria-label="Restaurar tamanho padrão do texto">Padrão</button></div><button class="menu-action menu-wide menu-theme" aria-label="Tema escuro" aria-pressed="false" onclick="toggleTheme()">☼ / ☾ Alternar tema claro ou escuro</button></div>
     <div id="reminderSettings" class="menu-section" hidden><div class="menu-label">Lembrete de celebrações</div><div class="reminder-panel"><label class="reminder-switch-row" for="reminderEnabled"><span><strong>Receber lembrete</strong><small>Somente nas celebrações próprias da Ordem</small></span><input id="reminderEnabled" type="checkbox" role="switch" disabled></label><label class="reminder-time-row" for="reminderTime"><span>Horário do lembrete</span><input id="reminderTime" type="time" value="07:00" required disabled></label><p id="reminderStatus" role="status">Desligado. Apenas nos dias com celebração própria.</p></div></div>
