@@ -39,5 +39,28 @@ try {
   await page.waitForFunction(()=>!!globalSearchIndex);
   await page.locator('#globalSearchInput').fill('misericordia');
   assert.ok(await page.locator('.search-result').count()>0,'Search works after offline reload');
+  await page.evaluate(()=>new Promise((resolve,reject)=>{
+    const request=indexedDB.deleteDatabase('osm-search-v2');
+    request.onsuccess=resolve;request.onerror=reject;
+  }));
+  await page.reload();
+  await page.waitForFunction(()=>typeof santoralReady!=='undefined'&&santoralReady);
+  await page.evaluate(()=>openGlobalSearch());
+  await page.waitForFunction(()=>!!globalSearchIndex);
+  await page.locator('#globalSearchInput').fill('misericordia');
+  assert.ok(await page.locator('.search-result').count()>0,'First search without IndexedDB cache works offline');
+  await page.evaluate(()=>new Promise((resolve,reject)=>{
+    const request=indexedDB.open('osm-search-v2');
+    request.onsuccess=()=>{
+      const db=request.result,tx=db.transaction('corpus','readwrite');
+      tx.objectStore('corpus').put({revision:'old',documents:[]},'current');
+      tx.oncomplete=()=>{db.close();resolve();};tx.onerror=reject;
+    };request.onerror=reject;
+  }));
+  await page.reload();
+  await page.waitForFunction(()=>typeof santoralReady!=='undefined'&&santoralReady);
+  await page.evaluate(()=>openGlobalSearch());
+  await page.waitForFunction(()=>!!globalSearchIndex);
+  assert.equal(await page.evaluate(()=>globalSearchIndex.documents.length),456,'Stale corpus cache rebuilt offline');
   console.log('Busca: filtros, leitura, retorno, PDF, 320/390/768 px e recarga offline OK.');
 } finally {await browser.close();server.kill();}
