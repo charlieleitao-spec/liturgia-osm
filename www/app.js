@@ -1205,7 +1205,7 @@ function renderGlobalSearchResults(){
   if(!OSMSearch.normalize(globalSearchQuery).match(/[a-z0-9]/)){target.innerHTML='<p>Digite um termo, uma oração, uma data ou uma edição. A busca consulta os textos e PDFs incluídos no aplicativo.</p>';return;}
   const results=globalSearchIndex.search(globalSearchQuery,globalSearchCategory);
   target.innerHTML='<p role="status">'+results.length+' resultados'+(results.length>globalSearchLimit?' · mostrando '+globalSearchLimit:'')+'</p>'+results.slice(0,globalSearchLimit).map(result=>
-    '<button class="search-result card" onclick="openSearchDocument('+result.id+')"><strong>'+escapeHtml(result.doc.title)+'</strong><small>'+escapeHtml(result.doc.category+' · '+result.doc.source+(result.doc.page?' · página '+result.doc.page:''))+'</small><span>'+escapeHtml(result.snippet)+'</span></button>').join('')+
+    '<button class="search-result card" onclick="openSearchDocument('+result.id+')"><strong>'+escapeHtml(result.doc.title)+'</strong><small>'+escapeHtml(result.doc.category+(result.doc.page?' · página '+result.doc.page:''))+'</small><span>'+escapeHtml(result.snippet)+'</span></button>').join('')+
     (results.length>globalSearchLimit?'<button class="action-btn" onclick="globalSearchLimit+=30;renderGlobalSearchResults()">Mostrar mais resultados</button>':'');
 }
 function openSearchDocument(id){globalSearchDocument=id;render();window.scrollTo(0,0);}
@@ -1213,7 +1213,7 @@ function closeSearchDocument(){globalSearchDocument=null;render();document.getEl
 function viewGlobalSearch(){
   const doc=globalSearchIndex?.documents[globalSearchDocument];
   if(doc){
-    return '<button class="action-btn" onclick="closeSearchDocument()">← Voltar aos resultados</button><h2>'+escapeHtml(doc.title)+'</h2><p>'+escapeHtml(doc.source+(doc.page?' · página '+doc.page:''))+'</p>'+
+    return '<button class="action-btn" onclick="closeSearchDocument()">← Voltar aos resultados</button><h2>'+escapeHtml(doc.title)+'</h2><p>'+escapeHtml(doc.category+(doc.page?' · página '+doc.page:''))+'</p>'+
       (doc.url?'<p><a class="action-btn" href="'+escapeHtml(doc.url)+'" target="_blank" rel="noopener">Abrir PDF · página '+doc.page+'</a></p>':'')+
       '<div class="liturgical-reading"><div class="prayer-block search-document">'+escapeHtml(doc.text)+'</div></div>';
   }
