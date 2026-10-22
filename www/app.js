@@ -386,6 +386,7 @@ function setTab(tab){
   const allowed=['hoje','calendario','santoral','liturgia','oracoes','biblioteca','sobre'];
   if(!allowed.includes(tab)) return;
   state.tab=tab;
+  dailyPrayerOpen480=null;
   localStorage.setItem('osmLastTab',tab);
   state.detailId=null;state.devo=null;state.devoSub=null;
   if(tab!=='liturgia')state.liturgiaDetail=null;
@@ -400,6 +401,8 @@ function openDetail(id){
     state.detailOriginTab=state.tab==='vida'?'hoje':(state.tab||'hoje');
     state.detailOriginScroll=window.scrollY||0;
   }
+  addRecent('saint',saint._id,saint.title,saint.date);
+  dailyPrayerOpen480=null;
   state.detailId=saint._id;state.devo=null;state.devoSub=null;
   render();window.scrollTo(0,0);
 }
@@ -468,6 +471,7 @@ function viewHoje(){
     '<div class="section-title home-heading">Celebração Servita</div>'+celebrationCard+
     
     '<div class="section-title home-heading">Oração diária</div><div class="home-prayer-card card fade-in"><div><span class="rank">'+escapeHtml(prayer.label)+'</span><h3>'+(state.angelus==='rainha'?'Rainha do Céu':'O Anjo do Senhor')+'</h3><p>'+escapeHtml(prayer.note)+'</p></div><button class="action-btn" onclick="openDailyPrayer480(\''+escapeHtml(state.angelus)+'\')">Rezar</button></div>'+
+    homePersonalAccess()+
     '<div class="home-end-ornament" aria-hidden="true"><span></span></div>';
 }
 
@@ -666,6 +670,8 @@ let dailyPrayerOpen480 = null;
 function openDailyPrayer480(which){
   dailyPrayerOpen480 = which;
   state.tab = 'oracoes';
+  state.detailId = null;
+  addRecent('prayer','daily-'+which,which==='rainha'?'Rainha do Céu':'O Anjo do Senhor','Oração diária');
   state.devo = null;
   state.devoSub = null;
   state.angelus = which;
@@ -683,7 +689,7 @@ function viewDailyPrayer480(which){
   const title = isRegina ? 'Rainha do Céu (Regina Caeli)' : 'O Anjo do Senhor';
   const text = isRegina ? PRAYERS.daily.rainha : PRAYERS.daily.anjo;
   return `
-    <div class="detail-header fade-in">
+    <div class="detail-header fade-in favorite-heading">${favButton('prayer','daily-'+which)}
       <div><div class="detail-title">${title}</div><div class="detail-date">${isRegina?'Tempo Pascal':'Prática mariana diária'}</div></div>
     </div>
     <div class="card fade-in">
@@ -1179,6 +1185,9 @@ function render(){
   else if(state.tab==='oracoes') html=viewOracoes();
   else if(state.tab==='biblioteca') html=viewBiblioteca();
   else html=viewSobre();
+  if(state.tab==='oracoes'&&state.devo&&!html.includes('class="favorite-btn')){
+    html=html.replace('<div class="detail-header fade-in">',`<div class="detail-header fade-in favorite-heading">${favButton('prayer',state.devo)}`);
+  }
   view.innerHTML=html;
   document.body.classList.toggle('liturgical-page',!!view.querySelector('.liturgical-reading,.prayer-block'));
   const activeTab=['vida','hoje','calendario','santoral'].includes(state.tab)?'vida':state.tab;
@@ -1206,19 +1215,18 @@ let prayerCategory = null;
 const FAV_KEY='osmFavoritesV4', RECENT_KEY='osmRecentV4';
 function loadJSON(k,d){try{return JSON.parse(localStorage.getItem(k)||'')||d}catch(e){return d}}
 function saveJSON(k,v){localStorage.setItem(k,JSON.stringify(v))}
-function favs(){return loadJSON(FAV_KEY,[])}
-function recents(){return loadJSON(RECENT_KEY,[])}
+function favs(){const value=loadJSON(FAV_KEY,[]);return Array.isArray(value)?value.filter(x=>typeof x==='string'):[]}
+function recents(){const value=loadJSON(RECENT_KEY,[]);return Array.isArray(value)?value.filter(x=>x&&typeof x.k==='string'):[]}
 function itemKey(type,key){return type+':'+key}
 function isFav(type,key){return favs().includes(itemKey(type,key))}
 function toggleFav(type,key){let a=favs(),k=itemKey(type,key);a=a.includes(k)?a.filter(x=>x!==k):[k,...a];saveJSON(FAV_KEY,a);render()}
 function addRecent(type,key,title,sub=''){let a=recents().filter(x=>x.k!==itemKey(type,key));a.unshift({k:itemKey(type,key),type,key,title,sub,ts:Date.now()});saveJSON(RECENT_KEY,a.slice(0,12))}
-function favButton(type,key){return `<button class="favorite-btn ${isFav(type,key)?'active':''}" onclick="event.stopPropagation();toggleFav('${type}','${String(key).replace(/'/g,"\\'")}')" aria-label="Favorito">${isFav(type,key)?'★':'☆'}</button>`}
+function favButton(type,key){return `<button class="favorite-btn ${isFav(type,key)?'active':''}" onclick="event.stopPropagation();toggleFav('${type}','${String(key).replace(/'/g,"\\'")}')" aria-pressed="${isFav(type,key)}" aria-label="${isFav(type,key)?'Remover dos favoritos':'Adicionar aos favoritos'}">${isFav(type,key)?'★':'☆'}</button>`}
 function openSaint(id){
   const saint=SANTORAL.find(x=>x._id===id||x.id===id);
   if(!saint)return;
-  addRecent('saint',saint._id,saint.title,saint.date);
   openDetail(saint._id);
-}function openDevo(key, sub){ state.tab='oracoes'; localStorage.setItem('osmLastTab','oracoes'); state.detailId=null; state.devo=key; state.devoSub=(sub===undefined?null:sub); let title=key; try{ if(key.startsWith('varias')) title=PRAYERS.devotions.variasHome[parseInt(key.slice(6))].title; else title=(DEVO_LIST.find(x=>x.key===key)||{}).title||key; }catch(e){} addRecent('prayer',key,title,'Oração'); render(); window.scrollTo(0,0); }
+}function openDevo(key, sub){ dailyPrayerOpen480=null; state.tab='oracoes'; localStorage.setItem('osmLastTab','oracoes'); state.detailId=null; state.devo=key; state.devoSub=(sub===undefined?null:sub); let title=key; try{ if(key.startsWith('varias')) title=PRAYERS.devotions.variasHome[parseInt(key.slice(6))].title; else title=(DEVO_LIST.find(x=>x.key===key)||{}).title||key; }catch(e){} addRecent('prayer',key,title,'Oração'); render(); window.scrollTo(0,0); }
 function celebrationOrder(){
   return [...SANTORAL].sort((a,b)=>(a.month-b.month)||(a.day-b.day)||String(a.title).localeCompare(String(b.title),'pt-BR'));
 }
@@ -1244,7 +1252,7 @@ function allPrayerEntries(){
  ]; return a;
 }
 function categoryOf(p){let t=(p.title+' '+p.sub).toLowerCase();if(/dor|matris|stabat|coroa/.test(t))return 'dores';if(/voca|miss|apost/.test(t))return 'missao';if(/defunt|doent|alegr|visita|refei|necess/.test(t))return 'comunidade';if(/ladain/.test(t))return 'ladainhas';if(/vigília|vigilia|anjo|rainha/.test(t))return 'diarias';return 'marianas'}
-function resultRows(rs){if(!rs.length)return '<div class="empty-state">Nenhum resultado encontrado.</div>';return `<div class="card fade-in" style="padding:6px 16px;">${rs.map(r=>`<div class="saint-row" onclick="${r.action}"><div class="rowtext"><div class="result-kind">${escapeHtml(r.kind)}</div><div class="rowtitle">${escapeHtml(r.title)}</div><div class="rowrank">${escapeHtml(r.sub||'')}</div></div><div class="chev">›</div></div>`).join('')}</div>`}
+function resultRows(rs){if(!rs.length)return '<div class="empty-state">Nenhum resultado encontrado.</div>';return `<div class="card fade-in" style="padding:6px 16px;">${rs.map(r=>`<button class="saint-row personal-library-row" onclick="${r.action}"><div class="rowtext"><div class="result-kind">${escapeHtml(r.kind)}</div><div class="rowtitle">${escapeHtml(r.title)}</div><div class="rowrank">${escapeHtml(r.sub||'')}</div></div><div class="chev" aria-hidden="true">›</div></button>`).join('')}</div>`}
 function goCalendarToday(){
   const n=new Date(); calDate=new Date(n.getFullYear(),n.getMonth(),1); selectedCalDate=new Date(n.getFullYear(),n.getMonth(),n.getDate()); render();
 }
@@ -1301,9 +1309,17 @@ function prayerActionForKey(key){
  if(key==='daily-rainha') return "openDailyPrayer480('rainha')";
  return `openDevo('${String(key).replace(/'/g,"\\'")}')`;
 }
+function homePersonalAccess(){
+  const favorites=favs().map(resolveStored).filter(Boolean);
+  const recent=recents().map(x=>resolveStored(x.k)).find(Boolean);
+  const shortcut=r=>`<button class="personal-access-item" onclick="${r.action}"><span><b>${escapeHtml(r.title)}</b><small>${escapeHtml(r.kind)}</small></span><span aria-hidden="true">›</span></button>`;
+  return `<section class="home-personal-access" aria-labelledby="personalAccessTitle"><div class="personal-access-heading"><h2 id="personalAccessTitle">Favoritos e recentes</h2><button onclick="setTab('biblioteca')" aria-label="Ver todos os favoritos e recentes">Ver todos</button></div>
+    ${favorites.length?`<div class="personal-access-list" aria-label="Favoritos">${favorites.slice(0,3).map(shortcut).join('')}</div>`:'<p class="reader-note">Toque na estrela de uma oração ou celebração para salvá-la nos favoritos.</p>'}
+    ${recent?`<h3 class="personal-access-recent">Continuar de onde parei</h3>${shortcut(recent)}`:''}</section>`;
+}
 function viewBiblioteca(){
   const favorites=favs().map(resolveStored).filter(Boolean);
-  const recent=recents().map(x=>({kind:x.type==='saint'?'Santoral':'Oração',title:x.title,sub:x.sub,action:x.type==='saint'?`openSaint(${x.key})`:prayerActionForKey(x.key)}));
+  const recent=recents().map(x=>resolveStored(x.k)).filter(Boolean);
   return `<div class="section-title">Biblioteca pessoal</div>
     <div class="section-title">Favoritos</div>${favorites.length?resultRows(favorites):'<div class="empty-state">Toque na estrela de uma oração ou celebração para guardá-la aqui.</div>'}
     <div class="section-title">Últimos acessados</div>${recent.length?resultRows(recent):'<div class="empty-state">Os conteúdos consultados aparecerão aqui.</div>'}`;
@@ -1726,7 +1742,7 @@ loadCanonicalSantoral();
     const saint=SANTORAL.find(item=>item._id===id||item.id===id);
     if(!saint)return '<div class="empty-state">Celebração não encontrada.</div>';
     if(hubOpenState.id!==saint._id)hubOpenState={id:saint._id,liturgia:false,oracao:false};
-    const life='<div class="hub-life">'+saintImageHtml(saint,true)+
+    const life='<div class="hub-life"><div class="personal-favorite-action">'+favButton('saint',saint._id)+'</div>'+saintImageHtml(saint,true)+
       (saintRankSubtitle(saint)?'<div class="rank">'+escapeHtml(saintRankSubtitle(saint))+'</div>':'')+
       '<h1 class="hub-life-title">'+escapeHtml(saint.title)+'</h1>'+
       '<div class="hub-life-meta">'+escapeHtml(saint.date)+'</div>'+
