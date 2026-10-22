@@ -1,0 +1,36 @@
+/* Shared by the app and the embedded Servite reader. Use real layout boxes,
+   rather than overlapping pseudo-elements, to keep neighbouring targets distinct. */
+button, summary, select, input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+[role="button"], .saint-row[onclick], .card[onclick] {
+  box-sizing: border-box;
+  min-height: 44px !important;
+}
+button:not(.cal-day), summary, select, [role="button"] {
+  min-width: 44px;
+}
+/* The seven-column calendar keeps its existing responsive column widths. */
+a[href*=".pdf" i], a.reader-note, a.btn-link {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px !important;
+  max-width: 100%;
+  padding: 10px 12px;
+  margin: 8px 0;
+  line-height: 1.4;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  vertical-align: middle;
+}
+.main-menu .menu-about-details > summary {
+  display: flex;
+  align-items: center;
+}
+.main-menu .menu-about-details > summary::after { top: 50%; translate: 0 -50%; }
+.main-menu .menu-font-controls, .servite-overlay .mini-tools,
+.topbar-tools, .toggle-row, .alpha-index, .hour-tabs, .office-hour-tabs {
+  gap: 8px;
+}
+.daily-date-nav { grid-template-columns: 44px minmax(0, 1fr) 44px; }

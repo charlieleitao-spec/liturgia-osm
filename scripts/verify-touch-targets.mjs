@@ -34,7 +34,7 @@ try{
       await targets(page.locator('.alpha-btn'),'Alphabet filters');
       await page.evaluate(()=>window.scrollTo(0,0));
       await page.locator('#menuBtn').click();
-      await targets(page.locator('#mainMenuOverlay button'),'Reading menu');
+      await targets(page.locator('#mainMenuOverlay button,#mainMenuOverlay summary'),'Reading menu');
       const themeButton=page.getByRole('button',{name:'Tema escuro',exact:true});
       assert.equal(await themeButton.getAttribute('aria-pressed'),String(theme==='dark'));
       await themeButton.click();
@@ -46,6 +46,17 @@ try{
       await frame.locator('.regra-floating-back').waitFor();
       await targets(frame.locator('.regra-floating-back'),'Resource return control');
       await page.getByRole('button',{name:'Fechar recurso',exact:true}).click();
+      await page.evaluate(()=>{setTab('liturgia');setLiturgiaSection('horas');});
+      await page.locator('.liturgia-resource-detail').evaluateAll(nodes=>nodes.forEach(n=>n.open=true));
+      await targets(page.locator('.liturgia-resource-actions a,.liturgia-resource-disclosure>summary'),'Office PDFs and full-text disclosures');
+      await page.evaluate(()=>openLiturgiaDetail('missa',0));
+      await targets(page.locator('a.reader-note'),'Proper Mass PDF');
+      const pdf=page.locator('a.reader-note').first();
+      const pdfHref=await pdf.getAttribute('href');
+      await page.evaluate(()=>{window.touchPdfClicked=false;document.querySelector('a.reader-note').addEventListener('click',e=>{e.preventDefault();window.touchPdfClicked=true;},{once:true});});
+      await pdf.click({position:{x:2,y:22}});
+      assert.equal(await page.evaluate(()=>window.touchPdfClicked),true,'PDF link responds at its padded edge');
+      assert.equal(await pdf.getAttribute('href'),pdfHref,'PDF destination unchanged');
       await page.evaluate(()=>openDevo('stabat'));
       await targets(page.locator('.favorite-btn'),'Favorite');
       await page.evaluate(()=>openDailyLiturgy());
