@@ -60,7 +60,7 @@ public final class UpgradeInstrumentation extends Instrumentation {
                 String seeded = evaluate("(()=>{adjustFont(0.2);toggleTheme();toggleFav('prayer','rosario');addRecent('prayer','rosario','Rosário','Oração');localStorage.setItem('upgradeExpected',JSON.stringify({scale:localStorage.getItem('osmReaderScale'),theme:localStorage.getItem('osmTheme'),favorites:localStorage.getItem('osmFavoritesV4'),recent:localStorage.getItem('osmRecentV4')}));return isFav('prayer','rosario')})()");
                 if (!"true".equals(seeded)) throw new Exception("Could not seed actual release settings");
             } else {
-                String valid = evaluate("(()=>{const e=JSON.parse(localStorage.getItem('upgradeExpected')||'null');return APP_VERSION==='4.9.113' && !!e && e.scale===localStorage.getItem('osmReaderScale') && e.theme===localStorage.getItem('osmTheme') && e.favorites===localStorage.getItem('osmFavoritesV4') && e.recent===localStorage.getItem('osmRecentV4') && isFav('prayer','rosario') && Math.abs(readerScale-Number(e.scale))<0.001 && lightMode===(e.theme==='light')})()");
+                String valid = evaluate("(()=>{const e=JSON.parse(localStorage.getItem('upgradeExpected')||'null');return APP_VERSION==='4.9.114' && !!e && e.scale===localStorage.getItem('osmReaderScale') && e.theme===localStorage.getItem('osmTheme') && e.favorites===localStorage.getItem('osmFavoritesV4') && e.recent===localStorage.getItem('osmRecentV4') && isFav('prayer','rosario') && Math.abs(readerScale-Number(e.scale))<0.001 && lightMode===(e.theme==='light')})()");
                 if (!"true".equals(valid)) throw new Exception("Stored data or loaded preferences did not survive upgrade: " + evaluate("JSON.stringify({...localStorage})"));
                 // First search from bundled files, with no corpus cache and external fetches denied.
                 evaluate("(()=>{globalSearchIndex=null;globalSearchLoading=null;window.externalSearchRequests=0;const original=window.fetch.bind(window);window.fetch=(input,...args)=>{const url=new URL(typeof input==='string'?input:input.url,location.href);if(url.origin!==location.origin){externalSearchRequests++;return Promise.reject(new Error('External network disabled for offline test'));}return original(input,...args);};const request=indexedDB.deleteDatabase('osm-search-v2');request.onsuccess=()=>openGlobalSearch();request.onerror=()=>{window.offlineSearchFailure=true;};})()");
@@ -70,6 +70,7 @@ public final class UpgradeInstrumentation extends Instrumentation {
                     Thread.sleep(1000);
                 }
                 if(!searchReady)throw new Exception("First-use search failed offline: "+evaluate("JSON.stringify({error:globalSearchError,loaded:!!globalSearchIndex,external:externalSearchRequests})"));
+                PdfValidation.verify(this,this::evaluate);
                 // Both native providers must be discoverable by the launcher.
                 long providerCount=android.appwidget.AppWidgetManager.getInstance(getTargetContext()).getInstalledProviders().stream()
                     .filter(p->p.provider.getPackageName().equals("com.liturgia_osm.app")).count();
