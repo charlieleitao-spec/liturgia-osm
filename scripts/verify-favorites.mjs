@@ -6,8 +6,8 @@ const browser=await chromium.launch({executablePath:process.env.CHROME_BIN||unde
 try{
   const page=await browser.newPage({viewport:{width:320,height:844},serviceWorkers:'block'});
   await page.goto('http://127.0.0.1:8771/');
-  await page.waitForFunction(()=>santoralReady&&typeof homePersonalAccess==='function'&&typeof window.renderCelebrationHub==='function');
-  const ready=()=>page.waitForFunction(()=>santoralReady&&typeof window.renderCelebrationHub==='function');
+  await page.waitForFunction(()=>typeof santoralReady!=='undefined'&&santoralReady&&typeof homePersonalAccess==='function'&&typeof window.renderCelebrationHub==='function');
+  const ready=()=>page.waitForFunction(()=>typeof santoralReady!=='undefined'&&santoralReady&&typeof window.renderCelebrationHub==='function');
   await page.evaluate(()=>{localStorage.setItem('osmFavoritesV4',JSON.stringify(['prayer:coroa']));setTab('hoje');});
   assert.equal(await page.locator('.home-personal-access .personal-access-list button').count(),1,'Existing favorites are preserved');
   await page.locator('.personal-access-list button').click();

@@ -7,7 +7,7 @@ try {
   const context=await browser.newContext({viewport:{width:390,height:844}});
   const page=await context.newPage();
   await page.goto('http://127.0.0.1:8772/');
-  await page.waitForFunction(()=>santoralReady);
+  await page.waitForFunction(()=>typeof santoralReady!=='undefined'&&santoralReady);
   await page.evaluate(()=>openGlobalSearch());
   await page.waitForFunction(()=>!!globalSearchIndex);
   await page.locator('#globalSearchInput').fill('coroa nossa senhora dores');
@@ -30,7 +30,7 @@ try {
   await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
   await context.setOffline(true);
   await page.reload();
-  await page.waitForFunction(()=>santoralReady);
+  await page.waitForFunction(()=>typeof santoralReady!=='undefined'&&santoralReady);
   await page.evaluate(()=>openGlobalSearch());
   await page.waitForFunction(()=>!!globalSearchIndex);
   await page.locator('#globalSearchInput').fill('misericordia');
