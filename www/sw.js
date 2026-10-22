@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.111-lembrete';
+const CACHE = 'liturgia-osm-v4.9.112-lembrete-busca-favoritos-toque';
 const CORE = [
   "./media/emblema-osm.svg",
   "./media/ornamento-final.svg",
@@ -8,7 +8,10 @@ const CORE = [
   "./app.css",
   "./liturgical-reader.css",
   "./typography.css",
+  "./touch-targets.css",
   "./app.js",
+  "./search.js",
+  "./data/search-index.json",
   "./reminders.js",
   "./widget-links.js",
   "./servite.html",
