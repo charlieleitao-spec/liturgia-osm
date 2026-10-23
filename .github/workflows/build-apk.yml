@@ -1,9 +1,9 @@
-name: Build APK Liturgia OSM 4.9.114 — teste de otimização offline
+name: Build APK Liturgia OSM 4.9.115 — leitor PDF e recursos completos
 
 on:
   workflow_dispatch:
   pull_request:
-    branches: ['optimize/**']
+    branches: ['optimize/**', 'fix/114-pdfs-offline']
 
 permissions:
   contents: read
@@ -47,6 +47,7 @@ jobs:
           node scripts/verify-liturgical-layout.mjs
           node scripts/verify-favorites.mjs
           node scripts/verify-search.mjs
+          node scripts/verify-office-resources.mjs
           node scripts/verify-accessibility.mjs
           node scripts/verify-touch-targets.mjs
           node scripts/verify-typography.mjs
@@ -55,7 +56,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v5
         with:
-          name: layout-liturgico-4.9.114
+          name: layout-liturgico-4.9.115
           path: validation-layout/
           if-no-files-found: warn
 
@@ -96,8 +97,8 @@ jobs:
 
       - name: Definir versão e segurança
         run: |
-          sed -i 's/versionCode [0-9][0-9]*/versionCode 41018/' android/app/build.gradle
-          sed -i 's/versionName "[^"]*"/versionName "4.9.114"/' android/app/build.gradle
+          sed -i 's/versionCode [0-9][0-9]*/versionCode 41019/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "4.9.115"/' android/app/build.gradle
           python3 - <<'PY'
           from pathlib import Path
           p = Path('android/app/build.gradle')
@@ -187,13 +188,13 @@ jobs:
           ./gradlew assembleRelease assembleReleaseAndroidTest
 
       - name: Nomear APK
-        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.114.apk
+        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.115.apk
 
-      - name: Recuperar APK 4.9.113 fornecido como referência
+      - name: Recuperar APK 4.9.114 fornecido como referência
         uses: actions/download-artifact@v5
         with:
-          name: Liturgia-OSM-4.9.113
-          run-id: 39847047660
+          name: Liturgia-OSM-4.9.114
+          run-id: 39862712371
           github-token: ${{ github.token }}
           path: baseline
 
@@ -201,8 +202,8 @@ jobs:
         run: |
           APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
           AAPT="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/aapt"
-          APK=Liturgia-OSM-4.9.114.apk
-          PREVIOUS=baseline/Liturgia-OSM-4.9.113.apk
+          APK=Liturgia-OSM-4.9.115.apk
+          PREVIOUS=baseline/Liturgia-OSM-4.9.114.apk
           "$APKSIGNER" verify --verbose --print-certs "$APK" > atual.txt
           "$APKSIGNER" verify --verbose --print-certs "$PREVIOUS" > anterior.txt
           cat atual.txt
@@ -216,8 +217,8 @@ jobs:
           ANTERIOR_CODE=$(echo "$ANTERIOR_BADGING" | sed -n "s/.*versionCode='\\([^']*\\)'.*/\\1/p")
           echo "$ATUAL_BADGING"
           echo "Baseline: $ANTERIOR_BADGING"
-          test "$ATUAL_CODE" = 41018
-          test "$ANTERIOR_CODE" = 41017
+          test "$ATUAL_CODE" = 41019
+          test "$ANTERIOR_CODE" = 41018
           test "$ATUAL_CODE" -gt "$ANTERIOR_CODE"
           "$AAPT" dump resources "$APK" > apk-resources.txt
           for resource in ic_launcher ic_launcher_round ic_launcher_monochrome; do grep -q "mipmap/$resource" apk-resources.txt; done
@@ -229,7 +230,7 @@ jobs:
       - name: Disponibilizar relatório de tamanho
         uses: actions/upload-artifact@v5
         with:
-          name: tamanho-4.9.114
+          name: tamanho-4.9.115
           path: validation-results/size-report.json
 
       - name: Habilitar KVM para teste de atualização
@@ -238,7 +239,7 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Validar atualização 4.9.113 para 4.9.114 e preservação de dados
+      - name: Validar atualização 4.9.114 para 4.9.115 e preservação de dados
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
@@ -252,7 +253,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v5
         with:
-          name: validacao-android-4.9.114
+          name: validacao-android-4.9.115
           path: |
             validation-results/
             atual.txt
@@ -262,14 +263,14 @@ jobs:
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.9.114
-          path: Liturgia-OSM-4.9.114.apk
+          name: Liturgia-OSM-4.9.115
+          path: Liturgia-OSM-4.9.115.apk
           if-no-files-found: error
 
       - name: Disponibilizar lock atualizado (temporário)
         uses: actions/upload-artifact@v5
         with:
-          name: lock-temporario-4.9.114
+          name: lock-temporario-4.9.115
           path: package-lock.json
           if-no-files-found: error
 

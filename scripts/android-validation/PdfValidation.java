@@ -40,12 +40,32 @@ final class PdfValidation {
         Activity viewer=instrumentation.waitForMonitorWithTimeout(monitor,15000);
         if(viewer==null)throw new Exception("Mass PDF button did not open native viewer");
         assertPosition(instrumentation,viewer,1);
+        instrumentation.waitForIdleSync();
+        instrumentation.runOnMainSync(()->{
+            int minimum=Math.round(48*viewer.getResources().getDisplayMetrics().density);
+            for(String tag:new String[]{"pdf-close","pdf-zoom-out","pdf-zoom-in","pdf-previous","pdf-next"}){
+                View control=viewer.getWindow().getDecorView().findViewWithTag(tag);
+                if(!(control instanceof android.widget.ImageButton)||control.getWidth()<minimum||control.getHeight()<minimum||control.getElevation()!=0||control.getContentDescription()==null)
+                    throw new AssertionError("PDF control style, touch area or label: "+tag);
+            }
+            if(viewer.getWindow().getDecorView().findViewWithTag("pdf-previous").isEnabled())throw new AssertionError("Previous must be disabled on first page");
+        });
+        screenshot(instrumentation,"pdf-reader-first.png");
         instrumentation.runOnMainSync(()->viewer.getWindow().getDecorView().findViewWithTag("pdf-next").performClick());
         assertPosition(instrumentation,viewer,2);
         instrumentation.runOnMainSync(()->viewer.getWindow().getDecorView().findViewWithTag("pdf-zoom-in").performClick());
         instrumentation.runOnMainSync(()->{
             View page=viewer.getWindow().getDecorView().findViewWithTag("pdf-page");
             if(!page.getContentDescription().toString().contains("125%"))throw new AssertionError("Zoom control failed");
+        });
+        screenshot(instrumentation,"pdf-reader-zoom.png");
+        instrumentation.runOnMainSync(()->{
+            viewer.getWindow().getDecorView().findViewWithTag("pdf-zoom-out").performClick();
+            if(!viewer.getWindow().getDecorView().findViewWithTag("pdf-page").getContentDescription().toString().contains("100%"))throw new AssertionError("Zoom out failed");
+            viewer.getWindow().getDecorView().findViewWithTag("pdf-previous").performClick();
+        });
+        assertPosition(instrumentation,viewer,1);
+        instrumentation.runOnMainSync(()->{
             viewer.getWindow().getDecorView().findViewWithTag("pdf-close").performClick();
         });
         instrumentation.waitForIdleSync();instrumentation.removeMonitor(monitor);
@@ -58,7 +78,15 @@ final class PdfValidation {
         assertPosition(instrumentation,office,2);
         instrumentation.runOnMainSync(office::finish);instrumentation.waitForIdleSync();instrumentation.removeMonitor(monitor);
         if(!"true".equals(javascript.evaluate("!location.pathname.endsWith('.pdf') && externalSearchRequests===0")))throw new Exception("PDF opening navigated WebView or used external network");
-        System.out.println("PASS: 63 PDFs / 342 pages decoded by Android; Mass and Office/search buttons opened offline; page anchor, next page, zoom and return passed.");
+        System.out.println("PASS: 63 PDFs / 342 pages decoded by Android; Mass and Office/search opened offline; five flat icon buttons with 48dp touch targets; previous/next, zoom in/out and return passed; native screenshots saved.");
+    }
+    private static void screenshot(Instrumentation instrumentation,String name) throws Exception {
+        instrumentation.waitForIdleSync();Thread.sleep(400);
+        Bitmap bitmap=instrumentation.getUiAutomation().takeScreenshot();
+        if(bitmap==null)throw new Exception("Native PDF screenshot unavailable");
+        try(java.io.FileOutputStream output=new java.io.FileOutputStream(new java.io.File(instrumentation.getTargetContext().getFilesDir(),name))){
+            if(!bitmap.compress(Bitmap.CompressFormat.PNG,100,output))throw new Exception("Could not save native PDF screenshot");
+        }finally{bitmap.recycle();}
     }
     private static void assertPosition(Instrumentation instrumentation,Activity viewer,int page){
         instrumentation.runOnMainSync(()->{

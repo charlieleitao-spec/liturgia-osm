@@ -1,20 +1,21 @@
-"""Audita os bytes reais do APK assinado e sua base 4.9.113; sem rede."""
+"""Audita os bytes reais do APK assinado e sua base 4.9.114; sem rede."""
 import json
 import re
 import zipfile
 from pathlib import Path
 
-before_path = Path('baseline/Liturgia-OSM-4.9.113.apk')
-after_path = Path('Liturgia-OSM-4.9.114.apk')
+before_path = Path('baseline/Liturgia-OSM-4.9.114.apk')
+after_path = Path('Liturgia-OSM-4.9.115.apk')
 before, after = zipfile.ZipFile(before_path), zipfile.ZipFile(after_path)
 prefix = 'assets/public/'
 old = {n.removeprefix(prefix): n for n in before.namelist() if n.startswith(prefix) and not n.endswith('/')}
 new = {n.removeprefix(prefix): n for n in after.namelist() if n.startswith(prefix) and not n.endswith('/')}
-assert old.keys() | {'pdf-links.js'} == new.keys(), 'Arquivos offline adicionados/removidos sem auditoria'
+assert old.keys() == new.keys(), 'Arquivos offline adicionados/removidos sem auditoria'
 for name in old:
     if name.endswith('.json') and name != 'data/search-index.json':
         assert json.loads(before.read(old[name])) == json.loads(after.read(new[name])), name
-for name in ['app.css', 'servite-3.js']:
+allowed_web_changes={'app.js','servite-3.js','index.html','servite.html','pdf-links.js','liturgical-reader.css','sw.js'}
+for name in old.keys()-allowed_web_changes:
     assert before.read(old[name]) == after.read(new[name]), name
 for name in old:
     if name.startswith('data/pdfs/') or name == 'data/search-index.json':
@@ -24,7 +25,7 @@ assert len(json.loads(after.read(new['data/santoral.json']))) == 32
 assert len(json.loads(after.read(new['data/oficios-osm.json']))['celebracoes']) == 32
 assert len(json.loads(after.read(new['data/search-index.json']))['documents']) == 456
 sw = after.read(new['sw.js']).decode()
-assert 'liturgia-osm-v4.9.114-otimizacao-pdf-offline' in sw
+assert 'liturgia-osm-v4.9.115-otimizacao-recursos-oficio' in sw
 core = set(re.findall(r'"\./([^"\n]+)"', sw))
 changed = [n for n in old if before.read(old[n]) != after.read(new[n])]
 changed += sorted(new.keys()-old.keys())
