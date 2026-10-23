@@ -1,11 +1,11 @@
-"""Audita os bytes reais do APK assinado e sua base 4.9.114; sem rede."""
+"""Audita os bytes reais do APK assinado e sua base 4.9.115; sem rede."""
 import json
 import re
 import zipfile
 from pathlib import Path
 
-before_path = Path('baseline/Liturgia-OSM-4.9.114.apk')
-after_path = Path('Liturgia-OSM-4.9.115.apk')
+before_path = Path('baseline/Liturgia-OSM-4.9.115.apk')
+after_path = Path('Liturgia-OSM-4.9.116.apk')
 before, after = zipfile.ZipFile(before_path), zipfile.ZipFile(after_path)
 prefix = 'assets/public/'
 old = {n.removeprefix(prefix): n for n in before.namelist() if n.startswith(prefix) and not n.endswith('/')}
@@ -25,7 +25,7 @@ assert len(json.loads(after.read(new['data/santoral.json']))) == 32
 assert len(json.loads(after.read(new['data/oficios-osm.json']))['celebracoes']) == 32
 assert len(json.loads(after.read(new['data/search-index.json']))['documents']) == 456
 sw = after.read(new['sw.js']).decode()
-assert 'liturgia-osm-v4.9.115-otimizacao-recursos-oficio' in sw
+assert 'liturgia-osm-v4.9.116-otimizacao-recursos-oficio' in sw
 core = set(re.findall(r'"\./([^"\n]+)"', sw))
 changed = [n for n in old if before.read(old[n]) != after.read(new[n])]
 changed += sorted(new.keys()-old.keys())

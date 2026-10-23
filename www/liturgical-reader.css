@@ -8,7 +8,19 @@
 .office-transcript>summary::-webkit-details-marker{display:none}
 .office-transcript>summary::after{content:'+';margin-left:10px}
 .office-transcript[open]>summary::after{content:'−'}
-.office-transcript-text{margin-top:14px;font-family:Georgia,'Times New Roman',serif;font-size:calc(1.25rem * var(--reader-scale,1));line-height:1.5;text-align:left;white-space:pre-wrap;overflow-wrap:break-word}
+.office-transcript-text{margin-top:18px;font-family:Georgia,'Times New Roman',serif;font-size:calc(1.25rem * var(--reader-scale,1));line-height:1.55;text-align:left;white-space:normal;overflow-wrap:break-word}
+.office-transcript-text p{margin:0 0 1em;line-height:inherit}
+.office-transcript-text .office-hour-heading,.office-transcript-text .office-document-heading{font:700 1.1em/1.35 Georgia,'Times New Roman',serif;text-align:center;margin:1.8em 0 1em;color:inherit}
+.office-transcript-text .office-section-heading,.office-transcript-text .office-psalm-heading{font:400 1em/1.4 Georgia,'Times New Roman',serif;color:var(--liturgical-red);margin:1.5em 0 .7em}
+.office-transcript-text .office-psalm-heading{text-align:center}
+.office-transcript-text .office-document-meta{text-align:center;font-style:italic}
+.office-transcript-text .office-reference,.office-transcript-text .office-caption{font-style:italic}
+.office-transcript-text .office-antiphon{margin:.8em 0 1em}
+.office-transcript-text .office-hymn-stanza{margin:0 1em 1.2em}
+.office-transcript-text .office-psalm-stanza{margin:0 0 1.2em}
+.office-transcript-text .office-verse-line{display:block}
+.office-transcript-text .office-instruction{font-style:italic;color:var(--liturgical-red)}
+.office-transcript-text .office-source-note{display:block;margin:1em 0;font-size:var(--type-meta,.8125rem);line-height:1.4;color:var(--text-muted)}
 html[data-theme="dark"],body:not(.light-mode):has(.brand-tag){--liturgical-paper:#101c29;--liturgical-ink:#f5eedc;--liturgical-red:#ef9a90}
 body.liturgical-page,body.liturgical-page #app,body.liturgical-page main#view{background:var(--liturgical-paper)!important;color:var(--liturgical-ink)!important}
 body.liturgical-page .ambient{display:none}

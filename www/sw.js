@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.115-otimizacao-recursos-oficio';
+const CACHE = 'liturgia-osm-v4.9.116-otimizacao-recursos-oficio';
 const CORE = [
   "./media/emblema-osm.svg",
   "./media/ornamento-final.svg",

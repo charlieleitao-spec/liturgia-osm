@@ -6,6 +6,7 @@ import {mkdir,writeFile} from 'node:fs/promises';
 const server=spawn('python3',['-m','http.server','8774','--directory','www'],{stdio:'ignore'});
 let browser;
 const results=[];
+const compact=value=>value.replace(/\s+/g,' ').trim();
 try{
   browser=await chromium.launch({executablePath:process.env.CHROME_BIN||undefined,headless:true,args:['--no-sandbox']});
   const context=await browser.newContext({viewport:{width:390,height:844}});
@@ -22,7 +23,7 @@ try{
     assert.equal(await page.locator('.office-complete-resources').count(),1);
     assert.equal(await page.getByRole('link',{name:'Abrir PDF completo',exact:true}).count(),1);
     assert.equal(await page.locator('.office-pdf-link').getAttribute('href'),office.url);
-    assert.equal(await page.locator('.office-transcript-text').textContent(),office.transcript);
+    assert.equal(compact(await page.locator('.office-transcript-text').textContent()),compact(office.transcript));
   }
   const chosen=offices.find(s=>s.month===10&&s.day===25);
   assert.ok(chosen);
@@ -35,20 +36,39 @@ try{
     assert.ok(boxes.every(b=>b.width>=44&&b.height>=44),JSON.stringify({width,theme,scale,boxes}));
     await page.getByText('Ler texto completo do Ofício',{exact:true}).click();
     assert.equal(await page.locator('.office-transcript').getAttribute('open'),'');
-    assert.equal(await page.locator('.office-transcript-text').textContent(),chosen.transcript);
+    assert.equal(compact(await page.locator('.office-transcript-text').textContent()),compact(chosen.transcript));
     const textStyle=await page.locator('.office-transcript-text').evaluate(n=>({align:getComputedStyle(n).textAlign,size:parseFloat(getComputedStyle(n).fontSize),overflow:n.scrollWidth>n.clientWidth+1}));
     assert.equal(textStyle.align,'left');assert.ok(Math.abs(textStyle.size-20*scale)<.1);assert.equal(textStyle.overflow,false);
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
     if(scale===1){
+      await page.locator('.office-transcript-text').scrollIntoViewIfNeeded();
+      await page.screenshot({path:`validation-layout/oficio-texto-${width}-${theme}.png`});
       await page.getByText('Ler texto completo do Ofício',{exact:true}).click();
       await page.locator('.office-complete-resources').screenshot({path:`validation-layout/oficio-recursos-${width}-${theme}.png`});
     }
     results.push({width,theme,scale});
   }
+  // Representative hymn, psalm and reading layouts, on a real phone viewport.
+  await page.setViewportSize({width:390,height:844});
+  for(const date of [[1,12],[2,17]]){
+    const office=offices.find(s=>s.month===date[0]&&s.day===date[1]);
+    assert.ok(office);
+    await page.evaluate(id=>{lightMode=true;readerScale=1;applyPreferences();openLiturgiaDetail('horas',id);},office.id);
+    await page.getByText('Ler texto completo do Ofício',{exact:true}).click();
+    assert.ok(await page.locator('.office-hymn-stanza').count()>0);
+    for(const type of ['hymn','psalm','prose']){
+      const block=page.locator(type==='prose'?'.office-transcript-text .office-prose':`.office-${type}-stanza`).first();
+      if(await block.count()){
+        await block.scrollIntoViewIfNeeded();
+        await page.screenshot({path:`validation-layout/oficio-${date.join('-')}-${type}.png`});
+      }
+    }
+  }
+  // Restore the selected office after the representative formatting samples.
   // Santoral and Liturgia must offer the same PDF and full text.
   await page.evaluate(id=>openSaintSection(id,'liturgia'),chosen.id);
   assert.equal(await page.locator('#hub-liturgia .office-complete-resources').count(),1);
-  assert.equal(await page.locator('#hub-liturgia .office-transcript-text').textContent(),chosen.transcript);
+  assert.equal(compact(await page.locator('#hub-liturgia .office-transcript-text').textContent()),compact(chosen.transcript));
   await page.evaluate(()=>{readerScale=1;applyPreferences();});
   const hours=await page.evaluate(id=>officeHoursForSaint(SANTORAL.find(s=>s._id===id)),chosen.id);
   // Every individual hour stays focused on its own text; closing returns to resources.
@@ -73,7 +93,7 @@ try{
   await standalone.goto(`http://127.0.0.1:8774/servite.html?view=oficio:${chosen.id}:laudes`);
   await standalone.locator('.hour-tab-content').waitFor();
   assert.equal(await standalone.locator('.office-pdf-link').count(),1);
-  assert.equal(await standalone.locator('.office-transcript-text').textContent(),chosen.transcript);
+  assert.equal(compact(await standalone.locator('.office-transcript-text').textContent()),compact(chosen.transcript));
   await standalone.close();
   // Reopen after an offline reload, then test the native dispatch of the actual new link.
   await page.evaluate(async()=>{await navigator.serviceWorker.ready;});
@@ -82,7 +102,7 @@ try{
   await page.waitForFunction(()=>typeof santoralReady!=='undefined'&&santoralReady&&oficiosReady);
   await page.evaluate(id=>openLiturgiaDetail('horas',id),chosen.id);
   await page.getByText('Ler texto completo do Ofício',{exact:true}).click();
-  assert.equal(await page.locator('.office-transcript-text').textContent(),chosen.transcript);
+  assert.equal(compact(await page.locator('.office-transcript-text').textContent()),compact(chosen.transcript));
   await page.evaluate(()=>{window.pdfCalls=[];window.Capacitor={isNativePlatform:()=>true,getPlatform:()=> 'android',Plugins:{LocalPdf:{open:async value=>window.pdfCalls.push(value)}}};});
   await page.getByRole('link',{name:'Abrir PDF completo',exact:true}).click();
   await page.waitForFunction(()=>pdfCalls.length===1);
