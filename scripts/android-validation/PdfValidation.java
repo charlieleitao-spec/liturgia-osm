@@ -81,7 +81,18 @@ final class PdfValidation {
         System.out.println("PASS: 63 PDFs / 342 pages decoded by Android; Mass and Office/search opened offline; five flat icon buttons with 48dp touch targets; previous/next, zoom in/out and return passed; native screenshots saved.");
     }
     private static void screenshot(Instrumentation instrumentation,String name) throws Exception {
-        instrumentation.waitForIdleSync();Thread.sleep(400);
+        // The CI launcher can show its own ANR dialog over an otherwise working reader.
+        // Stop only that emulator launcher, then require the PDF activity to have focus.
+        try(java.io.InputStream command=new android.os.ParcelFileDescriptor.AutoCloseInputStream(instrumentation.getUiAutomation().executeShellCommand("am force-stop com.google.android.apps.nexuslauncher"))){while(command.read()!=-1){}}
+        instrumentation.waitForIdleSync();
+        boolean focused=false;
+        for(int attempt=0;attempt<20;attempt++){
+            android.view.accessibility.AccessibilityNodeInfo root=instrumentation.getUiAutomation().getRootInActiveWindow();
+            if(root!=null&&instrumentation.getTargetContext().getPackageName().equals(String.valueOf(root.getPackageName()))){focused=true;break;}
+            Thread.sleep(250);
+        }
+        if(!focused)throw new Exception("PDF screenshot blocked by another Android window");
+        Thread.sleep(400);
         Bitmap bitmap=instrumentation.getUiAutomation().takeScreenshot();
         if(bitmap==null)throw new Exception("Native PDF screenshot unavailable");
         try(java.io.FileOutputStream output=new java.io.FileOutputStream(new java.io.File(instrumentation.getTargetContext().getFilesDir(),name))){
