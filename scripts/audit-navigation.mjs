@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import OSMPdf from '../www/pdf-links.js';
 
 const read = path => readFileSync(path, 'utf8');
 const html = read('www/index.html');
@@ -162,8 +163,8 @@ assert.ok(renderedHoursList.includes('onclick="openLiturgiaDetail(\'horas\','+of
 const availableMassEntries=listRendererFn.liturgiaCelebrations('missa');
 const renderedMassList=listRendererFn.renderLiturgiaCelebrationList('missa',availableMassEntries);
 assert.ok(renderedMassList.includes('onclick="openLiturgiaDetail(\'missa\','+massIndex+')"'),'A linha Missa deve chamar o roteador compartilhado com tipo=missa.');
-const detailRendererFn=new Function('SANTORAL','saintHasOffice','officeHoursForSaint','saintRankSubtitle','officeClassificationForSaint','escapeHtml','officeHourButtonHtml','window','renderProperMassContent','state',labelHelpers+detailRenderer+';return renderLiturgiaDetail;')(
-  testSaints,testHasOffice,testHoursFor,s=>s.rank||'',s=>testOfficeRecord(s)?.tipo_material||'',htmlEscape,(s,pair)=>'<button class="office-hour-choice">'+htmlEscape(pair[1])+'</button>',{MISSAS_OSM:massData},()=>'<div>MASS TEXT</div>',{liturgiaDetail:null});
+const detailRendererFn=new Function('SANTORAL','saintHasOffice','officeHoursForSaint','saintRankSubtitle','officeClassificationForSaint','escapeHtml','officeHourButtonHtml','window','renderProperMassContent','state','officeRecordForSaint','OSMPdf',labelHelpers+detailRenderer+';return renderLiturgiaDetail;')(
+  testSaints,testHasOffice,testHoursFor,s=>s.rank||'',s=>testOfficeRecord(s)?.tipo_material||'',htmlEscape,(s,pair)=>'<button class="office-hour-choice">'+htmlEscape(pair[1])+'</button>',{MISSAS_OSM:massData},()=>'<div>MASS TEXT</div>',{liturgiaDetail:null},testOfficeRecord,OSMPdf);
 const hoursPage=detailRendererFn('horas',officeSaint._id);
 assert.match(hoursPage,/Invitatório|Ofício das Leituras|Laudes|Hora Média|Vésperas/);
 assert.doesNotMatch(hoursPage,/Voltar aos Ofícios próprios/);

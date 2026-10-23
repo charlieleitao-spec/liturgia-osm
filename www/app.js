@@ -624,6 +624,7 @@ function viewDetail(id){
       <div class="office-hours-grid">
         ${officeHoursForSaint(s).map(pair=>officeHourButtonHtml(s,pair)).join('')}
       </div>
+      ${OSMPdf.officeResources(officeRecordForSaint(s))}
     </div>` : ''}
   `;
 }
@@ -1024,13 +1025,7 @@ function movableOfficeBlocks(){
     const title=item.title||'Ofício próprio';
     const actualDate=movableOfficeDate(item);
     const subtitle=[item.rank,(item.date_label||'Data móvel')+(actualDate?' ('+actualDate+')':'')].filter(Boolean).join(' · ');
-    const actions=[
-      ((item.local_pdf_url||item.pdf_url)?'<a class="reader-note" href="'+escapeHtml(item.local_pdf_url||item.pdf_url)+'" target="_blank" rel="noopener">PDF oficial OSM</a>':''),
-      
-    ].filter(Boolean).join('');
-    const transcript=item.pdf_transcript?'<details class="liturgia-resource-disclosure"><summary class="action-btn">Ler texto completo</summary><div class="liturgical-reading hub-text">'+escapeHtml(item.pdf_transcript)+'</div></details>':'';
-    const content=(actions?'<div class="liturgia-resource-actions">'+actions+'</div>':'')+
-      '<div class="liturgia-resource-content-title">Abrir Ofício completo</div><div class="hub-text">'+renderPrayer(item.text||'')+'</div>'+transcript;
+    const content='<div class="liturgia-resource-content-title">Abrir Ofício completo</div><div class="hub-text">'+renderPrayer(item.text||'')+'</div>'+OSMPdf.officeResources(item);
     return liturgiaResourceRow(title,subtitle,content);
   }).join('');
   return '<div class="section-title">Ofícios próprios com data móvel</div><div class="card fade-in liturgia-resource-list">'+rows+'</div>';
@@ -1107,12 +1102,12 @@ function marianSaturdayOfficeBlocks(){
     const title='Santa Maria no Sábado';
     const subtitle=(originalTitle.match(/Tempo (?:do Advento|do Natal|Pascal|Comum)/i)||[])[0]||originalTitle;
     const pdfUrl=item.local_pdf_url||item.pdf_url||'';
-    const pdfAction=liturgiaResourceAction('Abrir PDF oficial OSM',pdfUrl);
+    const pdfAction=liturgiaResourceAction('Abrir PDF completo',pdfUrl);
     let reading='';
     if(item.id==='tempo-comum'&&item.pdf_transcript){
       reading=marianSaturdayCommonForms(item);
     }else if(item.pdf_transcript){
-      reading='<details class="liturgia-resource-disclosure"><summary class="action-btn">Ler texto completo</summary><div class="liturgical-reading hub-text saturday-pdf-transcript">'+renderMarianOfficeTranscript(item.pdf_transcript,subtitle)+'</div></details>';
+      reading='<details class="liturgia-resource-disclosure"><summary class="action-btn">Ler texto completo do Ofício</summary><div class="liturgical-reading hub-text saturday-pdf-transcript">'+renderMarianOfficeTranscript(item.pdf_transcript,subtitle)+'</div></details>';
     }
     const content=(pdfAction?'<div class="liturgia-resource-actions">'+pdfAction+'</div>':'')+reading;
     return liturgiaResourceRow(title,subtitle,content,null,item.id==='tempo-comum'?'marianSaturdayOfficeCommon':null);
@@ -1128,7 +1123,7 @@ function renderLiturgiaDetail(tipo,reference){
     return '<div class="section-title">Ofícios próprios OSM</div><div class="hub-card"><div class="hub-card-title">'+celebrationNameHtml(saint.title,saint)+'</div>'+
       '<p class="reader-note">'+escapeHtml(saint.date)+(rank?' · '+escapeHtml(rank):'')+'</p>'+
       '<p class="hub-card-note">'+escapeHtml(officeClassificationForSaint(saint))+'</p><div class="office-hours-grid">'+
-      hours.map(pair=>officeHourButtonHtml(saint,pair)).join('')+'</div></div>';
+      hours.map(pair=>officeHourButtonHtml(saint,pair)).join('')+'</div>'+OSMPdf.officeResources(officeRecordForSaint(saint))+'</div>';
   }
   if(tipo==='missa'){
     const records=window.MISSAS_OSM?.celebrations||[];
@@ -1743,7 +1738,7 @@ loadCanonicalSantoral();
       office='<div class="hub-card"><div class="hub-card-title">'+officeTitle+'</div>'+
         '<p class="hub-card-note">'+escapeHtml(classification)+'</p><div class="hub-actions">'+
         hours.map(function(pair){return officeHourButtonHtml(s,pair,'hub-action');}).join('')+
-        '</div></div>';
+        '</div>'+OSMPdf.officeResources(officeRecordForSaint(s))+'</div>';
     }else if(officeRecordForSaint(s)?.tipo_material==='sem_material_proprio'){
       office='<div class="hub-card"><div class="hub-card-title">Liturgia das Horas</div>'+ 
         hubEmpty('Sem material próprio: usar o Comum.')+

@@ -576,7 +576,7 @@ function viewDetail(id){
       <button class="btn-link" style="width:100%; text-align:center;" onclick="toggleOficio()">
         ${state.showOficio ? escapeHtml(ptText('hideOffice')) : escapeHtml(ptText('showOffice'))}
       </button>
-      ${state.showOficio ? `<div class="prayer-block" style="margin-top:16px;">${renderOficioTabs(s.oficio)}${s.pdf_transcript?`<details style="margin-top:14px;"><summary class="btn-link">Transcrição completa do PDF</summary><div class="hub-text" style="white-space:pre-wrap;margin-top:10px;">${escapeHtml(s.pdf_transcript)}</div></details>`:''}${s.local_pdf_url?`<a class="btn-link" style="display:block;text-align:center;margin-top:14px;" href="${escapeHtml(s.local_pdf_url)}" target="_blank" rel="noopener">Abrir PDF baixado completo</a>`:''}${s.pdf_url?`<a class="btn-link" style="display:block;text-align:center;margin-top:8px;" href="${escapeHtml(s.pdf_url)}" target="_blank" rel="noopener">Fonte oficial OSM</a>`:''}</div>` : ''}
+      ${state.showOficio ? `<div class="prayer-block" style="margin-top:16px;">${renderOficioTabs(s.oficio)}</div>${String(window.__SERVITE_VIEW__||'').startsWith('oficio:')&&window.parent!==window?'':OSMPdf.officeResources(s)}` : ''}
     </div>` : ''}
   `;
 }

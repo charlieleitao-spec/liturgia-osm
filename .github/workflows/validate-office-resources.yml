@@ -1,0 +1,38 @@
+name: Validar recursos completos do Ofício
+
+on:
+  pull_request:
+    branches: ['fix/114-pdfs-offline']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Instalar ferramenta de verificação visual
+        run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright
+      - name: Conferir conteúdo e navegação
+        run: npm test
+      - name: Conferir leitura, recursos completos e toque
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+        run: |
+          node scripts/verify-office-resources.mjs
+          node scripts/verify-liturgical-layout.mjs
+          node scripts/verify-touch-targets.mjs
+          node scripts/verify-typography.mjs
+      - name: Disponibilizar evidências
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: oficio-recursos-completos
+          path: validation-layout/
+          if-no-files-found: warn

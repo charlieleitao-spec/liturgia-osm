@@ -14,7 +14,15 @@
       return {path,page:Number.isSafeInteger(page)&&page>0?page:1};
     }catch{return null;}
   }
-  root.OSMPdf={resolve};
+  function officeResources(record){
+    if(!record)return '';
+    const escape=value=>String(value||'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    const url=record.local_pdf_url||record.pdf_url;
+    const pdf=url?'<a class="btn-link office-pdf-link" href="'+escape(url)+'" target="_blank" rel="noopener">Abrir PDF completo</a>':'';
+    const transcript=record.pdf_transcript?'<details class="office-transcript"><summary class="btn-link">Ler texto completo do Ofício</summary><div class="hub-text office-transcript-text">'+escape(record.pdf_transcript)+'</div></details>':'';
+    return pdf||transcript?'<div class="office-complete-resources">'+pdf+transcript+'</div>':'';
+  }
+  root.OSMPdf={resolve,officeResources};
   if(typeof module!=='undefined')module.exports=root.OSMPdf;
   if(!root.document)return;
   const capacitor=()=>root.Capacitor||(root.parent!==root?root.parent.Capacitor:null);

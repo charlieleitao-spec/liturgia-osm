@@ -1,5 +1,14 @@
 /* Padrão litúrgico: referência visual aprovada em 15/10/2026. */
 :root{--liturgical-paper:#fcf3d5;--liturgical-ink:#15120d;--liturgical-red:#b3221c}
+/* Os recursos completos pertencem ao Ofício, fora da leitura de cada hora. */
+.office-complete-resources{margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
+.office-complete-resources .btn-link{display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:100%;min-height:44px;padding:10px 12px;margin:0;font-family:Georgia,'Times New Roman',serif;font-size:var(--type-body,1rem);line-height:1.4;text-align:center;text-transform:none;letter-spacing:normal;white-space:normal;overflow-wrap:anywhere}
+.office-transcript{margin-top:10px}
+.office-transcript>summary{cursor:pointer;list-style:none}
+.office-transcript>summary::-webkit-details-marker{display:none}
+.office-transcript>summary::after{content:'+';margin-left:10px}
+.office-transcript[open]>summary::after{content:'−'}
+.office-transcript-text{margin-top:14px;font-family:Georgia,'Times New Roman',serif;font-size:calc(1.25rem * var(--reader-scale,1));line-height:1.5;text-align:left;white-space:pre-wrap;overflow-wrap:break-word}
 html[data-theme="dark"],body:not(.light-mode):has(.brand-tag){--liturgical-paper:#101c29;--liturgical-ink:#f5eedc;--liturgical-red:#ef9a90}
 body.liturgical-page,body.liturgical-page #app,body.liturgical-page main#view{background:var(--liturgical-paper)!important;color:var(--liturgical-ink)!important}
 body.liturgical-page .ambient{display:none}
