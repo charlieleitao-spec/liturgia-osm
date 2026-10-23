@@ -1,0 +1,48 @@
+name: Publicar Liturgia OSM 4.9.117 aprovada
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-approved-4.9.117.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: publish-approved-4.9.117
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Conferir fontes aprovados
+        run: |
+          git merge-base --is-ancestor b2b6a61f2878e4e841bebee9ca1ab199d9e4f576 HEAD
+          test "$(node -p 'require("./package.json").version')" = 4.9.117
+          npm test
+      - name: Recuperar o APK já validado
+        uses: actions/download-artifact@v5
+        with:
+          name: Liturgia-OSM-4.9.117
+          run-id: 39936648513
+          github-token: ${{ github.token }}
+          path: approved
+      - name: Conferir identidade do APK e conteúdo local
+        run: python3 scripts/verify-approved-apk.py approved/Liturgia-OSM-4.9.117.apk
+      - name: Publicar versão aprovada
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v4.9.117 approved/Liturgia-OSM-4.9.117.apk --target "$GITHUB_SHA" --title 'Liturgia OSM 4.9.117' --notes-file docs/releases/4.9.117.md --latest
+          echo '## Liturgia OSM 4.9.117 publicada' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Mesmo APK aprovado no Samsung A56: leitura e janela de impressão confirmadas pelo usuário em 23/10/2026.' >> "$GITHUB_STEP_SUMMARY"
