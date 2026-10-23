@@ -1456,11 +1456,11 @@ function serviteAdjustFont(delta){try{const frame=document.getElementById('servi
   currentServiteView=view||'completo';
   const ov=document.getElementById('serviteOverlay'),fr=document.getElementById('serviteFrame');
   document.getElementById('serviteTitle').textContent=serviteNames[currentServiteView]||'Recursos OSM';
-  fr.src=serviteUrl(currentServiteView);
+  fr.contentWindow.location.replace(new URL(serviteUrl(currentServiteView),location.href).href);
   openAccessibleDialog('serviteOverlay');document.body.classList.add('servite-open');
   if(!history.state?.serviteOverlay) history.pushState({...history.state,serviteOverlay:true},'');
 }
-function closeServite(fromHistory=false){const ov=document.getElementById('serviteOverlay'),fr=document.getElementById('serviteFrame');const wasOpen=ov?.classList.contains('open');closeAccessibleDialog('serviteOverlay');readerScale=parseFloat(localStorage.getItem('osmReaderScale')||'1');applyPreferences();document.body.classList.remove('servite-open');fr.src='about:blank';if(wasOpen&&!fromHistory&&history.state?.serviteOverlay){serviteHistoryReturnPending=true;history.back();}}
+function closeServite(fromHistory=false){const ov=document.getElementById('serviteOverlay'),fr=document.getElementById('serviteFrame');const wasOpen=ov?.classList.contains('open');closeAccessibleDialog('serviteOverlay');readerScale=parseFloat(localStorage.getItem('osmReaderScale')||'1');applyPreferences();document.body.classList.remove('servite-open');fr.contentWindow.location.replace('about:blank');if(wasOpen&&!fromHistory&&history.state?.serviteOverlay){serviteHistoryReturnPending=true;history.back();}}
 // Keyboard events inside the embedded document do not bubble to the parent.
 document.getElementById('serviteFrame').addEventListener('load',()=>{
   const frame=document.getElementById('serviteFrame');
@@ -1476,7 +1476,7 @@ document.getElementById('serviteFrame').addEventListener('load',()=>{
     }
   });}catch(error){console.warn('[Liturgia OSM] Foco do recurso indisponível.',error);}
 });
-function serviteReload(){if(currentServiteView)document.getElementById('serviteFrame').src=serviteUrl(currentServiteView)+'&reload='+Date.now();}
+function serviteReload(){if(currentServiteView)document.getElementById('serviteFrame').contentWindow.location.replace(new URL(serviteUrl(currentServiteView)+'&reload='+Date.now(),location.href).href);}
 window.addEventListener('popstate',event=>{
   const resourceOpen=document.getElementById('serviteOverlay')?.classList.contains('open');
   if(resourceOpen||serviteHistoryReturnPending){

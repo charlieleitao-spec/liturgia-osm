@@ -52,8 +52,8 @@ try{
   await page.evaluate(()=>{readerScale=1;applyPreferences();});
   const hours=await page.evaluate(id=>officeHoursForSaint(SANTORAL.find(s=>s._id===id)),chosen.id);
   // Every individual hour stays focused on its own text; closing returns to resources.
-  for(const [hour] of hours){
-    await page.evaluate(({id,hour})=>openSantoralOfficeHour(id,hour),{id:chosen.id,hour});
+  for(const [index,[hour]] of hours.entries()){
+    await page.locator('#hub-liturgia .office-hour-choice').nth(index).click();
     const frame=page.frameLocator('#serviteFrame');
     await frame.locator('.hour-tab-content').waitFor();
     assert.equal(await frame.locator('.office-complete-resources,a[href*=".pdf"],.office-transcript').count(),0);
