@@ -6,7 +6,7 @@ import {mkdir,writeFile} from 'node:fs/promises';
 const server=spawn('python3',['-m','http.server','8774','--directory','www'],{stdio:'ignore'});
 let browser;
 const results=[];
-const compact=value=>value.replace(/\s+/g,' ').trim();
+const compact=value=>value.replace(/Copyright\s*© CURIA GENERALIZIA OSM, Piazza San Marcello, 5 – Roma/g,'').replace(/\s+/g,' ').trim();
 try{
   browser=await chromium.launch({executablePath:process.env.CHROME_BIN||undefined,headless:true,args:['--no-sandbox']});
   const context=await browser.newContext({viewport:{width:390,height:844}});

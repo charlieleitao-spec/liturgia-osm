@@ -16,7 +16,7 @@
   }
   function escape(value){return String(value||'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
   function formatOfficeText(value){
-    const blocks=[];
+    const blocks=[],sourceNotes=new Set();
     let paragraph=[],kind='prose',mode='prose',lastIndent=0,seenHour=false;
     const hour=/^(?:(?:I{1,3}|IV|V|1[ªa]?|2[ªa]?)\s+)?(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média|Completas)$/i;
     const section=/^(HINO|SALMODIA|(?:PRIMEIRA|SEGUNDA|TERCEIRA) LEITURA|LEITURA(?: BREVE| ALTERNATIVA)?|RESPONSÓRIO(?: BREVE)?|PRECES|ORAÇÃO(?: SÁLMICA| SOBRE O CÂNTICO)?|CÂNTICO EVANGÉLICO|PAI[- ]NOSSO|CONCLUSÃO|DESPEDIDA)(?:\s+(.+))?$/i;
@@ -35,7 +35,7 @@
     for(const raw of lines){
       const line=raw.trim().replace(/[ \t]+/g,' '),indent=raw.length-raw.trimStart().length;
       if(!line){flush();lastIndent=0;continue;}
-      if(/^Copyright\s*©/i.test(line)){flush();blocks.push('<small class="office-source-note">'+escape(line)+'</small>');continue;}
+      if(/^Copyright\s*©/i.test(line)){sourceNotes.add(line);continue;}
       if(hour.test(line)){flush();blocks.push('<h3 class="office-hour-heading">'+escape(line)+'</h3>');mode='prose';seenHour=true;continue;}
       const heading=line.match(section);
       // A complete section label may have a biblical reference or a short rubric.
@@ -69,7 +69,7 @@
       }
       lastIndent=indent;
     }
-    flush();return blocks.join('\n');
+    flush();for(const note of sourceNotes)blocks.push('<small class="office-source-note">'+escape(note)+'</small>');return blocks.join('\n');
   }
   function officeResources(record){
     if(!record)return '';

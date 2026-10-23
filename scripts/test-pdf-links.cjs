@@ -27,9 +27,10 @@ console.log('PDFs: 63 links oficiais correspondem aos arquivos locais; páginas 
 const offices=JSON.parse(fs.readFileSync('www/data/oficios-osm.json'));
 const records=[...Object.values(offices.celebracoes),...offices.celebracoes_moveis,...offices.sabados_marianos_pdf].filter(item=>item.pdf_transcript);
 const plain=html=>html.replace(/<[^>]+>/g,'').replace(/&(amp|lt|gt|quot|#39);/g,(_,entity)=>({amp:'&',lt:'<',gt:'>',quot:'"','#39':"'"}[entity]));
-const compact=value=>value.replace(/\s+/g,' ').trim();
+const compact=value=>value.replace(/Copyright\s*© CURIA GENERALIZIA OSM, Piazza San Marcello, 5 – Roma/g,'').replace(/\s+/g,' ').trim();
 assert.equal(records.length,31);
 for(const item of records)assert.equal(compact(plain(formatOfficeText(item.pdf_transcript))),compact(item.pdf_transcript),'O texto integral deve ser preservado: '+item.pdf_file);
+for(const item of records)assert.equal((formatOfficeText(item.pdf_transcript).match(/class="office-source-note"/g)||[]).length,1,'Crédito único ao final, sem interromper a leitura');
 const pucci=formatOfficeText(offices.celebracoes['01-12'].pdf_transcript);
 assert.match(pucci,/<h3 class="office-hour-heading">Ofício das Leituras<\/h3>/);
 assert.ok((pucci.match(/office-hymn-stanza/g)||[]).length>=6,'Preservar as estrofes do hino de Pucci');
