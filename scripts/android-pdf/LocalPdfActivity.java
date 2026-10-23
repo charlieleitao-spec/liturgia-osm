@@ -35,7 +35,7 @@ public final class LocalPdfActivity extends Activity {
     private ImageButton previous,next;
     private int pageIndex;
     private static final int INK=0xff26384a,BORDER=0xffe2e6e9,DISABLED=0xffb8c0c7,BAR=0xfffcfbf8;
-    private static final int BACK=0,NEXT=1,MINUS=2,PLUS=3;
+    private static final int BACK=0,NEXT=1,MINUS=2,PLUS=3,PRINT=4;
     private int dp(int value){return Math.round(value*getResources().getDisplayMetrics().density);}
     private ImageButton button(int icon,String description,String tag){
         ImageButton button=new ImageButton(this);button.setImageDrawable(new ControlIcon(icon));
@@ -69,6 +69,7 @@ public final class LocalPdfActivity extends Activity {
             Path path=new Path();
             if(icon==BACK){path.moveTo(15,5);path.lineTo(8,12);path.lineTo(15,19);}
             else if(icon==NEXT){path.moveTo(9,5);path.lineTo(16,12);path.lineTo(9,19);}
+            else if(icon==PRINT){path.moveTo(7,8);path.lineTo(7,3);path.lineTo(17,3);path.lineTo(17,8);path.moveTo(7,17);path.lineTo(3,17);path.lineTo(3,8);path.lineTo(21,8);path.lineTo(21,17);path.lineTo(17,17);path.moveTo(7,13);path.lineTo(17,13);path.lineTo(17,21);path.lineTo(7,21);path.close();path.moveTo(17,10.5f);path.lineTo(18,10.5f);}
             else {path.moveTo(5,12);path.lineTo(19,12);if(icon==PLUS){path.moveTo(12,5);path.lineTo(12,19);}}
             canvas.drawPath(path,paint);canvas.restoreToCount(save);
         }
@@ -96,6 +97,8 @@ public final class LocalPdfActivity extends Activity {
             toolbar.addView(title,new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.WRAP_CONTENT,1));
             ImageButton less=button(MINUS,"Diminuir ampliação","pdf-zoom-out"),more=button(PLUS,"Aumentar ampliação","pdf-zoom-in");
             toolbar.addView(less,new LinearLayout.LayoutParams(dp(48),dp(48)));toolbar.addView(more,new LinearLayout.LayoutParams(dp(48),dp(48)));
+            ImageButton print=button(PRINT,"Imprimir PDF","pdf-print");
+            print.setOnClickListener(view->printPdf());toolbar.addView(print,new LinearLayout.LayoutParams(dp(48),dp(48)));
             root.addView(toolbar);
             divider(root);
             pageView=new PageView();pageView.setTag("pdf-page");root.addView(pageView,new LinearLayout.LayoutParams(-1,0,1));
@@ -110,6 +113,18 @@ public final class LocalPdfActivity extends Activity {
             if(state!=null)pageView.zoomBy(state.getFloat("zoom",1));
         }catch(Exception error){
             new AlertDialog.Builder(this).setMessage("Não foi possível abrir este PDF local.").setPositiveButton("Voltar",(dialog,which)->finish()).setOnCancelListener(dialog->finish()).show();
+        }
+    }
+    private void printPdf(){
+        try {
+            android.print.PrintManager manager=(android.print.PrintManager)getSystemService(PRINT_SERVICE);
+            if(manager==null)throw new IllegalStateException("Impressão indisponível");
+            String path=getIntent().getStringExtra("path"),title=getIntent().getStringExtra("title");
+            manager.print(title==null||title.trim().isEmpty()?"Liturgia OSM":title,
+                new LocalPdfPrintAdapter(this,path,renderer.getPageCount()),
+                new android.print.PrintAttributes.Builder().setMediaSize(android.print.PrintAttributes.MediaSize.ISO_A4).build());
+        }catch(Exception error){
+            new AlertDialog.Builder(this).setMessage("Não foi possível abrir a impressão. Verifique o serviço de impressão nas configurações do Android.").setPositiveButton("OK",null).show();
         }
     }
     private void renderPage(){

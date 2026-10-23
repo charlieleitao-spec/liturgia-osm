@@ -15,10 +15,18 @@ final class PdfValidation {
         // Decode every bundled page using the same engine as the real reader.
         Class<?> store=instrumentation.getTargetContext().getClassLoader().loadClass("com.liturgia_osm.app.LocalPdfStore");
         Method open=store.getMethod("open",android.content.Context.class,String.class);
+        Class<?> printer=instrumentation.getTargetContext().getClassLoader().loadClass("com.liturgia_osm.app.LocalPdfPrintAdapter");
+        Method write=printer.getMethod("writeOriginal",android.content.Context.class,String.class,java.io.OutputStream.class,android.os.CancellationSignal.class);
         int files=0,pages=0;
         for(String directory:new String[]{"missal","oficios"}){
             for(String file:instrumentation.getTargetContext().getAssets().list("public/data/pdfs/"+directory)){
                 if(!file.endsWith(".pdf"))continue;
+                String asset="data/pdfs/"+directory+"/"+file;
+                java.io.ByteArrayOutputStream printed=new java.io.ByteArrayOutputStream();
+                write.invoke(null,instrumentation.getTargetContext(),asset,printed,new android.os.CancellationSignal());
+                try(java.io.InputStream input=instrumentation.getTargetContext().getAssets().open("public/"+asset)){
+                    if(!java.util.Arrays.equals(input.readAllBytes(),printed.toByteArray()))throw new Exception("Print changed original PDF: "+file);
+                }
                 try(PdfRenderer renderer=(PdfRenderer)open.invoke(null,instrumentation.getTargetContext(),"data/pdfs/"+directory+"/"+file)){
                     files++;
                     for(int index=0;index<renderer.getPageCount();index++){
@@ -43,7 +51,7 @@ final class PdfValidation {
         instrumentation.waitForIdleSync();
         instrumentation.runOnMainSync(()->{
             int minimum=Math.round(48*viewer.getResources().getDisplayMetrics().density);
-            for(String tag:new String[]{"pdf-close","pdf-zoom-out","pdf-zoom-in","pdf-previous","pdf-next"}){
+            for(String tag:new String[]{"pdf-close","pdf-zoom-out","pdf-zoom-in","pdf-previous","pdf-next","pdf-print"}){
                 View control=viewer.getWindow().getDecorView().findViewWithTag(tag);
                 if(!(control instanceof android.widget.ImageButton)||control.getWidth()<minimum||control.getHeight()<minimum||control.getElevation()!=0||control.getContentDescription()==null)
                     throw new AssertionError("PDF control style, touch area or label: "+tag);
@@ -59,6 +67,28 @@ final class PdfValidation {
             if(!page.getContentDescription().toString().contains("125%"))throw new AssertionError("Zoom control failed");
         });
         screenshot(instrumentation,"pdf-reader-zoom.png");
+        instrumentation.runOnMainSync(()->viewer.getWindow().getDecorView().findViewWithTag("pdf-print").performClick());
+        boolean printOpened=false;
+        for(int attempt=0;attempt<60;attempt++){
+            android.view.accessibility.AccessibilityNodeInfo root=instrumentation.getUiAutomation().getRootInActiveWindow();
+            if(root!=null&&"com.android.printspooler".equals(String.valueOf(root.getPackageName()))){printOpened=true;break;}
+            Thread.sleep(250);
+        }
+        if(!printOpened)throw new Exception("Print button did not open Android printing");
+        Thread.sleep(1500);
+        Bitmap printScreen=instrumentation.getUiAutomation().takeScreenshot();
+        if(printScreen==null)throw new Exception("Print screenshot unavailable");
+        try(java.io.FileOutputStream output=new java.io.FileOutputStream(new java.io.File(instrumentation.getTargetContext().getFilesDir(),"pdf-print.png"))){printScreen.compress(Bitmap.CompressFormat.PNG,100,output);}finally{printScreen.recycle();}
+        instrumentation.getUiAutomation().performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK);
+        instrumentation.waitForIdleSync();
+        boolean returned=false;
+        for(int attempt=0;attempt<60;attempt++){
+            android.view.accessibility.AccessibilityNodeInfo root=instrumentation.getUiAutomation().getRootInActiveWindow();
+            if(root!=null&&instrumentation.getTargetContext().getPackageName().equals(String.valueOf(root.getPackageName()))){returned=true;break;}
+            Thread.sleep(250);
+        }
+        if(!returned)throw new Exception("Print cancellation did not return to reader");
+        assertPosition(instrumentation,viewer,2);
         instrumentation.runOnMainSync(()->{
             viewer.getWindow().getDecorView().findViewWithTag("pdf-zoom-out").performClick();
             if(!viewer.getWindow().getDecorView().findViewWithTag("pdf-page").getContentDescription().toString().contains("100%"))throw new AssertionError("Zoom out failed");
@@ -78,7 +108,7 @@ final class PdfValidation {
         assertPosition(instrumentation,office,2);
         instrumentation.runOnMainSync(office::finish);instrumentation.waitForIdleSync();instrumentation.removeMonitor(monitor);
         if(!"true".equals(javascript.evaluate("!location.pathname.endsWith('.pdf') && externalSearchRequests===0")))throw new Exception("PDF opening navigated WebView or used external network");
-        System.out.println("PASS: 63 PDFs / 342 pages decoded by Android; Mass and Office/search opened offline; five flat icon buttons with 48dp touch targets; previous/next, zoom in/out and return passed; native screenshots saved.");
+        System.out.println("PASS: 63 PDFs / 342 pages decoded by Android; Mass and Office/search opened offline; six flat icon buttons; original bytes of 63 PDFs preserved for printing; Android print screen and cancellation passed with 48dp touch targets; previous/next, zoom in/out and return passed; native screenshots saved.");
     }
     private static void screenshot(Instrumentation instrumentation,String name) throws Exception {
         // The CI launcher can show its own ANR dialog over an otherwise working reader.
