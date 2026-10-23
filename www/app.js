@@ -1450,6 +1450,7 @@ if ("serviceWorker" in navigator && !window.Capacitor?.isNativePlatform?.()) {
 /* BEGIN SCRIPT BLOCK: serviteIntegrationScript */
 let currentServiteView='';
 const serviteNames={regra:'Regra OSSM',rosario:'Rosário',coroa:'Coroa de Nossa Senhora das Dores',oficio:'Ofício',sabado:'Sábado Mariano',completo:'Recursos OSM'};
+let serviteHistoryReturnPending=false;
 function serviteUrl(view){return 'servite.html?view='+encodeURIComponent(view||'completo');}
 function serviteAdjustFont(delta){try{const frame=document.getElementById('serviteFrame');const change=frame?.contentWindow?.changeFontSize;if(typeof change==='function')change(delta);}catch(error){console.warn('[Liturgia OSM] Controle de fonte do recurso indisponível.',error);}} function openServite(view){
   currentServiteView=view||'completo';
@@ -1459,7 +1460,7 @@ function serviteAdjustFont(delta){try{const frame=document.getElementById('servi
   openAccessibleDialog('serviteOverlay');document.body.classList.add('servite-open');
   if(!history.state?.serviteOverlay) history.pushState({...history.state,serviteOverlay:true},'');
 }
-function closeServite(fromHistory=false){const ov=document.getElementById('serviteOverlay'),fr=document.getElementById('serviteFrame');const wasOpen=ov?.classList.contains('open');closeAccessibleDialog('serviteOverlay');readerScale=parseFloat(localStorage.getItem('osmReaderScale')||'1');applyPreferences();document.body.classList.remove('servite-open');fr.src='about:blank';if(wasOpen&&!fromHistory&&history.state?.serviteOverlay)history.back();}
+function closeServite(fromHistory=false){const ov=document.getElementById('serviteOverlay'),fr=document.getElementById('serviteFrame');const wasOpen=ov?.classList.contains('open');closeAccessibleDialog('serviteOverlay');readerScale=parseFloat(localStorage.getItem('osmReaderScale')||'1');applyPreferences();document.body.classList.remove('servite-open');fr.src='about:blank';if(wasOpen&&!fromHistory&&history.state?.serviteOverlay){serviteHistoryReturnPending=true;history.back();}}
 // Keyboard events inside the embedded document do not bubble to the parent.
 document.getElementById('serviteFrame').addEventListener('load',()=>{
   const frame=document.getElementById('serviteFrame');
@@ -1476,7 +1477,14 @@ document.getElementById('serviteFrame').addEventListener('load',()=>{
   });}catch(error){console.warn('[Liturgia OSM] Foco do recurso indisponível.',error);}
 });
 function serviteReload(){if(currentServiteView)document.getElementById('serviteFrame').src=serviteUrl(currentServiteView)+'&reload='+Date.now();}
-window.addEventListener('popstate',()=>{if(document.getElementById('serviteOverlay')?.classList.contains('open'))closeServite(true);});
+window.addEventListener('popstate',event=>{
+  const resourceOpen=document.getElementById('serviteOverlay')?.classList.contains('open');
+  if(resourceOpen||serviteHistoryReturnPending){
+    serviteHistoryReturnPending=false;
+    event.osmServiteReturn=true;
+    if(resourceOpen)closeServite(true);
+  }
+});
 /* END SCRIPT BLOCK: serviteIntegrationScript */
 
 /* BEGIN SCRIPT BLOCK: interface490Script */
@@ -1822,7 +1830,8 @@ loadCanonicalSantoral();
 
   installAndroidBackHandler();
   window.addEventListener('keydown',function(event){if(event.key==='Escape')smartBack();});
-  window.addEventListener('popstate',function(){
+  window.addEventListener('popstate',function(event){
+    if(event.osmServiteReturn)return;
     const mass=document.getElementById('dailyLiturgyOverlay');
     if(mass&&mass.classList.contains('open')&&typeof window.closeDailyLiturgy==='function'){window.closeDailyLiturgy();updateBackButton();return;}
     if(state.detailId!==null&&state.detailId!==undefined)closeDetail();

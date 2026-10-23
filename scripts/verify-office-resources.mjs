@@ -13,7 +13,7 @@ try{
   const errors=[];page.on('pageerror',error=>errors.push(error.message));
   await mkdir('validation-layout',{recursive:true});
   await page.goto('http://127.0.0.1:8774/');
-  await page.waitForFunction(()=>santoralReady&&oficiosReady&&typeof OSMPdf?.officeResources==='function');
+  await page.waitForFunction(()=>typeof santoralReady!=='undefined'&&santoralReady&&oficiosReady&&typeof OSMPdf?.officeResources==='function');
   const offices=await page.evaluate(()=>SANTORAL.filter(s=>officeRecordForSaint(s)?.pdf_transcript).map(s=>({id:s._id,month:s.month,day:s.day,transcript:officeRecordForSaint(s).pdf_transcript,url:officeRecordForSaint(s).local_pdf_url})));
   assert.equal(offices.length,26);
   // The real entry point must retain every complete office exactly once.
@@ -60,8 +60,14 @@ try{
     assert.ok((await frame.locator('.hour-tab-content').textContent()).trim().length>20);
     await page.getByRole('button',{name:'Fechar recurso',exact:true}).click();
     await page.waitForFunction(()=>!document.getElementById('serviteOverlay').classList.contains('open'));
+    await page.waitForFunction(()=>!history.state?.serviteOverlay);
     assert.equal(await page.locator('#hub-liturgia .office-pdf-link').count(),1);
   }
+  await page.evaluate(({id,hour})=>openSantoralOfficeHour(id,hour),{id:chosen.id,hour:hours[0][0]});
+  await page.frameLocator('#serviteFrame').locator('.hour-tab-content').waitFor();
+  await page.goBack();
+  await page.waitForFunction(()=>!document.getElementById('serviteOverlay').classList.contains('open'));
+  assert.equal(await page.locator('#hub-liturgia .office-pdf-link').count(),1);
   // Standalone resource pages retain the complete text and a single PDF action.
   const standalone=await context.newPage();
   await standalone.goto(`http://127.0.0.1:8774/servite.html?view=oficio:${chosen.id}:laudes`);
@@ -73,7 +79,7 @@ try{
   await page.evaluate(async()=>{await navigator.serviceWorker.ready;});
   await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
   await context.setOffline(true);await page.reload();
-  await page.waitForFunction(()=>santoralReady&&oficiosReady);
+  await page.waitForFunction(()=>typeof santoralReady!=='undefined'&&santoralReady&&oficiosReady);
   await page.evaluate(id=>openLiturgiaDetail('horas',id),chosen.id);
   await page.getByText('Ler texto completo do Ofício',{exact:true}).click();
   assert.equal(await page.locator('.office-transcript-text').textContent(),chosen.transcript);
