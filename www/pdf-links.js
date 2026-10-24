@@ -9,7 +9,7 @@
         const match=url.pathname.match(/^\/sitoosm\/po\/textos-osm\/livros-liturgicos-osm\/(missa|lhoras)\/([a-z0-9-]+\.pdf)$/i);
         if(match)path='data/pdfs/'+(match[1]==='missa'?'missal':'oficios')+'/'+match[2];
       }
-      if(!/^data\/pdfs\/(missal|oficios)\/[a-z0-9-]+\.pdf$/.test(path))return null;
+      if(!/^data\/pdfs\/(missal|oficios|biblioteca)\/[a-z0-9-]+\.pdf$/.test(path))return null;
       const page=Number(new URLSearchParams(url.hash.slice(1)).get('page'));
       return {path,page:Number.isSafeInteger(page)&&page>0?page:1};
     }catch{return null;}

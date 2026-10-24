@@ -17,4 +17,4 @@ O pacote ZIP de integração preparado para o projeto contém exatamente esse ar
 4. Testar abertura e impressão do PDF, leitura sem rede e atualização por cima no Samsung A56.
 5. Não fazer merge ou publicar APK sem aprovação.
 
-**Estado atual:** PDF preparado localmente, mas ainda não enviado ao GitHub. Não declarar integração offline concluída.
+**Estado atual:** PDF enviado à branch, com integridade SHA-256 conferida (`dde52f1feeed23b275f27bb230a7d56c27949272dade68504b1bd5423c79341a`). Os dois catálogos apontam os três documentos para o volume local; o arquivo foi incluído em CORE e o cache foi atualizado. Abertura, impressão, instalação limpa e atualização por cima no Samsung A56 ainda aguardam teste. Sem merge ou publicação de APK.

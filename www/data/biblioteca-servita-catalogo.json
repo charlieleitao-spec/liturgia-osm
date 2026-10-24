@@ -2,28 +2,28 @@
   "schema_version": 1,
   "title": "Biblioteca Servita",
   "language": "pt-BR",
-  "status": "preparacao",
+  "status": "parcialmente_offline",
   "documents": [
     {
       "id": "constituicoes-osm",
       "title": "Constituições da Ordem dos Servos de Maria",
       "edition": "Cúria Geral OSM, 2015",
       "source_group": "volume-osm-2015",
-      "offline_asset": null
+      "offline_asset": "./data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf"
     },
     {
       "id": "regra-santo-agostinho",
       "title": "Regra de Santo Agostinho",
       "edition": "Cúria Geral OSM, 2015",
       "source_group": "volume-osm-2015",
-      "offline_asset": null
+      "offline_asset": "./data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf"
     },
     {
       "id": "diretorio-geral",
       "title": "Diretório Geral",
       "edition": "Cúria Geral OSM, 2015",
       "source_group": "volume-osm-2015",
-      "offline_asset": null
+      "offline_asset": "./data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf"
     },
     {
       "id": "ratio-institutionis",

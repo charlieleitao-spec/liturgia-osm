@@ -12,7 +12,7 @@ public final class LocalPdfPlugin extends Plugin {
     @PluginMethod
     public void open(PluginCall call){
         String path=call.getString("path");
-        if(path==null||!path.matches("data/pdfs/(missal|oficios)/[a-z0-9-]+\\.pdf")){
+        if(path==null||!path.matches("data/pdfs/(missal|oficios|biblioteca)/[a-z0-9-]+\\.pdf")){
             call.reject("PDF local inválido");return;
         }
         try(java.io.InputStream input=getContext().getAssets().open("public/"+path)){

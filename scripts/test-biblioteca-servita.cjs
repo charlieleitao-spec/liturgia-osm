@@ -19,6 +19,16 @@ for(const d of catalog.documents){
   }
 }
 const sw=fs.readFileSync(path.join(web,'sw.js'),'utf8');
+const vm=require('node:vm');
+const core=vm.runInNewContext(sw+'; CORE;', {self:{addEventListener(){}}});
+const volume='./data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf';
+for(const id of ['constituicoes-osm','regra-santo-agostinho','diretorio-geral']){
+ if(catalog.documents.find(d=>d.id===id)?.offline_asset!==volume)throw Error('Volume de 2015 não integrado: '+id);
+}
+for(const d of catalog.documents){
+ if(d.offline_asset&&!core.includes(d.offline_asset))throw Error('PDF fora do cache inicial: '+d.id);
+}
+if(fs.readFileSync(catalogPath,'utf8')!==fs.readFileSync(path.join(root,'data','biblioteca-servita-catalogo.json'),'utf8'))throw Error('Catálogos divergentes');
 for(const asset of ['biblioteca-servita.html','data/biblioteca-servita-catalogo.json']){
  if(!sw.includes(asset))throw Error('Falta no cache: '+asset);
 }
