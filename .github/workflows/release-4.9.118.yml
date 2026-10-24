@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['.github/workflows/release-4.9.118.yml', 'scripts/audit-servita-base.mjs']
+    paths: ['.github/workflows/release-4.9.118.yml', 'scripts/audit-servita-base.mjs', 'scripts/audit-navigation.mjs']
 
 permissions:
   contents: write
