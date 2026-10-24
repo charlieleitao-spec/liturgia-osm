@@ -71,7 +71,7 @@ try{
  }
  // Individual-hour screen, using the real standalone resource page.
  const standalone=await context.newPage();
- await standalone.goto('http://127.0.0.1:8781/servite.html?view=oficio:0:hora_media');
+ await standalone.goto('http://127.0.0.1:8781/servite.html?view=oficio:0:horaMedia');
  await standalone.locator('.hour-tab-content').waitFor();
  assert.equal(await standalone.locator('.psalm-title').count(),9);
  assert.ok(await standalone.locator('.psalm-stanza').count()>=25);
