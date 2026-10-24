@@ -1,0 +1,38 @@
+name: Validar fonte comum da Biblioteca Servita
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'www/data/biblioteca-servita-catalogo.json'
+      - 'data/biblioteca-servita-catalogo.json'
+      - 'www/data/pdfs/biblioteca/**'
+      - 'scripts/sync-servita-content.py'
+      - 'scripts/test-servita-content.py'
+      - '.github/workflows/validate-shared-content.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'www/data/biblioteca-servita-catalogo.json'
+      - 'data/biblioteca-servita-catalogo.json'
+      - 'www/data/pdfs/biblioteca/**'
+      - 'scripts/sync-servita-content.py'
+      - 'scripts/test-servita-content.py'
+      - '.github/workflows/validate-shared-content.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testar divergências e preservação offline
+        run: python scripts/test-servita-content.py
+      - name: Conferir espelho e PDFs da fonte
+        run: python scripts/sync-servita-content.py --source . --target . --profile source --check
+      - name: Conferir biblioteca e cache offline
+        run: node scripts/test-biblioteca-servita.cjs
