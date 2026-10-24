@@ -63,7 +63,7 @@ try{
     }
     return result;
   });
-  assert.deepEqual(psalmStrophes,{'8':[2,9,4,8,2],'18':[8,4,4,4,4,8,4,8],'23':[4,9,3,6,3],'110':[4,8,4,6],'112':[6,11],'145':[3,10,4,6,3]});
+  assert.deepEqual(psalmStrophes,{'8':[2,5,4,4,4,4,2],'18':[4,4,4,4,4,4,4,4,4,4,4],'23':[4,5,4,3,3,3,3],'110':[4,4,4,4,3,3],'112':[6,5,6],'145':[3,5,5,4,3,3,3]});
   report.push({psalmStrophes});
 
   await page.evaluate(()=>openDevo('vigilia','formula2'));
