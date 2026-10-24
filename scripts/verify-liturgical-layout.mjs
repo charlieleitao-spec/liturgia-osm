@@ -47,6 +47,25 @@ try{
     }
   }
   report.push({vigilTypography});
+  // Liturgical strophes group several verses; never split at every marker.
+  const psalmStrophes = await page.evaluate(async()=>{
+    const formulas=await (await fetch('data/devocoes/vigilia.json')).json();
+    const result={};
+    for(const text of Object.values(formulas)){
+      const root=document.createElement('div');root.innerHTML=renderPrayer(text,{vigilia:true});
+      for(const heading of root.querySelectorAll('.liturgical-psalm-heading')){
+        const number=heading.textContent.match(/\d+/)[0],strophes=[];
+        for(let n=heading.nextElementSibling;n&&!n.matches('.prayer-antiphon,h3,h4');n=n.nextElementSibling){
+          if(n.matches('.prayer-stanza'))strophes.push(n.querySelectorAll('.liturgical-verse-line').length);
+        }
+        result[number]=strophes;
+      }
+    }
+    return result;
+  });
+  assert.deepEqual(psalmStrophes,{'8':[2,5,4,4,4,4,2],'18':[4,4,4,4,4,4,4,4,4,4,4],'23':[4,5,4,3,3,3,3],'110':[4,4,4,4,3,3],'112':[6,5,6],'145':[3,5,5,4,3,3,3]});
+  report.push({psalmStrophes});
+
   await page.evaluate(()=>openDevo('vigilia','formula2'));
   await page.waitForTimeout(300);
   await page.screenshot({path:out+'/vigilia-formula2.png',fullPage:true});

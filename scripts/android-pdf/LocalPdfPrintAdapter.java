@@ -28,7 +28,7 @@ public final class LocalPdfPrintAdapter extends PrintDocumentAdapter {
             .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(pageCount).build(),false);
     }
     public static void writeOriginal(Context context,String path,OutputStream output,CancellationSignal cancellation) throws IOException {
-        if(path==null||!path.matches("data/pdfs/(missal|oficios)/[a-z0-9-]+\\.pdf"))throw new IOException("PDF local inválido");
+        if(path==null||!path.matches("data/pdfs/(missal|oficios|biblioteca)/[a-z0-9-]+\\.pdf"))throw new IOException("PDF local inválido");
         cancellation.throwIfCanceled();
         try(InputStream input=context.getAssets().open("public/"+path)){
             byte[] buffer=new byte[16384];int read;

@@ -1,9 +1,14 @@
-const CACHE = 'liturgia-osm-v4.9.117-otimizacao-recursos-oficio';
+const CACHE = 'liturgia-osm-v4.9.117-otimizacao-biblioteca-canticos-evangelicos';
 const CORE = [
   "./media/emblema-osm.svg",
   "./media/ornamento-final.svg",
   "./",
   "./index.html",
+  "./biblioteca-servita.html",
+  "./data/biblioteca-servita-catalogo.json",
+  "./data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf",
+  "./data/pdfs/biblioteca/ratio-institutionis-osm-2015.pdf",
+  "./data/pdfs/biblioteca/regra-vida-ordem-secular-1995.pdf",
   "./causas-beatos.html",
   "./app.css",
   "./liturgical-reader.css",

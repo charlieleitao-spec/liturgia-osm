@@ -90,7 +90,7 @@ function liturgicalLineHtml(value, verse=false){
   let text=String(value??'').trim();
   let prefix='';
   if(verse){
-    const mark=text.match(/^([–—=])\s*/);
+    const mark=text.match(/^([–—=\-])\s*/);
     if(mark){prefix='<span class="liturgical-marker">'+escapeHtml(mark[1])+'</span>';text=text.slice(mark[0].length);}
     const number=text.match(/^(\d{1,3})(?=\s*[A-Za-zÀ-ÿ“"«])/);
     if(number){prefix+='<sup class="verse-number">'+number[1]+'</sup> ';text=text.slice(number[0].length).trimStart();}
@@ -346,11 +346,13 @@ function renderFinalAntifonaBlock(){
 }
 
 function insertCanticleAfterAntiphon(text, canticleText){
-  const re = /(C[âÂ]ntico [Ee]vang[eé]lico[^\n]*\n[^\n]*)/;
-  if(re.test(text)){
-    return text.replace(re, (m) => `${m}\n\n${canticleText}`);
-  }
-  return text; // no antiphon found in this segment; leave unchanged
+  const re = /^([ \t]*C[âa]ntico evang[eé]lico([^\n]*)\n(?:[ \t]*\n)*)([ \t]*(?:Ant\.|Antífona)[^\n]*(?:\n(?![ \t]*$|[ \t]*(?:PRECES|ORAÇÃO|HINO|PAI[- ]NOSSO|C[âa]ntico evang[eé]lico)\b)[^\n]+)*)/gim;
+  return String(text).replace(re, (match, heading, label, antiphon, offset, source) => {
+    const following=source.slice(offset+match.length).trimStart();
+    if(/^(?:[–—=\-]\s*)?(?:Bendito seja o Senhor|A minh[’']alma engrandece|A minha alma engrandece)/i.test(following))return match;
+    const canticle=/Magnificat/i.test(label)?MAGNIFICAT_TEXT:/Benedictus/i.test(label)?BENEDICTUS_TEXT:canticleText;
+    return canticle?`${heading}${antiphon}\n\n${canticle}`:match;
+  });
 }
 
 function wrapSection(text){ return text ? [{label:null,text}] : []; }

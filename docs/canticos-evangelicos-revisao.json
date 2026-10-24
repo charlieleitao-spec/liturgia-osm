@@ -1,0 +1,34 @@
+{
+  "scope": "Apresentação dos dois cânticos evangélicos dos Ofícios; redação existente e antífonas próprias preservadas. Citações bíblicas em leituras permanecem no contexto original.",
+  "reference": "PAULUS, Liturgia Diária das Horas, julho de 2020, 2ª capa, cânticos evangélicos; estrofes conferidas na página diagramada.",
+  "source_url": "https://www.paulus.com.br/portal/wp-content/uploads/2020/06/LDH-Julho2020.pdf",
+  "canticles": {
+    "BENEDICTUS_TEXT": {
+      "strophes": 8,
+      "lines_per_strophe": [
+        4,
+        4,
+        4,
+        3,
+        3,
+        4,
+        4,
+        2
+      ],
+      "source": "Redação do texto existente preservada; estrofes cotejadas com Liturgia Diária das Horas, PAULUS, julho de 2020, 2ª capa.",
+      "original_text_sha256": "57f37f753f82068aa67fcda8dbca4fb4ba25a2239a9a80c07482e21b555c0085"
+    },
+    "MAGNIFICAT_TEXT": {
+      "strophes": 5,
+      "lines_per_strophe": [
+        4,
+        4,
+        6,
+        4,
+        2
+      ],
+      "source": "Redação do texto existente preservada; estrofes cotejadas com Liturgia Diária das Horas, PAULUS, julho de 2020, 2ª capa.",
+      "original_text_sha256": "e3016e472469406783081df68322105301600c98f4b538d9a64283201a69c2f1"
+    }
+  }
+}

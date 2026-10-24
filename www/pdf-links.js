@@ -9,7 +9,7 @@
         const match=url.pathname.match(/^\/sitoosm\/po\/textos-osm\/livros-liturgicos-osm\/(missa|lhoras)\/([a-z0-9-]+\.pdf)$/i);
         if(match)path='data/pdfs/'+(match[1]==='missa'?'missal':'oficios')+'/'+match[2];
       }
-      if(!/^data\/pdfs\/(missal|oficios)\/[a-z0-9-]+\.pdf$/.test(path))return null;
+      if(!/^data\/pdfs\/(missal|oficios|biblioteca)\/[a-z0-9-]+\.pdf$/.test(path))return null;
       const page=Number(new URLSearchParams(url.hash.slice(1)).get('page'));
       return {path,page:Number.isSafeInteger(page)&&page>0?page:1};
     }catch{return null;}
@@ -20,7 +20,7 @@
     let paragraph=[],kind='prose',mode='prose',lastIndent=0,seenHour=false;
     const hour=/^(?:(?:I{1,3}|IV|V|1[ªa]?|2[ªa]?)\s+)?(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média|Completas)$/i;
     const section=/^(HINO|SALMODIA|(?:PRIMEIRA|SEGUNDA|TERCEIRA) LEITURA|LEITURA(?: BREVE| ALTERNATIVA)?|RESPONSÓRIO(?: BREVE)?|PRECES|ORAÇÃO(?: SÁLMICA| SOBRE O CÂNTICO)?|CÂNTICO EVANGÉLICO|PAI[- ]NOSSO|CONCLUSÃO|DESPEDIDA)(?:\s+(.+))?$/i;
-    function inline(text){return escape(text).replace(/^((?:Ant\.(?:\s*\d+)?|Antífona(?:\s*\d+)?|[VR][./]|[℣℟]\.?)\s*)/i,'<span class="rubric">$1</span>');}
+    function inline(text){return escape(text).replace(/^((?:Ant\.(?:\s*\d+)?|Antífona(?:\s*\d+)?|[VR][./]|[℣℟]\.?)\s*)/i,'<span class="rubric">$1</span>').replace(/([^\s<>]+)\s+([*†])(?=\s|$)/g,'<span class="liturgical-cue">$1 $2</span>');}
     function flush(){
       if(!paragraph.length)return;
       if(kind==='hymn'||kind==='psalm')blocks.push('<div class="office-'+kind+'-stanza">'+paragraph.map(line=>'<span class="office-verse-line">'+inline(line)+'</span>').join('\n')+'</div>');
@@ -52,7 +52,7 @@
         flush();blocks.push('<p class="office-document-meta">'+escape(line)+'</p>');continue;
       }
       if(/^(?:Salmo\s+\d|Cântico\s*\(|Série\s+[A-Z])/i.test(line)){
-        flush();blocks.push('<h4 class="office-psalm-heading">'+escape(line)+'</h4>');continue;
+        flush();blocks.push('<h4 class="office-psalm-heading">'+escape(line)+'</h4>');mode='psalm';continue;
       }
       if(/^(?:Ant\.|Antífona)\s*\d*/i.test(line)){flush();add(line,'antiphon');}
       else if(/^(?:[VR][./]|[℣℟]\.?)\s*/.test(line)){flush();add(line,'response');}

@@ -3,6 +3,7 @@ const fs=require('node:fs');
 const {resolve,formatOfficeText}=require('../www/pdf-links.js');
 const base='https://localhost/index.html';
 for(const [input,path,page] of [
+ ['./data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf#page=25','data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf',25],
  ['./data/pdfs/missal/antonio.pdf','data/pdfs/missal/antonio.pdf',1],
  ['./data/pdfs/oficios/piecruz.pdf#page=3','data/pdfs/oficios/piecruz.pdf',3],
  ['http://servidimaria.net/sitoosm/po/textos-osm/livros-liturgicos-osm/missa/dolorosa.pdf','data/pdfs/missal/dolorosa.pdf',1],

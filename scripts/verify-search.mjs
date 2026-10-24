@@ -1,7 +1,8 @@
 import {chromium} from 'playwright';
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
-import {mkdir} from 'node:fs/promises';
+import {mkdir,readFile} from 'node:fs/promises';
+const expectedDocuments=JSON.parse(await readFile('www/data/search-index.json','utf8')).documents.length;
 const server=spawn('python3',['-m','http.server','8772','--directory','www'],{stdio:'ignore'});
 const browser=await chromium.launch({executablePath:process.env.CHROME_BIN||undefined,headless:true,args:['--no-sandbox']});
 try {
@@ -61,6 +62,24 @@ try {
   await page.waitForFunction(()=>typeof santoralReady!=='undefined'&&santoralReady);
   await page.evaluate(()=>openGlobalSearch());
   await page.waitForFunction(()=>!!globalSearchIndex);
-  assert.equal(await page.evaluate(()=>globalSearchIndex.documents.length),456,'Stale corpus cache rebuilt offline');
+  assert.equal(await page.evaluate(()=>globalSearchIndex.documents.length),expectedDocuments,'Stale corpus cache rebuilt offline');
+  await page.goto('http://127.0.0.1:8772/biblioteca-servita.html');
+  await page.waitForFunction(()=>document.querySelectorAll('#documents article').length===5);
+  await page.evaluate(()=>{
+    window.libraryOpened=[];
+    window.Capacitor={isNativePlatform:()=>true,getPlatform:()=> 'android',Plugins:{LocalPdf:{open:async options=>{libraryOpened.push(options);}}}};
+  });
+  for(const [index,expected] of [43,25,131].entries()){
+    const link=page.locator('#documents article').nth(index).getByRole('link');
+    assert.match(await link.getAttribute('href'),new RegExp('#page='+expected+'$'));
+    await link.click();
+    await page.waitForFunction(count=>libraryOpened.length===count,index+1);
+  }
+  assert.deepEqual(await page.evaluate(()=>libraryOpened.map(item=>item.page)),[43,25,131]);
+  assert.ok(await page.evaluate(async()=>{
+    const res=await fetch('./data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf');
+    return res.ok&&(await res.text()).startsWith('%PDF-');
+  }),'Volume oficial disponível offline');
+  console.log('Biblioteca: três links enviam páginas 43, 25 e 131 ao leitor Android simulado; PDF disponível offline.');
   console.log('Busca: filtros, leitura, retorno, PDF, 320/390/768 px e recarga offline OK.');
 } finally {await browser.close();server.kill();}

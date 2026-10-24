@@ -11,7 +11,7 @@ import java.io.IOException;
 /** Opens only packaged PDFs. No HTTP, storage permission or external viewer. */
 public final class LocalPdfStore {
     public static PdfRenderer open(Context context, String path) throws IOException {
-        if(path==null || !path.matches("data/pdfs/(missal|oficios)/[a-z0-9-]+\\.pdf"))
+        if(path==null || !path.matches("data/pdfs/(missal|oficios|biblioteca)/[a-z0-9-]+\\.pdf"))
             throw new IOException("PDF local inválido");
         File directory=new File(context.getCacheDir(),"osm-pdfs");
         if(!directory.isDirectory()&&!directory.mkdirs())throw new IOException("Cache indisponível");
