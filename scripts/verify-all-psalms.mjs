@@ -21,7 +21,8 @@ try{
    const node=document.createElement('div');node.innerHTML=renderPrayer(source);
    const expected=(source.match(/^[ \t]*Salmo\s+\d+\b/gim)||[]).length;
    if(node.querySelectorAll('.liturgical-psalm-heading').length!==expected)throw Error('Título não reconhecido: '+item.file+'/'+item.path.join('/'));
-   if(expected&&/[*†]/.test(source)&&!node.querySelector('.liturgical-verse-line'))throw Error('Salmo apresentado como prosa: '+item.path.join('/'));
+   const references=(source.match(/^[ \t]*Salmo 94, como no Ordinário[^\n]*/gim)||[]).length;
+   if(expected>references&&/[*†]/.test(source)&&!node.querySelector('.liturgical-verse-line'))throw Error('Salmo apresentado como prosa: '+item.path.join('/'));
    results.push({file:item.file,path:item.path,headings:expected,verses:node.querySelectorAll('.liturgical-verse-line').length});
   }
   let masses=0;
