@@ -21,3 +21,10 @@ O pacote ZIP de integração preparado para o projeto contém exatamente esse ar
 
 ## Acesso direto às partes do volume
 Os links do catálogo abrem o início do texto: Constituições na página 43, Regra de Santo Agostinho na página 25 e Diretório Geral na página 131. As páginas foram conferidas no PDF e no índice do volume; a numeração impressa coincide com a numeração do arquivo. O PDF permanece integral e inalterado. O teste de navegador verifica o envio das três páginas ao leitor Android simulado, inclusive sem rede. A confirmação no aparelho continua pendente.
+
+## Documentos acrescentados
+
+- Ratio Institutionis OSM: texto em português, edição de 2015, 79 páginas, fornecido como `texto.pdf`.
+- Regra de Vida da Ordem Secular dos Servos de Maria: Roma, 1995, 21 páginas, fornecida como `regrossm-2.pdf`.
+
+Os arquivos foram preservados integralmente e incluídos no catálogo e no cache inicial. A versão de teste é `4.9.117-biblioteca-teste3`; sem merge ou publicação de versão definitiva.
