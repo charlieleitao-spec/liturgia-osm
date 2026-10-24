@@ -1,7 +1,8 @@
 import {chromium} from 'playwright';
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
-import {mkdir} from 'node:fs/promises';
+import {mkdir,readFile} from 'node:fs/promises';
+const expectedDocuments=JSON.parse(await readFile('www/data/search-index.json','utf8')).documents.length;
 const server=spawn('python3',['-m','http.server','8772','--directory','www'],{stdio:'ignore'});
 const browser=await chromium.launch({executablePath:process.env.CHROME_BIN||undefined,headless:true,args:['--no-sandbox']});
 try {
@@ -61,6 +62,6 @@ try {
   await page.waitForFunction(()=>typeof santoralReady!=='undefined'&&santoralReady);
   await page.evaluate(()=>openGlobalSearch());
   await page.waitForFunction(()=>!!globalSearchIndex);
-  assert.equal(await page.evaluate(()=>globalSearchIndex.documents.length),456,'Stale corpus cache rebuilt offline');
+  assert.equal(await page.evaluate(()=>globalSearchIndex.documents.length),expectedDocuments,'Stale corpus cache rebuilt offline');
   console.log('Busca: filtros, leitura, retorno, PDF, 320/390/768 px e recarga offline OK.');
 } finally {await browser.close();server.kill();}

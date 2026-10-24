@@ -4,8 +4,6 @@ on:
   workflow_dispatch:
   push:
     branches: ['feature/biblioteca-servita']
-    paths:
-      - '.github/workflows/build-biblioteca-teste.yml'
 
 permissions:
   contents: read
