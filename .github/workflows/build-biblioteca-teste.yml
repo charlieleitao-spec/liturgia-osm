@@ -37,7 +37,7 @@ jobs:
           npm ci
 
       - name: Auditar conteúdo e funcionamento offline
-        run: node scripts/test-biblioteca-servita.cjs && node scripts/test-salmos.cjs && npm test
+        run: node scripts/test-biblioteca-servita.cjs && node scripts/test-salmos.cjs && node scripts/test-canticles.cjs && npm test
 
       - name: Verificar padrão litúrgico no navegador
         env:
@@ -46,6 +46,7 @@ jobs:
           npm install --no-save --package-lock=false --ignore-scripts playwright
           node scripts/verify-liturgical-layout.mjs
           node scripts/verify-all-psalms.mjs
+          node scripts/verify-canticles.mjs
           node scripts/verify-favorites.mjs
           node scripts/verify-search.mjs
           node scripts/verify-office-resources.mjs
@@ -98,8 +99,8 @@ jobs:
 
       - name: Definir versão e segurança
         run: |
-          sed -i 's/versionCode [0-9][0-9]*/versionCode 41028/' android/app/build.gradle
-          sed -i 's/versionName "[^"]*"/versionName "4.9.117-biblioteca-teste8"/' android/app/build.gradle
+          sed -i 's/versionCode [0-9][0-9]*/versionCode 41029/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "4.9.117-biblioteca-teste9"/' android/app/build.gradle
           python3 - <<'PY'
           from pathlib import Path
           p = Path('android/app/build.gradle')
@@ -173,17 +174,17 @@ jobs:
           ./gradlew assembleRelease
 
       - name: Nomear APK
-        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.117-biblioteca-teste8.apk
+        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.117-biblioteca-teste9.apk
 
       - name: Conferir assinatura e todos os arquivos offline
         run: |
           APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
-          "$APKSIGNER" verify --verbose --print-certs Liturgia-OSM-4.9.117-biblioteca-teste8.apk > assinatura.txt
+          "$APKSIGNER" verify --verbose --print-certs Liturgia-OSM-4.9.117-biblioteca-teste9.apk > assinatura.txt
           grep -q 'certificate SHA-256 digest: 5b2b3319cc9f9bb61a14fb8a30e63044db225f7b930fca9568c82854f38b4fe0' assinatura.txt
           python3 - <<'PYCHECK'
           from pathlib import Path
           import zipfile
-          with zipfile.ZipFile('Liturgia-OSM-4.9.117-biblioteca-teste8.apk') as apk:
+          with zipfile.ZipFile('Liturgia-OSM-4.9.117-biblioteca-teste9.apk') as apk:
               for p in Path('www').rglob('*'):
                   if p.is_file():
                       assert apk.read('assets/public/'+p.relative_to('www').as_posix())==p.read_bytes(), str(p)
@@ -193,8 +194,8 @@ jobs:
       - name: Disponibilizar APK para teste no A56
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.9.117-biblioteca-teste8
+          name: Liturgia-OSM-4.9.117-biblioteca-teste9
           path: |
-            Liturgia-OSM-4.9.117-biblioteca-teste8.apk
+            Liturgia-OSM-4.9.117-biblioteca-teste9.apk
             assinatura.txt
           if-no-files-found: error
