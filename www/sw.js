@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.117-otimizacao-biblioteca-canticos-evangelicos';
+const CACHE = 'liturgia-osm-v4.9.118-otimizacao-biblioteca-canticos-evangelicos';
 const CORE = [
   "./media/emblema-osm.svg",
   "./media/ornamento-final.svg",
