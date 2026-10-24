@@ -63,5 +63,23 @@ try {
   await page.evaluate(()=>openGlobalSearch());
   await page.waitForFunction(()=>!!globalSearchIndex);
   assert.equal(await page.evaluate(()=>globalSearchIndex.documents.length),expectedDocuments,'Stale corpus cache rebuilt offline');
+  await page.goto('http://127.0.0.1:8772/biblioteca-servita.html');
+  await page.waitForFunction(()=>document.querySelectorAll('#documents article').length===5);
+  await page.evaluate(()=>{
+    window.libraryOpened=[];
+    window.Capacitor={isNativePlatform:()=>true,getPlatform:()=> 'android',Plugins:{LocalPdf:{open:async options=>{libraryOpened.push(options);}}}};
+  });
+  for(const [index,expected] of [43,25,131].entries()){
+    const link=page.locator('#documents article').nth(index).getByRole('link');
+    assert.match(await link.getAttribute('href'),new RegExp('#page='+expected+'$'));
+    await link.click();
+    await page.waitForFunction(count=>libraryOpened.length===count,index+1);
+  }
+  assert.deepEqual(await page.evaluate(()=>libraryOpened.map(item=>item.page)),[43,25,131]);
+  assert.ok(await page.evaluate(async()=>{
+    const res=await fetch('./data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf');
+    return res.ok&&(await res.text()).startsWith('%PDF-');
+  }),'Volume oficial disponível offline');
+  console.log('Biblioteca: três links enviam páginas 43, 25 e 131 ao leitor Android simulado; PDF disponível offline.');
   console.log('Busca: filtros, leitura, retorno, PDF, 320/390/768 px e recarga offline OK.');
 } finally {await browser.close();server.kill();}

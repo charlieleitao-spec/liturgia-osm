@@ -33,3 +33,8 @@ for(const asset of ['biblioteca-servita.html','data/biblioteca-servita-catalogo.
  if(!sw.includes(asset))throw Error('Falta no cache: '+asset);
 }
 console.log('Biblioteca Servita: catálogo, arquivos locais declarados e cache OK.');
+
+const startPages={'constituicoes-osm':43,'regra-santo-agostinho':25,'diretorio-geral':131};
+for(const [id,page] of Object.entries(startPages)){
+ if(catalog.documents.find(d=>d.id===id)?.start_page!==page)throw Error('Página inicial incorreta: '+id);
+}

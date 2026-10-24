@@ -9,21 +9,24 @@
       "title": "Constituições da Ordem dos Servos de Maria",
       "edition": "Cúria Geral OSM, 2015",
       "source_group": "volume-osm-2015",
-      "offline_asset": "./data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf"
+      "offline_asset": "./data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf",
+      "start_page": 43
     },
     {
       "id": "regra-santo-agostinho",
       "title": "Regra de Santo Agostinho",
       "edition": "Cúria Geral OSM, 2015",
       "source_group": "volume-osm-2015",
-      "offline_asset": "./data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf"
+      "offline_asset": "./data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf",
+      "start_page": 25
     },
     {
       "id": "diretorio-geral",
       "title": "Diretório Geral",
       "edition": "Cúria Geral OSM, 2015",
       "source_group": "volume-osm-2015",
-      "offline_asset": "./data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf"
+      "offline_asset": "./data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf",
+      "start_page": 131
     },
     {
       "id": "ratio-institutionis",
