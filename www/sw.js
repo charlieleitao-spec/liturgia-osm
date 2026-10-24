@@ -1,9 +1,11 @@
-const CACHE = 'liturgia-osm-v4.9.117-otimizacao-recursos-oficio';
+const CACHE = 'liturgia-osm-v4.9.117-biblioteca-rascunho';
 const CORE = [
   "./media/emblema-osm.svg",
   "./media/ornamento-final.svg",
   "./",
   "./index.html",
+  "./biblioteca-servita.html",
+  "./data/biblioteca-servita-catalogo.json",
   "./causas-beatos.html",
   "./app.css",
   "./liturgical-reader.css",
