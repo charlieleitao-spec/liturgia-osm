@@ -19,6 +19,7 @@
 .office-transcript-text .office-hymn-stanza{margin:0 1em 1.2em}
 .office-transcript-text .office-psalm-stanza{margin:0 0 1.2em}
 .office-transcript-text .office-verse-line{display:block}
+.office-transcript-text .liturgical-cue{white-space:nowrap}
 .office-transcript-text .office-instruction{font-style:italic;color:var(--liturgical-red)}
 .office-transcript-text .office-source-note{display:block;margin:1em 0;font-size:var(--type-meta,.8125rem);line-height:1.4;color:var(--text-muted)}
 html[data-theme="dark"],body:not(.light-mode):has(.brand-tag){--liturgical-paper:#101c29;--liturgical-ink:#f5eedc;--liturgical-red:#ef9a90}

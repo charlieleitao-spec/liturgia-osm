@@ -20,7 +20,7 @@
     let paragraph=[],kind='prose',mode='prose',lastIndent=0,seenHour=false;
     const hour=/^(?:(?:I{1,3}|IV|V|1[ªa]?|2[ªa]?)\s+)?(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média|Completas)$/i;
     const section=/^(HINO|SALMODIA|(?:PRIMEIRA|SEGUNDA|TERCEIRA) LEITURA|LEITURA(?: BREVE| ALTERNATIVA)?|RESPONSÓRIO(?: BREVE)?|PRECES|ORAÇÃO(?: SÁLMICA| SOBRE O CÂNTICO)?|CÂNTICO EVANGÉLICO|PAI[- ]NOSSO|CONCLUSÃO|DESPEDIDA)(?:\s+(.+))?$/i;
-    function inline(text){return escape(text).replace(/^((?:Ant\.(?:\s*\d+)?|Antífona(?:\s*\d+)?|[VR][./]|[℣℟]\.?)\s*)/i,'<span class="rubric">$1</span>');}
+    function inline(text){return escape(text).replace(/^((?:Ant\.(?:\s*\d+)?|Antífona(?:\s*\d+)?|[VR][./]|[℣℟]\.?)\s*)/i,'<span class="rubric">$1</span>').replace(/([^\s<>]+)\s+([*†])(?=\s|$)/g,'<span class="liturgical-cue">$1 $2</span>');}
     function flush(){
       if(!paragraph.length)return;
       if(kind==='hymn'||kind==='psalm')blocks.push('<div class="office-'+kind+'-stanza">'+paragraph.map(line=>'<span class="office-verse-line">'+inline(line)+'</span>').join('\n')+'</div>');
