@@ -90,7 +90,7 @@ function liturgicalLineHtml(value, verse=false){
   let text=String(value??'').trim();
   let prefix='';
   if(verse){
-    const mark=text.match(/^([–—=])\s*/);
+    const mark=text.match(/^([–—=\-])\s*/);
     if(mark){prefix='<span class="liturgical-marker">'+escapeHtml(mark[1])+'</span>';text=text.slice(mark[0].length);}
     const number=text.match(/^(\d{1,3})(?=\s*[A-Za-zÀ-ÿ“"«])/);
     if(number){prefix+='<sup class="verse-number">'+number[1]+'</sup> ';text=text.slice(number[0].length).trimStart();}

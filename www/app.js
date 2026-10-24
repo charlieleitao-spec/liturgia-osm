@@ -144,7 +144,7 @@ function liturgicalLineHtml(value, verse=false){
   let text=String(value??'').trim();
   let prefix='';
   if(verse){
-    const mark=text.match(/^([–—=])\s*/);
+    const mark=text.match(/^([–—=\-])\s*/);
     if(mark){prefix='<span class="liturgical-marker">'+escapeHtml(mark[1])+'</span>';text=text.slice(mark[0].length);}
     const number=text.match(/^(\d{1,3})(?=\s*[A-Za-zÀ-ÿ“"«])/);
     if(number){prefix+='<sup class="verse-number">'+number[1]+'</sup> ';text=text.slice(number[0].length).trimStart();}
@@ -250,7 +250,7 @@ function renderPrayer(text, options={}){
       if(/^[–—=]\s*|^(?:\d+ª\s*)?Ant\.|^Salmo\b/i.test(line)) flushPsalmQuote();
       else {psalmQuote.push(line);continue;}
     }
-    if(hymnMode==='psalm' && !stanza.length && /^[“"«]/.test(line)){psalmQuote.push(line);continue;}
+    if(vigilia && hymnMode==='psalm' && !stanza.length && /^[“"«]/.test(line)){psalmQuote.push(line);continue;}
     if(vigilia && pendingPsalmCaption){
       flushStanza();
       blocks.push('<h5 class="prayer-psalm-caption">'+escapeHtml(line)+'</h5>');
@@ -270,7 +270,7 @@ function renderPrayer(text, options={}){
       hymnMode = false;
       continue;
     }
-    if(PRAYER_TEXT_HEADINGS.test(line) || (vigilia && /^Salmo\b/i.test(line))){
+    if(PRAYER_TEXT_HEADINGS.test(line) || /^Salmo\s+\d+\b/i.test(line)){
       flushStanza();
       blocks.push('<h4 class="prayer-text-heading'+(/^(?:Laudes|Vésperas|Ofício das Leituras|Hora Média|Invitatório)$/i.test(line)?' liturgical-hour-heading':/^Salmo(?:\s|$)/i.test(line)?' liturgical-psalm-heading':'')+'">'+escapeHtml(line)+'</h4>');
       hymnMode = /^(?:Hino|Canto)$/i.test(line)?'hymn':/^(?:Salmo|Cântico)/i.test(line)?'psalm':false;

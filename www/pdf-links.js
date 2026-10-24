@@ -52,7 +52,7 @@
         flush();blocks.push('<p class="office-document-meta">'+escape(line)+'</p>');continue;
       }
       if(/^(?:Salmo\s+\d|Cântico\s*\(|Série\s+[A-Z])/i.test(line)){
-        flush();blocks.push('<h4 class="office-psalm-heading">'+escape(line)+'</h4>');continue;
+        flush();blocks.push('<h4 class="office-psalm-heading">'+escape(line)+'</h4>');mode='psalm';continue;
       }
       if(/^(?:Ant\.|Antífona)\s*\d*/i.test(line)){flush();add(line,'antiphon');}
       else if(/^(?:[VR][./]|[℣℟]\.?)\s*/.test(line)){flush();add(line,'response');}
