@@ -32,9 +32,17 @@
       const match=raw.match(/^(.*[.;])\s+(Ofício das Leituras|Laudes|Vésperas|Invitatório|Hora Média)$/i);
       return match?[match[1],match[2]]:[raw];
     });
-    for(const raw of lines){
+    for(const [lineIndex,raw] of lines.entries()){
       const line=raw.trim().replace(/[ \t]+/g,' '),indent=raw.length-raw.trimStart().length;
-      if(!line){flush();lastIndent=0;continue;}
+      if(!line){
+        // A PDF page break may interrupt a sentence. Only join prose when
+        // the following text continues in lower case; keep poetic stanzas.
+        const next=lines.slice(lineIndex+1).find(value=>value.trim()&&!/^Copyright\s*©/i.test(value.trim()))||'';
+        const continuation=kind==='prose'&&paragraph.length&&mode!=='hymn'&&mode!=='psalm'
+          &&!/[.!?;:]\s*["”’»)]*$/.test(paragraph.at(-1))&&/^[a-zà-ÿ]/.test(next.trim());
+        if(!continuation){flush();lastIndent=0;}
+        continue;
+      }
       if(/^Copyright\s*©/i.test(line)){sourceNotes.add(line);continue;}
       if(hour.test(line)){flush();blocks.push('<h3 class="office-hour-heading">'+escape(line)+'</h3>');mode='prose';seenHour=true;continue;}
       const heading=line.match(section);

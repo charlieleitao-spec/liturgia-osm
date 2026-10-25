@@ -16,10 +16,10 @@ const masses = json('www/data/missas-osm.json');
 const variousPrayers = json('www/data/devocoes/oracoes-varias.json');
 const dataReadme = read('docs/dados-apoio/data/README.md');
 
-assert.equal(pkg.version, '4.9.117', 'package.json deve identificar a versão 4.9.117');
+assert.match(pkg.version, /^4\.9\.\d+$/, 'Versão semântica do aplicativo');
 assert.equal(pkg.dependencies['@capacitor/app'], '8.1.2', 'Plugin nativo do botão Voltar deve fazer parte do app.');
-assert.match(appJs, /const APP_VERSION = ['"]4\.9\.117['"]/);
-assert.match(sw, /liturgia-osm-v4\.9\.117-otimizacao/);
+assert.equal(appJs.match(/const APP_VERSION = ['"]([^'"]+)['"]/)[1], pkg.version, 'Menu e pacote devem identificar a mesma versão');
+assert.ok(sw.includes('liturgia-osm-v'+pkg.version+'-'), 'Cache corresponde à versão do aplicativo');
 assert.match(html, /app\.js/);
 assert.match(html, /app\.css/);
 assert.match(appJs, /function openSantoralOfficeHour/);
