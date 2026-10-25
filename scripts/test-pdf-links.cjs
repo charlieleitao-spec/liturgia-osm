@@ -42,6 +42,6 @@ console.log('Leitura completa: 31 transcrições preservadas integralmente; tít
 // A56: quebras de página dentro de frases não criam novos parágrafos.
 const porro=formatOfficeText(offices.celebracoes['10-25'].pdf_transcript);
 assert.match(porro,/seu apostolado: a educação cristã das crianças/);
-const thomas=porro;
-assert.match(thomas,/em servir sempre melhor o Senhor/);
+// Verificar separadamente dois trechos da mesma transcrição, sem atribuir outra celebração.
+assert.match(porro,/em servir sempre melhor o Senhor/);
 assert.match(formatOfficeText('HINO\n\nPrimeira estrofe\n\nsegunda estrofe'),/office-hymn-stanza[\s\S]*office-hymn-stanza/);
