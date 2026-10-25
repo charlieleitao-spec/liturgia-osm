@@ -56,7 +56,7 @@ try{
   // A56 regressions: PDF sentences continue across page breaks and controls
   // stay in document flow instead of covering the reading at any scroll offset.
   await page.setViewportSize({width:390,height:844});
-  await page.evaluate(()=>{readerScale=1;applyPreferences();openSaint(SANTORAL.find(s=>s.month===10&&s.day===25)._id);});
+  await page.evaluate(()=>{readerScale=1;applyPreferences();openSaintSection(SANTORAL.find(s=>s.month===10&&s.day===25)._id,'liturgia');});
   await page.locator('.office-transcript summary').click();
   assert.ok(await page.locator('.office-prose').evaluateAll(nodes=>nodes.some(n=>n.textContent.includes('seu apostolado: a educação cristã das crianças'))));
   assert.ok(await page.locator('.office-prose').evaluateAll(nodes=>nodes.some(n=>n.textContent.includes('em servir sempre melhor o Senhor'))));
