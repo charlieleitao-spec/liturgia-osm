@@ -308,7 +308,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.118';
+const APP_VERSION = '4.9.120';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1539,7 +1539,11 @@ window.addEventListener('popstate',event=>{
     showToast(active?'Modo celebração ativado.':'Modo celebração encerrado.');
     updateCelebrationButton();
   };
-  function updateCelebrationButton(){const b=document.getElementById('celebrationToggle');if(!b)return;const dailyPrayerOpen=typeof dailyPrayerOpen480!=='undefined'&&!!dailyPrayerOpen480;const dailyMassOpen=!!document.querySelector('#dailyLiturgyOverlay.open');const celebrationDetail=state.detailId!==null&&state.detailId!==undefined;const reading=celebrationDetail||!!state.devo||!!state.devoSub||dailyPrayerOpen||dailyMassOpen;b.classList.toggle('show',reading||document.body.classList.contains('celebration-mode'));}
+  function updateCelebrationButton(){const b=document.getElementById('celebrationToggle');if(!b)return;const dailyPrayerOpen=typeof dailyPrayerOpen480!=='undefined'&&!!dailyPrayerOpen480;const dailyMassOpen=!!document.querySelector('#dailyLiturgyOverlay.open');const celebrationDetail=state.detailId!==null&&state.detailId!==undefined;const reading=celebrationDetail||!!state.devo||!!state.devoSub||dailyPrayerOpen||dailyMassOpen;const active=document.body.classList.contains('celebration-mode');
+    // In normal reading the control belongs to the header, outside the text.
+    const parent=active?document.body:dailyMassOpen?document.querySelector('#dailyLiturgyOverlay .daily-liturgy-body'):document.querySelector('.topbar');
+    if(parent&&b.parentElement!==parent)parent.prepend(b);
+    b.classList.toggle('show',reading||active);}
   window.updateCelebrationButton=updateCelebrationButton;
   render();
 })();

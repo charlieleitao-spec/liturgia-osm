@@ -53,6 +53,21 @@ try{
       results.push({width,scale,theme});
     }
   }
+  // A56 regressions: PDF sentences continue across page breaks and controls
+  // stay in document flow instead of covering the reading at any scroll offset.
+  await page.setViewportSize({width:390,height:844});
+  await page.evaluate(()=>{readerScale=1;applyPreferences();openSaintSection(SANTORAL.find(s=>s.month===10&&s.day===25)._id,'liturgia');});
+  await page.locator('.office-transcript summary').click();
+  assert.ok(await page.locator('.office-prose').evaluateAll(nodes=>nodes.some(n=>n.textContent.includes('seu apostolado: a educação cristã das crianças'))));
+  assert.ok(await page.locator('.office-prose').evaluateAll(nodes=>nodes.some(n=>n.textContent.includes('em servir sempre melhor o Senhor'))));
+  for(const selector of ['#app>.topbar','#app>.tabbar','.topbar>.celebration-toggle']){
+    assert.ok(['static','relative'].includes(await page.locator(selector).evaluate(n=>getComputedStyle(n).position)),selector+' must stay outside the reading');
+  }
+  await page.locator('.office-prose').filter({hasText:'seu apostolado: a educação cristã'}).scrollIntoViewIfNeeded();
+  await page.screenshot({path:'validation-layout/leitura-a56-corrigida.png'});
+  await page.evaluate(()=>{openMainMenu();});
+  assert.ok((await page.locator('.menu-status').textContent()).includes('4.9.120'));
+  await page.evaluate(()=>closeMainMenu());
   // The inner reader uses root scaling. It must not apply --reader-scale a second time.
   const resource=await browser.newPage({viewport:{width:390,height:844},serviceWorkers:'block'});
   await resource.addInitScript(()=>localStorage.setItem('osmReaderScale','2'));
