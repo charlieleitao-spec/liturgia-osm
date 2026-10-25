@@ -25,7 +25,7 @@ for (const tab of ['vida', 'liturgia', 'oracoes']) assert.ok(html.includes('data
 assert.match(html, /app\.js/);
 assert.match(html, /href=["'][^"']*app\.css["']/);
 assert.match(app, /function officeHourButtonHtml/);
-assert.match(app, /const APP_VERSION = ['"]4\.9\.118['"]/);
+assert.equal(app.match(/const APP_VERSION = ['"]([^'"]+)['"]/)[1], pkg.version, 'Menu e pacote com a mesma versão');
 assert.match(app, /section-title home-heading/);
 assert.match(app, /onclick="openDailyLiturgy/);
 assert.doesNotMatch(app, /MAIN_I18N|MAIN_LANG|applyMainLanguage|openLanguagePanel|closeLanguagePanel|setMainLanguage|languageOverlay/);
@@ -42,7 +42,7 @@ assert.match(html, /<h1>Liturgia <span class="brand-tag">OSM<\/span><\/h1>/);
 assert.match(css, /\.topbar \.brand-tag/);
 assert.doesNotMatch(css,/\.topbar-tools \.tool-btn:first-child\{display:none\}/,'O menu deve permanecer visível em telas estreitas.');
 assert.doesNotMatch(serviteCss,/Cinzel|EB Garamond|Cormorant Garamond|system-ui,-apple-system,sans-serif/,'Fontes da interface e recursos servitas devem estar harmonizadas.');
-assert.match(read('www/sw.js'), /liturgia-osm-v4\.9\.118-otimizacao/);
+assert.ok(read('www/sw.js').includes('liturgia-osm-v'+pkg.version+'-'));
 assert.match(app, /function renderLiturgiaCelebrationList\(tipo,entries\)/);
 assert.match(app, /function liturgiaDateKey\(s\)/);
 

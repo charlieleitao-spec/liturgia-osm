@@ -38,3 +38,10 @@ assert.ok((pucci.match(/office-hymn-stanza/g)||[]).length>=6,'Preservar as estro
 assert.match(pucci,/<p class="office-prose">Antônio Maria Pucci nasceu em Poggiole, pequeno povoado da diocese de Pistóia, Itália, em 1819\. Aos 18 anos/);
 assert.match(formatOfficeText('<img src=x onerror=alert(1)>'),/&lt;img/);
 console.log('Leitura completa: 31 transcrições preservadas integralmente; títulos, parágrafos corridos e estrofes do hino conferidos.');
+
+// A56: quebras de página dentro de frases não criam novos parágrafos.
+const porro=formatOfficeText(offices.celebracoes['10-25'].pdf_transcript);
+assert.match(porro,/seu apostolado: a educação cristã das crianças/);
+// Verificar separadamente dois trechos da mesma transcrição, sem atribuir outra celebração.
+assert.match(porro,/em servir sempre melhor o Senhor/);
+assert.match(formatOfficeText('HINO\n\nPrimeira estrofe\n\nsegunda estrofe'),/office-hymn-stanza[\s\S]*office-hymn-stanza/);

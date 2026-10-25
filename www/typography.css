@@ -56,3 +56,19 @@ body.causes-page{font-family:Georgia,'Times New Roman',serif;font-size:var(--typ
 .causes-page .meta,.causes-page .status,.causes-page .subhead,.causes-page footer{font-size:var(--type-meta);line-height:1.4}
 .causes-page .intro,.causes-page .bio{font-size:var(--type-body);line-height:1.55;overflow-wrap:anywhere;hyphens:none}
 .causes-page .prayer{font-size:calc(1.25rem * var(--reader-scale,1));line-height:1.5;overflow-wrap:anywhere}
+
+/* Leitura móvel: parágrafos regulares, sem alterar a escala escolhida pelo leitor. */
+#view .bio-text,#view .about-text,#view .rule-reader,#view .card{
+  min-width:0;
+  max-width:100%;
+  overflow-wrap:break-word;
+}
+#view .bio-text p,#view .about-text p,#view .rule-reader p,
+#view .card p{
+  margin-block:0 .8em;
+  line-height:1.55;
+}
+#view .bio-text p:last-child,#view .rule-reader p:last-child,
+#view .card p:last-child{margin-bottom:0}
+#view .bio-text blockquote,#view .rule-reader blockquote,
+#view .card blockquote{margin: .8em 0;padding-left:1em}

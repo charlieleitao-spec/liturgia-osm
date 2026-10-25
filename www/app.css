@@ -1251,3 +1251,35 @@ body:has(.calendar-simple){scroll-padding-bottom:calc(110px + env(safe-area-inse
 .personal-favorite-action{display:flex;justify-content:flex-end;margin-bottom:8px}
 .personal-favorite-action .favorite-btn{position:static;flex-shrink:0}
 .personal-library-row{width:100%;min-height:48px;text-align:left;font:inherit;color:var(--text);background:transparent;border-width:0 0 1px;border-color:var(--line)}
+
+/* Ajustes de leitura no A56: botão fora do texto e área final livre. */
+@media(max-width:600px){
+ body:not(.celebration-mode):not(.servite-open) main#view{
+   padding-bottom:calc(180px + env(safe-area-inset-bottom))!important;
+ }
+ body:not(.celebration-mode):not(.servite-open) .celebration-toggle.show{
+   left:auto;
+   right:12px;
+   bottom:calc(106px + env(safe-area-inset-bottom));
+   max-width:min(46vw,190px);
+   padding:9px 12px;
+   font-size:12px;
+ }
+ body:has(#dailyLiturgyOverlay.open):not(.celebration-mode) .celebration-toggle.show{
+   bottom:calc(18px + env(safe-area-inset-bottom));
+ }
+}
+
+/* A leitura ocupa o fluxo da página: nenhum controle cobre as linhas. */
+body.liturgical-page:not(.celebration-mode) #app>.topbar{position:relative!important;top:auto!important}
+body.liturgical-page:not(.celebration-mode) #app>.tabbar{
+  position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;
+  transform:none!important;opacity:1!important;pointer-events:auto!important;
+  margin:16px auto calc(12px + env(safe-area-inset-bottom));
+}
+body.liturgical-page:not(.celebration-mode) .topbar>.celebration-toggle.show{
+  position:static!important;transform:none!important;opacity:1!important;pointer-events:auto!important;
+  max-width:100%!important;margin:0 0 10px auto;display:block;
+}
+body.liturgical-page:not(.celebration-mode) #floatingBack{display:none!important}
+body.liturgical-page:not(.celebration-mode):not(.servite-open) main#view{padding-bottom:24px!important}
