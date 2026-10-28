@@ -1,0 +1,31 @@
+name: Conferir ações discretas ao final da leitura
+on:
+  workflow_dispatch:
+  push:
+    branches: ['fix/acoes-leitura-discretas']
+permissions:
+  contents: read
+jobs:
+  layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - name: Preparar navegador de verificação
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm install --no-save --package-lock=false --ignore-scripts playwright@1.56.1
+      - name: Conferir posição, tamanho, temas e acesso à anotação
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+        run: node scripts/verify-reader-actions-layout.mjs
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: layout-acoes-leitura
+          path: validation-reader-actions/
+          if-no-files-found: warn
