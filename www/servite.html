@@ -134,6 +134,12 @@ window.addEventListener('servite-ready', function(){
   }catch(e){}
 });
 </script>
+<script>
+window.addEventListener('servite-ready',function(){
+  window.OSMResourceContext.ready=true;
+  if(window.parent!==window)window.parent.OSMPersonalReader?.afterRender(true);
+});
+</script>
 <script id="embeddedResourceMode4923Script">
 if(window.parent!==window) document.body.classList.add('embedded-resource-mode');
 </script>

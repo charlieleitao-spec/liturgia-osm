@@ -362,7 +362,7 @@ function closeAccessibleDialog(id){
 }
 document.addEventListener('keydown',event=>{
   if(event.key!=='Tab')return;
-  const dialog=document.querySelector('[role="dialog"].open');if(!dialog)return;
+  const dialog=[...document.querySelectorAll('[role="dialog"].open')].find(node=>!node.inert);if(!dialog)return;
   const controls=dialogControls(dialog),first=controls[0],last=controls.at(-1);
   if(!first){event.preventDefault();dialog.focus();return;}
   if(event.shiftKey && (document.activeElement===first||document.activeElement===dialog)){
@@ -1217,6 +1217,7 @@ function viewGlobalSearch(){
 }
 
 function render(){
+  window.OSMPersonalReader?.beforeRender();
   const view=document.getElementById('view');
   if(!view) return;
   if(!santoralReady){
@@ -1250,6 +1251,7 @@ function render(){
   if(share&&pendingSharePrayer) share.onclick=function(){sharePrayer(pendingSharePrayer.title,pendingSharePrayer.text);};
   if(typeof updateBackButton==='function') updateBackButton();
   if(typeof window.updateCelebrationButton==='function') window.updateCelebrationButton();
+  window.OSMPersonalReader?.afterRender();
 }
 document.querySelectorAll('.tab-btn').forEach(b=>{
   b.addEventListener('click', ()=> setTab(b.dataset.tab));
@@ -1382,7 +1384,7 @@ function updateBackButton(){
   const platform=window.Capacitor?.getPlatform?.()||'';
   const androidApp=!!window.Capacitor?.isNativePlatform?.()&&(platform==='android'||/Android/i.test(navigator.userAgent));
   const hasDetail=state.detailId!==null&&state.detailId!==undefined;
-  const overlay=['serviteOverlay','mainMenuOverlay','dailyLiturgyOverlay'].some(id=>document.getElementById(id)?.classList.contains('open'));
+  const overlay=['serviteOverlay','mainMenuOverlay','dailyLiturgyOverlay','personalOverlay'].some(id=>document.getElementById(id)?.classList.contains('open'));
   const subpage=hasDetail||!!state.devo||state.devoSub!==null&&state.devoSub!==undefined||!!dailyPrayerOpen480||!!memoriaSelectedDate||!!state.liturgiaDetail;
   const nonHomeTab=state.tab!=='vida'&&state.tab!=='hoje';
   const visible=!androidApp&&!overlay&&(subpage||nonHomeTab);
@@ -1393,6 +1395,7 @@ function updateBackButton(){
 }
 
 function smartBack(){
+  if(document.getElementById('personalOverlay')?.classList.contains('open')){window.OSMPersonalReader.close();return true;}
   const menu=document.getElementById('mainMenuOverlay');
   const servite=document.getElementById('serviteOverlay');
   const mass=document.getElementById('dailyLiturgyOverlay');
@@ -1453,6 +1456,7 @@ const serviteNames={regra:'Regra OSSM',rosario:'Rosário',coroa:'Coroa de Nossa 
 let serviteHistoryReturnPending=false;
 function serviteUrl(view){return 'servite.html?view='+encodeURIComponent(view||'completo');}
 function serviteAdjustFont(delta){try{const frame=document.getElementById('serviteFrame');const change=frame?.contentWindow?.changeFontSize;if(typeof change==='function')change(delta);}catch(error){console.warn('[Liturgia OSM] Controle de fonte do recurso indisponível.',error);}} function openServite(view){
+  window.OSMPersonalReader?.resourceOpening();
   currentServiteView=view||'completo';
   const ov=document.getElementById('serviteOverlay'),fr=document.getElementById('serviteFrame');
   document.getElementById('serviteTitle').textContent=serviteNames[currentServiteView]||'Recursos OSM';
@@ -1460,7 +1464,7 @@ function serviteAdjustFont(delta){try{const frame=document.getElementById('servi
   openAccessibleDialog('serviteOverlay');document.body.classList.add('servite-open');
   if(!history.state?.serviteOverlay) history.pushState({...history.state,serviteOverlay:true},'');
 }
-function closeServite(fromHistory=false){const ov=document.getElementById('serviteOverlay'),fr=document.getElementById('serviteFrame');const wasOpen=ov?.classList.contains('open');closeAccessibleDialog('serviteOverlay');readerScale=parseFloat(localStorage.getItem('osmReaderScale')||'1');applyPreferences();document.body.classList.remove('servite-open');fr.contentWindow.location.replace('about:blank');if(wasOpen&&!fromHistory&&history.state?.serviteOverlay){serviteHistoryReturnPending=true;history.back();}}
+function closeServite(fromHistory=false){window.OSMPersonalReader?.resourceClosed();const ov=document.getElementById('serviteOverlay'),fr=document.getElementById('serviteFrame');const wasOpen=ov?.classList.contains('open');closeAccessibleDialog('serviteOverlay');readerScale=parseFloat(localStorage.getItem('osmReaderScale')||'1');applyPreferences();document.body.classList.remove('servite-open');fr.contentWindow.location.replace('about:blank');if(wasOpen&&!fromHistory&&history.state?.serviteOverlay){serviteHistoryReturnPending=true;history.back();}}
 // Keyboard events inside the embedded document do not bubble to the parent.
 document.getElementById('serviteFrame').addEventListener('load',()=>{
   const frame=document.getElementById('serviteFrame');

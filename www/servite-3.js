@@ -1074,6 +1074,7 @@ function viewSobre(){
 
 // ===================== router =====================
 function render(){
+  if(window.parent!==window)window.parent.OSMPersonalReader?.beforeRender(true);
   const view = document.getElementById('view');
   let html = '';
   if(state.tab === 'hoje') html = viewHoje();
@@ -1083,6 +1084,7 @@ function render(){
   else if(state.tab === 'sobre') html = viewSobre();
   view.innerHTML = html;
   document.body.classList.toggle('liturgical-page',!!view.querySelector('.today-servita-reader,.prayer-block'));
+  if(window.parent!==window)window.parent.OSMPersonalReader?.afterRender(true);
 }
 
 document.querySelectorAll('.tab-btn').forEach(b=>{
@@ -1127,6 +1129,22 @@ function changeFontSize(dir){
   document.documentElement.style.fontSize = next + 'px';
   try{ localStorage.setItem('santoral-osm-fontsize', next); localStorage.setItem('osmReaderScale', (next/16).toFixed(2)); }catch(e){}
 }
+
+// Somente campos de navegação validados pelo controlador pessoal do aplicativo.
+window.OSMResourceContext={
+ ready:false,
+ snapshot(){return Object.fromEntries(['tab','detailId','devo','devoSub','showOficio','oficioTab','regraChapter','finalAntifona','coroaFormula','coroaGuidedStep','rosarioSet','rosarioGuidedStep'].map(k=>[k,state[k]]));},
+ restore(saved){
+  if(window.parent===window||!window.parent.OSMPersonalData)return;
+  const valid=window.parent.OSMPersonalData.route({type:'resource',view:window.__SERVITE_VIEW__,state:saved}).state;
+  if(valid.detailId!=null&&!SANTORAL.some(s=>s._id===valid.detailId))throw Error('Celebração indisponível nesta edição.');
+  const previous={...state};
+  try{
+   Object.assign(state,{detailId:null,devo:null,devoSub:null,showOficio:false,oficioTab:null,regraChapter:null,finalAntifona:null},valid);
+   render();
+  }catch(error){Object.assign(state,previous);render();throw Error('Esta parte do recurso não está disponível nesta edição.');}
+ }
+};
 
 // ===================== init =====================
 async function initServite(){
