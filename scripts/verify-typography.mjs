@@ -66,7 +66,7 @@ try{
   await page.locator('.office-prose').filter({hasText:'seu apostolado: a educação cristã'}).scrollIntoViewIfNeeded();
   await page.screenshot({path:'validation-layout/leitura-a56-corrigida.png'});
   await page.evaluate(()=>{openMainMenu();});
-  assert.ok((await page.locator('.menu-status').textContent()).includes('4.9.120'));
+  assert.ok(await page.locator('.menu-status').evaluate(n=>n.textContent.includes(`Versão ${APP_VERSION}`)));
   await page.evaluate(()=>closeMainMenu());
   // The inner reader uses root scaling. It must not apply --reader-scale a second time.
   const resource=await browser.newPage({viewport:{width:390,height:844},serviceWorkers:'block'});
