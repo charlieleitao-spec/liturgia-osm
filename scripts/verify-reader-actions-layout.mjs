@@ -19,7 +19,7 @@ async function check(page,frame,name){
  await page.evaluate(()=>{OSMPersonalReader.saveCurrent();OSMPersonalReader.afterRender(document.getElementById('serviteOverlay').classList.contains('open'));});
  await bar.scrollIntoViewIfNeeded();
  for(const b of await bar.locator('button').all())assert.equal(await b.evaluate(el=>{const r=el.getBoundingClientRect();return document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('button')===el;}),true,'Cada comando deve estar livre de sobreposição');
- await page.screenshot({path:output+'/'+name+'.png'});return geometry;
+ await page.screenshot({animations:'disabled',path:output+'/'+name+'.png'});return geometry;
 }
 try{
  for(let n=0;n<80;n++){try{if((await fetch('http://127.0.0.1:18770/')).ok)break;}catch{}await new Promise(r=>setTimeout(r,50));}
@@ -29,14 +29,14 @@ try{
   const page=await c.newPage();await page.goto('http://127.0.0.1:18770/');await page.waitForFunction(()=>typeof santoralReady!=='undefined'&&santoralReady&&window.OSMPersonalReader);
   await page.getByRole('button',{name:'Abrir menu',exact:true}).tap();await page.getByRole('button',{name:'Ordem Secular · Regra de Vida',exact:true}).tap();await page.waitForFunction(()=>document.getElementById('serviteFrame').contentWindow.OSMResourceContext?.ready);
   const frame=page.frameLocator('#serviteFrame'),name=width+'-'+scale+'-'+theme;
-  await page.screenshot({path:output+'/regra-inicio-'+name+'.png'});
+  await page.screenshot({animations:'disabled',path:output+'/regra-inicio-'+name+'.png'});
   const regra=await check(page,frame,'regra-final-'+name);
   if(width===320&&scale===1&&theme==='light'){
    await frame.locator('.personal-note-action').tap();const input=page.locator('#personalNoteText');await input.tap();await page.keyboard.type('Nota pelo comando discreto.');assert.equal(await input.inputValue(),'Nota pelo comando discreto.');await page.getByRole('button',{name:'Salvar anotação',exact:true}).tap();await page.getByRole('button',{name:'Fechar dados pessoais',exact:true}).tap();assert.equal(await frame.locator('.personal-note-action').textContent(),'Editar nota');
   }
   await frame.getByText('Capítulo I',{exact:true}).tap();const chapter=await check(page,frame,'capitulo-final-'+name);
   await page.getByRole('button',{name:'Fechar recurso',exact:true}).tap();await page.evaluate(()=>openDevo('stabat'));
-  await page.screenshot({path:output+'/stabat-inicio-'+name+'.png'});
+  await page.screenshot({animations:'disabled',path:output+'/stabat-inicio-'+name+'.png'});
   const stabat=await check(page,page.locator('#view'),'stabat-final-'+name);
   results.push({width,scale,theme,regra,chapter,stabat});await c.close();
  }
