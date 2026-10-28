@@ -19,7 +19,7 @@ try{
     const s=getComputedStyle(block), b=getComputedStyle(document.body);
     return {align:s.textAlign,font:s.fontFamily,color:s.color,background:b.backgroundColor,poetry:block.querySelectorAll('.liturgical-verse-line').length,rubrics:block.querySelectorAll('.rubric').length};
   });
-  assert.equal(main.align,'left');assert.equal(main.color,'rgb(21, 18, 13)');assert.equal(main.background,'rgb(252, 243, 213)');assert.ok(main.poetry>10);assert.ok(main.rubrics>0);report.push({main});
+  assert.equal(main.align,'left');assert.equal(main.color,'rgb(21, 18, 13)');assert.equal(main.background,'rgb(247, 244, 237)');assert.ok(main.poetry>10);assert.ok(main.rubrics>0);report.push({main});
   for(const width of [320,390,768]){
     await page.setViewportSize({width,height:844});
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Main reader overflows at ${width}`);
