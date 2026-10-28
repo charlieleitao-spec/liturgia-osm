@@ -2,13 +2,13 @@
 
 Base: `30ad09b8998ccc7ad938a184d66e9ce136e40fe6` (4.9.128). Branch: `optimize/4.9.129-assets`.
 
-## Resultado local
+## Resultado final
 
-- Inventário real: **66 PDFs, 594 páginas**, e não 67 PDFs. Há 32 PDFs de Missa, 31 de Ofícios e 3 da Biblioteca.
-- PDFs: **7,111,456 → 5,579,849 bytes**, economia de **1,531,607 bytes (21.54%)**.
-- Oito fontes removidas: **374,148 bytes**. Duas fontes Cinzel mantidas.
-- Economia de PDFs e arquivos WOFF2: **1,905,755 bytes**, antes da compactação do APK.
-- APK público 4.9.128: **10.637.179 bytes**. Tamanho do APK 4.9.129: pendente do build assinado; não inferido a partir dos recursos.
+- Inventário real: **66 PDFs, 594 páginas**, e não 67 PDFs. Há 32 PDFs de Missa, 31 de Ofícios e 3 da Biblioteca. O 67º arquivo da pasta é um README, não um PDF.
+- PDFs: **7.111.456 → 5.579.849 bytes**, economia de **1.531.607 bytes (21.54%)**.
+- Oito fontes removidas: **374.148 bytes**. Duas fontes Cinzel mantidas.
+- Economia de PDFs e arquivos WOFF2: **1.905.755 bytes**, antes da compactação do APK.
+- APK público 4.9.128: **10.637.179 bytes**. APK de teste 4.9.129: **10.151.923 bytes**. Economia real de **485.256 bytes (4,56%)**. O APK já comprime os recursos, por isso o ganho final é menor que a soma dos arquivos soltos.
 - APP_VERSION, package.json, package-lock.json e cache: **4.9.129**.
 - Novo APK preparado com `versionCode 41042`, superior a `41041` da 4.9.128, mesmo applicationId e assinatura estável verificada pelo CI.
 
@@ -114,29 +114,43 @@ Foram inspecionados todos os arquivos de CSS, HTML, JavaScript e dados em `www`,
 | eb-garamond-italic-latin.woff2 e latin-ext | Remover | Nenhum uso da família; variantes sem consumidores. |
 | OFL-LICENSES.txt | Manter integralmente | Mesmo conteúdo e hash da base. |
 
-As oito declarações correspondentes foram removidas de fonts.css e do CORE de sw.js. O cache passa de 156 para 148 entradas, mantendo todos os 66 PDFs.
+A pasta de fontes passou de **431.467 para 54.447 bytes** (12 para 4 arquivos), incluindo CSS e licença. As oito declarações correspondentes foram removidas de fonts.css e do CORE de sw.js. O cache passa de 156 para 148 entradas, mantendo todos os 66 PDFs.
 
 ## Cordova
 
 Mantidos `www/cordova.js` e `www/cordova_plugins.js` (0 byte). Na versão instalada @capacitor/cli 8.5.1, `handleCordovaPluginsJS()` chama `createEmptyCordovaJS()` quando não há plugins Cordova e cria ambos no diretório Android de recursos. Sem ganho material de tamanho, não se interfere nesse comportamento gerado.
 
-## Validação e limites
+## Validação final
 
-**Passou localmente:** npm test; npm run test:reader-stability; npm run test:personal; equivalência de busca (708 documentos, 10 consultas × 6 filtros); auditoria completa dos PDFs; sintaxe Python, JS, shell e YAML; git diff --check.
+**Todos os checks aprovados no código `364485fb38a8badc3e1566b7f6bce456deb597d4`:**
 
-**Preparado para CI, ainda sem execução nesta revisão:** tipografia no Chromium; atualização real do service worker da 4.9.128 para 4.9.129, preservação do armazenamento e leitura dos 148 recursos offline; build Android com assinatura estável; comparação de certificados e tamanhos; instalação sobre a 4.9.128 sem desinstalação; preservação do UID e hashes dos arquivos/armazenamento; abertura das 594 páginas pelo PdfRenderer do Android e destino #page=2 através da busca offline.
+- [Build, assinatura, cache e instalação Android](https://github.com/charlieleitao-spec/liturgia-osm/actions/runs/40710510967).
+- [Gate de otimização offline](https://github.com/charlieleitao-spec/liturgia-osm/actions/runs/40710521717).
+- [Validação da fonte comum da Biblioteca](https://github.com/charlieleitao-spec/liturgia-osm/actions/runs/40710521782).
 
-A criação do projeto Android, a sincronização Capacitor e os patches de notificações, PDF, widgets e cópia pessoal passaram localmente; ambos os placeholders Cordova foram recriados automaticamente com 0 byte.
+Passaram npm test, testes de estabilidade do leitor e dados pessoais, equivalência de busca e a auditoria completa dos PDFs. O Chromium conferiu a tipografia em 320/390/768 px, escalas 76/100/200% e ambos os temas. A atualização do service worker da 4.9.128 para 4.9.129 foi efetivamente aguardada antes de desligar a rede: versão nova carregada, cache anterior removido, armazenamento preservado e **148 recursos, incluindo 66 PDFs e os dois arquivos Cinzel, disponíveis offline**.
 
-O Chromium local não iniciou devido à restrição de socket do ambiente. Não se declara aprovação visual do navegador, do APK ou da instalação sem a execução correspondente. A aprovação visual dos PDFs sem perdas é respaldada pela comparação de pixels de todas as páginas e inspeção da capa do Ratio.
+O APK foi instalado sobre a **4.9.128 sem desinstalação**, no emulador Android 15/API 35. Foram confirmados o mesmo UID, os hashes do armazenamento e arquivos antes/depois da instalação, fonte, tema, favoritos e histórico após relançar o app. O PdfRenderer do Android abriu **66 PDFs / 594 páginas**. A busca offline abriu o PDF de Ofício na página 2, verificando a âncora `#page=2` através do leitor nativo. Não foi operado o aparelho físico do usuário.
 
-Workflow de teste: `.github/workflows/test-4.9.129.yml`. Dispara somente na branch de otimização ou manualmente; guarda APK e evidências e **não publica release**. Reutiliza o processo da 4.9.128, com mesma assinatura, R8, ícones, notificações, widgets e leitor PDF.
+Identidade: `com.liturgia_osm.app`; `versionName 4.9.129`; **versionCode 41042 > 41041**. Certificado SHA-256 igual ao APK público 4.9.128:
 
-O gate existente de equivalência apontava para um corpus antigo de 456 documentos. Foi atualizado para a base 4.9.128 de 708 documentos e passou a resolver também as referências JSON do manifesto de origem, evitando comparar referências compactadas com documentos já resolvidos. O gate passa a atender PRs para main.
+`5b2b3319cc9f9bb61a14fb8a30e63044db225f7b930fca9568c82854f38b4fe0`
+
+APK final: **10.151.923 bytes**. SHA-256:
+
+`3d0b05e0a07a1b1cc6488ba28d50e5ccaad00d9b602fea0ddd4c262ca2a2eabc`
+
+O conteúdo de todos os arquivos de `www` foi conferido byte a byte no APK. A criação/sincronização Capacitor e os patches Android de notificações, PDF, widgets e cópia pessoal passaram. Os placeholders Cordova foram recriados automaticamente com 0 byte.
+
+O teste de tipografia passou a consultar a versão do package.json, em vez de exigir uma versão antiga fixa. O gate de equivalência foi atualizado para as 708 entradas da 4.9.128, resolvendo as referências JSON de ambos os lados. O gate atende PRs de otimização para main sem impor equivalência a mudanças funcionais de outras branches.
+
+A política de funcionamento do service worker e o carregamento do código foram preservados; as alterações em produção restringem-se à versão/cache, lista de recursos, PDFs, fontes e hashes do índice. A espera assíncrona do teste foi corrigida para não desligar a rede durante a instalação do cache.
+
+**Entrega de teste:** [PR #150](https://github.com/charlieleitao-spec/liturgia-osm/pull/150). Nenhuma release foi publicada e main permanece na 4.9.128. A documentação final foi registrada após os testes, sem alterar os recursos do aplicativo.
 
 ## Arquivos
 
-Modificados: 66 PDFs; www/data/search-index.json (hashes); www/app.js; www/sw.js; www/media/fonts/fonts.css; package.json; package-lock.json; scripts/verify-search-equivalence.cjs; .github/workflows/optimization-gate.yml.
+Modificados: 66 PDFs; www/data/search-index.json (hashes); www/app.js; www/sw.js; www/media/fonts/fonts.css; package.json; package-lock.json; scripts/verify-search-equivalence.cjs; scripts/verify-typography.mjs; .github/workflows/optimization-gate.yml.
 
 Adicionados: scripts/recompress-pdfs.py; scripts/verify-optimized-assets.py; scripts/verify-asset-cache.mjs; scripts/verify-asset-upgrade.sh; scripts/android-validation/AssetUpgradeInstrumentation.java; .github/workflows/test-4.9.129.yml; este relatório, CSV com tamanhos/hashes e JSONs de fontes removidas e experimento do Ratio.
 
@@ -150,7 +164,3 @@ Removidos:
 - `www/media/fonts/cormorant-garamond-italic-latin-ext.woff2` — 34392 bytes.
 - `www/media/fonts/cormorant-garamond-normal-latin-ext.woff2` — 33736 bytes.
 - `www/media/fonts/eb-garamond-italic-latin.woff2` — 25388 bytes.
-
-## Bloqueio de envio
-
-A revisão automática rejeitou o envio da branch ao GitHub por exigir autorização explícita para esse destino externo. O conector confirmou o repositório público `charlieleitao-spec/liturgia-osm`, a URL de clone e as permissões de escrita, mas a revisão manteve o bloqueio. Nenhuma alternativa de publicação foi usada. O CI, a compilação com a chave estável e a instalação sobre a 4.9.128 permanecem pendentes. Os resultados locais acima estão concluídos e as alterações estão registradas em commit local.
