@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<script src="./reader-scale.js"></script>
 <script>window.__SERVITE_VIEW__=new URLSearchParams(location.search).get('view')||'completo';</script>
 <script>
 (function(){
   try{
     var t = localStorage.getItem('osmTheme') || localStorage.getItem('santoral-osm-theme') || 'light';
     document.documentElement.setAttribute('data-theme', t);
-    var scale = parseFloat(localStorage.getItem('osmReaderScale') || '1');
+    var scale = OSMReaderScale.read(localStorage);
     if(isFinite(scale)){ document.documentElement.style.fontSize = (16*Math.max(.76,Math.min(2,scale))) + 'px'; }
   }catch(e){}
 })();</script>
@@ -138,7 +139,7 @@ window.addEventListener('servite-ready', function(){
 <script>
 window.addEventListener('servite-ready',function(){
   window.OSMResourceContext.ready=true;
-  if(window.parent!==window)window.parent.OSMPersonalReader?.afterRender(true);
+  if(window.parent!==window){window.parent.OSMPersonalReader?.afterRender(true);window.parent.updateServiteFontControls?.();}
 });
 </script>
 <script id="embeddedResourceMode4923Script">

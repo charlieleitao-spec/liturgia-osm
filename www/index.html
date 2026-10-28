@@ -55,7 +55,7 @@
   <div class="servite-head">
     <button class="servite-close" onclick="closeServite()" aria-label="Fechar recurso">✕</button>
     <div class="servite-title" id="serviteTitle">Recurso OSM</div>
-    <div class="mini-tools"><button onclick="serviteAdjustFont(-1)" aria-label="Diminuir fonte">A−</button><button onclick="serviteAdjustFont(1)" aria-label="Aumentar fonte">A+</button><button onclick="serviteReload()" aria-label="Recarregar">↻</button></div>
+    <div class="mini-tools"><button data-servite-font="-1" onclick="serviteAdjustFont(-1)" aria-label="Diminuir fonte">A−</button><button data-servite-font="1" onclick="serviteAdjustFont(1)" aria-label="Aumentar fonte">A+</button><button onclick="serviteReload()" aria-label="Recarregar">↻</button></div>
   </div>
   <iframe id="serviteFrame" class="servite-frame" title="Conteúdo OSM"></iframe>
 </div>
@@ -67,6 +67,7 @@
   <div class="daily-liturgy-body"><div class="daily-date-nav"><button onclick="moveDailyDate(-1)" aria-label="Dia anterior">‹</button><div class="daily-date-field"><span id="dailyLiturgyDateDisplay" class="daily-date-display" aria-hidden="true"></span><span class="daily-date-chevron" aria-hidden="true">⌄</span><input id="dailyLiturgyDate" type="date" aria-label="Selecionar data da liturgia" onchange="loadDailyLiturgy(this.value)"></div><button onclick="moveDailyDate(1)" aria-label="Dia seguinte">›</button></div><div id="dailyLiturgyContent"></div></div>
 </div>
 
+<script src="./reader-scale.js"></script>
 <script src="./personal-data.js"></script>
 <script src="./personal-reader.js"></script>
 <script src="./search.js"></script>

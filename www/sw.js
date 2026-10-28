@@ -16,6 +16,7 @@ const CORE = [
   "./touch-targets.css",
   "./app.js",
   "./personal-data.js",
+  "./reader-scale.js",
   "./personal-reader.js",
   "./personal-reader.css",
   "./search.js",

@@ -2,7 +2,7 @@
 (function(){
  'use strict';
  const D=window.OSMPersonalData;
- let ready=false,active=null,resourceActive=null,pending=null,restoring=false,timer=null,draft=null,backup=null,noteOrigin=null;
+ let ready=false,active=null,resourceActive=null,pending=null,restoring=false,timer=null,draft=null,backup=null,noteOrigin=null,noteContext=null,restoreTask=null;
  const $=id=>document.getElementById(id);
  const key=r=>D.routeKey(r);
  const text=node=>(node?.textContent||'').replace(/\s+/g,' ').trim();
@@ -54,14 +54,33 @@
  function saveOne(item,win){if(item&&!restoring)D.savePosition(localStorage,item.route,item.title,capture(win));}
  function saveCurrent(){if(!ready||restoring)return;try{if(resourceActive)saveOne(resourceActive,$('serviteFrame').contentWindow);else saveOne(active,window);}catch(error){$('personalStorageWarning').hidden=false;$('personalStorageWarning').textContent='Não foi possível guardar a leitura. Abra “Anotações e cópia de segurança” para conferir o armazenamento.';}}
  function scheduleSave(){clearTimeout(timer);timer=setTimeout(saveCurrent,450);}
- function schedulePosition(win,p){restoring=true;requestAnimationFrame(()=>requestAnimationFrame(()=>{try{position(win,p);}finally{restoring=false;}}));}
- function beforeRender(resource=false){if(!ready||restoring||!resource&&$('serviteOverlay').classList.contains('open'))return;try{saveOne(resource?resourceActive:active,resource?$('serviteFrame').contentWindow:window);}catch{}}
+ function cancelPosition(){if(!restoreTask)return false;cancelAnimationFrame(restoreTask.first);cancelAnimationFrame(restoreTask.second);restoreTask=null;restoring=false;return true;}
+ function schedulePosition(win,p){
+  cancelPosition();const item=win===window?descriptor():resourceDescriptor();if(!item)return;
+  const task={win,doc:win.document,routeKey:key(item.route),first:null,second:null};restoreTask=task;restoring=true;
+  task.first=requestAnimationFrame(()=>{task.second=requestAnimationFrame(()=>{
+   if(restoreTask!==task)return;
+   try{const current=win===window?descriptor():resourceDescriptor();if(win.document===task.doc&&current&&key(current.route)===task.routeKey)position(win,p);}
+   finally{if(restoreTask===task){restoreTask=null;restoring=false;}}
+  });});
+ }
+ function beforeRender(resource=false){
+  if(!ready)return;
+  if(restoreTask){const win=resource?$('serviteFrame').contentWindow:window;if(restoreTask.win===win){const next=resource?resourceDescriptor():descriptor();if(!next||key(next.route)!==restoreTask.routeKey)cancelPosition();}return;}
+  if(restoring||!resource&&$('serviteOverlay').classList.contains('open'))return;
+  try{saveOne(resource?resourceActive:active,resource?$('serviteFrame').contentWindow:window);}catch{}
+ }
+ function storedNote(item){
+  const notes=data().notes;
+  if(typeof item.text==='string')return notes.find(n=>key(n.route)===key(item.route));
+  return notes.filter(n=>D.noteKey(n.route)===D.noteKey(item.route)).sort((a,b)=>b.updatedAt-a.updatedAt)[0];
+ }
  function readingTools(doc,item,win){
   const view=doc?.getElementById('view');if(!view)return;
   view.querySelectorAll('.personal-reading-tools').forEach(node=>node.remove());
   if(!item)return;
   const bar=doc.createElement('div');bar.className='personal-reading-tools';bar.setAttribute('role','group');bar.setAttribute('aria-label','Ações de leitura pessoal');
-  const note=button('Anotação pessoal',event=>openNote(item,event.currentTarget));note.classList.add('personal-note-action');bar.append(note);
+  const existing=safe(()=>storedNote(item));const note=button(existing&&!existing.deleted?'Editar anotação':'Anotação pessoal',event=>openNote(item,event.currentTarget));note.classList.add('personal-note-action');bar.append(note);
   const saved=safe(()=>data().positions.find(x=>key(x.route)===key(item.route)));
   if(saved&&saved.point.y>0)bar.append(button('Retomar posição salva',()=>schedulePosition(win,saved.point)));
   const heading=view.querySelector('.detail-header,.hub-life-heading,.liturgia-own-heading')||view.querySelector('h1,h2');
@@ -70,15 +89,13 @@
  function afterRender(resource=false){
   if(!ready)return;
   if(resource){
-   const previous=resourceActive;resourceActive=resourceDescriptor();
+   resourceActive=resourceDescriptor();
    readingTools($('serviteFrame').contentDocument,resourceActive,$('serviteFrame').contentWindow);
    if(pending&&resourceActive){const item=pending;pending=null;restoring=true;try{$('serviteFrame').contentWindow.OSMResourceContext.restore(item.route.state);resourceActive=resourceDescriptor();}catch(error){restoring=false;open();notice(error.message||'Não foi possível retomar este recurso.',true);return;}finally{restoring=false;}schedulePosition($('serviteFrame').contentWindow,item.point);}
-   else if(previous&&resourceActive&&key(previous.route)===key(resourceActive.route)&&!restoring){const p=data().positions.find(x=>key(x.route)===key(resourceActive.route));if(p)schedulePosition($('serviteFrame').contentWindow,p.point);}
    return;
   }
-  const previous=active;active=descriptor();
+  active=descriptor();
   readingTools(document,active,window);
-  if(previous&&active&&key(previous.route)===key(active.route)&&!restoring&&!$('serviteOverlay').classList.contains('open')){const saved=safe(()=>data().positions.find(x=>key(x.route)===key(active.route)));if(saved)schedulePosition(window,saved.point);}
   if(state.tab==='biblioteca'){
    const section=element('section');section.className='personal-library';section.append(element('h2','Anotações e cópia de segurança'),element('p','Suas anotações ficam separadas dos textos e são guardadas neste aparelho.'),button('Abrir meus dados pessoais',open));$('view').append(section);
   }
@@ -86,8 +103,8 @@
   if(home){const p=safe(()=>data().last);if(p){home.querySelector('.personal-access-recent')?.nextElementSibling?.remove();home.querySelector('.personal-access-recent')?.remove();home.append(element('h3','Continuar de onde parei'),button(p.title,()=>resume(p)));}}
  }
  function refreshPreferences(){readerScale=Number(localStorage.getItem('osmReaderScale')||1);lightMode=localStorage.getItem('osmTheme')!=='dark';localStorage.setItem('santoral-osm-theme',lightMode?'light':'dark');localStorage.setItem('santoral-osm-fontsize',String(readerScale*16));applyPreferences();try{const doc=$('serviteFrame').contentDocument;doc.documentElement.style.fontSize=(readerScale*16)+'px';doc.documentElement.setAttribute('data-theme',lightMode?'light':'dark');}catch{}}
- function open(){saveCurrent();closeMainMenu();noteOrigin=null;draft=null;backup=null;$('personalBody').replaceChildren();notice('');renderLibrary();openAccessibleDialog('personalOverlay');updateBackButton();}
- function close(){if(draft&&$('personalNoteText')?.value!==draft.original){if(!saveDraft())return;}closeAccessibleDialog('personalOverlay');draft=null;backup=null;if(noteOrigin?.isConnected)noteOrigin.focus({preventScroll:true});noteOrigin=null;updateBackButton();}
+ function open(){if(!cancelPosition())saveCurrent();closeMainMenu();noteOrigin=null;noteContext=null;draft=null;backup=null;$('personalBody').replaceChildren();notice('');renderLibrary();openAccessibleDialog('personalOverlay');updateBackButton();}
+ function close(){if(draft&&$('personalNoteText')?.value!==draft.original){if(!saveDraft())return;}closeAccessibleDialog('personalOverlay');backup=null;if(noteOrigin?.isConnected){if(noteOrigin.classList.contains('personal-note-action')){const note=safe(()=>storedNote(noteContext));if(note)noteOrigin.textContent=note.deleted?'Anotação pessoal':'Editar anotação';}noteOrigin.focus({preventScroll:true});}noteOrigin=null;noteContext=null;draft=null;updateBackButton();}
  function renderLibrary(){
   const body=$('personalBody');body.replaceChildren();draft=null;backup=null;
   const p=safe(data);if(!p)return;
@@ -101,13 +118,13 @@
   if(localStorage.getItem(D.RECOVERY))body.append(button('Desfazer última restauração',()=>{body.replaceChildren(element('h3','Conferir recuperação'),element('p','Esta ação recupera os dados anteriores à última restauração e substitui as alterações feitas depois dela. Exporte uma cópia dos dados atuais se quiser preservá-los.'),button('Exportar dados atuais',exportFile),button('Recuperar dados anteriores',()=>{if(safe(()=>{D.undoRestore(localStorage);refreshPreferences();return true;})){renderLibrary();notice('Restauração desfeita. Os dados anteriores foram recuperados.');}}),button('Cancelar',renderLibrary));}));
  }
  function openNote(item,origin=null){
-  if(!item)return;noteOrigin=origin;saveCurrent();let found;try{found=data().notes.find(n=>key(n.route)===key(item.route));}catch(error){notice(error.message,true);return;}
+  if(!item)return;noteOrigin=origin;noteContext=item;if(!cancelPosition())saveCurrent();let found;try{found=storedNote(item);}catch(error){notice(error.message,true);return;}
   if(!$('personalOverlay').classList.contains('open'))openAccessibleDialog('personalOverlay');
-  const original=found&&!found.deleted?found.text:'';draft={route:item.route,title:item.title,original};
+  const original=found&&!found.deleted?found.text:'';draft={route:found?.route||item.route,title:item.title,original};
   const body=$('personalBody');body.replaceChildren();notice('');body.append(element('h3',item.title),element('p','Anotação pessoal. O texto original da oração permanece preservado.'));
   const label=element('label','Sua anotação');label.htmlFor='personalNoteText';const input=element('textarea');input.id='personalNoteText';input.rows=9;input.maxLength=D.MAX_NOTE;input.value=original;
   body.append(label,input,button('Salvar anotação',()=>{if(saveDraft())notice('Anotação salva neste aparelho.');}),button('Voltar às anotações',()=>{if(saveDraft())renderLibrary();}));
-  if(found&&!found.deleted)body.append(button('Excluir anotação',()=>{const previous=input.value;if(safe(()=>D.saveNote(localStorage,item.route,item.title,previous,true))){draft=null;renderLibrary();notice('Anotação excluída.');body.append(button('Desfazer exclusão',()=>{if(safe(()=>D.saveNote(localStorage,item.route,item.title,previous))){renderLibrary();notice('Anotação recuperada.');}}));}}));
+  if(found&&!found.deleted)body.append(button('Excluir anotação',()=>{const previous=input.value;if(safe(()=>D.saveNote(localStorage,found.route,item.title,previous,true))){draft=null;renderLibrary();notice('Anotação excluída.');body.append(button('Desfazer exclusão',()=>{if(safe(()=>D.saveNote(localStorage,found.route,item.title,previous))){renderLibrary();notice('Anotação recuperada.');}}));}}));
   input.focus();updateBackButton();
  }
  function saveDraft(){if(!draft)return true;const value=$('personalNoteText').value;if(value===draft.original)return true;if(!value.trim()){notice('Para remover uma anotação existente, use “Excluir anotação”.',true);return false;}const saved=safe(()=>D.saveNote(localStorage,draft.route,draft.title,value));if(!saved)return false;draft.original=value;return true;}
@@ -160,5 +177,5 @@
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&overlay.classList.contains('open')){e.preventDefault();e.stopImmediatePropagation();close();}},true);
   afterRender();
  }
- window.OSMPersonalReader={init,beforeRender,afterRender,open,close,saveCurrent,resourceClosed(){saveCurrent();resourceActive=null;},resourceOpening(){saveCurrent();resourceActive=null;}};
+ window.OSMPersonalReader={init,beforeRender,afterRender,open,close,saveCurrent,cancelPosition,resourceClosed(){if(!cancelPosition())saveCurrent();resourceActive=null;},resourceOpening(){if(!cancelPosition())saveCurrent();resourceActive=null;}};
 })();

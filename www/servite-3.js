@@ -1121,13 +1121,11 @@ function updateThemeChips(){
 }
 
 // ===================== font size control =====================
-const FONT_MIN = 13, FONT_MAX = 32, FONT_STEP = 1;
 function changeFontSize(dir){
-  const current = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-  let next = Math.round(current + dir * FONT_STEP);
-  next = Math.max(FONT_MIN, Math.min(FONT_MAX, next));
-  document.documentElement.style.fontSize = next + 'px';
-  try{ localStorage.setItem('santoral-osm-fontsize', next); localStorage.setItem('osmReaderScale', (next/16).toFixed(2)); }catch(e){}
+  if(window.parent!==window)window.parent.OSMPersonalReader?.cancelPosition();
+  const next=OSMReaderScale.write(localStorage,OSMReaderScale.next(OSMReaderScale.read(localStorage),dir));
+  document.documentElement.style.fontSize=(16*next)+'px';
+  if(window.parent!==window)window.parent.updateServiteFontControls?.();
 }
 
 // Somente campos de navegação validados pelo controlador pessoal do aplicativo.
