@@ -1,4 +1,5 @@
 name: Publicar Liturgia OSM 4.9.130
+# Acionamento por alteração deste workflow ou execução manual.
 
 on:
   workflow_dispatch:
