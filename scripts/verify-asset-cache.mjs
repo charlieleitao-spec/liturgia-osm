@@ -24,7 +24,7 @@ const origin='http://127.0.0.1:'+server.address().port;
 const browser=await chromium.launch({executablePath:process.env.CHROME_BIN||undefined,args:['--no-sandbox']});
 try{
   const context=await browser.newContext({viewport:{width:390,height:844}});
-  const page=await context.newPage();
+  let page=await context.newPage();
   const session=await context.newCDPSession(page);
   await session.send('Network.enable');
   await session.send('Network.setCacheDisabled',{cacheDisabled:true});
@@ -42,7 +42,12 @@ try{
   await page.evaluate(async()=>{const reg=await navigator.serviceWorker.ready;await reg.update();});
   await page.waitForFunction(async()=>JSON.stringify(await caches.keys())==='["liturgia-osm-v4.9.129-personal-v1"]');
   await page.waitForFunction(async()=>{const reg=await navigator.serviceWorker.getRegistration();return !reg.installing&&!reg.waiting&&reg.active?.state==='activated'&&navigator.serviceWorker.controller===reg.active&&navigator.serviceWorker.controller!==window.assetOldController;});
-  await page.reload();
+  // Reopen the updated PWA in the same storage context, already offline.
+  // A running page retains its executed JavaScript until its client is closed.
+  await page.close();
+  await context.setOffline(true);
+  page=await context.newPage();
+  await page.goto(origin);
   await page.waitForFunction(()=>typeof APP_VERSION!=='undefined'&&APP_VERSION==='4.9.129').catch(async error=>{
     console.error('Upgrade diagnostics:',await page.evaluate(async()=>({version:typeof APP_VERSION==='undefined'?'undefined':APP_VERSION,caches:await caches.keys(),controller:navigator.serviceWorker.controller?.scriptURL,body:document.body.innerText.slice(0,1800),scripts:[...document.scripts].map(s=>s.src),cachedApp:(await (await caches.match('./app.js')).text()).match(/const APP_VERSION[^;]+/)[0]})));
     throw error;

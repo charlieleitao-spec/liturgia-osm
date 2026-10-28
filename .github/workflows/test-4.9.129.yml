@@ -54,7 +54,6 @@ jobs:
 
       - name: Verificar tipografia e atualização do cache offline
         id: browser
-        continue-on-error: true
         timeout-minutes: 3
         env:
           CHROME_BIN: /usr/bin/google-chrome
