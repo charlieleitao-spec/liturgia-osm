@@ -27,13 +27,14 @@ A conferência informa novos registros e conflitos. Favoritos são unidos; notas
 - `npm run test:personal`: 18 cenários: preparação Android idempotente/preservação do leitor PDF e persistência, fórmulas/horas distintas, exportação/restauração, conflitos, desfazer, dados inválidos, limites, campos extras, armazenamento cheio e recuperação após falha parcial.
 - Integração DOM executada com JSDOM: oração e fórmula, anotação tratada como texto literal, edição salva pelo Voltar, Biblioteca pessoal, retomada em 845 px, oração diária, Missa e busca.
 - Integração DOM do recurso: Laudes em 620 px e Vésperas em 330 px guardadas separadamente; retomada da hora e posição pela ponte incorporada. A navegação de documentos do iframe foi simulada porque JSDOM não a implementa.
-- Preparação real com `npx cap add android`: hook executado e plugin copiado/registrado. A integração posterior do leitor PDF preservou os dois registros antes de `super.onCreate`. Não equivale a compilação nativa.
+- Preparação real com `npx cap add android`: hook executado e plugin copiado/registrado. A integração posterior do leitor PDF preservou os dois registros antes de `super.onCreate`.
 - Sintaxe dos arquivos JavaScript alterados conferida.
-- Nenhuma repetição dos testes do A56 já aprovados; nenhum APK foi gerado ou publicado nesta etapa.
+- Nenhuma repetição dos testes do A56 já aprovados. Após a implementação, foi gerado um APK de teste paralelo, sem substituir ou publicar uma nova versão estável.
+- Compilação Android `:app:assembleDebug` aprovada com Java 21, Gradle 8.14.3 e SDK 36. Assinatura verificada, plugin pessoal presente no DEX e 162 arquivos web/offline iguais às fontes. Evidências em `validacao-android-pr144.md`.
 
 ## Antes de distribuir a atualização Android
 
-Pendente: compilação Android e conferência visual em aparelho. O ambiente desta implementação dispõe de Java 17, sem SDK Android configurado; não foi alegada validação nativa ou visual concluída.
+A compilação nativa de teste está concluída. Pendente: instalação e conferência dos três novos recursos no aparelho, incluindo os seletores de arquivo. A aprovação da compilação não substitui essa conferência. O APK de teste usa um pacote separado e não compartilha dados com a versão estável.
 
 1. Usar a preparação Android habitual, com `npx cap sync android`, e confirmar os registros de `PersonalBackup` e `LocalPdf` antes de `super.onCreate`.
 2. Na versão de teste, retomar uma oração, uma fórmula da Coroa e duas horas do Ofício, inclusive depois de fechar o aplicativo.
