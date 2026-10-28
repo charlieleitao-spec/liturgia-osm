@@ -204,7 +204,31 @@ jobs:
           - APK assinado com a chave estável, com arquivos offline conferidos.
           - Instalação de teste no Samsung A56 confirmada.
           EOF
-          gh release create v4.9.130 Liturgia-OSM-4.9.130.apk SHA256SUMS.txt --target "$GITHUB_SHA" --title 'Liturgia OSM 4.9.130' --notes-file release-notes.md --latest
+          if gh release view v4.9.130 >/dev/null 2>&1; then
+            # Preserve a published release; allow only workflow changes since its tag.
+            git diff --exit-code v4.9.130 HEAD -- . ':!.github/workflows/release-4.9.130.yml'
+            mkdir -p /tmp/release-4.9.130
+            gh release download v4.9.130 --pattern 'Liturgia-OSM-4.9.130.apk' --pattern 'SHA256SUMS.txt' --dir /tmp/release-4.9.130
+            (cd /tmp/release-4.9.130 && sha256sum --check SHA256SUMS.txt)
+            cp /tmp/release-4.9.130/Liturgia-OSM-4.9.130.apk Liturgia-OSM-4.9.130.apk
+            APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
+            "$APKSIGNER" verify --verbose --print-certs Liturgia-OSM-4.9.130.apk > assinatura-publicada.txt
+            grep -q 'certificate SHA-256 digest: 5b2b3319cc9f9bb61a14fb8a30e63044db225f7b930fca9568c82854f38b4fe0' assinatura-publicada.txt
+            AAPT="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/aapt"
+            "$AAPT" dump badging Liturgia-OSM-4.9.130.apk > identidade-publicada.txt
+            grep -q "package: name='com.liturgia_osm.app' versionCode='41043' versionName='4.9.130'" identidade-publicada.txt
+            python3 - <<'PYRELEASE'
+          from pathlib import Path
+          import zipfile
+          with zipfile.ZipFile('Liturgia-OSM-4.9.130.apk') as apk:
+              for p in Path('www').rglob('*'):
+                  if p.is_file():
+                      assert apk.read('assets/public/'+p.relative_to('www').as_posix()) == p.read_bytes(), str(p)
+          print('Release existente: checksum, assinatura, versão e conteúdo offline confirmados.')
+          PYRELEASE
+          else
+            gh release create v4.9.130 Liturgia-OSM-4.9.130.apk SHA256SUMS.txt --target "$GITHUB_SHA" --title 'Liturgia OSM 4.9.130' --notes-file release-notes.md --latest
+          fi
 
       - name: Verificar download público da versão definitiva
         run: |
