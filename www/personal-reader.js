@@ -2,7 +2,7 @@
 (function(){
  'use strict';
  const D=window.OSMPersonalData;
- let ready=false,active=null,resourceActive=null,pending=null,restoring=false,timer=null,draft=null,backup=null;
+ let ready=false,active=null,resourceActive=null,pending=null,restoring=false,timer=null,draft=null,backup=null,noteOrigin=null;
  const $=id=>document.getElementById(id);
  const key=r=>D.routeKey(r);
  const text=node=>(node?.textContent||'').replace(/\s+/g,' ').trim();
@@ -56,18 +56,28 @@
  function scheduleSave(){clearTimeout(timer);timer=setTimeout(saveCurrent,450);}
  function schedulePosition(win,p){restoring=true;requestAnimationFrame(()=>requestAnimationFrame(()=>{try{position(win,p);}finally{restoring=false;}}));}
  function beforeRender(resource=false){if(!ready||restoring||!resource&&$('serviteOverlay').classList.contains('open'))return;try{saveOne(resource?resourceActive:active,resource?$('serviteFrame').contentWindow:window);}catch{}}
+ function readingTools(doc,item,win){
+  const view=doc?.getElementById('view');if(!view)return;
+  view.querySelectorAll('.personal-reading-tools').forEach(node=>node.remove());
+  if(!item)return;
+  const bar=doc.createElement('div');bar.className='personal-reading-tools';bar.setAttribute('role','group');bar.setAttribute('aria-label','Ações de leitura pessoal');
+  const note=button('Anotação pessoal',event=>openNote(item,event.currentTarget));note.classList.add('personal-note-action');bar.append(note);
+  const saved=safe(()=>data().positions.find(x=>key(x.route)===key(item.route)));
+  if(saved&&saved.point.y>0)bar.append(button('Retomar posição salva',()=>schedulePosition(win,saved.point)));
+  const heading=view.querySelector('.detail-header,.hub-life-heading,.liturgia-own-heading')||view.querySelector('h1,h2');
+  if(heading)heading.after(bar);else view.prepend(bar);
+ }
  function afterRender(resource=false){
   if(!ready)return;
   if(resource){
    const previous=resourceActive;resourceActive=resourceDescriptor();
+   readingTools($('serviteFrame').contentDocument,resourceActive,$('serviteFrame').contentWindow);
    if(pending&&resourceActive){const item=pending;pending=null;restoring=true;try{$('serviteFrame').contentWindow.OSMResourceContext.restore(item.route.state);resourceActive=resourceDescriptor();}catch(error){restoring=false;open();notice(error.message||'Não foi possível retomar este recurso.',true);return;}finally{restoring=false;}schedulePosition($('serviteFrame').contentWindow,item.point);}
    else if(previous&&resourceActive&&key(previous.route)===key(resourceActive.route)&&!restoring){const p=data().positions.find(x=>key(x.route)===key(resourceActive.route));if(p)schedulePosition($('serviteFrame').contentWindow,p.point);}
    return;
   }
   const previous=active;active=descriptor();
-  if(active){const bar=element('div');bar.className='personal-reading-tools';bar.setAttribute('aria-label','Leitura pessoal');bar.append(button('Anotação pessoal',()=>openNote(active)));const saved=safe(()=>data().positions.find(x=>key(x.route)===key(active.route)));
-   if(saved)bar.append(button('Retomar posição salva',()=>schedulePosition(window,saved.point)));$('view').prepend(bar);
-  }
+  readingTools(document,active,window);
   if(previous&&active&&key(previous.route)===key(active.route)&&!restoring&&!$('serviteOverlay').classList.contains('open')){const saved=safe(()=>data().positions.find(x=>key(x.route)===key(active.route)));if(saved)schedulePosition(window,saved.point);}
   if(state.tab==='biblioteca'){
    const section=element('section');section.className='personal-library';section.append(element('h2','Anotações e cópia de segurança'),element('p','Suas anotações ficam separadas dos textos e são guardadas neste aparelho.'),button('Abrir meus dados pessoais',open));$('view').append(section);
@@ -76,8 +86,8 @@
   if(home){const p=safe(()=>data().last);if(p){home.querySelector('.personal-access-recent')?.nextElementSibling?.remove();home.querySelector('.personal-access-recent')?.remove();home.append(element('h3','Continuar de onde parei'),button(p.title,()=>resume(p)));}}
  }
  function refreshPreferences(){readerScale=Number(localStorage.getItem('osmReaderScale')||1);lightMode=localStorage.getItem('osmTheme')!=='dark';localStorage.setItem('santoral-osm-theme',lightMode?'light':'dark');localStorage.setItem('santoral-osm-fontsize',String(readerScale*16));applyPreferences();try{const doc=$('serviteFrame').contentDocument;doc.documentElement.style.fontSize=(readerScale*16)+'px';doc.documentElement.setAttribute('data-theme',lightMode?'light':'dark');}catch{}}
- function open(){saveCurrent();closeMainMenu();draft=null;backup=null;$('personalBody').replaceChildren();notice('');renderLibrary();openAccessibleDialog('personalOverlay');updateBackButton();}
- function close(){if(draft&&$('personalNoteText')?.value!==draft.original){if(!saveDraft())return;}closeAccessibleDialog('personalOverlay');draft=null;backup=null;updateBackButton();}
+ function open(){saveCurrent();closeMainMenu();noteOrigin=null;draft=null;backup=null;$('personalBody').replaceChildren();notice('');renderLibrary();openAccessibleDialog('personalOverlay');updateBackButton();}
+ function close(){if(draft&&$('personalNoteText')?.value!==draft.original){if(!saveDraft())return;}closeAccessibleDialog('personalOverlay');draft=null;backup=null;if(noteOrigin?.isConnected)noteOrigin.focus({preventScroll:true});noteOrigin=null;updateBackButton();}
  function renderLibrary(){
   const body=$('personalBody');body.replaceChildren();draft=null;backup=null;
   const p=safe(data);if(!p)return;
@@ -90,8 +100,8 @@
   body.append(element('h3','Cópia de segurança'),element('p','Inclui favoritos, recentes, anotações, posições de leitura, tema e tamanho do texto. Guarde o arquivo em um local de sua confiança.'),button('Exportar cópia',exportFile),button('Escolher cópia para restaurar',importFile));
   if(localStorage.getItem(D.RECOVERY))body.append(button('Desfazer última restauração',()=>{body.replaceChildren(element('h3','Conferir recuperação'),element('p','Esta ação recupera os dados anteriores à última restauração e substitui as alterações feitas depois dela. Exporte uma cópia dos dados atuais se quiser preservá-los.'),button('Exportar dados atuais',exportFile),button('Recuperar dados anteriores',()=>{if(safe(()=>{D.undoRestore(localStorage);refreshPreferences();return true;})){renderLibrary();notice('Restauração desfeita. Os dados anteriores foram recuperados.');}}),button('Cancelar',renderLibrary));}));
  }
- function openNote(item){
-  if(!item)return;saveCurrent();let found;try{found=data().notes.find(n=>key(n.route)===key(item.route));}catch(error){notice(error.message,true);return;}
+ function openNote(item,origin=null){
+  if(!item)return;noteOrigin=origin;saveCurrent();let found;try{found=data().notes.find(n=>key(n.route)===key(item.route));}catch(error){notice(error.message,true);return;}
   if(!$('personalOverlay').classList.contains('open'))openAccessibleDialog('personalOverlay');
   const original=found&&!found.deleted?found.text:'';draft={route:item.route,title:item.title,original};
   const body=$('personalBody');body.replaceChildren();notice('');body.append(element('h3',item.title),element('p','Anotação pessoal. O texto original da oração permanece preservado.'));
@@ -145,7 +155,6 @@
   const panel=element('section');panel.className='personal-panel';const head=element('div');head.className='personal-head';const h=element('h2','Anotações e cópia de segurança');h.id='personalTitle';const c=button('Fechar',close);c.setAttribute('aria-label','Fechar dados pessoais');head.append(h,c);const status=element('p');status.id='personalStatus';status.setAttribute('role','status');const body=element('div');body.id='personalBody';panel.append(head,status,body);overlay.append(panel);document.body.append(overlay);
   const warning=element('p');warning.id='personalStorageWarning';warning.className='personal-storage-warning';warning.setAttribute('role','alert');warning.hidden=true;document.body.append(warning);
   const menu=document.querySelector('.main-menu .menu-section');menu?.append(button('Anotações e cópia de segurança',open));
-  const note=button('Anotação',()=>openNote(resourceDescriptor()));note.setAttribute('aria-label','Anotação pessoal deste recurso');document.querySelector('.servite-head .mini-tools')?.prepend(note);
   window.addEventListener('scroll',scheduleSave,true);window.addEventListener('pagehide',()=>{if(draft)saveDraft();saveCurrent();});document.addEventListener('visibilitychange',()=>{if(document.hidden){if(draft)saveDraft();saveCurrent();}});
   $('serviteFrame').addEventListener('load',()=>{try{const win=$('serviteFrame').contentWindow;win.addEventListener('scroll',scheduleSave,true);win.addEventListener('servite-ready',()=>afterRender(true));if(win.OSMResourceContext?.ready)afterRender(true);}catch{}});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&overlay.classList.contains('open')){e.preventDefault();e.stopImmediatePropagation();close();}},true);
