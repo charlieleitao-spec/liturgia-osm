@@ -58,7 +58,7 @@ jobs:
         env:
           CHROME_BIN: /usr/bin/google-chrome
         run: |
-          npm install --no-save --package-lock=false --ignore-scripts playwright@1.56.1
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund --fetch-retries=1 --fetch-timeout=30000 playwright@1.56.1
           node scripts/verify-typography.mjs
           node scripts/verify-asset-cache.mjs
 
