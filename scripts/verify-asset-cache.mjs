@@ -22,6 +22,7 @@ const browser=await chromium.launch({executablePath:process.env.CHROME_BIN||unde
 try{
   const context=await browser.newContext({viewport:{width:390,height:844}});
   const page=await context.newPage();
+  page.on('pageerror',error=>console.error('Page error:',error.message));
   await page.goto(origin);
   await page.evaluate(()=>navigator.serviceWorker.ready);
   await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
@@ -31,7 +32,10 @@ try{
   await page.evaluate(async()=>{const reg=await navigator.serviceWorker.ready;await reg.update();});
   await page.waitForFunction(async()=>JSON.stringify(await caches.keys())==='["liturgia-osm-v4.9.129-personal-v1"]');
   await page.reload();
-  await page.waitForFunction(()=>typeof APP_VERSION!=='undefined'&&APP_VERSION==='4.9.129');
+  await page.waitForFunction(()=>typeof APP_VERSION!=='undefined'&&APP_VERSION==='4.9.129').catch(async error=>{
+    console.error('Upgrade diagnostics:',await page.evaluate(async()=>({version:typeof APP_VERSION==='undefined'?'undefined':APP_VERSION,caches:await caches.keys(),controller:navigator.serviceWorker.controller?.scriptURL,body:document.body.innerText.slice(0,1800),scripts:[...document.scripts].map(s=>s.src),cachedApp:(await (await caches.match('./app.js')).text()).match(/const APP_VERSION[^;]+/)[0]})));
+    throw error;
+  });
   await context.setOffline(true);
   await page.reload();
   await page.waitForFunction(()=>typeof santoralReady!=='undefined'&&santoralReady&&oficiosReady);
