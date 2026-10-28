@@ -16,6 +16,7 @@ const server=http.createServer(async(req,res)=>{
   if(file.includes('..')){res.writeHead(400).end();return;}
   try{
     const data=previous?execFileSync('git',['show',base+':'+file],{maxBuffer:8*1024*1024,stdio:['ignore','pipe','ignore']}):await fs.readFile(file);
+    if(/(?:index\.html|app\.js|sw\.js)$/.test(file))console.log('Server resource:',previous?'baseline':'current',req.url,data.toString().match(/const (?:APP_VERSION|CACHE)[^;]+|script.src='[^']+'/)?.[0]);
     res.writeHead(200,{'Content-Type':types[path.extname(file)]||'application/octet-stream','Cache-Control':'no-store'}).end(data);
   }catch{res.writeHead(404).end();}
 });
@@ -49,7 +50,12 @@ try{
   page=await context.newPage();
   await page.goto(origin);
   await page.waitForFunction(()=>typeof APP_VERSION!=='undefined'&&APP_VERSION==='4.9.129').catch(async error=>{
-    console.error('Upgrade diagnostics:',await page.evaluate(async()=>({version:typeof APP_VERSION==='undefined'?'undefined':APP_VERSION,caches:await caches.keys(),controller:navigator.serviceWorker.controller?.scriptURL,body:document.body.innerText.slice(0,1800),scripts:[...document.scripts].map(s=>s.src),cachedApp:(await (await caches.match('./app.js?v=4.9.129')).text()).match(/const APP_VERSION[^;]+/)[0]})));
+    console.error('Upgrade diagnostics:',await page.evaluate(async()=>{
+      const cache=await caches.open('liturgia-osm-v4.9.129-personal-v1');
+      const keys=(await cache.keys()).map(r=>r.url);
+      const read=async url=>{const r=await cache.match(url);return r?await r.text():'MISSING';};
+      return {version:typeof APP_VERSION==='undefined'?'undefined':APP_VERSION,caches:await caches.keys(),location:location.href,controller:navigator.serviceWorker.controller?.scriptURL,documentUsesVersionedCode:document.documentElement.outerHTML.includes('app.js?v=4.9.129'),scripts:[...document.scripts].map(s=>s.src),keys:keys.filter(k=>/app\.js|index\.html|fonts/.test(k)),cachedApp:(await read('./app.js?v=4.9.129')).match(/const APP_VERSION[^;]+/)?.[0],cachedRootUsesVersionedCode:(await read('./')).includes('app.js?v=4.9.129')};
+    }));
     throw error;
   });
   mark('reload offline');
