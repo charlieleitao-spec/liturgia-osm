@@ -314,10 +314,10 @@ const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'
 const dailySuggestion = dailyPrayerSuggestion();
 let pendingSharePrayer = null;
 let state = { tab: 'hoje', angelus:dailySuggestion.key, detailId:null, search:'', devo:null, devoSub:null, liturgiaDetail:null };
-let readerScale = parseFloat(localStorage.getItem('osmReaderScale') || '1');
+let readerScale = OSMReaderScale.read(localStorage);
 let lightMode = localStorage.getItem('osmTheme') !== 'dark';
 function applyPreferences(){
-  readerScale = Number.isFinite(readerScale)?Math.max(.76, Math.min(2, readerScale)):1;
+  readerScale = OSMReaderScale.normalize(readerScale);
   document.documentElement.style.setProperty('--reader-scale', readerScale.toFixed(2));
   document.body.classList.toggle('light-mode', lightMode);
   document.documentElement.style.colorScheme = lightMode ? 'light' : 'dark';
@@ -326,11 +326,11 @@ function applyPreferences(){
   const b=document.getElementById('themeBtn'); if(b) b.textContent = lightMode ? '☾' : '☼'; document.querySelectorAll('.reader-scale-value').forEach(rv=>rv.textContent=Math.round(readerScale*100)+'%');
 }
 function adjustFont(delta){
-  readerScale=Math.max(.76,Math.min(2,readerScale+delta));
-  localStorage.setItem('osmReaderScale',readerScale);
+  window.OSMPersonalReader?.cancelPosition();
+  readerScale=OSMReaderScale.write(localStorage,OSMReaderScale.normalize(readerScale+delta));
   applyPreferences();
 }
-function resetFont(){readerScale=1;localStorage.setItem('osmReaderScale',readerScale);applyPreferences();}
+function resetFont(){window.OSMPersonalReader?.cancelPosition();readerScale=OSMReaderScale.write(localStorage,1);applyPreferences();}
 // Keep background content out of keyboard and screen-reader navigation while a dialog is open.
 const dialogOrigins = new Map();
 const dialogBackground = new Map();
@@ -341,6 +341,7 @@ function dialogControls(dialog){
 function openAccessibleDialog(id){
   const dialog=document.getElementById(id);
   if(dialog.classList.contains('open'))return;
+  document.body.classList.remove('scroll-controls-hidden');
   dialogOrigins.set(id,document.activeElement);
   if(id==='dailyLiturgyOverlay')dialog.append(document.getElementById('celebrationToggle'));
   dialog.classList.add('open');dialog.setAttribute('aria-hidden','false');
@@ -1252,6 +1253,7 @@ function render(){
   if(typeof updateBackButton==='function') updateBackButton();
   if(typeof window.updateCelebrationButton==='function') window.updateCelebrationButton();
   window.OSMPersonalReader?.afterRender();
+  document.body.classList.remove('scroll-controls-hidden');
 }
 document.querySelectorAll('.tab-btn').forEach(b=>{
   b.addEventListener('click', ()=> setTab(b.dataset.tab));
@@ -1455,9 +1457,16 @@ let currentServiteView='';
 const serviteNames={regra:'Regra OSSM',rosario:'Rosário',coroa:'Coroa de Nossa Senhora das Dores',oficio:'Ofício',sabado:'Sábado Mariano',completo:'Recursos OSM'};
 let serviteHistoryReturnPending=false;
 function serviteUrl(view){return 'servite.html?view='+encodeURIComponent(view||'completo');}
-function serviteAdjustFont(delta){try{const frame=document.getElementById('serviteFrame');const change=frame?.contentWindow?.changeFontSize;if(typeof change==='function')change(delta);}catch(error){console.warn('[Liturgia OSM] Controle de fonte do recurso indisponível.',error);}} function openServite(view){
+function updateServiteFontControls(){
+ const frame=document.getElementById('serviteFrame'),loaded=!!frame?.contentWindow?.OSMResourceContext?.ready,scale=OSMReaderScale.read(localStorage);
+ document.querySelectorAll('[data-servite-font]').forEach(button=>{const step=Number(button.dataset.serviteFont);button.disabled=!loaded||(step<0?scale<=OSMReaderScale.MIN:scale>=OSMReaderScale.MAX);});
+ if(loaded){readerScale=scale;applyPreferences();}
+}
+function serviteAdjustFont(delta){try{const frame=document.getElementById('serviteFrame');if(!frame?.contentWindow?.OSMResourceContext?.ready)return;frame.contentWindow.changeFontSize(delta);updateServiteFontControls();}catch(error){console.warn('[Liturgia OSM] Controle de fonte do recurso indisponível.',error);}}
+function openServite(view){
   window.OSMPersonalReader?.resourceOpening();
   currentServiteView=view||'completo';
+  document.querySelectorAll('[data-servite-font]').forEach(button=>button.disabled=true);
   const ov=document.getElementById('serviteOverlay'),fr=document.getElementById('serviteFrame');
   document.getElementById('serviteTitle').textContent=serviteNames[currentServiteView]||'Recursos OSM';
   fr.contentWindow.location.replace(new URL(serviteUrl(currentServiteView),location.href).href);
@@ -1468,7 +1477,7 @@ function closeServite(fromHistory=false){window.OSMPersonalReader?.resourceClose
 // Keyboard events inside the embedded document do not bubble to the parent.
 document.getElementById('serviteFrame').addEventListener('load',()=>{
   const frame=document.getElementById('serviteFrame');
-  try{frame.contentDocument.addEventListener('keydown',event=>{
+  try{updateServiteFontControls();frame.contentDocument.addEventListener('keydown',event=>{
     if(!document.getElementById('serviteOverlay').classList.contains('open'))return;
     if(event.key==='Escape'){event.preventDefault();closeServite();return;}
     if(event.key!=='Tab')return;
@@ -1480,7 +1489,7 @@ document.getElementById('serviteFrame').addEventListener('load',()=>{
     }
   });}catch(error){console.warn('[Liturgia OSM] Foco do recurso indisponível.',error);}
 });
-function serviteReload(){if(currentServiteView)document.getElementById('serviteFrame').contentWindow.location.replace(new URL(serviteUrl(currentServiteView)+'&reload='+Date.now(),location.href).href);}
+function serviteReload(){if(!currentServiteView)return;window.OSMPersonalReader?.resourceOpening();document.querySelectorAll('[data-servite-font]').forEach(button=>button.disabled=true);document.getElementById('serviteFrame').contentWindow.location.replace(new URL(serviteUrl(currentServiteView)+'&reload='+Date.now(),location.href).href);}
 window.addEventListener('popstate',event=>{
   const resourceOpen=document.getElementById('serviteOverlay')?.classList.contains('open');
   if(resourceOpen||serviteHistoryReturnPending){
@@ -1877,6 +1886,7 @@ loadCanonicalSantoral();
   function show(){ document.body.classList.remove('scroll-controls-hidden'); }
   function hide(){ document.body.classList.add('scroll-controls-hidden'); }
   function onScroll(event){
+    if(document.querySelector('[role="dialog"].open')){show();return;}
     var target = normalizeTarget(event.target);
     var y = readY(target);
     if(target !== lastTarget){
@@ -1901,6 +1911,7 @@ loadCanonicalSantoral();
     var y = event.touches[0].clientY;
     var delta = touchLastY - y;
     if(Math.abs(y - touchStartY) > 7) touchMoved = true;
+    if(document.querySelector('[role="dialog"].open')){show();touchLastY=y;return;}
     if(delta > 4) hide();
     else if(delta < -4) show();
     touchLastY = y;
@@ -1913,6 +1924,7 @@ loadCanonicalSantoral();
     touchStartY = touchLastY = null;
   }, {passive:true, capture:true});
   document.addEventListener('wheel', function(event){
+    if(document.querySelector('[role="dialog"].open')){show();return;}
     if(event.deltaY > 2) hide();
     else if(event.deltaY < -2) show();
   }, {passive:true, capture:true});

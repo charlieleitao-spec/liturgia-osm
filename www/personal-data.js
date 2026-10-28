@@ -26,6 +26,21 @@
   return r;
  }
  const routeKey=r=>JSON.stringify(route(r));
+ // A anotação pertence ao conteúdo, não ao caminho usado para chegar até ele.
+ function noteKey(value){
+  const r=route(value);if(r.type!=='resource')return routeKey(r);
+  const s=r.state;
+  if(s.tab==='regra'||!s.tab&&r.view==='regra')return JSON.stringify({type:'resource',book:'regra',chapter:s.regraChapter??null});
+  if(s.showOficio&&s.detailId!=null)return JSON.stringify({type:'resource',book:'oficio',id:s.detailId,hour:s.oficioTab??null});
+  if(s.devo){const n={type:'resource',book:'prayer',key:s.devo,sub:s.devoSub??null};
+   if(s.devo==='coroa'){n.formula=s.coroaFormula??'formula1';if(s.devoSub==='guided')n.step=s.coroaGuidedStep??0;}
+   if(s.devo==='rosario'){n.mystery=s.rosarioSet??'gozosos';if(s.devoSub==='guided')n.step=s.rosarioGuidedStep??0;}
+   return JSON.stringify(n);
+  }
+  if(s.detailId!=null)return JSON.stringify({type:'resource',book:'saint',id:s.detailId});
+  return JSON.stringify({type:'resource',view:r.view,tab:s.tab??null});
+ }
+
  function point(p={}){
   if(!p||!integer(p.y)||!['window','view'].includes(p.scroller))throw Error('Posição de leitura inválida.');
   const details=p.details??[];if(!Array.isArray(details)||details.length>150||details.some(x=>typeof x!=='string'||!/^([a-zA-Z][\w-]{0,90}|@\d{1,4})$/.test(x)))throw Error('Seções inválidas.');
@@ -67,10 +82,14 @@
  function exportBackup(storage){const now=new Date();const b={app:'liturgia-osm-personal',schema:1,createdDate:now.toISOString().slice(0,10),personal:load(storage),library:legacy(storage)};const text=JSON.stringify(normalizeBackup(b),null,2);if(new TextEncoder().encode(text).length>MAX_BYTES)throw Error('A cópia excede o tamanho permitido.');return text;}
  function parseBackup(text){if(typeof text!=='string'||new TextEncoder().encode(text).length>MAX_BYTES)throw Error('Arquivo muito grande. Limite de 2 MB.');let b;try{b=JSON.parse(text)}catch{throw Error('O arquivo não contém JSON válido.');}return normalizeBackup(b);}
  function mergeByKey(local,incoming){const map=new Map(local.map(x=>[routeKey(x.route),x]));for(const x of incoming)if(!map.has(routeKey(x.route)))map.set(routeKey(x.route),x);if(map.size>MAX_ENTRIES)throw Error('A soma dos registros excede o limite permitido.');return [...map.values()];}
+ function mergeNotes(local,incoming){
+  const localContents=new Set(local.map(x=>noteKey(x.route)));
+  return mergeByKey(local,incoming.filter(x=>!localContents.has(noteKey(x.route))));
+ }
  function planRestore(storage,b,preferences=true){
-  const incoming=normalizeBackup(b),local=load(storage),old=legacy(storage),p={schema:1,notes:mergeByKey(local.notes,incoming.personal.notes),positions:mergeByKey(local.positions,incoming.personal.positions).slice(0,200),last:local.last||incoming.personal.last};
-  const existing=new Map(local.notes.map(x=>[routeKey(x.route),x]));
-  const conflicts=incoming.personal.notes.filter(x=>{const y=existing.get(routeKey(x.route));return y&&(x.text!==y.text||x.deleted!==y.deleted)}).length;
+  const incoming=normalizeBackup(b),local=load(storage),old=legacy(storage),p={schema:1,notes:mergeNotes(local.notes,incoming.personal.notes),positions:mergeByKey(local.positions,incoming.personal.positions).slice(0,200),last:local.last||incoming.personal.last};
+  const existing=new Map();for(const note of local.notes){const k=noteKey(note.route),previous=existing.get(k);if(!previous||note.updatedAt>previous.updatedAt)existing.set(k,note);}
+  const conflicts=incoming.personal.notes.filter(x=>{const y=existing.get(noteKey(x.route));return y&&(x.text!==y.text||x.deleted!==y.deleted)}).length;
   const favorites=[...new Set([...old.favorites,...incoming.library.favorites])];if(favorites.length>MAX_ENTRIES)throw Error('A soma dos favoritos excede o limite permitido.');
   const recent=new Map();for(const x of [...old.recents,...incoming.library.recents]){const y=recent.get(x.k);if(!y||x.ts>y.ts)recent.set(x.k,x);}
   const prefs=preferences?incoming.library.preferences:old.preferences;
@@ -84,5 +103,5 @@
   try{applyValues(storage,plan.values)}catch(error){try{applyValues(storage,before)}catch{throw Error('Armazenamento indisponível durante a recuperação. A cópia anterior está preservada para desfazer.');}throw Error('Não foi possível restaurar. Os dados anteriores foram mantidos.');}return plan.summary;
  }
  function undoRestore(storage){const raw=storage.getItem(RECOVERY);if(!raw)throw Error('Não há restauração para desfazer.');const data=JSON.parse(raw),keys=[KEY,...LEGACY];if(keys.some(k=>!Object.hasOwn(data,k)||!(data[k]===null||typeof data[k]==='string')))throw Error('Cópia de recuperação inválida.');const before=snapshot(storage);try{applyValues(storage,Object.fromEntries(keys.map(k=>[k,data[k]])))}catch(error){applyValues(storage,before);throw Error('Não foi possível desfazer; os dados atuais foram mantidos.');}storage.removeItem(RECOVERY);}
- return {KEY,RECOVERY,MAX_BYTES,MAX_NOTE,route,routeKey,point,empty,load,saveNote,savePosition,exportBackup,parseBackup,planRestore,restore,undoRestore};
+ return {KEY,RECOVERY,MAX_BYTES,MAX_NOTE,route,routeKey,noteKey,point,empty,load,saveNote,savePosition,exportBackup,parseBackup,planRestore,restore,undoRestore};
 });
