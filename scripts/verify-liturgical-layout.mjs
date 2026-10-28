@@ -225,13 +225,13 @@ try{
   const saintId=await page.evaluate(()=>SANTORAL.find(s=>s.month===2&&s.day===17)._id);
   await page.goto(`http://127.0.0.1:8766/servite.html?view=oficio:${saintId}:vesperas`);
   await page.waitForSelector('.today-servita-reader .psalm-verse');
-  await page.waitForFunction(()=>getComputedStyle(document.body).backgroundColor==='rgb(252, 243, 213)');
+  await page.waitForFunction(()=>getComputedStyle(document.body).backgroundColor==='rgb(247, 244, 237)');
   const office=await page.evaluate(()=>{
     const root=document.querySelector('.today-servita-reader');
     const style=selector=>{const n=root.querySelector(selector);if(!n)return null;const s=getComputedStyle(n);return {color:s.color,align:s.textAlign,background:s.backgroundColor,border:s.borderTopWidth,weight:s.fontWeight};};
     return {background:getComputedStyle(document.body).backgroundColor,antiphon:style('.antiphon'),verse:style('.psalm-verse'),heading:style('.litheading'),response:style('.preces-response'),frame:getComputedStyle(root.closest('.card'),'::before').display,text:root.textContent,poetry:root.querySelectorAll('.psalm-verse').length};
   });
-  assert.equal(office.frame,'none');assert.equal(office.background,'rgb(252, 243, 213)');assert.equal(office.antiphon.align,'left');assert.equal(office.antiphon.border,'0px');assert.equal(office.verse.align,'left');assert.equal(office.heading.color,'rgb(179, 34, 28)');assert.ok(office.poetry>10);assert.match(office.text,/minh.alma engrandece/);report.push({office});
+  assert.equal(office.frame,'none');assert.equal(office.background,'rgb(247, 244, 237)');assert.equal(office.antiphon.align,'left');assert.equal(office.antiphon.border,'0px');assert.equal(office.verse.align,'left');assert.equal(office.heading.color,'rgb(179, 34, 28)');assert.ok(office.poetry>10);assert.match(office.text,/minh.alma engrandece/);report.push({office});
   for(const width of [320,390,768]){
     await page.setViewportSize({width,height:844});
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Office reader overflows at ${width}`);
