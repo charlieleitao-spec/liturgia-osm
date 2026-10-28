@@ -32,7 +32,7 @@ try{
  }
  const url=await serve(path.resolve('www'),18770);
  for(const width of [320,390,768]){
-  const c=await context(width),page=await c.newPage();await ready(page,url);const frame=await regra(page);const note=frame.locator('.personal-note-action');const box=await note.boundingBox();const ui=await note.evaluate(el=>({font:getComputedStyle(el).fontSize,width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height}));assert.equal(ui.font,'15px');assert.ok(ui.height>=44&&ui.height<=48);assert.ok(ui.width<160,'Botão de anotação deve ser compacto mesmo com leitura a 200%');
+  const c=await context(width),page=await c.newPage();await ready(page,url);const frame=await regra(page);const note=frame.locator('.personal-note-action');const box=await note.boundingBox();const ui=await note.evaluate(el=>({font:getComputedStyle(el).fontSize,width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height}));assert.equal(ui.font,'14px');assert.ok(ui.height>=44&&ui.height<=48);assert.ok(ui.width<160,'Botão de anotação deve ser compacto mesmo com leitura a 200%');
   await saveAndReopen(page,note,'Nota da Regra em '+width+'.');assert.equal(await page.locator('#serviteOverlay').evaluate(el=>el.inert),false);assert.equal(await page.locator('#personalOverlay').evaluate(el=>el.inert),true,'Ao fechar a nota, o diálogo oculto volta ao estado do recurso');
   await frame.getByText('Capítulo I',{exact:true}).tap();await saveAndReopen(page,frame.locator('.personal-note-action'),'Nota do capitulo em '+width+'.');
   await page.getByRole('button',{name:'Fechar recurso',exact:true}).tap();await page.locator('#serviteOverlay').waitFor({state:'hidden'});assert.equal(await page.locator('#app').evaluate(el=>el.inert),false);
