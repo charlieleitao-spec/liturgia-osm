@@ -17,6 +17,7 @@ async function regra(page){await page.getByRole('button',{name:'Abrir menu',exac
 async function saveAndReopen(page,noteButton,text){
  await noteButton.tap();const overlay=page.locator('#personalOverlay'),field=page.locator('#personalNoteText');await overlay.waitFor({state:'visible'});
  assert.equal(await overlay.evaluate(el=>el.inert),false,'Janela ativa não pode permanecer inert');
+ const closeBox=await page.getByRole('button',{name:'Fechar dados pessoais',exact:true}).boundingBox();assert.ok(closeBox.height<=48&&closeBox.width>=64,'Fechar precisa permanecer compacto em uma linha');
  await field.tap();assert.equal(await field.evaluate(el=>document.activeElement===el),true,'O toque precisa focar o campo');
  await page.keyboard.type(text);assert.equal(await field.inputValue(),text,'Digitação real precisa entrar no campo');
  await page.getByRole('button',{name:'Salvar anotação',exact:true}).tap();assert.match(await page.locator('#personalStatus').textContent(),/salva/);
