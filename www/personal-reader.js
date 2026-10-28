@@ -79,12 +79,11 @@
   const view=doc?.getElementById('view');if(!view)return;
   view.querySelectorAll('.personal-reading-tools').forEach(node=>node.remove());
   if(!item)return;
-  const bar=doc.createElement('div');bar.className='personal-reading-tools';bar.setAttribute('role','group');bar.setAttribute('aria-label','Ações de leitura pessoal');
+  const bar=doc.createElement('footer');bar.className='personal-reading-tools';bar.setAttribute('role','group');bar.setAttribute('aria-label','Ações de leitura pessoal');
   const existing=safe(()=>storedNote(item));const note=button(existing&&!existing.deleted?'Editar nota':'Anotar',event=>openNote(item,event.currentTarget));note.classList.add('personal-note-action');note.setAttribute('aria-label',existing&&!existing.deleted?'Editar nota desta leitura':'Anotar nesta leitura');bar.append(note);
   const saved=safe(()=>data().positions.find(x=>key(x.route)===key(item.route)));
   if(saved&&saved.point.y>0)bar.append(button('Retomar',()=>schedulePosition(win,saved.point)));
-  const heading=view.querySelector('.detail-header,.hub-life-heading,.liturgia-own-heading')||view.querySelector('h1,h2');
-  if(heading)heading.after(bar);else view.prepend(bar);
+  view.append(bar);
  }
  function afterRender(resource=false){
   if(!ready)return;
@@ -112,7 +111,7 @@
   if(p.last)body.append(button('Continuar: '+p.last.title,()=>resume(p.last)));
   body.append(element('h3','Minhas anotações'));
   const notes=p.notes.filter(n=>!n.deleted);
-  if(!notes.length)body.append(element('p','Abra uma oração e toque em “Anotação pessoal” para escrever.'));
+  if(!notes.length)body.append(element('p','Abra uma oração e toque em “Anotar”, ao final da leitura, para escrever.'));
   notes.sort((a,b)=>b.updatedAt-a.updatedAt).forEach(n=>{const row=element('article');row.className='personal-note-item';row.append(element('h4',n.title),element('p',n.text.slice(0,180)),button('Editar anotação',()=>openNote(n)),button('Abrir leitura',()=>resume({route:n.route,title:n.title,point:p.positions.find(x=>key(x.route)===key(n.route))?.point||{y:0,scroller:'window',details:[]}})));body.append(row);});
   body.append(element('h3','Cópia de segurança'),element('p','Inclui favoritos, recentes, anotações, posições de leitura, tema e tamanho do texto. Guarde o arquivo em um local de sua confiança.'),button('Exportar cópia',exportFile),button('Escolher cópia para restaurar',importFile));
   if(localStorage.getItem(D.RECOVERY))body.append(button('Desfazer última restauração',()=>{body.replaceChildren(element('h3','Conferir recuperação'),element('p','Esta ação recupera os dados anteriores à última restauração e substitui as alterações feitas depois dela. Exporte uma cópia dos dados atuais se quiser preservá-los.'),button('Exportar dados atuais',exportFile),button('Recuperar dados anteriores',()=>{if(safe(()=>{D.undoRestore(localStorage);refreshPreferences();return true;})){renderLibrary();notice('Restauração desfeita. Os dados anteriores foram recuperados.');}}),button('Cancelar',renderLibrary));}));
