@@ -2,6 +2,8 @@ name: APK de teste — revisão visual 4.9.129
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
   push:
     branches: ['review/suavizacao-leitura-menus-20261028']
 
@@ -176,7 +178,7 @@ jobs:
           print('Todos os arquivos web/offline preservados byte a byte no APK.')
           PYCHECK
 
-      - name: Guardar APK definitivo
+      - name: Guardar APK de teste
         uses: actions/upload-artifact@v5
         with:
           name: Liturgia-OSM-4.9.129
