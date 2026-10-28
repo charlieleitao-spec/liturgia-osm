@@ -15,7 +15,11 @@ async function check(page,frame,name){
  });
  assert.equal(geometry.last,true,'As ações precisam vir depois do conteúdo');
  assert.equal(geometry.position,'static');assert.equal(geometry.font,'14px');assert.equal(geometry.border,'0px');assert.equal(geometry.background,'rgba(0, 0, 0, 0)');assert.equal(geometry.overflow,false);assert.ok(geometry.height>=44&&geometry.height<=48);assert.ok(geometry.width<120);
- await bar.scrollIntoViewIfNeeded();await page.screenshot({path:output+'/'+name+'.png'});return geometry;
+ await bar.scrollIntoViewIfNeeded();
+ await page.evaluate(()=>{OSMPersonalReader.saveCurrent();OSMPersonalReader.afterRender(document.getElementById('serviteOverlay').classList.contains('open'));});
+ await bar.scrollIntoViewIfNeeded();
+ for(const b of await bar.locator('button').all())assert.equal(await b.evaluate(el=>{const r=el.getBoundingClientRect();return document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('button')===el;}),true,'Cada comando deve estar livre de sobreposição');
+ await page.screenshot({path:output+'/'+name+'.png'});return geometry;
 }
 try{
  for(let n=0;n<80;n++){try{if((await fetch('http://127.0.0.1:18770/')).ok)break;}catch{}await new Promise(r=>setTimeout(r,50));}
