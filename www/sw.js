@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.120-leitura-corrigida';
+const CACHE = 'liturgia-osm-personal-v1';
 const CORE = [
   "./media/emblema-osm.svg",
   "./media/ornamento-final.svg",
@@ -15,6 +15,9 @@ const CORE = [
   "./typography.css",
   "./touch-targets.css",
   "./app.js",
+  "./personal-data.js",
+  "./personal-reader.js",
+  "./personal-reader.css",
   "./search.js",
   "./pdf-links.js",
   "./data/search-index.json",
