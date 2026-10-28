@@ -21,6 +21,7 @@ assert.equal(pkg.dependencies['@capacitor/app'], '8.1.2', 'Plugin nativo do bot�
 assert.equal(appJs.match(/const APP_VERSION = ['"]([^'"]+)['"]/)[1], pkg.version, 'Menu e pacote devem identificar a mesma versão');
 assert.ok(sw.includes('liturgia-osm-v'+pkg.version+'-'), 'Cache corresponde à versão do aplicativo');
 assert.match(html, /app\.js/);
+assert.ok(html.includes("script.src='./app.js?v="+pkg.version+"'"), 'Bootstrap deve pedir a versão atual do código');
 assert.match(html, /app\.css/);
 assert.match(appJs, /function openSantoralOfficeHour/);
 assert.match(appJs, /detail-navigation/);
@@ -55,7 +56,7 @@ for (const file of devotionalFiles) assert.ok(fs.existsSync(path.join(root, 'www
 
 const core = [...sw.matchAll(/["']\.\/(.*?)["']/g)].map(match => match[1]);
 assert.ok(core.length > 0, 'Service worker deve declarar recursos CORE');
-for (const file of core) assert.ok(fs.existsSync(path.join(root, 'www', file)), 'Recurso CORE ausente: ' + file);
+for (const file of core) assert.ok(fs.existsSync(path.join(root, 'www', file.split(/[?#]/)[0])), 'Recurso CORE ausente: ' + file);
 for (const item of santoral) {
   if (item.image) assert.ok(fs.existsSync(path.join(root, 'www', item.image)), 'Imagem ausente: ' + item.image);
 }

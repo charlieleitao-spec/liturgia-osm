@@ -49,7 +49,7 @@ try{
   page=await context.newPage();
   await page.goto(origin);
   await page.waitForFunction(()=>typeof APP_VERSION!=='undefined'&&APP_VERSION==='4.9.129').catch(async error=>{
-    console.error('Upgrade diagnostics:',await page.evaluate(async()=>({version:typeof APP_VERSION==='undefined'?'undefined':APP_VERSION,caches:await caches.keys(),controller:navigator.serviceWorker.controller?.scriptURL,body:document.body.innerText.slice(0,1800),scripts:[...document.scripts].map(s=>s.src),cachedApp:(await (await caches.match('./app.js')).text()).match(/const APP_VERSION[^;]+/)[0]})));
+    console.error('Upgrade diagnostics:',await page.evaluate(async()=>({version:typeof APP_VERSION==='undefined'?'undefined':APP_VERSION,caches:await caches.keys(),controller:navigator.serviceWorker.controller?.scriptURL,body:document.body.innerText.slice(0,1800),scripts:[...document.scripts].map(s=>s.src),cachedApp:(await (await caches.match('./app.js?v=4.9.129')).text()).match(/const APP_VERSION[^;]+/)[0]})));
     throw error;
   });
   mark('reload offline');

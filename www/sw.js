@@ -14,7 +14,7 @@ const CORE = [
   "./liturgical-reader.css",
   "./typography.css",
   "./touch-targets.css",
-  "./app.js",
+  "./app.js?v=4.9.129",
   "./personal-data.js",
   "./reader-scale.js",
   "./personal-reader.js",

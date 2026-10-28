@@ -75,6 +75,6 @@
 <script src="./widget-links.js"></script>
 <script src="./pdf-links.js"></script>
 <script src="./data/load-devotions.js"></script>
-<script>loadOSMDevotionalData().then(function(){var script=document.createElement('script');script.src='./app.js';script.onload=function(){OSMPersonalReader.init();};document.body.appendChild(script);}).catch(function(error){console.error('[Liturgia OSM] Falha ao carregar orações.',error);document.getElementById('view').innerHTML='<div class="empty-state">Não foi possível carregar as orações. Verifique o armazenamento do aplicativo.</div>';});</script>
+<script>loadOSMDevotionalData().then(function(){var script=document.createElement('script');script.src='./app.js?v=4.9.129';script.onload=function(){OSMPersonalReader.init();};document.body.appendChild(script);}).catch(function(error){console.error('[Liturgia OSM] Falha ao carregar orações.',error);document.getElementById('view').innerHTML='<div class="empty-state">Não foi possível carregar as orações. Verifique o armazenamento do aplicativo.</div>';});</script>
 </body>
 </html>
