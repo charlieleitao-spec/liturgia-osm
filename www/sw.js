@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.128-personal-v1';
+const CACHE = 'liturgia-osm-v4.9.129-personal-v1';
 const CORE = [
   "./media/emblema-osm.svg",
   "./media/ornamento-final.svg",
@@ -63,14 +63,6 @@ const CORE = [
   "./media/fonts/fonts.css",
   "./media/fonts/cinzel-normal-latin-ext.woff2",
   "./media/fonts/cinzel-normal-latin.woff2",
-  "./media/fonts/cormorant-garamond-italic-latin-ext.woff2",
-  "./media/fonts/cormorant-garamond-italic-latin.woff2",
-  "./media/fonts/cormorant-garamond-normal-latin-ext.woff2",
-  "./media/fonts/cormorant-garamond-normal-latin.woff2",
-  "./media/fonts/eb-garamond-italic-latin-ext.woff2",
-  "./media/fonts/eb-garamond-italic-latin.woff2",
-  "./media/fonts/eb-garamond-normal-latin-ext.woff2",
-  "./media/fonts/eb-garamond-normal-latin.woff2",
   "./media/servite-13.webp",
   "./media/andre-sansepolcro.webp",
   "./media/benincasa-montepulciano.webp",

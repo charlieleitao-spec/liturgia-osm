@@ -1,0 +1,58 @@
+{
+  "images": [
+    {
+      "page": 1,
+      "xref": 204,
+      "width": 647,
+      "height": 755,
+      "dpi": 70.3
+    },
+    {
+      "page": 1,
+      "xref": 205,
+      "width": 247,
+      "height": 275,
+      "dpi": 199.38
+    },
+    {
+      "page": 2,
+      "xref": 209,
+      "width": 52,
+      "height": 54,
+      "dpi": 198.09
+    },
+    {
+      "page": 2,
+      "xref": 210,
+      "width": 898,
+      "height": 1024,
+      "dpi": 87.15
+    }
+  ],
+  "changed": [
+    {
+      "page": 1,
+      "xref": 205,
+      "width": 247,
+      "height": 275,
+      "dpi": 199.38,
+      "new_size": [
+        186,
+        207
+      ]
+    },
+    {
+      "page": 2,
+      "xref": 209,
+      "width": 52,
+      "height": 54,
+      "dpi": 198.09,
+      "new_size": [
+        39,
+        41
+      ]
+    }
+  ],
+  "lossless_bytes": 1755275,
+  "candidate_bytes": 1764066
+}
