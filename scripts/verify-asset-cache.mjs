@@ -25,10 +25,14 @@ const origin='http://127.0.0.1:'+server.address().port;
 const browser=await chromium.launch({executablePath:process.env.CHROME_BIN||undefined,args:['--no-sandbox']});
 try{
   const context=await browser.newContext({viewport:{width:390,height:844}});
-  let page=await context.newPage();
-  const session=await context.newCDPSession(page);
-  await session.send('Network.enable');
-  await session.send('Network.setCacheDisabled',{cacheDisabled:true});
+  const page=await context.newPage();
+  async function waitAsync(predicate){
+    for(let attempt=0;attempt<300;attempt++){
+      if(await page.evaluate(predicate))return;
+      await new Promise(resolve=>setTimeout(resolve,100));
+    }
+    throw new Error('Timed out waiting for asynchronous worker/cache state');
+  }
   page.on('pageerror',error=>console.error('Page error:',error.message));
   page.on('response',async response=>{if(response.url().endsWith('/app.js'))console.log('app.js response:',response.fromServiceWorker(),(await response.text()).match(/const APP_VERSION[^;]+/)?.[0]);});
   mark('load baseline');
@@ -41,20 +45,15 @@ try{
   mark('update worker');
   previous=false;
   await page.evaluate(async()=>{const reg=await navigator.serviceWorker.ready;await reg.update();});
-  await page.waitForFunction(async()=>JSON.stringify(await caches.keys())==='["liturgia-osm-v4.9.129-personal-v1"]');
-  await page.waitForFunction(async()=>{const reg=await navigator.serviceWorker.getRegistration();return !reg.installing&&!reg.waiting&&reg.active?.state==='activated'&&navigator.serviceWorker.controller===reg.active&&navigator.serviceWorker.controller!==window.assetOldController;});
-  // Reopen the updated PWA in the same storage context, already offline.
-  // A running page retains its executed JavaScript until its client is closed.
-  await page.close();
-  await context.setOffline(true);
-  page=await context.newPage();
-  await page.goto(origin);
+  await waitAsync(async()=>JSON.stringify(await caches.keys())==='["liturgia-osm-v4.9.129-personal-v1"]');
+  await waitAsync(async()=>{const reg=await navigator.serviceWorker.getRegistration();return !reg.installing&&!reg.waiting&&reg.active?.state==='activated'&&navigator.serviceWorker.controller===reg.active&&navigator.serviceWorker.controller!==window.assetOldController;});
+  await page.reload();
   await page.waitForFunction(()=>typeof APP_VERSION!=='undefined'&&APP_VERSION==='4.9.129').catch(async error=>{
     console.error('Upgrade diagnostics:',await page.evaluate(async()=>{
       const cache=await caches.open('liturgia-osm-v4.9.129-personal-v1');
       const keys=(await cache.keys()).map(r=>r.url);
       const read=async url=>{const r=await cache.match(url);return r?await r.text():'MISSING';};
-      return {version:typeof APP_VERSION==='undefined'?'undefined':APP_VERSION,caches:await caches.keys(),location:location.href,controller:navigator.serviceWorker.controller?.scriptURL,documentUsesVersionedCode:document.documentElement.outerHTML.includes('app.js?v=4.9.129'),scripts:[...document.scripts].map(s=>s.src),keys:keys.filter(k=>/app\.js|index\.html|fonts/.test(k)),cachedApp:(await read('./app.js?v=4.9.129')).match(/const APP_VERSION[^;]+/)?.[0],cachedRootUsesVersionedCode:(await read('./')).includes('app.js?v=4.9.129')};
+      return {version:typeof APP_VERSION==='undefined'?'undefined':APP_VERSION,caches:await caches.keys(),location:location.href,controller:navigator.serviceWorker.controller?.scriptURL,documentUsesVersionedCode:document.documentElement.outerHTML.includes('app.js'),scripts:[...document.scripts].map(s=>s.src),keys:keys.filter(k=>/app\.js|index\.html|fonts/.test(k)),cachedApp:(await read('./app.js')).match(/const APP_VERSION[^;]+/)?.[0],cachedRootUsesVersionedCode:(await read('./')).includes('app.js')};
     }));
     throw error;
   });

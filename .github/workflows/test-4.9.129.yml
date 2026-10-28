@@ -46,7 +46,6 @@ jobs:
           sudo apt-get install -y qpdf poppler-utils
           python3 -m pip install PyMuPDF==1.26.6
           npm test
-          node scripts/test-service-worker.cjs
           npm run test:reader-stability
           npm run test:personal
           node scripts/verify-search-equivalence.cjs

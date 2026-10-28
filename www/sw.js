@@ -14,7 +14,7 @@ const CORE = [
   "./liturgical-reader.css",
   "./typography.css",
   "./touch-targets.css",
-  "./app.js?v=4.9.129",
+  "./app.js",
   "./personal-data.js",
   "./reader-scale.js",
   "./personal-reader.js",
@@ -150,20 +150,7 @@ const CORE = [
   "./data/pdfs/oficios/villa.pdf"
 ];
 
-self.addEventListener('install',event=>{event.waitUntil((async()=>{
-  const cache=await caches.open(CACHE);
-  try{
-    const entries=await Promise.all(CORE.map(async asset=>{
-      const fresh=new URL(asset,self.location.href);
-      fresh.searchParams.set('__osm_cache',CACHE);
-      const response=await fetch(fresh.href,{cache:'reload'});
-      if(!response.ok)throw new Error('Falha no recurso offline: '+asset);
-      return [asset,response];
-    }));
-    await Promise.all(entries.map(([asset,response])=>cache.put(asset,response)));
-    await self.skipWaiting();
-  }catch(error){await caches.delete(CACHE);throw error;}
-})());});
+self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('liturgia-osm-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));});
-self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;const url=new URL(event.request.url);if(url.origin!==self.location.origin)return;event.respondWith(caches.open(CACHE).then(async cache=>{const cached=await cache.match(event.request);if(cached)return cached;const response=await fetch(event.request);if(response.ok)await cache.put(event.request,response.clone()).catch(()=>{});return response;}));});
+self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;const url=new URL(event.request.url);if(url.origin!==self.location.origin)return;event.respondWith(caches.match(event.request).then(cached=>cached||fetch(event.request).then(response=>{if(response.ok)caches.open(CACHE).then(cache=>cache.put(event.request,response.clone()));return response;})));});
 
