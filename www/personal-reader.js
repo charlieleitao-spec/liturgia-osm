@@ -80,9 +80,9 @@
   view.querySelectorAll('.personal-reading-tools').forEach(node=>node.remove());
   if(!item)return;
   const bar=doc.createElement('div');bar.className='personal-reading-tools';bar.setAttribute('role','group');bar.setAttribute('aria-label','Ações de leitura pessoal');
-  const existing=safe(()=>storedNote(item));const note=button(existing&&!existing.deleted?'Editar anotação':'Anotação pessoal',event=>openNote(item,event.currentTarget));note.classList.add('personal-note-action');bar.append(note);
+  const existing=safe(()=>storedNote(item));const note=button(existing&&!existing.deleted?'Editar nota':'Anotar',event=>openNote(item,event.currentTarget));note.classList.add('personal-note-action');note.setAttribute('aria-label',existing&&!existing.deleted?'Editar nota desta leitura':'Anotar nesta leitura');bar.append(note);
   const saved=safe(()=>data().positions.find(x=>key(x.route)===key(item.route)));
-  if(saved&&saved.point.y>0)bar.append(button('Retomar posição salva',()=>schedulePosition(win,saved.point)));
+  if(saved&&saved.point.y>0)bar.append(button('Retomar',()=>schedulePosition(win,saved.point)));
   const heading=view.querySelector('.detail-header,.hub-life-heading,.liturgia-own-heading')||view.querySelector('h1,h2');
   if(heading)heading.after(bar);else view.prepend(bar);
  }
@@ -104,7 +104,7 @@
  }
  function refreshPreferences(){readerScale=Number(localStorage.getItem('osmReaderScale')||1);lightMode=localStorage.getItem('osmTheme')!=='dark';localStorage.setItem('santoral-osm-theme',lightMode?'light':'dark');localStorage.setItem('santoral-osm-fontsize',String(readerScale*16));applyPreferences();try{const doc=$('serviteFrame').contentDocument;doc.documentElement.style.fontSize=(readerScale*16)+'px';doc.documentElement.setAttribute('data-theme',lightMode?'light':'dark');}catch{}}
  function open(){if(!cancelPosition())saveCurrent();closeMainMenu();noteOrigin=null;noteContext=null;draft=null;backup=null;$('personalBody').replaceChildren();notice('');renderLibrary();openAccessibleDialog('personalOverlay');updateBackButton();}
- function close(){if(draft&&$('personalNoteText')?.value!==draft.original){if(!saveDraft())return;}closeAccessibleDialog('personalOverlay');backup=null;if(noteOrigin?.isConnected){if(noteOrigin.classList.contains('personal-note-action')){const note=safe(()=>storedNote(noteContext));if(note)noteOrigin.textContent=note.deleted?'Anotação pessoal':'Editar anotação';}noteOrigin.focus({preventScroll:true});}noteOrigin=null;noteContext=null;draft=null;updateBackButton();}
+ function close(){if(draft&&$('personalNoteText')?.value!==draft.original){if(!saveDraft())return;}closeAccessibleDialog('personalOverlay');backup=null;if(noteOrigin?.isConnected){if(noteOrigin.classList.contains('personal-note-action')){const note=safe(()=>storedNote(noteContext));if(note){noteOrigin.textContent=note.deleted?'Anotar':'Editar nota';noteOrigin.setAttribute('aria-label',note.deleted?'Anotar nesta leitura':'Editar nota desta leitura');}}noteOrigin.focus({preventScroll:true});}noteOrigin=null;noteContext=null;draft=null;updateBackButton();}
  function renderLibrary(){
   const body=$('personalBody');body.replaceChildren();draft=null;backup=null;
   const p=safe(data);if(!p)return;
