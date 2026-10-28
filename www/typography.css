@@ -72,3 +72,16 @@ body.causes-page{font-family:Georgia,'Times New Roman',serif;font-size:var(--typ
 #view .card p:last-child{margin-bottom:0}
 #view .bio-text blockquote,#view .rule-reader blockquote,
 #view .card blockquote{margin: .8em 0;padding-left:1em}
+
+/* Revisão visual: manter a leitura sem cortes artificiais em palavras longas.
+   A quebra emergencial permanece apenas quando não há espaço suficiente. */
+#view .detail-header h2,#view .hub-life-title,#view .liturgical-title,
+#view .rowtitle,#view .hub-card-title,#view .office-hour-copy strong{
+  word-break:normal;
+  overflow-wrap:break-word;
+  hyphens:none;
+}
+@media(max-width:600px){
+  #view .bio-text p,#view .about-text p,#view .rule-reader p,
+  #view .card p{orphans:2;widows:2}
+}
