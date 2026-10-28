@@ -334,6 +334,7 @@ function resetFont(){window.OSMPersonalReader?.cancelPosition();readerScale=OSMR
 // Keep background content out of keyboard and screen-reader navigation while a dialog is open.
 const dialogOrigins = new Map();
 const dialogBackground = new Map();
+const dialogOwnInert = new Map();
 function dialogControls(dialog){
   return [...dialog.querySelectorAll('button, [href], input, select, textarea, iframe, [tabindex]')]
     .filter(node=>!node.disabled && node.tabIndex>=0 && node.getClientRects().length);
@@ -341,6 +342,8 @@ function dialogControls(dialog){
 function openAccessibleDialog(id){
   const dialog=document.getElementById(id);
   if(dialog.classList.contains('open'))return;
+  dialogOwnInert.set(id,Boolean(dialog.inert));
+  dialog.inert=false;
   document.body.classList.remove('scroll-controls-hidden');
   dialogOrigins.set(id,document.activeElement);
   if(id==='dailyLiturgyOverlay')dialog.append(document.getElementById('celebrationToggle'));
@@ -355,11 +358,12 @@ function closeAccessibleDialog(id){
   if(!dialog.classList.contains('open'))return;
   for(const [node,inert] of dialogBackground.get(id)||[])node.inert=inert;
   dialogBackground.delete(id);
+  dialog.classList.remove('open');dialog.setAttribute('aria-hidden','true');
+  dialog.inert=dialogOwnInert.get(id)??false;dialogOwnInert.delete(id);
   if(id==='dailyLiturgyOverlay')dialog.before(document.getElementById('celebrationToggle'));
   const origin=dialogOrigins.get(id);dialogOrigins.delete(id);
   const target=origin?.isConnected && origin.matches('button, [href], input, select, textarea, [tabindex]') && !origin.closest('[inert]')?origin:document.getElementById('menuBtn');
   target?.focus();
-  dialog.classList.remove('open');dialog.setAttribute('aria-hidden','true');
 }
 document.addEventListener('keydown',event=>{
   if(event.key!=='Tab')return;

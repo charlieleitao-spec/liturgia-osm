@@ -1,0 +1,39 @@
+name: Verificar escrita real nas anotações
+on:
+  workflow_dispatch:
+  push:
+    branches: ['fix/editor-anotacoes-interativo']
+permissions:
+  contents: read
+jobs:
+  input:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - name: Instalar dependências de teste
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm install --no-save --package-lock=false --ignore-scripts playwright@1.56.1
+      - name: Preparar a versão anterior para reproduzir o bloqueio
+        run: |
+          mkdir -p /tmp/annotation-baseline
+          git archive 4a66370b45f7107a148f8ed6931f68b8fde08f8c www | tar -x -C /tmp/annotation-baseline
+      - name: Tocar, digitar, salvar e reabrir em Chrome real
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+          BASELINE_DIR: /tmp/annotation-baseline/www
+        run: node scripts/verify-annotation-input.mjs
+      - name: Guardar evidências da verificação
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: escrita-real-anotacoes
+          path: validation-annotation-input/
+          if-no-files-found: warn
