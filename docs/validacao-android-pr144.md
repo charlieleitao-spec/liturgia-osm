@@ -30,10 +30,12 @@ O comando `gradle -p android :app:assembleDebug --console=plain` terminou com `B
 
 A conferência final usou `apksigner verify --verbose --print-certs`, `aapt dump badging`, `aapt dump permissions`, leitura do DEX e comparação dos arquivos `assets/public` do APK com as fontes. O pacote separado permite coexistir com o estável; seus dados pessoais são independentes.
 
-## Conferir somente os três avanços novos no A56
+## Conferência dos três avanços novos no A56
 
 1. No **Liturgia OSM · Teste**, abrir uma oração longa ou hora do Ofício, rolar, fechar e reabrir. “Continuar de onde parei” deve retornar à parte/hora e posição salvas.
 2. Escrever uma anotação pessoal, salvar, sair e voltar. O texto litúrgico deve permanecer preservado e a nota disponível na Biblioteca pessoal.
 3. Exportar a cópia pelo seletor de arquivos e conferir o arquivo salvo. A restauração deve apresentar conferência antes de aplicar dados; cancelar deve preservar os dados. Para conferir a recuperação em uma instalação limpa, usar somente os dados do aplicativo de teste; a versão estável não precisa ser desinstalada nem ter dados apagados.
 
-A conferência visual deve abranger tela estreita, teclado aberto, fonte aumentada e tema claro/escuro apenas nesses novos controles. Não foram repetidos os testes antigos do A56. A PR permanece em rascunho até esta conferência; o APK estável não foi substituído.
+Em 28/10/2026, o usuário confirmou nesta conversa a conferência dos três avanços no A56 (“Conferido”), após receber o APK paralelo e o roteiro acima. A conferência foi informada pelo usuário; as verificações automatizadas e da compilação estão descritas nas seções anteriores.
+
+A condição para retirar a PR do rascunho foi atendida. Não foram repetidos os testes antigos do A56. A integração não substitui o APK estável nem publica uma nova release.

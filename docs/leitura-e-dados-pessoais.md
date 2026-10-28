@@ -32,9 +32,11 @@ A conferência informa novos registros e conflitos. Favoritos são unidos; notas
 - Nenhuma repetição dos testes do A56 já aprovados. Após a implementação, foi gerado um APK de teste paralelo, sem substituir ou publicar uma nova versão estável.
 - Compilação Android `:app:assembleDebug` aprovada com Java 21, Gradle 8.14.3 e SDK 36. Assinatura verificada, plugin pessoal presente no DEX e 162 arquivos web/offline iguais às fontes. Evidências em `validacao-android-pr144.md`.
 
-## Antes de distribuir a atualização Android
+## Conferência da atualização Android
 
-A compilação nativa de teste está concluída. Pendente: instalação e conferência dos três novos recursos no aparelho, incluindo os seletores de arquivo. A aprovação da compilação não substitui essa conferência. O APK de teste usa um pacote separado e não compartilha dados com a versão estável.
+A compilação nativa de teste está concluída. Em 28/10/2026, o usuário confirmou a conferência dos três avanços no A56, após receber o APK paralelo. A condição para integrar a PR foi atendida. O APK de teste usa um pacote separado e não compartilha dados com a versão estável; a integração do código não publica uma nova release estável.
+
+Roteiro de referência para as verificações da funcionalidade nova:
 
 1. Usar a preparação Android habitual, com `npx cap sync android`, e confirmar os registros de `PersonalBackup` e `LocalPdf` antes de `super.onCreate`.
 2. Na versão de teste, retomar uma oração, uma fórmula da Coroa e duas horas do Ofício, inclusive depois de fechar o aplicativo.
