@@ -97,6 +97,9 @@ public final class AssetUpgradeInstrumentation extends Instrumentation {
                 waitFor("externalAssetRequests===0");
                 result.putInt("pdfFiles",files);result.putInt("pdfPages",pages);
             }
+            // Chromium commits localStorage to LevelDB asynchronously. The verify
+            // phase checks the actual values after reinstall/relaunch, not raw bytes.
+            if("seed".equals(phase))Thread.sleep(6000);
             result.putString("validation","PASS");result.putString("phase",phase);
             finish(Activity.RESULT_OK,result);
         } catch(Throwable error) {

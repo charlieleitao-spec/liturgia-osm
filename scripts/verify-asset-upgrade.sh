@@ -18,11 +18,9 @@ adb shell "mkdir -p '$DATA/files'; echo upgrade-4.9.128-to-4.9.129 > '$DATA/file
 adb shell "cd '$DATA'; find app_webview/Default/'Local Storage' files shared_prefs -type f -exec sha256sum {} \; | sort" > validation-results/data-before.sha256
 adb shell dumpsys package "$PACKAGE" > validation-results/package-before.txt
 adb pull "$DATA/app_webview/Default/Local Storage" validation-results/storage-before
-python3 - <<'PY'
-from pathlib import Path
-raw=b''.join(p.read_bytes() for p in Path('validation-results/storage-before').rglob('*') if p.is_file())
-assert b'osmReaderScale' in raw or b'santoral-osm-fontsize' in raw, 'Real reading preference missing from WebView storage'
-PY
+# Do not search raw LevelDB for plain-text keys: blocks may be compressed.
+# The instrumentation verifies real preferences both before and after the update.
+
 adb install -r Liturgia-OSM-4.9.129.apk
 adb shell pm grant "$PACKAGE" android.permission.POST_NOTIFICATIONS
 adb shell "cd '$DATA'; find app_webview/Default/'Local Storage' files shared_prefs -type f -exec sha256sum {} \; | sort" > validation-results/data-after.sha256
