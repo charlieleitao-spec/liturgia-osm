@@ -1,0 +1,53 @@
+name: Revisão visual — Liturgia OSM
+
+on:
+  pull_request:
+    paths:
+      - 'www/**'
+      - 'scripts/**'
+      - 'docs/revisao-visual-pr-151.md'
+      - '.github/workflows/revisao-visual.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v5
+      - name: Configurar Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Instalar dependências
+        run: npm ci
+      - name: Testes de regressão
+        run: |
+          npm test
+          npm run test:reader-stability
+          npm run test:personal
+      - name: Instalar Playwright
+        run: npm install --no-save --package-lock=false --ignore-scripts playwright
+      - name: Conferir apresentação litúrgica e acessibilidade
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+        run: |
+          node scripts/verify-liturgical-layout.mjs
+          node scripts/verify-all-psalms.mjs
+          node scripts/verify-canticles.mjs
+          node scripts/verify-office-resources.mjs
+          node scripts/verify-accessibility.mjs
+          node scripts/verify-touch-targets.mjs
+          node scripts/verify-typography.mjs
+      - name: Guardar capturas e evidências
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: revisao-visual-liturgia-osm
+          path: validation-layout/
+          if-no-files-found: warn
