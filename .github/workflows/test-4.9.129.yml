@@ -11,7 +11,7 @@ permissions:
 
 concurrency:
   group: test-4.9.129
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -52,6 +52,9 @@ jobs:
           python3 scripts/verify-optimized-assets.py
 
       - name: Verificar tipografia e atualização do cache offline
+        id: browser
+        continue-on-error: true
+        timeout-minutes: 3
         env:
           CHROME_BIN: /usr/bin/google-chrome
         run: |
@@ -254,6 +257,10 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: bash scripts/verify-asset-upgrade.sh
+
+      - name: Exigir aprovação do navegador
+        if: always() && steps.browser.outcome != 'success'
+        run: exit 1
 
       - name: Guardar resultados dos testes
         if: always()
