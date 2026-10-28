@@ -1,0 +1,36 @@
+name: Conferir cabeçalho e Voltar com barras do sistema
+on:
+  workflow_dispatch:
+  push:
+    branches: ['fix/leitor-area-segura']
+permissions:
+  contents: read
+jobs:
+  layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - name: Preparar navegador
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm install --no-save --package-lock=false --ignore-scripts playwright@1.56.1
+          mkdir -p /tmp/resource-baseline
+          git archive c735f8f405a9ff7fb31979aaeb9480e2935cc956 www | tar -x -C /tmp/resource-baseline
+      - name: Reproduzir corte anterior e conferir cabeçalho, Voltar e redimensionamento
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+          BASELINE_DIR: /tmp/resource-baseline/www
+        run: node scripts/verify-resource-safe-area.mjs
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: leitor-area-segura
+          path: validation-resource-safe-area/
+          if-no-files-found: warn
