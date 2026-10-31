@@ -1071,6 +1071,12 @@ function renderMarianOfficeTranscript(text, season){
       blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
       continue;
     }
+    // Marcadores litúrgicos não devem ser absorvidos pela prosa anterior.
+    if(!hymn && /^(?:Ant\\.?|Antífona|Salmo(?:\\s+\\d+)?|Cântico|Leitura|Responsório|Oração|Rubrica|Preces)(?:\\s|\\.|:|$)/i.test(line)){
+      flush();
+      blocks.push('<p class="marian-office-liturgical-label">'+escapeHtml(line)+'</p>');
+      continue;
+    }
     if(!hymn && response.test(line)){
       flush();
       blocks.push('<p class="marian-office-response">'+escapeHtml(line)+'</p>');
