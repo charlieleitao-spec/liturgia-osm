@@ -1054,6 +1054,8 @@ function renderMarianOfficeTranscript(text, season){
   let paragraph=[];
   let hymn=false;
   const heading=/^(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média|HINO|Hino|Salmodia|Preces|Oração|Cântico evangélico|Responsório breve|RESPONSÓRIO BREVE|Leitura breve(?:\s+.*)?|LEITURA BREVE(?:\s+.*)?)$/i;
+  const response=/^(?:R\.|V\.)\s*/;
+  const inlineHeading=/^(.*?\bp\.\s*\d+\.)\s+(Ofício das Leituras|Laudes|Vésperas|Hora Média)$/i;
   const flush=()=>{
     if(!paragraph.length)return;
     const joined=hymn?paragraph.map(escapeHtml).join('<br>'):escapeHtml(paragraph.join(' ').replace(/\s+/g,' '));
@@ -1066,7 +1068,28 @@ function renderMarianOfficeTranscript(text, season){
     if(heading.test(line)){
       flush();
       hymn=/^HINO$/i.test(line);
-      blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
+      if(!blocks.length || blocks[blocks.length-1]!==('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>')) blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
+      continue;
+    }
+    // Reconhecer somente rubricas e etiquetas completas, sem confundir frases comuns.
+    if(/^(?:Ant\.?\s*\d*\.?|Antífona(?:\s+\d+)?|Salmo\s+\d+[A-Za-z]?(?:\s*\([^)]*\))?|Cântico(?:\s+[^,.:]{1,45})?|Leitura breve|Leitura bíblica|Responsório breve|Responsório|Oração conclusiva|Preces)\s*[:.]?$/i.test(line)){
+      flush();
+      hymn=false;
+      blocks.push('<p class="marian-office-liturgical-label">'+escapeHtml(line)+'</p>');
+      continue;
+    }
+    if(!hymn && response.test(line)){
+      flush();
+      blocks.push('<p class="marian-office-response">'+escapeHtml(line)+'</p>');
+      continue;
+    }
+    const embedded=!hymn && line.match(inlineHeading);
+    if(embedded){
+      const prefix=embedded[1].trim();
+      if(prefix)paragraph.push(prefix);
+      flush();
+      hymn=false;
+      blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(embedded[2])+'</h4>');
       continue;
     }
     paragraph.push(line);
