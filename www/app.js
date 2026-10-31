@@ -1054,6 +1054,7 @@ function renderMarianOfficeTranscript(text, season){
   let paragraph=[];
   let hymn=false;
   const heading=/^(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média|HINO|Hino|Salmodia|Preces|Oração|Cântico evangélico|Responsório breve|RESPONSÓRIO BREVE|Leitura breve(?:\s+.*)?|LEITURA BREVE(?:\s+.*)?)$/i;
+  const response=/^(?:R\.|V\.)\s*/;
   const flush=()=>{
     if(!paragraph.length)return;
     const joined=hymn?paragraph.map(escapeHtml).join('<br>'):escapeHtml(paragraph.join(' ').replace(/\s+/g,' '));
@@ -1067,6 +1068,11 @@ function renderMarianOfficeTranscript(text, season){
       flush();
       hymn=/^HINO$/i.test(line);
       blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
+      continue;
+    }
+    if(!hymn && response.test(line)){
+      flush();
+      blocks.push('<p class="marian-office-response">'+escapeHtml(line)+'</p>');
       continue;
     }
     paragraph.push(line);
