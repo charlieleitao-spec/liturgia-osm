@@ -1059,6 +1059,7 @@ function renderMarianOfficeTranscript(text, season){
   let paragraph=[];
   let hymn=false;
   let lastWasBlank=true;
+  let previousHymnLine=false;
   const heading=/^(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média|HINO|Salmodia|Preces|Oração|Cântico evangélico|Responsório breve|Leitura breve|SEGUNDA LEITURA|PRIMEIRA LEITURA)$/i;
   const response=/^(?:R\.|V\.)\s*/;
   const inlineHeading=/^(.*?\bp\.\s*\d+\.)\s+(Ofício das Leituras|Laudes|Vésperas|Hora Média)$/i;
@@ -1070,20 +1071,22 @@ function renderMarianOfficeTranscript(text, season){
   };
   for(const raw of lines){
     const line=raw.trim();
-    if(!line){flush();lastWasBlank=true;continue;}
+    if(!line){flush();lastWasBlank=true;previousHymnLine=false;continue;}
     if(heading.test(line)){
       flush();
       hymn=/^HINO$/i.test(line);
       lastWasBlank=false;
+      previousHymnLine=false;
       if(!blocks.length || blocks[blocks.length-1]!==('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>')) blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
       continue;
     }
     // Uma rubrica de remissão encerra o hino; não é verso do hino.
-    if(/^Antífonas, salmos, versículo/i.test(line)){
+    if(/^(?:Antífonas?,?\s+salmos?|Salmos?\s+e\s+antífonas?|Salmo invitatório|Repetem-se as antífonas)/i.test(line)){
       flush();
       hymn=false;
       blocks.push('<p class="marian-office-rubric">'+escapeHtml(line)+'</p>');
       lastWasBlank=false;
+      previousHymnLine=false;
       continue;
     }
     // A indentação editorial de início de parágrafo deve sobreviver à extração do PDF.
@@ -1110,7 +1113,9 @@ function renderMarianOfficeTranscript(text, season){
       blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(embedded[2])+'</h4>');
       continue;
     }
+    // Conservar cada verso do hino; uma linha vazia separa as estrofes.
     paragraph.push(line);
+    previousHymnLine=hymn;
   }
   flush();
   return blocks.join('');
