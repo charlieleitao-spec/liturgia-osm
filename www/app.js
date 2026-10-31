@@ -1059,9 +1059,10 @@ function renderMarianOfficeTranscript(text, season){
   let paragraph=[];
   let hymn=false;
   let lastWasBlank=true;
-  let previousHymnLine=false;
   const heading=/^(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média|HINO|Salmodia|Preces|Oração|Cântico evangélico|Responsório breve|Leitura breve|SEGUNDA LEITURA|PRIMEIRA LEITURA)$/i;
   const response=/^(?:R\.|V\.)\s*/;
+  const intercession=/^[-–]\s+\S/;
+  const officeTitle=/^(?:[IVX]+|SANTA MARIA(?:\s+.+)?|NOSSA SENHORA(?:\s+.+)?)$/i;
   const inlineHeading=/^(.*?\bp\.\s*\d+\.)\s+(Ofício das Leituras|Laudes|Vésperas|Hora Média)$/i;
   const flush=()=>{
     if(!paragraph.length)return;
@@ -1071,12 +1072,16 @@ function renderMarianOfficeTranscript(text, season){
   };
   for(const raw of lines){
     const line=raw.trim();
-    if(!line){flush();lastWasBlank=true;previousHymnLine=false;continue;}
+    if(!line){flush();lastWasBlank=true;continue;}
+    if(officeTitle.test(line) && !hymn){
+      flush();
+      blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
+      continue;
+    }
     if(heading.test(line)){
       flush();
       hymn=/^HINO$/i.test(line);
       lastWasBlank=false;
-      previousHymnLine=false;
       if(!blocks.length || blocks[blocks.length-1]!==('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>')) blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
       continue;
     }
@@ -1099,7 +1104,7 @@ function renderMarianOfficeTranscript(text, season){
       blocks.push('<p class="marian-office-liturgical-label">'+escapeHtml(line)+'</p>');
       continue;
     }
-    if(!hymn && response.test(line)){
+    if(!hymn && (response.test(line) || intercession.test(line))){
       flush();
       blocks.push('<p class="marian-office-response">'+escapeHtml(line)+'</p>');
       continue;
@@ -1115,7 +1120,6 @@ function renderMarianOfficeTranscript(text, season){
     }
     // Conservar cada verso do hino; uma linha vazia separa as estrofes.
     paragraph.push(line);
-    previousHymnLine=hymn;
   }
   flush();
   return blocks.join('');
