@@ -1053,6 +1053,7 @@ function renderMarianOfficeTranscript(text, season){
   const blocks=[];
   let paragraph=[];
   let hymn=false;
+  let lastHeading='';
   const heading=/^(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média|HINO|Hino|Salmodia|Preces|Oração|Cântico evangélico|Responsório breve|RESPONSÓRIO BREVE|Leitura breve(?:\s+.*)?|LEITURA BREVE(?:\s+.*)?)$/i;
   const response=/^(?:R\.|V\.)\s*/;
   const inlineHeading=/^(.*?\bp\.\s*\d+\.)\s+(Ofício das Leituras|Laudes|Vésperas|Hora Média)$/i;
@@ -1068,7 +1069,8 @@ function renderMarianOfficeTranscript(text, season){
     if(heading.test(line)){
       flush();
       hymn=/^HINO$/i.test(line);
-      blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
+      lastHeading=line.toLowerCase();
+      if(lastHeading!=='hino' || !blocks.length || !blocks[blocks.length-1].includes('>HINO</h4>')) blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
       continue;
     }
     // Reconhecer somente rubricas e etiquetas completas, sem confundir frases comuns.
