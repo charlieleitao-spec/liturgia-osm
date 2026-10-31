@@ -1076,7 +1076,7 @@ function renderMarianOfficeTranscript(text, season){
       blocks.push('<p class="marian-office-response">'+escapeHtml(line)+'</p>');
       continue;
     }
-    const embedded=line.match(inlineHeading);
+    const embedded=!hymn && line.match(inlineHeading);
     if(embedded){
       const prefix=embedded[1].trim();
       if(prefix)paragraph.push(prefix);
