@@ -1039,7 +1039,12 @@ function normalizeMarianOfficeTranscript(text, season){
   let value=cleanMassText(text)
     .replace(/([A-Za-zÀ-ÿ])-\n\s*([a-zà-ÿ])/g,'$1$2')
     .replace(/\bce-lebra-se\b/gi,'celebra-se')
-    .replace(/\boutu-bro\b/gi,'outubro');
+    .replace(/\\boutu-bro\\b/gi,'outubro')
+    // Remover cabeçalhos e rodapés repetidos da extração dos PDFs.
+    .replace(/^\\s*Copyright © CURIA GENERALIZIA OSM[^\\n]*$/gmi,'')
+    // Reconstruir palavras divididas na diagramação original.
+    .replace(/([A-Za-zÀ-ÿ]{3,})-\\s*\\n\\s*([a-zà-ÿ]{2,})/g,'$1$2')
+    .replace(/\\b(bem-aventu|bem-aven|bem-aventu-)rada\\b/gi,'bem-aventurada');
   const lines=value.split('\n');
   const heading=/^MEMÓRIAS DE SANTA MARIA NO SÁBADO\s+TEMPO (?:DO ADVENTO|DO NATAL|PASCAL|COMUM)$/i;
   if(lines.length>1 && heading.test(lines[0].trim()) && lines[1].trim().toLowerCase()===String(season).toLowerCase()){
@@ -1053,7 +1058,7 @@ function renderMarianOfficeTranscript(text, season){
   const blocks=[];
   let paragraph=[];
   let hymn=false;
-  const heading=/^(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média|HINO|Hino|Salmodia|Preces|Oração|Cântico evangélico|Responsório breve|RESPONSÓRIO BREVE|Leitura breve(?:\s+.*)?|LEITURA BREVE(?:\s+.*)?)$/i;
+  const heading=/^(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média|HINO|Salmodia|Preces|Oração|Cântico evangélico|Responsório breve|Leitura breve|SEGUNDA LEITURA|PRIMEIRA LEITURA)$/i;
   const response=/^(?:R\.|V\.)\s*/;
   const inlineHeading=/^(.*?\bp\.\s*\d+\.)\s+(Ofício das Leituras|Laudes|Vésperas|Hora Média)$/i;
   const flush=()=>{
