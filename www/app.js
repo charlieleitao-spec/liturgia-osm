@@ -1058,6 +1058,7 @@ function renderMarianOfficeTranscript(text, season){
   const blocks=[];
   let paragraph=[];
   let hymn=false;
+  let lastWasBlank=true;
   const heading=/^(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média|HINO|Salmodia|Preces|Oração|Cântico evangélico|Responsório breve|Leitura breve|SEGUNDA LEITURA|PRIMEIRA LEITURA)$/i;
   const response=/^(?:R\.|V\.)\s*/;
   const inlineHeading=/^(.*?\bp\.\s*\d+\.)\s+(Ofício das Leituras|Laudes|Vésperas|Hora Média)$/i;
@@ -1069,13 +1070,25 @@ function renderMarianOfficeTranscript(text, season){
   };
   for(const raw of lines){
     const line=raw.trim();
-    if(!line){flush();continue;}
+    if(!line){flush();lastWasBlank=true;continue;}
     if(heading.test(line)){
       flush();
       hymn=/^HINO$/i.test(line);
+      lastWasBlank=false;
       if(!blocks.length || blocks[blocks.length-1]!==('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>')) blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
       continue;
     }
+    // Uma rubrica de remissão encerra o hino; não é verso do hino.
+    if(/^Antífonas, salmos, versículo/i.test(line)){
+      flush();
+      hymn=false;
+      blocks.push('<p class="marian-office-rubric">'+escapeHtml(line)+'</p>');
+      lastWasBlank=false;
+      continue;
+    }
+    // A indentação editorial de início de parágrafo deve sobreviver à extração do PDF.
+    if(!hymn && paragraph.length && /^ {5,}\S/.test(raw) && !lastWasBlank)flush();
+    lastWasBlank=false;
     // Reconhecer somente rubricas e etiquetas completas, sem confundir frases comuns.
     if(/^(?:Ant\.?\s*\d*\.?|Antífona(?:\s+\d+)?|Salmo\s+\d+[A-Za-z]?(?:\s*\([^)]*\))?|Cântico(?:\s+[^,.:]{1,45})?|Leitura breve|Leitura bíblica|Responsório breve|Responsório|Oração conclusiva|Preces)\s*[:.]?$/i.test(line)){
       flush();
