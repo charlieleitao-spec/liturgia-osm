@@ -29,6 +29,7 @@ jobs:
       - name: Atualizar índice offline na branch de revisão
         if: github.event_name == 'pull_request' && github.head_ref == 'revisao-minuciosa-oficios-marianos'
         run: |
+          git fetch origin "${{ github.head_ref }}":"refs/heads/${{ github.head_ref }}"
           git checkout "${{ github.head_ref }}"
           npm run search:build
           if ! git diff --quiet -- www/data/search-index.json; then
