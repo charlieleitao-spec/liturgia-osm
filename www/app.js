@@ -1091,14 +1091,13 @@ function renderMarianOfficeTranscript(text, season){
       hymn=false;
       blocks.push('<p class="marian-office-rubric">'+escapeHtml(line)+'</p>');
       lastWasBlank=false;
-      previousHymnLine=false;
       continue;
     }
     // A indentação editorial de início de parágrafo deve sobreviver à extração do PDF.
     if(!hymn && paragraph.length && /^ {5,}\S/.test(raw) && !lastWasBlank)flush();
     lastWasBlank=false;
     // Cabeçalhos de leitura com referência bíblica devem ser separados do texto.
-    const scripture=line.match(/^(LEITURA BREVE|LEITURA BÍBLICA|PRIMEIRA LEITURA|SEGUNDA LEITURA)\\s*[—–:-]?\\s+(.+)$/i);
+    const scripture=line.match(/^(LEITURA BREVE|LEITURA BÍBLICA|PRIMEIRA LEITURA|SEGUNDA LEITURA)\s*[—–:-]?\s+(.+)$/i);
     if(scripture){
       flush();
       hymn=false;
