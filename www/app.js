@@ -1062,7 +1062,7 @@ function renderMarianOfficeTranscript(text, season){
   const heading=/^(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média|HINO|Salmodia|Preces|Oração|Cântico evangélico|Responsório breve|Leitura breve|SEGUNDA LEITURA|PRIMEIRA LEITURA)$/i;
   const response=/^(?:R\.|V\.)\s*/;
   const intercession=/^[-–]\s+\S/;
-  const officeTitle=/^(?:[IVX]+|SANTA MARIA(?:\s+.+)?|NOSSA SENHORA(?:\s+.+)?)$/i;
+  const officeTitle=/^(?:[IVX]+|SANTA MARIA(?:\s+.+)?|NOSSA SENHORA(?:\s+.+)?|MARIA,\s+RAINHA\s+DA\s+MISERICÓRDIA)$/i;
   const inlineHeading=/^(.*?\bp\.\s*\d+\.)\s+(Ofício das Leituras|Laudes|Vésperas|Hora Média)$/i;
   const flush=()=>{
     if(!paragraph.length)return;
