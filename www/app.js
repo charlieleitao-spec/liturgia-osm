@@ -1122,6 +1122,10 @@ function renderMarianOfficeTranscript(text, season){
     paragraph.push(line);
   }
   flush();
+  // O texto-fonte pascal termina com uma oração sem conteúdo.
+  if(season==='pascoa' && /(?:^|\n)Oração\s*$/i.test(source)){
+    blocks.push('<p class="marian-office-rubric">A oração conclusiva não consta da transcrição disponível. Consulte o Ofício Próprio oficial.</p>');
+  }
   return blocks.join('');
 }
 function marianSaturdayCommonForms(item){
