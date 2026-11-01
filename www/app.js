@@ -1097,6 +1097,15 @@ function renderMarianOfficeTranscript(text, season){
     // A indentação editorial de início de parágrafo deve sobreviver à extração do PDF.
     if(!hymn && paragraph.length && /^ {5,}\S/.test(raw) && !lastWasBlank)flush();
     lastWasBlank=false;
+    // Cabeçalhos de leitura com referência bíblica devem ser separados do texto.
+    const scripture=line.match(/^(LEITURA BREVE|LEITURA BÍBLICA|PRIMEIRA LEITURA|SEGUNDA LEITURA)\\s*[—–:-]?\\s+(.+)$/i);
+    if(scripture){
+      flush();
+      hymn=false;
+      blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(scripture[1])+'</h4>');
+      blocks.push('<p class="marian-office-liturgical-label">'+escapeHtml(scripture[2])+'</p>');
+      continue;
+    }
     // Reconhecer somente rubricas e etiquetas completas, sem confundir frases comuns.
     if(/^(?:Ant\.?\s*\d*\.?|Antífona(?:\s+\d+)?|Salmo\s+\d+[A-Za-z]?(?:\s*\([^)]*\))?|Cântico(?:\s+[^,.:]{1,45})?|Leitura breve|Leitura bíblica|Responsório breve|Responsório|Oração conclusiva|Preces)\s*[:.]?$/i.test(line)){
       flush();
