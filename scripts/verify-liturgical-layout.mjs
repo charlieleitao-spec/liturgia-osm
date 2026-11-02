@@ -22,8 +22,6 @@ try{
   assert.equal(main.align,'left');assert.equal(main.color,'rgb(21, 18, 13)');assert.equal(main.background,'rgb(247, 244, 237)');assert.ok(main.poetry>10);assert.ok(main.rubrics>0);report.push({main});
   for(const width of [320,390,768]){
     await page.setViewportSize({width,height:844});
-    // Each viewport must start from October; the Today button changes the month.
-    await page.evaluate(()=>{calDate=new Date(2026,9,1);selectedCalDate=null;render();});
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Main reader overflows at ${width}`);
   }
   await page.setViewportSize({width:390,height:844});
@@ -135,6 +133,8 @@ try{
   const calendarChecks=[];
   for(const width of [320,390,768]){
     await page.setViewportSize({width,height:844});
+    // Each viewport must start from October; the Today button changes the month.
+    await page.evaluate(()=>{calDate=new Date(2026,9,1);selectedCalDate=null;render();});
     assert.equal(await page.locator('.calendar-toolbar select').count(),1);
     assert.equal(await page.locator('.calendar-filter-panel,#calendar-category,#calendar-grade').count(),0);
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Calendar overflow ${width}`);
