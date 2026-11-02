@@ -1061,6 +1061,7 @@ function renderMarianOfficeTranscript(text, season){
   let lastWasBlank=true;
   const heading=/^(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média|HINO|Salmodia|Preces|Oração|Cântico evangélico|Responsório breve|Leitura breve|SEGUNDA LEITURA|PRIMEIRA LEITURA)$/i;
   const response=/^(?:R\.|V\.)\s*/;
+  const antiphon=/^Ant\.\s*\S/i;
   const intercession=/^[-–]\s+\S/;
   const officeTitle=/^(?:[IVX]+|SANTA MARIA(?:\s+.+)?|NOSSA SENHORA(?:\s+.+)?|MARIA,\s+RAINHA\s+DA\s+MISERICÓRDIA)$/i;
   const inlineHeading=/^(.*?\bp\.\s*\d+\.)\s+(Ofício das Leituras|Laudes|Vésperas|Hora Média)$/i;
@@ -1109,6 +1110,11 @@ function renderMarianOfficeTranscript(text, season){
     if(/^(?:Ant\.?\s*\d*\.?|Antífona(?:\s+\d+)?|Salmo\s+\d+[A-Za-z]?(?:\s*\([^)]*\))?|Cântico(?:\s+[^,.:]{1,45})?|Leitura breve|Leitura bíblica|Responsório breve|Responsório|Oração conclusiva|Preces)\s*[:.]?$/i.test(line)){
       flush();
       hymn=false;
+      blocks.push('<p class="marian-office-liturgical-label">'+escapeHtml(line)+'</p>');
+      continue;
+    }
+    if(!hymn && antiphon.test(line)){
+      flush();
       blocks.push('<p class="marian-office-liturgical-label">'+escapeHtml(line)+'</p>');
       continue;
     }
