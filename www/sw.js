@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.130-personal-v1-fontes-s21';
+const CACHE = 'liturgia-osm-v4.9.131-personal-v1-fontes-s21';
 const CORE = [
   "./media/emblema-osm.svg",
   "./media/ornamento-final.svg",
