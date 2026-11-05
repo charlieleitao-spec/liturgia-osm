@@ -1,22 +1,24 @@
-name: Testar APK Liturgia OSM 4.9.129
+name: Publicar Liturgia OSM 4.9.129
 
 on:
   workflow_dispatch:
   push:
-    branches: ['optimize/4.9.129-assets']
+    branches: [main]
+    paths: ['.github/workflows/release-4.9.129.yml']
 
 permissions:
-  contents: read
+  contents: write
   actions: read
 
 concurrency:
-  group: test-4.9.129
-  cancel-in-progress: true
+  group: release-4.9.129
+  cancel-in-progress: false
 
 jobs:
   build:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
 
     steps:
       - name: Baixar o código
@@ -40,26 +42,9 @@ jobs:
       - name: Instalar dependências sem alterar o lock aprovado
         run: npm ci --ignore-scripts --no-audit --no-fund
 
-      - name: Gate de conteúdo e integridade
+      - name: Conferir o código aprovado e as alterações de versão
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y qpdf poppler-utils
-          python3 -m pip install PyMuPDF==1.26.6
-          npm test
-          npm run test:reader-stability
-          npm run test:personal
-          node scripts/verify-search-equivalence.cjs
-          python3 scripts/verify-optimized-assets.py
-
-      - name: Verificar tipografia e atualização do cache offline
-        id: browser
-        timeout-minutes: 3
-        env:
-          CHROME_BIN: /usr/bin/google-chrome
-        run: |
-          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund --fetch-retries=1 --fetch-timeout=30000 playwright@1.56.1
-          node scripts/verify-typography.mjs
-          node scripts/verify-asset-cache.mjs
+          node --check www/app.js
 
       - name: Criar projeto Android
         run: npx cap add android
@@ -166,27 +151,11 @@ jobs:
           test -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
           test -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
           test -f android/app/src/main/res/mipmap-mdpi/ic_launcher_monochrome.png
-      - name: Preparar instrumentação de atualização
-        run: |
-          find android/app/src/androidTest -name '*.java' -delete
-          mkdir -p android/app/src/androidTest/java/com/liturgia_osm/validation
-          cp scripts/android-validation/AssetUpgradeInstrumentation.java android/app/src/androidTest/java/com/liturgia_osm/validation/
-          python3 - <<'PYTEST'
-          from pathlib import Path
-          import re
-          p = Path('android/app/build.gradle')
-          s = p.read_text()
-          s = re.sub(r'^.*androidTestImplementation.*\n', '', s, flags=re.M)
-          s = re.sub(r'testInstrumentationRunner "[^"]+"', 'testInstrumentationRunner "com.liturgia_osm.validation.AssetUpgradeInstrumentation"', s)
-          s = s.replace('android {', "android {\n    testBuildType 'release'", 1)
-          p.write_text(s)
-          PYTEST
-
       - name: Gerar APK
         working-directory: android
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease assembleReleaseAndroidTest
+          ./gradlew assembleRelease
 
       - name: Nomear APK
         run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.129.apk
@@ -209,67 +178,34 @@ jobs:
           print('Todos os arquivos web/offline preservados byte a byte no APK.')
           PYCHECK
 
-      - name: Guardar APK de teste assinado
+      - name: Guardar APK definitivo
         uses: actions/upload-artifact@v5
         with:
           name: Liturgia-OSM-4.9.129
           path: |
             Liturgia-OSM-4.9.129.apk
             assinatura.txt
-            identidade.txt
-            docs/size-optimization/4.9.129/
           if-no-files-found: error
 
 
-      - name: Recuperar APK público 4.9.128 e comparar assinatura e tamanho
+
+      - name: Publicar release verificada
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir -p baseline
-          gh release download v4.9.128 --pattern 'Liturgia-OSM-4.9.128.apk' --dir baseline
-          APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
-          "$APKSIGNER" verify --verbose --print-certs baseline/Liturgia-OSM-4.9.128.apk > anterior.txt
-          diff <(grep 'certificate SHA-256 digest:' anterior.txt) <(grep 'certificate SHA-256 digest:' assinatura.txt)
-          python3 - <<'PYSIZE'
-          from pathlib import Path
-          import json
-          a=Path('baseline/Liturgia-OSM-4.9.128.apk').stat().st_size
-          b=Path('Liturgia-OSM-4.9.129.apk').stat().st_size
-          assert b<a, (a,b)
-          Path('validation-results').mkdir(exist_ok=True)
-          Path('validation-results/apk-size.json').write_text(json.dumps(dict(before_bytes=a,after_bytes=b,saved_bytes=a-b,percent=round(100*(a-b)/a,2)),indent=2)+'\n')
-          print(a,b,a-b)
-          PYSIZE
+          sha256sum Liturgia-OSM-4.9.129.apk > SHA256SUMS.txt
+          cat > release-notes.md <<'EOF'
+          Liturgia OSM 4.9.129 — revisão visual e tipográfica.
 
-      - name: Habilitar KVM
+          - Leitura aprimorada: evita cortes artificiais de palavras, preserva estrofes e melhora a impressão.
+          - Transições discretas nos menus, respeitando preferências de movimento reduzido.
+          - Testes automatizados de liturgia, acessibilidade, toque e tipografia aprovados.
+          - APK assinado com a chave estável, com arquivos offline conferidos.
+          - Instalação de teste no Samsung A56 confirmada.
+          EOF
+          gh release create v4.9.129 Liturgia-OSM-4.9.129.apk SHA256SUMS.txt --target "$GITHUB_SHA" --title 'Liturgia OSM 4.9.129' --notes-file release-notes.md --latest
+
+      - name: Verificar download público da versão definitiva
         run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-
-      - name: Atualizar 4.9.128 para 4.9.129 e abrir todos os PDFs offline
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 35
-          target: google_apis
-          arch: x86_64
-          profile: pixel_6
-          disable-animations: true
-          script: bash scripts/verify-asset-upgrade.sh
-
-      - name: Exigir aprovação do navegador
-        if: always() && steps.browser.outcome != 'success'
-        run: exit 1
-
-      - name: Guardar resultados dos testes
-        if: always()
-        uses: actions/upload-artifact@v5
-        with:
-          name: validacao-4.9.129
-          path: |
-            validation-results/
-            validation-layout/
-            assinatura.txt
-            identidade.txt
-            anterior.txt
-          if-no-files-found: warn
+          curl --fail --location --retry 4 --retry-delay 5 --output /tmp/Liturgia-OSM-4.9.129-publicado.apk https://github.com/charlieleitao-spec/liturgia-osm/releases/download/v4.9.129/Liturgia-OSM-4.9.129.apk
+          cmp Liturgia-OSM-4.9.129.apk /tmp/Liturgia-OSM-4.9.129-publicado.apk

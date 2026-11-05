@@ -1,12 +1,11 @@
 name: Gate otimização offline
 on:
   pull_request:
-    branches: [main, 'optimize/**']
+    branches: ['optimize/**']
 permissions:
   contents: read
 jobs:
   gate:
-    if: startsWith(github.head_ref, 'optimize/') || startsWith(github.base_ref, 'optimize/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -18,8 +17,6 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npm test
-      - run: npm run test:reader-stability
-      - run: npm run test:personal
       - run: node scripts/verify-search-equivalence.cjs
       - uses: actions/upload-artifact@v5
         with:

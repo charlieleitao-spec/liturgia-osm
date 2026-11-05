@@ -308,7 +308,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.129';
+const APP_VERSION = '4.9.131';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1054,6 +1054,8 @@ function renderMarianOfficeTranscript(text, season){
   let paragraph=[];
   let hymn=false;
   const heading=/^(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média|HINO|Hino|Salmodia|Preces|Oração|Cântico evangélico|Responsório breve|RESPONSÓRIO BREVE|Leitura breve(?:\s+.*)?|LEITURA BREVE(?:\s+.*)?)$/i;
+  const response=/^(?:R\.|V\.)\s*/;
+  const inlineHeading=/^(.*?\bp\.\s*\d+\.)\s+(Ofício das Leituras|Laudes|Vésperas|Hora Média)$/i;
   const flush=()=>{
     if(!paragraph.length)return;
     const joined=hymn?paragraph.map(escapeHtml).join('<br>'):escapeHtml(paragraph.join(' ').replace(/\s+/g,' '));
@@ -1066,7 +1068,28 @@ function renderMarianOfficeTranscript(text, season){
     if(heading.test(line)){
       flush();
       hymn=/^HINO$/i.test(line);
-      blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
+      if(!blocks.length || blocks[blocks.length-1]!==('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>')) blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
+      continue;
+    }
+    // Reconhecer somente rubricas e etiquetas completas, sem confundir frases comuns.
+    if(/^(?:Ant\.?\s*\d*\.?|Antífona(?:\s+\d+)?|Salmo\s+\d+[A-Za-z]?(?:\s*\([^)]*\))?|Cântico(?:\s+[^,.:]{1,45})?|Leitura breve|Leitura bíblica|Responsório breve|Responsório|Oração conclusiva|Preces)\s*[:.]?$/i.test(line)){
+      flush();
+      hymn=false;
+      blocks.push('<p class="marian-office-liturgical-label">'+escapeHtml(line)+'</p>');
+      continue;
+    }
+    if(!hymn && response.test(line)){
+      flush();
+      blocks.push('<p class="marian-office-response">'+escapeHtml(line)+'</p>');
+      continue;
+    }
+    const embedded=!hymn && line.match(inlineHeading);
+    if(embedded){
+      const prefix=embedded[1].trim();
+      if(prefix)paragraph.push(prefix);
+      flush();
+      hymn=false;
+      blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(embedded[2])+'</h4>');
       continue;
     }
     paragraph.push(line);
@@ -1524,7 +1547,7 @@ window.addEventListener('popstate',event=>{
   const menu=document.querySelector('.main-menu');
   if(menu) menu.innerHTML=`<div class="main-menu-head"><h3 id="mainMenuTitle">Menu</h3><button class="tool-btn" onclick="closeMainMenu()" aria-label="Fechar menu">✕</button></div>
     <div class="menu-section menu-section-first"><div class="menu-label">Biblioteca</div><button class="menu-action menu-wide menu-entry" onclick="closeMainMenu();openGlobalSearch()">Buscar textos e documentos <span aria-hidden="true">›</span></button><button class="menu-action menu-wide menu-entry" onclick="closeMainMenu();setTab('biblioteca')">Favoritos e recentes <span aria-hidden="true">›</span></button></div>
-    <div class="menu-section"><div class="menu-label">Recursos da família servita</div><a class="menu-action menu-wide menu-entry" href="./biblioteca-servita.html">Biblioteca Servita <span aria-hidden="true">›</span></a><button class="menu-action menu-wide menu-entry" onclick="closeMainMenu();openServite('regra')">Ordem Secular · Regra de Vida <span aria-hidden="true">›</span></button><a class="menu-action menu-wide menu-entry menu-resource-link" href="https://somosservos.blogspot.com/p/aplicativos-servitas.html#caminho-servita-app" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event,this.href)">Caminho Servita <span aria-hidden="true">›</span></a><a class="menu-action menu-wide menu-entry menu-resource-link" href="https://charlieleitao-spec.github.io/somos-servos-app/recursos.html" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event,this.href)">Oração, formação e memória <span aria-hidden="true">›</span></a></div>
+    <div class="menu-section"><div class="menu-label">Recursos da família servita</div><a class="menu-action menu-wide menu-entry" href="./biblioteca-servita.html">Biblioteca Servita <span aria-hidden="true">›</span></a><button class="menu-action menu-wide menu-entry" onclick="closeMainMenu();openServite('regra')">Ordem Secular · Regra de Vida <span aria-hidden="true">›</span></button><a class="menu-action menu-wide menu-entry menu-resource-link" href="https://somosservos.blogspot.com/p/aplicativos-servitas.html#caminho-servita-app" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event,this.href)">Caminho Servita <span aria-hidden="true">›</span></a><a class="menu-action menu-wide menu-entry menu-resource-link" href="https://github.com/charlieleitao-spec/caminho-servita/releases/download/v1.0.5/Caminho-Servita-1.0.5-assinado.apk" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event,this.href)">Baixar Caminho Servita 1.0.5 <span aria-hidden="true">›</span></a><a class="menu-action menu-wide menu-entry menu-resource-link" href="https://charlieleitao-spec.github.io/somos-servos-app/recursos.html" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event,this.href)">Oração, formação e memória <span aria-hidden="true">›</span></a></div>
     <div class="menu-section"><div class="menu-label">Ajustes de leitura</div><div class="menu-row menu-font-controls"><button class="menu-action" onclick="adjustFont(-0.08)" aria-label="Diminuir tamanho do texto">A−</button><span class="reader-scale-value" role="status" aria-label="Tamanho do texto">100%</span><button class="menu-action" onclick="adjustFont(0.08)" aria-label="Aumentar tamanho do texto">A+</button><button class="menu-action" onclick="resetFont()" aria-label="Restaurar tamanho padrão do texto">Padrão</button></div><button class="menu-action menu-wide menu-theme" aria-label="Tema escuro" aria-pressed="false" onclick="toggleTheme()">☼ / ☾ Alternar tema claro ou escuro</button></div>
     <div id="reminderSettings" class="menu-section" hidden><div class="menu-label">Lembrete de celebrações</div><div class="reminder-panel"><label class="reminder-switch-row" for="reminderEnabled"><span><strong>Receber lembrete</strong><small>Somente nas celebrações próprias da Ordem</small></span><input id="reminderEnabled" type="checkbox" role="switch" disabled></label><label class="reminder-time-row" for="reminderTime"><span>Horário do lembrete</span><input id="reminderTime" type="time" value="07:00" required disabled></label><p id="reminderStatus" role="status">Desligado. Apenas nos dias com celebração própria.</p></div></div>
     <details class="menu-section menu-about-details"><summary>Sobre, créditos e redes sociais</summary><div class="menu-about-content">${viewSobre()}</div></details>

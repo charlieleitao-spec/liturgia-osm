@@ -1295,3 +1295,22 @@ body.liturgical-page:not(.celebration-mode):not(.servite-open) main#view{padding
 }
 .servite-head{box-sizing:border-box;flex:0 0 auto;height:auto;min-height:60px;padding:8px 14px;gap:8px}
 .servite-frame{display:block;box-sizing:border-box;flex:1 1 0%;min-height:0;min-width:0;height:0}
+
+/* Suavização discreta dos menus, sem alterar o tamanho das áreas de toque. */
+.main-menu .menu-entry,.main-menu .menu-action,.main-menu .menu-theme,
+.main-menu .menu-resource-link,.main-menu .servite-resource-action{
+  transition:background-color .18s ease,border-color .18s ease,color .18s ease;
+}
+.main-menu .menu-about-details summary::after{
+  transition:transform .18s ease;
+}
+@media(hover:hover) and (pointer:fine){
+  .main-menu .menu-entry:hover,.main-menu .menu-resource-link:hover{
+    background-color:rgba(127,127,127,.055);
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .main-menu .menu-entry,.main-menu .menu-action,.main-menu .menu-theme,
+  .main-menu .menu-resource-link,.main-menu .servite-resource-action,
+  .main-menu .menu-about-details summary::after{transition:none!important}
+}

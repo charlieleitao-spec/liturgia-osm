@@ -70,3 +70,19 @@ body.liturgical-page #app #view .card:has(.today-servita-reader)::before,body.li
 /* O leitor incorporado e as orações usam o mesmo papel, inclusive na Regra. */
 body.embedded-resource-mode,body.embedded-resource-mode #app,body.embedded-resource-mode main#view{background:var(--liturgical-paper)!important;color:var(--liturgical-ink)!important}
 body.embedded-resource-mode .ambient{display:none}
+
+/* Ajustes de composição: evitar quebra dentro dos marcadores litúrgicos. */
+.office-transcript-text .office-verse-line,
+body.liturgical-page #app #view .liturgical-verse-line{
+  overflow-wrap:break-word;
+  word-break:normal;
+  hyphens:none;
+}
+@media print{
+  .office-transcript-text .office-hymn-stanza,
+  .office-transcript-text .office-psalm-stanza,
+  body.liturgical-page #app #view .prayer-stanza{
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+}

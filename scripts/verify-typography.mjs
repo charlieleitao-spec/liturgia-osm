@@ -1,8 +1,7 @@
 import {chromium} from 'playwright';
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
-import {mkdir,writeFile,readFile} from 'node:fs/promises';
-const version=JSON.parse(await readFile(new URL('../package.json',import.meta.url),'utf8')).version;
+import {mkdir,writeFile} from 'node:fs/promises';
 const server=spawn('python3',['-m','http.server','8769','--directory','www'],{stdio:'ignore'});
 const browser=await chromium.launch({executablePath:process.env.CHROME_BIN||undefined,headless:true,args:['--no-sandbox']});
 const results=[];
@@ -67,7 +66,7 @@ try{
   await page.locator('.office-prose').filter({hasText:'seu apostolado: a educação cristã'}).scrollIntoViewIfNeeded();
   await page.screenshot({path:'validation-layout/leitura-a56-corrigida.png'});
   await page.evaluate(()=>{openMainMenu();});
-  assert.ok((await page.locator('.menu-status').textContent()).includes(version));
+  assert.ok(await page.locator('.menu-status').evaluate(n=>n.textContent.includes(`Versão ${APP_VERSION}`)));
   await page.evaluate(()=>closeMainMenu());
   // The inner reader uses root scaling. It must not apply --reader-scale a second time.
   const resource=await browser.newPage({viewport:{width:390,height:844},serviceWorkers:'block'});
