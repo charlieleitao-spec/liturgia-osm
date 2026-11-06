@@ -47,7 +47,7 @@ jobs:
           npm run test:reader-stability
           npm run test:personal
       - name: Instalar Playwright
-        run: npm install --no-save --package-lock=false --ignore-scripts playwright
+        run: npm install --no-save --package-lock=false --ignore-scripts playwright@1.56.1
       - name: Conferir apresentação litúrgica e acessibilidade
         env:
           CHROME_BIN: /usr/bin/google-chrome
