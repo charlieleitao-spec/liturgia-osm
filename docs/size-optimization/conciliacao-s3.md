@@ -1,3 +1,18 @@
+# Conciliação atual s3 — PR #150 com a release 4.9.132
+
+Verificação de 6 de novembro de 2026. Base atual: `b8944dd4c25d8a04342710557b5d9c59b4c92109` (release pública 4.9.132). Esta atualização incorpora essa base ao PR sem alterar a tag nem a release publicada.
+
+- Mantém `package.json`, lockfile e `APP_VERSION` em 4.9.132. Preserva os workflows de publicação 4.9.131/4.9.132 e a integração de fontes s21.
+- Conserva os 66 PDFs otimizados, com SHA-256 idêntico ao inventário já aprovado; sem recompressão e sem repetição da auditoria visual dos PDFs.
+- Conserva os 708 documentos, as 82 fontes da busca, Cinzel e sua licença. Remove as oito fontes não utilizadas e suas referências no cache.
+- Cache específico `liturgia-osm-v4.9.132-personal-v1-fontes-s21-assets-pr150`, com 148 recursos existentes. O sufixo impede confundir o cache do candidato otimizado com o da release pública.
+- Workflow de teste alinhado a 4.9.132/41045, mesma identidade e certificado estável. Eventual APK otimizado é candidato do PR, distinto do APK da release pública; não substituir o download publicado.
+- A conciliação é incorporada à branch do PR. Não realiza merge em main, publicação, alteração de tag nem teste físico no Samsung A56.
+
+A documentação abaixo preserva o histórico da proposta 4.9.131. Identificações e próximos passos históricos não descrevem o estado atual.
+
+---
+
 # Conciliação s3 — PR #150
 
 A proposta 4.9.131 concilia a otimização do PR #150 com main edd1648e666925929005d29ebc9ac8ae8d40f1df, preservando revisões marianas, apresentação visual e o link Caminho Servita.

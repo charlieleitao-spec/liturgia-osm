@@ -1,4 +1,4 @@
-name: APK de teste — revisão visual 4.9.131
+name: APK de teste — revisão visual 4.9.132
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: teste-revisao-visual-4.9.131
+  group: teste-revisao-visual-4.9.132
   cancel-in-progress: false
 
 jobs:
@@ -83,8 +83,8 @@ jobs:
 
       - name: Definir versão e segurança
         run: |
-          sed -i 's/versionCode [0-9][0-9]*/versionCode 41044/' android/app/build.gradle
-          sed -i 's/versionName "[^"]*"/versionName "4.9.131"/' android/app/build.gradle
+          sed -i 's/versionCode [0-9][0-9]*/versionCode 41045/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "4.9.132"/' android/app/build.gradle
           python3 - <<'PY'
           from pathlib import Path
           p = Path('android/app/build.gradle')
@@ -158,20 +158,20 @@ jobs:
           ./gradlew assembleRelease
 
       - name: Nomear APK
-        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.131.apk
+        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.132.apk
 
       - name: Conferir assinatura e todos os arquivos offline
         run: |
           APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
-          "$APKSIGNER" verify --verbose --print-certs Liturgia-OSM-4.9.131.apk > assinatura.txt
+          "$APKSIGNER" verify --verbose --print-certs Liturgia-OSM-4.9.132.apk > assinatura.txt
           grep -q 'certificate SHA-256 digest: 5b2b3319cc9f9bb61a14fb8a30e63044db225f7b930fca9568c82854f38b4fe0' assinatura.txt
           AAPT="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/aapt"
-          "$AAPT" dump badging Liturgia-OSM-4.9.131.apk > identidade.txt
-          grep -q "package: name='com.liturgia_osm.app' versionCode='41044' versionName='4.9.131'" identidade.txt
+          "$AAPT" dump badging Liturgia-OSM-4.9.132.apk > identidade.txt
+          grep -q "package: name='com.liturgia_osm.app' versionCode='41045' versionName='4.9.132'" identidade.txt
           python3 - <<'PYCHECK'
           from pathlib import Path
           import zipfile
-          with zipfile.ZipFile('Liturgia-OSM-4.9.131.apk') as apk:
+          with zipfile.ZipFile('Liturgia-OSM-4.9.132.apk') as apk:
               for p in Path('www').rglob('*'):
                   if p.is_file():
                       assert apk.read('assets/public/'+p.relative_to('www').as_posix())==p.read_bytes(), str(p)
@@ -181,9 +181,9 @@ jobs:
       - name: Guardar APK de teste
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.9.131
+          name: Liturgia-OSM-4.9.132
           path: |
-            Liturgia-OSM-4.9.131.apk
+            Liturgia-OSM-4.9.132.apk
             assinatura.txt
             identidade.txt
           if-no-files-found: error
