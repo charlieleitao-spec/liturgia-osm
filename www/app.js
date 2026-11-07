@@ -1036,7 +1036,8 @@ function movableOfficeBlocks(){
   return '<div class="section-title">Ofícios próprios com data móvel</div><div class="card fade-in liturgia-resource-list">'+rows+'</div>';
 }
 function normalizeMarianOfficeTranscript(text, season){
-  let value=cleanMassText(text)
+  // Rodapés e mudanças de página não encerram uma frase nem uma estrofe.
+  let value=cleanMassText(String(text||'').replace(/\n(?:[ \t]*\n)*[ \t]*Copyright[^\n]*\n(?:[ \t]*\n)*/gi,'\n'))
     .replace(/([A-Za-zÀ-ÿ])-\n\s*([a-zà-ÿ])/g,'$1$2')
     .replace(/\bce-lebra-se\b/gi,'celebra-se')
     .replace(/\boutu-bro\b/gi,'outubro');
@@ -1052,49 +1053,86 @@ function renderMarianOfficeTranscript(text, season){
   const lines=source.split('\n');
   const blocks=[];
   let paragraph=[];
-  let hymn=false;
-  const heading=/^(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média|HINO|Hino|Salmodia|Preces|Oração|Cântico evangélico|Responsório breve|RESPONSÓRIO BREVE|Leitura breve(?:\s+.*)?|LEITURA BREVE(?:\s+.*)?)$/i;
+  let mode='prose';
+  let role='prose';
+  let intercession=[];
+  const heading=/^(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média|HINO|Salmodia|Preces|Oração|Cântico evangélico|Primeira leitura|Segunda leitura|Leitura alternativa(?:\s+[IVX]+)?)$/i;
   const response=/^(?:R\.|V\.)\s*/;
   const inlineHeading=/^(.*?\bp\.\s*\d+\.)\s+(Ofício das Leituras|Laudes|Vésperas|Hora Média)$/i;
+  const endIntercession=()=>{
+    if(!intercession.length)return;
+    blocks.push('<div class="marian-office-intercession">'+intercession.join('')+'</div>');
+    intercession=[];
+  };
   const flush=()=>{
     if(!paragraph.length)return;
-    const joined=hymn?paragraph.map(escapeHtml).join('<br>'):escapeHtml(paragraph.join(' ').replace(/\s+/g,' '));
-    blocks.push('<p class="marian-office-'+(hymn?'hymn':'prose')+'">'+joined+'</p>');
+    const joined=role==='hymn'?paragraph.map(line=>'<span class="liturgical-hymn-line">'+liturgicalLineHtml(line)+'</span>').join(''):liturgicalLineHtml(paragraph.join(' ').replace(/\s+/g,' '));
+    const html='<p class="marian-office-'+role+'">'+joined+'</p>';
+    if(role==='intention'||role==='petition')intercession.push(html);
+    else{endIntercession();blocks.push(html);}
     paragraph=[];
+  };
+  const start=(nextRole,line)=>{flush();role=nextRole;if(line)paragraph.push(line);};
+  const addHeading=line=>{
+    flush();endIntercession();
+    const hour=/^(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média)$/i.test(line);
+    blocks.push('<h4 class="prayer-text-heading'+(hour?' liturgical-hour-heading':'')+'">'+escapeHtml(line)+'</h4>');
+    mode=/^HINO$/i.test(line)?'hymn':/^PRECES$/i.test(line)?'preces':/^(?:Primeira|Segunda|Leitura alternativa)/i.test(line)?'reading':'prose';
+    role=mode==='hymn'?'hymn':'prose';
   };
   for(const raw of lines){
     const line=raw.trim();
     if(!line){flush();continue;}
     if(heading.test(line)){
-      flush();
-      hymn=/^HINO$/i.test(line);
-      if(!blocks.length || blocks[blocks.length-1]!==('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>')) blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
+      addHeading(line);
       continue;
     }
-    // Reconhecer somente rubricas e etiquetas completas, sem confundir frases comuns.
-    if(/^(?:Ant\.?\s*\d*\.?|Antífona(?:\s+\d+)?|Salmo\s+\d+[A-Za-z]?(?:\s*\([^)]*\))?|Cântico(?:\s+[^,.:]{1,45})?|Leitura breve|Leitura bíblica|Responsório breve|Responsório|Oração conclusiva|Preces)\s*[:.]?$/i.test(line)){
-      flush();
-      hymn=false;
-      blocks.push('<p class="marian-office-liturgical-label">'+escapeHtml(line)+'</p>');
+    const reference=line.match(/^(LEITURA BREVE|RESPONS[ÓO]RIO(?: BREVE)?|ESPONSÓRIO)\s*(.*)$/i);
+    if(reference){
+      addHeading(reference[1]);
+      mode=/^LEITURA/i.test(reference[1])?'reading':'responsory';
+      if(reference[2]){start('reference',reference[2]);flush();}
       continue;
     }
-    if(!hymn && response.test(line)){
-      flush();
-      blocks.push('<p class="marian-office-response">'+escapeHtml(line)+'</p>');
-      continue;
-    }
-    const embedded=!hymn && line.match(inlineHeading);
+    const embedded=line.match(inlineHeading);
     if(embedded){
-      const prefix=embedded[1].trim();
-      if(prefix)paragraph.push(prefix);
-      flush();
-      hymn=false;
-      blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(embedded[2])+'</h4>');
+      start('rubric',embedded[1].trim());flush();addHeading(embedded[2]);
       continue;
+    }
+    if(/^(?:Antífonas? e salmos|Antífonas?, salmos|Salmo(?:s| invitatório)?\b|Salmodia complementar)/i.test(line)){
+      mode='prose';start('rubric',line);continue;
+    }
+    if(/^\[/.test(line)){start('rubric',line);continue;}
+    if(response.test(line)){
+      start(mode==='preces'?'refrain':'response',line);continue;
+    }
+    if(/^(?:Ant\.|Antífona)\s/i.test(line)){
+      start('antiphon',line);continue;
+    }
+    if(/^Ou:/.test(line)){
+      start(line==='Ou:'?'rubric':'antiphon',line);continue;
+    }
+    if(mode==='preces'&&role!=='rubric'){
+      if(/^[-–—]\s+/.test(line)){start('petition',line);continue;}
+      // A transcrição revista separa cada invocação por uma linha vazia.
+      // As continuações de uma petição permanecem no mesmo parágrafo.
+      if(!paragraph.length){
+        if(role==='petition'||role==='refrain'||role==='intention'){endIntercession();role='intention';}
+        else role='intro';
+      }
+    }else if(!paragraph.length){
+      role=mode==='hymn'?'hymn':'prose';
+    }else if(mode==='reading'&&/^\s/.test(raw)&&role==='prose'){
+      // O recuo original distingue os parágrafos das leituras em prosa.
+      flush();
     }
     paragraph.push(line);
+    if(role==='rubric'&&/\]$/.test(line)){
+      flush();role='prose';
+      continue;
+    }
   }
-  flush();
+  flush();endIntercession();
   return blocks.join('');
 }
 function marianSaturdayCommonForms(item){
@@ -1111,12 +1149,12 @@ function marianSaturdayCommonForms(item){
   const displayTitles=['Santa Maria dos seus Servos','Maria e a Igreja','Maria, Mulher Nova','Maria, Rainha da Misericórdia','Santa Maria das Américas'];
   const starts=titles.map(title=>source.indexOf(title));
   if(starts.some(index=>index<0))return '<p class="reader-note">Os cinco formulários completos estão no PDF oficial.</p>';
-  const intro=source.slice(0,starts[0]).trim();
+  const intro=source.slice(0,starts[0]).replace(/\s+I\s*$/,'').trim();
   const introHtml=intro?'<div class="marian-saturday-intro">'+renderMarianOfficeTranscript(intro,'Tempo Comum')+'</div>':'';
   const forms=titles.map((title,index)=>{
     const start=starts[index]+title.length;
     const end=index<titles.length-1?starts[index+1]:source.length;
-    const body=source.slice(start,end).replace(/^\s*(?:I|II|III|IV|V)\s*/,'').trim();
+    const body=source.slice(start,end).replace(/\n\s*(?:I|II|III|IV|V)\s*$/,'').trim();
     const content='<div class="liturgical-reading hub-text saturday-pdf-transcript">'+renderMarianOfficeTranscript(body,'Tempo Comum')+'</div>';
     return liturgiaResourceRow(roman[index]+' — '+displayTitles[index],'Ofício próprio OSM',content,null,'marianSaturdayForm'+(index+1));
   }).join('');
