@@ -15,6 +15,49 @@
     }catch{return null;}
   }
   function escape(value){return String(value||'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
+  // Um único tratamento para preces em todos os leitores. Só organiza os
+  // sinais e limites presentes na fonte; não acrescenta palavras nem respostas.
+  function formatIntercessions(value,prefix='preces-'){
+    const blocks=[],group=[];
+    const explicitRequests=/^[-–—_]\s*\S/m.test(String(value||''));
+    let lines=[],role='intro',blank=false;
+    const endGroup=()=>{if(group.length){blocks.push('<div class="liturgical-intercession '+prefix+'intercession">'+group.join('\n')+'</div>');group.length=0;}};
+    const flush=()=>{
+      if(!lines.length)return;
+      const text=lines.join(' ').replace(/\s+/g,' ').trim();
+      if(role==='intention'&&!explicitRequests){
+        const boundary=text.match(/;\s+|,\s+(?=(?:fazei|dai|concedei|enchei|ajudai|ensinai|olhai|aceitai|orientai|aumentai)\b)/i);
+        if(boundary){
+          const cut=boundary.index+1;
+          group.push('<p class="liturgical-intercession-intention '+prefix+'intention">'+escape(text.slice(0,cut))+'</p>\n<p class="liturgical-intercession-petition '+prefix+'petition">'+escape(text.slice(cut).trim())+'</p>');
+          lines=[];return;
+        }
+      }
+      const alias=role==='refrain'&&prefix==='preces-'?'response':role;
+      const html='<p class="liturgical-intercession-'+role+' '+prefix+alias+(role==='refrain'?' liturgical-response':'')+'">'+escape(text).replace(/^((?:[RV][./]|[℣℟]\.?)\s*)/,'<span class="rubric">$1</span>')+'</p>';
+      if(role==='intention'||role==='petition')group.push(html);else{endGroup();blocks.push(html);}
+      lines=[];
+    };
+    const start=(type,line)=>{flush();role=type;lines.push(line);};
+    const source=String(value||'').replace(/\r\n?/g,'\n').replace(/(?<![RV℣℟]\.)(?<=\.)[ \t]+(?=(?:Pastor eterno|Senhor Jesus|Cristo(?: ressuscitado)?),)/g,'\n');
+    for(const raw of source.split('\n')){
+      const line=raw.trim();
+      if(!line){blank=true;continue;}
+      if(/^Copyright\b/i.test(line))continue;
+      if(/^\[/.test(line)){start('rubric',line);blank=false;continue;}
+      if(/^(?:R[./]|℟\.?)\s*/.test(line)){start('refrain',line);blank=false;continue;}
+      if(/^(?:V[./]|℣\.?)\s*/.test(line)){start('response',line);blank=false;continue;}
+      if(/^[-–—_]\s*\S/.test(line)){start('petition',line);blank=false;continue;}
+      const ended=lines.length&&/[.!?]["”’»)]*$/.test(lines.at(-1));
+      const newInvocation=/^[A-ZÀ-Ý]/.test(line)&&ended&&['refrain','petition','intention'].includes(role);
+      if(newInvocation||(blank&&role==='intention'&&ended)){
+        flush();endGroup();role='intention';
+      }
+      lines.push(line);blank=false;
+      if(role==='rubric'&&/\][.]?$/.test(line)){flush();role='intro';}
+    }
+    flush();endGroup();return blocks.join('\n');
+  }
   function formatOfficeText(value){
     const blocks=[],sourceNotes=new Set();
     let paragraph=[],kind='prose',mode='prose',lastIndent=0,seenHour=false;
@@ -23,8 +66,9 @@
     function inline(text){return escape(text).replace(/^((?:Ant\.(?:\s*\d+)?|Antífona(?:\s*\d+)?|[VR][./]|[℣℟]\.?)\s*)/i,'<span class="rubric">$1</span>').replace(/([^\s<>]+)\s+([*†])(?=\s|$)/g,'<span class="liturgical-cue">$1 $2</span>');}
     function flush(){
       if(!paragraph.length)return;
-      if(kind==='hymn'||kind==='psalm')blocks.push('<div class="office-'+kind+'-stanza">'+paragraph.map(line=>'<span class="office-verse-line">'+inline(line)+'</span>').join('\n')+'</div>');
-      else blocks.push('<p class="office-'+kind+'">'+inline(paragraph.join(' '))+'</p>');
+      if(mode==='preces')blocks.push(formatIntercessions(paragraph.join('\n'),'office-'));
+      else if(kind==='hymn'||kind==='psalm')blocks.push('<div class="office-'+kind+'-stanza">'+paragraph.map(line=>'<span class="office-verse-line">'+inline(line)+'</span>').join('\n')+'</div>');
+      else blocks.push('<p class="office-'+kind+(kind==='response'&&/^(?:R[./]|℟)/.test(paragraph[0])?' liturgical-response':'')+'">'+inline(paragraph.join(' '))+'</p>');
       paragraph=[];
     }
     function add(line,nextKind){if(kind!==nextKind)flush();kind=nextKind;paragraph.push(line);}
@@ -35,6 +79,7 @@
     for(const [lineIndex,raw] of lines.entries()){
       const line=raw.trim().replace(/[ \t]+/g,' '),indent=raw.length-raw.trimStart().length;
       if(!line){
+        if(mode==='preces'){paragraph.push('');continue;}
         // A PDF page break may interrupt a sentence. Only join prose when
         // the following text continues in lower case; keep poetic stanzas.
         const next=lines.slice(lineIndex+1).find(value=>value.trim()&&!/^Copyright\s*©/i.test(value.trim()))||'';
@@ -50,9 +95,10 @@
       if(heading&&(!heading[2]||/^(?:RESPONSÓRIO|LEITURA BREVE|HINO)$/i.test(heading[1]))){
         flush();blocks.push('<h4 class="office-section-heading">'+escape(heading[1])+'</h4>');
         if(heading[2])blocks.push('<p class="office-reference">'+escape(heading[2])+'</p>');
-        mode=/^HINO$/i.test(heading[1])?'hymn':/LEITURA/i.test(heading[1])?'reading':/SALMODIA|CÂNTICO EVANGÉLICO/i.test(heading[1])?'psalm':'prose';
+        mode=/^PRECES$/i.test(heading[1])?'preces':/^HINO$/i.test(heading[1])?'hymn':/LEITURA/i.test(heading[1])?'reading':/SALMODIA|CÂNTICO EVANGÉLICO/i.test(heading[1])?'psalm':'prose';
         continue;
       }
+      if(mode==='preces'){paragraph.push(line);continue;}
       if(!seenHour&&line.length>5&&line===line.toLocaleUpperCase('pt-BR')&&/[A-ZÀ-Ý]/.test(line)){
         flush();blocks.push('<h3 class="office-document-heading">'+escape(line)+'</h3>');continue;
       }
@@ -86,7 +132,7 @@
     const transcript=record.pdf_transcript?'<details class="office-transcript"><summary class="btn-link">Ler texto completo do Ofício</summary><div class="hub-text office-transcript-text">'+formatOfficeText(record.pdf_transcript)+'</div></details>':'';
     return pdf||transcript?'<div class="office-complete-resources">'+pdf+transcript+'</div>':'';
   }
-  root.OSMPdf={resolve,officeResources,formatOfficeText};
+  root.OSMPdf={resolve,officeResources,formatOfficeText,formatIntercessions};
   if(typeof module!=='undefined')module.exports=root.OSMPdf;
   if(!root.document)return;
   const capacitor=()=>root.Capacitor||(root.parent!==root?root.parent.Capacitor:null);

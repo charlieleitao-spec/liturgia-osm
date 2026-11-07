@@ -117,9 +117,10 @@ function renderPrayer(text){
   const formatted = formatLiturgicalStanzas(text);
   const lines=formatted.split('\n'),blocks=[];
   const heading=/^(?:HINO|CANTO|SALMO(?:\s+\d+)?|SALMODIA|INTRODUÇÃO|REFLEXÃO|EVANGELHO(?:\s+DE .+)?|ORAÇÃO|INVOCAÇÕES|CÂNTICO(?: EVANGÉLICO)?|LEITURA BREVE|RESPONSÓRIO BREVE|PRECES|DESPEDIDA)$/i;
-  let paragraph=[],poetry=false;
+  let paragraph=[],poetry=false,preces=false;
   const flush=()=>{
     if(!paragraph.length)return;
+    if(preces){blocks.push(OSMPdf.formatIntercessions(paragraph.join('\n')));paragraph=[];return;}
     const clean=paragraph.map(line=>normalizeServiteLineBreaks(line).trim()).filter(Boolean);
     const speaker=/^(?:D\.|T\.|C\.|R[./]|V[./]|A\.|B\.|L\d?:|L\.)\s*/;
     const verse=/^(?:[–—=]\s*|\d{1,3}\s*[†*])/;
@@ -128,7 +129,7 @@ function renderPrayer(text){
     else if(clean.some(speaker.test.bind(speaker))){
       const turns=[];
       for(const line of clean){if(speaker.test(line)||verse.test(line)||!turns.length)turns.push(line);else turns[turns.length-1]+=' '+line;}
-      joined=turns.map(line=>liturgicalLineHtml(line)).join('<br>');
+      joined=turns.map(line=>'<span class="liturgical-turn'+(/^(?:R[./]|T\.|℟)/.test(line)?' liturgical-response':'')+'">'+liturgicalLineHtml(line)+'</span>').join('');
     }else if(clean.some(verse.test.bind(verse)))joined=clean.map(line=>liturgicalLineHtml(line,true)).join('<br>');
     else joined=escapeHtml(clean.join(' ').replace(/\s+/g,' ').trim());
     const marked=joined.replace(/^(D\.|T\.|C\.|L\.\d?|L\.|V\.|R\.|\u2123\.|\u211f\.)/gm,'<span class="rubric">$1</span>');
@@ -136,10 +137,11 @@ function renderPrayer(text){
   };
   for(const raw of lines){
     const line=normalizeServiteLineBreaks(raw).trim();
-    if(!line){flush();continue;}
+    if(!line){if(preces)paragraph.push('');else flush();continue;}
     if(heading.test(line)){
       flush();
       poetry=/^(?:HINO|CANTO|SALMO|CÂNTICO)/i.test(line)?line:false;
+      preces=/^PRECES$/i.test(line);
       blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
       continue;
     }
@@ -160,15 +162,19 @@ function renderLiturgicalHourContent(text){
   let block = null;
   let currentHead = '';
   let stanza = null;
-  let precesCount = 0;
   let proseNode = null;
   let proseClass = '';
+  let precesLines=[];
+
+  function flushPreces(){
+    if(precesLines.length&&block){block.insertAdjacentHTML('beforeend',OSMPdf.formatIntercessions(precesLines.join('\n')));precesLines=[];}
+  }
 
   function startBlock(label){
+    flushPreces();
     block = document.createElement('section');
     block.className = 'litblock';
     currentHead = String(label || '').replace(/^\d+[.)-]?\s*/, '').replace(/\s*[:.-]?\s*$/, '').toUpperCase();
-    precesCount = 0;
     stanza = null;
     proseNode = null; proseClass = '';
     if(label){
@@ -210,15 +216,10 @@ function renderLiturgicalHourContent(text){
     addProse(match[2].trim(), 'reading-body');
     return true;
   }
-  function addPrecesLine(line){
-    // Mantém o texto integral e recupera apenas as intenções explicitamente
-    // iniciadas por uma nova invocação na própria fonte.
-    const intentions = line.split(/(?<=\.)\s+(?=(?:Pastor eterno|Senhor Jesus|Cristo(?: ressuscitado)?),)/);
-    intentions.forEach(intention => add(intention, precesCount++ === 0 ? 'preces-intro' : 'preces-intention'));
-  }
 
   lines.forEach(raw => {
     if(!raw.trim()){
+      if(currentHead==='PRECES')precesLines.push('');
       stanza = null;
       proseNode = null; proseClass = '';
       return;
@@ -256,10 +257,11 @@ function renderLiturgicalHourContent(text){
       return;
     }
     if(!block) startBlock('');
+    if(currentHead==='PRECES'){precesLines.push(line);return;}
 
     if(/^(?:Ant\.|Antífona)\s*\d*/i.test(line)){ stanza=null; add(line,'antiphon'); return; }
     if(/^(Salmo|Cântico|C[âa]ntico)\s+/i.test(line)){ stanza=null; currentHead='SALMODIA'; add(line,'psalm-title'); return; }
-    if(/^(V\.|R\.|℣\.|℟\.)\s*/.test(line)){ stanza=null; add(line, currentHead==='PRECES'?'preces-response':'response'); return; }
+    if(/^(V\.|R\.|℣\.|℟\.)\s*/.test(line)){ stanza=null; add(line, 'response'+(/^(?:R[./]|℟)/.test(line)?' liturgical-response':'')); return; }
     if(/^(Escolhe-se|Salmos? do|Salmos? e cântico|Como no (?:Comum|Ordinário|Próprio)|Do Comum|Quando esta memória|Antífona e salmos|Salmodia complementar)/i.test(line)){
       stanza=null; add(line,'rubric'); return;
     }
@@ -273,17 +275,13 @@ function renderLiturgicalHourContent(text){
       addStanzaLine(line);
       return;
     }
-    if(currentHead==='PRECES'){
-      if(/^(?:Pastor eterno|Senhor Jesus|Cristo(?: ressuscitado)?),/i.test(line))proseNode=null;
-      addProse(line,precesCount++===0?'preces-intro':'preces-intention');
-      return;
-    }
     if(/^(ORAÇÃO(?: SÁLMICA)?|PAI[- ]NOSSO|CONCLUSÃO)$/.test(currentHead)){
       addProse(line,'liturgical-prayer');
       return;
     }
     addProse(line);
   });
+  flushPreces();
   // O invólucro carrega o escopo visual canônico do Hoje na Família Servita.
   // Devolver somente innerHTML descartava essa classe e reativava o cartão antigo.
   return root.outerHTML;

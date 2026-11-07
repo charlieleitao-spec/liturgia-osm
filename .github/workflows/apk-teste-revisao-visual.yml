@@ -1,18 +1,16 @@
-name: APK de teste — revisão visual 4.9.132
+name: APK de teste — padrão litúrgico 4.9.132-padrao-teste2
 
 on:
   workflow_dispatch:
   pull_request:
     branches: [main]
-  push:
-    branches: ['fix/version-label-4.9.130']
 
 permissions:
   contents: read
   actions: read
 
 concurrency:
-  group: teste-revisao-visual-4.9.132
+  group: teste-padrao-liturgico-2026-11-07
   cancel-in-progress: false
 
 jobs:
@@ -25,6 +23,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Configurar Node.js 22
         uses: actions/setup-node@v5
@@ -45,6 +44,43 @@ jobs:
       - name: Conferir o código aprovado e as alterações de versão
         run: |
           node --check www/app.js
+
+      - name: Conferir conteúdo e os cinco formulários marianos
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+        run: |
+          sudo apt-get update && sudo apt-get install -y poppler-utils
+          npm test
+          npm install --no-save --package-lock=false --ignore-scripts playwright@1.56.1
+          node scripts/verify-marian-offices.mjs
+          node scripts/verify-unified-readers.mjs
+
+      - name: Guardar capturas dos formulários
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: padrao-liturgico-capturas-teste2
+          path: validation-layout/
+          if-no-files-found: warn
+
+      - name: Identificar o aplicativo como teste
+        run: |
+          python3 - <<'PYTEST'
+          from pathlib import Path
+          import json
+          version = '4.9.132-padrao-teste2'
+          p = Path('www/app.js')
+          s = p.read_text()
+          assert "const APP_VERSION = '4.9.132';" in s
+          p.write_text(s.replace("const APP_VERSION = '4.9.132';", "const APP_VERSION = '"+version+"';", 1))
+          p = Path('www/sw.js')
+          p.write_text(p.read_text().replace('liturgia-osm-v4.9.132-', 'liturgia-osm-v'+version+'-', 1))
+          p = Path('package.json')
+          data = json.loads(p.read_text()); data['version'] = version
+          p.write_text(json.dumps(data, ensure_ascii=False, indent=2)+'\n')
+          PYTEST
+          node scripts/audit-servita-base.mjs
+          node scripts/audit-navigation.mjs
 
       - name: Criar projeto Android
         run: npx cap add android
@@ -83,8 +119,8 @@ jobs:
 
       - name: Definir versão e segurança
         run: |
-          sed -i 's/versionCode [0-9][0-9]*/versionCode 41045/' android/app/build.gradle
-          sed -i 's/versionName "[^"]*"/versionName "4.9.132"/' android/app/build.gradle
+          sed -i 's/versionCode [0-9][0-9]*/versionCode 41047/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "4.9.132-padrao-teste2"/' android/app/build.gradle
           python3 - <<'PY'
           from pathlib import Path
           p = Path('android/app/build.gradle')
@@ -158,34 +194,45 @@ jobs:
           ./gradlew assembleRelease
 
       - name: Nomear APK
-        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.132.apk
+        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.132-padrao-teste2.apk
 
       - name: Conferir assinatura e todos os arquivos offline
         run: |
           APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
-          "$APKSIGNER" verify --verbose --print-certs Liturgia-OSM-4.9.132.apk > assinatura.txt
+          "$APKSIGNER" verify --verbose --print-certs Liturgia-OSM-4.9.132-padrao-teste2.apk > assinatura.txt
           grep -q 'certificate SHA-256 digest: 5b2b3319cc9f9bb61a14fb8a30e63044db225f7b930fca9568c82854f38b4fe0' assinatura.txt
           AAPT="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/aapt"
-          "$AAPT" dump badging Liturgia-OSM-4.9.132.apk > identidade.txt
-          grep -q "package: name='com.liturgia_osm.app' versionCode='41045' versionName='4.9.132'" identidade.txt
+          "$AAPT" dump badging Liturgia-OSM-4.9.132-padrao-teste2.apk > identidade.txt
+          grep -q "package: name='com.liturgia_osm.app' versionCode='41047' versionName='4.9.132-padrao-teste2'" identidade.txt
           python3 - <<'PYCHECK'
           from pathlib import Path
           import zipfile
-          with zipfile.ZipFile('Liturgia-OSM-4.9.132.apk') as apk:
+          with zipfile.ZipFile('Liturgia-OSM-4.9.132-padrao-teste2.apk') as apk:
               for p in Path('www').rglob('*'):
                   if p.is_file():
                       assert apk.read('assets/public/'+p.relative_to('www').as_posix())==p.read_bytes(), str(p)
-          print('Todos os arquivos web/offline preservados byte a byte no APK.')
+              app = apk.read('assets/public/app.js').decode('utf-8')
+              assert "const APP_VERSION = '4.9.132-padrao-teste2';" in app
+              assert 'OSMPdf.formatIntercessions' in app
+              shared = apk.read('assets/public/pdf-links.js').decode('utf-8')
+              assert 'function formatIntercessions' in shared
+              assert 'OSMPdf.formatIntercessions' in apk.read('assets/public/servite-3.js').decode('utf-8')
+              assert 'padrao2' in apk.read('assets/public/sw.js').decode('utf-8')
+          print('Todos os arquivos web/offline preservados byte a byte no APK; correção mariana e identidade de teste confirmadas.')
           PYCHECK
+
+      - name: Calcular resumo do APK
+        run: sha256sum Liturgia-OSM-4.9.132-padrao-teste2.apk > SHA256SUMS.txt
 
       - name: Guardar APK de teste
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.9.132
+          name: Liturgia-OSM-4.9.132-padrao-teste2
           path: |
-            Liturgia-OSM-4.9.132.apk
+            Liturgia-OSM-4.9.132-padrao-teste2.apk
             assinatura.txt
             identidade.txt
+            SHA256SUMS.txt
           if-no-files-found: error
 
 
