@@ -72,6 +72,27 @@ body.embedded-resource-mode,body.embedded-resource-mode #app,body.embedded-resou
 body.embedded-resource-mode .ambient{display:none}
 
 /* Ajustes de composição: evitar quebra dentro dos marcadores litúrgicos. */
+/* Preces: os mesmos papéis em Ofícios completos, Horas e orações. */
+#app #view .liturgical-intercession{margin:0 0 1.15em;break-inside:avoid}
+#view .card:has(.office-transcript[open]),#view .hub-card:has(.office-transcript[open]){background:var(--liturgical-paper)!important;color:var(--liturgical-ink)!important}
+.office-transcript-text{color:var(--liturgical-ink)}
+#app #view [class*="liturgical-intercession-"]{
+  font:inherit!important;line-height:inherit!important;text-align:left!important;
+  white-space:normal!important;word-break:normal;hyphens:none;overflow-wrap:break-word;
+  margin:0 0 .8em;
+}
+body #app #view .liturgical-intercession .liturgical-intercession-intention,
+body #app #view .liturgical-intercession .liturgical-intercession-petition{margin:0!important}
+body #app #view .liturgical-intercession .liturgical-intercession-petition{padding-left:.9em;margin-top:.25em!important}
+body #app #view .liturgical-intercession-refrain{font-weight:700!important;margin-block:1em!important}
+body #app #view .liturgical-intercession-rubric{color:var(--liturgical-red)!important}
+#app #view .liturgical-intercession-refrain .rubric,#app #view .liturgical-intercession-response .rubric{color:var(--liturgical-red)!important;font-weight:400!important}
+body #app #view .liturgical-intercession .liturgical-cue{white-space:normal!important}
+#dailyLiturgyOverlay .liturgical-response{font-weight:700!important;font-style:normal}
+#view .liturgical-response{font-weight:700!important}
+.prayer-paragraph .liturgical-turn{display:block}
+/* Mantém o sinal junto à palavra quando cabe; permite acomodar fontes grandes. */
+body.liturgical-page #app #view .liturgical-cue,.office-transcript-text .liturgical-cue{display:inline-block;max-width:100%;white-space:normal;vertical-align:baseline}
 .saturday-pdf-transcript .marian-office-intercession{margin:0 0 1.15em;break-inside:avoid}
 #view .saturday-pdf-transcript .marian-office-intention,
 #view .saturday-pdf-transcript .marian-office-petition,

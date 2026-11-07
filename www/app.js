@@ -182,7 +182,7 @@ function formatPrayerStanza(lines, vigilia, hymnMode, preces=false){
       if(speaker.test(line)||verse.test(line)||!turns.length)turns.push(line);
       else turns[turns.length-1]+=' '+line;
     }
-    return turns.map(line=>'<span class="liturgical-turn'+(preces&&/^R\./.test(line)?' liturgical-response':'')+'">'+prayerLineHtml(line,false)+'</span>').join('');
+    return turns.map(line=>'<span class="liturgical-turn'+(/^(?:R[./]|T\.|℟)/.test(line)?' liturgical-response':'')+'">'+prayerLineHtml(line,false)+'</span>').join('');
   }
   if(clean.some(verse.test.bind(verse)))return clean.map(line=>'<span class="liturgical-verse-line">'+prayerLineHtml(line,true)+'</span>').join('');
   return prayerLineHtml(clean.join(' ').replace(/\s+/g,' ').trim(),false);
@@ -240,12 +240,13 @@ function renderPrayer(text, options={}){
   };
   const flushStanza = () => {
     if(!stanza.length) return;
-    blocks.push('<p class="prayer-stanza'+(hymnMode==='hymn'?' liturgical-hymn-stanza':'')+'">'+formatPrayerStanza(stanza,vigilia,hymnMode,precesMode)+'</p>');
+    if(precesMode)blocks.push(OSMPdf.formatIntercessions(stanza.join('\n')));
+    else blocks.push('<p class="prayer-stanza'+(hymnMode==='hymn'?' liturgical-hymn-stanza':'')+'">'+formatPrayerStanza(stanza,vigilia,hymnMode,precesMode)+'</p>');
     stanza = [];
   };
   for(const rawLine of source.replace(/\r\n?/g,'\n').split('\n')){
     const line = rawLine.trim();
-    if(!line){ flushPsalmQuote(); flushStanza(); continue; }
+    if(!line){if(precesMode){stanza.push('');continue;}flushPsalmQuote();flushStanza();continue;}
     if(psalmQuote.length){
       if(/^[–—=]\s*|^(?:\d+ª\s*)?Ant\.|^Salmo\b/i.test(line)) flushPsalmQuote();
       else {psalmQuote.push(line);continue;}
@@ -941,7 +942,7 @@ function properMassTextHtml(title,text){
     return '<div class="liturgical-reading mass-hymn">'+stanzas+'</div>';
   }
   if(/^(?:Salmo|Cântico|Aclamação)/i.test(String(title||''))){
-    const stanzas=clean.split(/\n[ \t]*\n/).map(stanza=>'<p class="mass-psalm-stanza">'+stanza.split('\n').map(line=>'<span class="liturgical-verse-line">'+liturgicalLineHtml(line,true)+'</span>').join('')+'</p>').join('');
+    const stanzas=clean.split(/\n[ \t]*\n/).map(stanza=>'<p class="mass-psalm-stanza">'+stanza.split('\n').map(line=>'<span class="liturgical-verse-line'+(/^(?:R[./]|℟)\s*/.test(line.trim())?' liturgical-response':'')+'">'+liturgicalLineHtml(line,true)+'</span>').join('')+'</p>').join('');
     return '<div class="liturgical-reading mass-psalm">'+stanzas+'</div>';
   }
   const paragraphs=clean.replace(/\r\n?/g,'\n').split(/\n[ \t]*\n+/).map(block=>block.trim()).filter(Boolean);
@@ -1055,33 +1056,35 @@ function renderMarianOfficeTranscript(text, season){
   let paragraph=[];
   let mode='prose';
   let role='prose';
-  let intercession=[];
+  let sharedPreces=false;
+  let precesBuffer=[];
+  const flushPreces=()=>{
+    if(precesBuffer.length)blocks.push(OSMPdf.formatIntercessions(precesBuffer.join('\n'),'marian-office-'));
+    precesBuffer=[];sharedPreces=false;
+  };
   const heading=/^(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média|HINO|Salmodia|Preces|Oração|Cântico evangélico|Primeira leitura|Segunda leitura|Leitura alternativa(?:\s+[IVX]+)?)$/i;
   const response=/^(?:R\.|V\.)\s*/;
   const inlineHeading=/^(.*?\bp\.\s*\d+\.)\s+(Ofício das Leituras|Laudes|Vésperas|Hora Média)$/i;
-  const endIntercession=()=>{
-    if(!intercession.length)return;
-    blocks.push('<div class="marian-office-intercession">'+intercession.join('')+'</div>');
-    intercession=[];
-  };
   const flush=()=>{
     if(!paragraph.length)return;
     const joined=role==='hymn'?paragraph.map(line=>'<span class="liturgical-hymn-line">'+liturgicalLineHtml(line)+'</span>').join(''):liturgicalLineHtml(paragraph.join(' ').replace(/\s+/g,' '));
-    const html='<p class="marian-office-'+role+'">'+joined+'</p>';
-    if(role==='intention'||role==='petition')intercession.push(html);
-    else{endIntercession();blocks.push(html);}
+    const html='<p class="marian-office-'+role+(role==='response'&&/^(?:R[./]|℟)/.test(paragraph[0])?' liturgical-response':'')+'">'+joined+'</p>';
+    blocks.push(html);
     paragraph=[];
   };
   const start=(nextRole,line)=>{flush();role=nextRole;if(line)paragraph.push(line);};
   const addHeading=line=>{
-    flush();endIntercession();
+    flushPreces();
+    flush();
     const hour=/^(?:Invitatório|Ofício das Leituras|Laudes|Vésperas|Hora Média)$/i.test(line);
     blocks.push('<h4 class="prayer-text-heading'+(hour?' liturgical-hour-heading':'')+'">'+escapeHtml(line)+'</h4>');
     mode=/^HINO$/i.test(line)?'hymn':/^PRECES$/i.test(line)?'preces':/^(?:Primeira|Segunda|Leitura alternativa)/i.test(line)?'reading':'prose';
     role=mode==='hymn'?'hymn':'prose';
+    sharedPreces=mode==='preces';
   };
   for(const raw of lines){
     const line=raw.trim();
+    if(sharedPreces&&!heading.test(line)){precesBuffer.push(raw);continue;}
     if(!line){flush();continue;}
     if(heading.test(line)){
       addHeading(line);
@@ -1112,18 +1115,9 @@ function renderMarianOfficeTranscript(text, season){
     if(/^Ou:/.test(line)){
       start(line==='Ou:'?'rubric':'antiphon',line);continue;
     }
-    if(mode==='preces'&&role!=='rubric'){
-      if(/^[-–—]\s+/.test(line)){start('petition',line);continue;}
-      // A transcrição revista separa cada invocação por uma linha vazia.
-      // As continuações de uma petição permanecem no mesmo parágrafo.
-      if(!paragraph.length){
-        if(role==='petition'||role==='refrain'||role==='intention'){endIntercession();role='intention';}
-        else role='intro';
-      }
-    }else if(!paragraph.length){
+    if(!paragraph.length){
       role=mode==='hymn'?'hymn':'prose';
     }else if(mode==='reading'&&/^\s/.test(raw)&&role==='prose'){
-      // O recuo original distingue os parágrafos das leituras em prosa.
       flush();
     }
     paragraph.push(line);
@@ -1132,7 +1126,7 @@ function renderMarianOfficeTranscript(text, season){
       continue;
     }
   }
-  flush();endIntercession();
+  flushPreces();flush();
   return blocks.join('');
 }
 function marianSaturdayCommonForms(item){
@@ -1663,7 +1657,7 @@ window.addEventListener('popstate',event=>{
   }
   function readingCards(group,label){
     const items=(Array.isArray(group)?group:(group?[group]:[])).filter(item=>item&&(item.texto||item.referencia||item.refrao));
-    return items.map((item,index)=>`<article class="daily-reading"><b>${safe(item.titulo||label+(items.length>1?' '+(index+1):''))}</b>${item.referencia?`<em>${safe(item.referencia)}</em>`:''}${item.refrao?`<em>${safe(item.refrao)}</em>`:''}${readingBody(item.texto,label)}</article>`).join('');
+    return items.map((item,index)=>`<article class="daily-reading"><b>${safe(item.titulo||label+(items.length>1?' '+(index+1):''))}</b>${item.referencia?`<em>${safe(item.referencia)}</em>`:''}${item.refrao?`<p class="liturgical-response">${safe(item.refrao)}</p>`:''}${readingBody(item.texto,label)}</article>`).join('');
   }
   function section(title,body){return body?`<section class="daily-section"><h3>${safe(title)}</h3>${body}</section>`:''}
   function renderMass(payload,offline){
