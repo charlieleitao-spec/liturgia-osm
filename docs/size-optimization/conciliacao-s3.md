@@ -1,3 +1,45 @@
+# Estado consolidado — release 4.9.132 e código posterior
+
+Verificação em 6 de novembro de 2026 (Curitiba), após a correção do grau de 16/11. Referências conferidas diretamente no GitHub; não foi feita nova compilação nem instalação em aparelho.
+
+| Artefato | Identificação | Estado comprovado |
+| --- | --- | --- |
+| APK público 4.9.132 | tag `v4.9.132`, commit `b8944dd4c25d8a04342710557b5d9c59b4c92109`, Android 41045 | Publicado em 5/11; arquivo não substituído nesta consolidação |
+| Otimização do PR #150 | merge `3cf5be65cd9ed31030ae01ce0b77d80421349dd5`, 6/11 | Integrada à main depois da release; ainda não incorporada ao APK público |
+| Correção de 16/11 | commit `29931e7195bd08daf257782a772c968598fb68e7` | rank Festa no santoral e na Missa; base derivada do Hoje sincronizada; não incorporada ao APK público |
+
+## Identidade do download público
+
+- Arquivo: [Liturgia-OSM-4.9.132.apk](https://github.com/charlieleitao-spec/liturgia-osm/releases/download/v4.9.132/Liturgia-OSM-4.9.132.apk).
+- SHA-256 informado pelo GitHub: `0861c11cb97c7c16dcbd812a35ace5aae0b84928fb627cccd86995db6fd7f3fe`.
+- A existência de candidatos também identificados como 4.9.132 não os torna o mesmo binário da release. Usar origem e hash para identificar cada artefato.
+- Não se presume qual candidato está instalado no A56 apenas pelo número exibido. Esta revisão não solicita repetir testes físicos já aceitos.
+
+## Diferenças relevantes depois da release
+
+- 66 PDFs otimizados, remoção de oito fontes sem uso, metadados da busca e cache específico do PR #150.
+- A comparação líquida entre a tag e a main não mostra alteração em `www/app.js`, `www/app.css` ou `www/index.html`; não atribuir uma nova revisão desses arquivos à integração do PR.
+- Somente o grau textual de 16/11 foi corrigido nos dados: de Solenidade para Festa, coerente com `grau=festa` e com o Missal oficial. Datas, textos litúrgicos e PDFs foram preservados nessa correção.
+- [Comparação tag → main](https://github.com/charlieleitao-spec/liturgia-osm/compare/v4.9.132...main).
+
+## Evidências aproveitadas
+
+- [Release pública validada](https://github.com/charlieleitao-spec/liturgia-osm/actions/runs/42107057212).
+- [Revisão visual e regressões do candidato do PR #150](https://github.com/charlieleitao-spec/liturgia-osm/actions/runs/42202182766): aprovada; evidência de CI, não novo aceite físico.
+- [APK candidato do PR #150](https://github.com/charlieleitao-spec/liturgia-osm/actions/runs/42202182787): compilação aprovada, distinta do download público.
+- [Fonte comum na main após merge](https://github.com/charlieleitao-spec/liturgia-osm/actions/runs/42221816566): aprovada.
+- [Geração e sincronização da base derivada após correção de 16/11](https://github.com/charlieleitao-spec/liturgia-osm/actions/runs/42317232025): aprovada.
+
+## Encaminhamento
+
+Conciliação documental concluída. O PR #150 já foi integrado; não aguarda merge. As melhorias posteriores permanecem reunidas para eventual versão futura, sem substituir a tag 4.9.132 ou presumir autorização para compilar. Conferir o escopo e as verificações pertinentes antes de uma futura release.
+
+---
+
+## Histórico preservado — etapas anteriores à integração
+
+As expressões “atual”, “aguardar workflows” e “merge não realizado” abaixo descrevem o momento histórico de cada registro e não o estado consolidado acima.
+
 # Conciliação atual s3 — PR #150 com a release 4.9.132
 
 Verificação de 6 de novembro de 2026. Base atual: `b8944dd4c25d8a04342710557b5d9c59b4c92109` (release pública 4.9.132). Esta atualização incorpora essa base ao PR sem alterar a tag nem a release publicada.
