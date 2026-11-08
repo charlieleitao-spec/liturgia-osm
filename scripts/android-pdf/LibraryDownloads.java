@@ -60,6 +60,9 @@ public final class LibraryDownloads {
     public static synchronized void remove(Context context, String path) throws Exception {
         File f=file(context,entry(context,path));
         if(f.exists()&&!f.delete()) throw new IOException("Não foi possível remover o download");
+        // Remove any reader copy left by versions which opened packaged library PDFs.
+        File legacy=new File(new File(context.getCacheDir(),"osm-pdfs"),path.replace('/','_'));
+        if(legacy.exists()&&!legacy.delete()) throw new IOException("Não foi possível remover a cópia temporária");
     }
     public static synchronized void download(Context context, String path) throws Exception {
         JSONObject data=entry(context,path);

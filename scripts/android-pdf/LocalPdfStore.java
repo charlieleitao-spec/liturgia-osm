@@ -19,6 +19,16 @@ public final class LocalPdfStore {
         return context.getAssets().open("public/"+path);
     }
     public static PdfRenderer open(Context context, String path) throws IOException {
+        if (LibraryDownloads.isLibrary(path)) {
+            ParcelFileDescriptor descriptor=null;
+            try {
+                descriptor=ParcelFileDescriptor.open(LibraryDownloads.local(context,path),ParcelFileDescriptor.MODE_READ_ONLY);
+                return new PdfRenderer(descriptor);
+            } catch(Exception error) {
+                if(descriptor!=null)descriptor.close();
+                throw new IOException(error);
+            }
+        }
         if(path==null || !path.matches("data/pdfs/(missal|oficios|biblioteca)/[a-z0-9-]+\\.pdf"))
             throw new IOException("PDF local inválido");
         File directory=new File(context.getCacheDir(),"osm-pdfs");
