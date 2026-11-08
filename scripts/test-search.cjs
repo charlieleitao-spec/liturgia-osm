@@ -11,11 +11,12 @@ for(const [path,hash] of Object.entries(corpus.sources)){
 }
 const documents=await loadDocuments(corpus,async source=>JSON.parse(fs.readFileSync('www/data/'+source)));
 const index=createIndex(documents);
+const downloadable=new Set(JSON.parse(fs.readFileSync('www/data/biblioteca-servita-catalogo.json')).documents.map(d=>d.download_path));
 assert(index.search('coroa nossa senhora dores','Orações').some(x=>x.doc.title.includes('Coroa')));
 assert.deepEqual(index.search('misericórdia').map(x=>x.id),index.search('MISERICORDIA').map(x=>x.id));
 assert(index.search('2024').length>0);
 assert(index.search('Regra Vida Ordem Secular','Orações').length>0);
-assert(index.search('Deus','PDFs').every(x=>x.doc.page>0&&fs.existsSync('www/'+x.doc.source)));
+assert(index.search('Deus','PDFs').every(x=>x.doc.page>0&&(fs.existsSync('www/'+x.doc.source)||downloadable.has(x.doc.source))));
 assert(index.search('Deus','PDFs').length>0);
 assert.equal(index.search('zzzxxyysemresultado').length,0);
 assert.equal(index.search('   ').length,0);

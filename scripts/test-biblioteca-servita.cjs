@@ -1,40 +1,20 @@
-#!/usr/bin/env node
-// Verifica a integridade estrutural da Biblioteca Servita antes da publicação.
-const fs=require('node:fs');
-const path=require('node:path');
-const root=path.resolve(__dirname,'..');
-const web=fs.existsSync(path.join(root,'www','biblioteca-servita.html'))?path.join(root,'www'):root;
-const catalogPath=path.join(web,'data','biblioteca-servita-catalogo.json');
-const catalog=JSON.parse(fs.readFileSync(catalogPath,'utf8'));
-const ids=new Set();
-if(catalog.documents.length!==5)throw Error('Esperados cinco documentos');
-for(const d of catalog.documents){
-  if(!d.id||!d.title||ids.has(d.id))throw Error('Documento inválido ou duplicado');
-  ids.add(d.id);
-  if(d.offline_asset){
-    if(/^(https?:)?\/\//.test(d.offline_asset)||d.offline_asset.includes('..'))throw Error('Caminho offline inseguro: '+d.id);
-    const asset=path.resolve(web,d.offline_asset);
-    if(!asset.startsWith(web+path.sep)||!fs.existsSync(asset))throw Error('PDF offline ausente: '+d.id);
-    if(fs.readFileSync(asset).subarray(0,5).toString()!=='%PDF-')throw Error('Arquivo não é PDF: '+d.id);
-  }
+const assert=require('node:assert/strict'),fs=require('node:fs'),crypto=require('node:crypto'),vm=require('node:vm');
+const raw=fs.readFileSync('www/data/biblioteca-servita-catalogo.json','utf8'),catalog=JSON.parse(raw);
+assert.equal(raw,fs.readFileSync('data/biblioteca-servita-catalogo.json','utf8'));
+assert.equal(catalog.schema_version,2);assert.equal(catalog.documents.length,5);
+assert.equal(new Set(catalog.documents.map(d=>d.id)).size,5);
+const sw=fs.readFileSync('www/sw.js','utf8'),core=vm.runInNewContext(sw+'; CORE;', {self:{addEventListener(){}}});
+const paths=new Set();
+for(const doc of catalog.documents){
+ assert.match(doc.download_path,/^data\/pdfs\/biblioteca\/[a-z0-9-]+\.pdf$/);
+ assert.equal(doc.offline_asset,undefined);assert(!fs.existsSync('www/'+doc.download_path));
+ assert(!core.includes('./'+doc.download_path));assert(!sw.includes(doc.download_path));
+ assert.match(doc.download.url,new RegExp('^https://raw\\.githubusercontent\\.com/charlieleitao-spec/liturgia-osm/[a-f0-9]{40}/www/'+doc.download_path.replaceAll('.','\\.')+'$'));
+ const bytes=fs.readFileSync('docs/biblioteca-pdfs/'+doc.download_path.split('/').at(-1));
+ assert.equal(bytes.length,doc.download.bytes);assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),doc.download.sha256);assert.equal(bytes.subarray(0,5).toString(),'%PDF-');paths.add(doc.download_path);
 }
-const sw=fs.readFileSync(path.join(web,'sw.js'),'utf8');
-const vm=require('node:vm');
-const core=vm.runInNewContext(sw+'; CORE;', {self:{addEventListener(){}}});
-const volume='./data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf';
-for(const id of ['constituicoes-osm','regra-santo-agostinho','diretorio-geral']){
- if(catalog.documents.find(d=>d.id===id)?.offline_asset!==volume)throw Error('Volume de 2015 não integrado: '+id);
-}
-for(const d of catalog.documents){
- if(d.offline_asset&&!core.includes(d.offline_asset))throw Error('PDF fora do cache inicial: '+d.id);
-}
-if(fs.readFileSync(catalogPath,'utf8')!==fs.readFileSync(path.join(root,'data','biblioteca-servita-catalogo.json'),'utf8'))throw Error('Catálogos divergentes');
-for(const asset of ['biblioteca-servita.html','data/biblioteca-servita-catalogo.json']){
- if(!sw.includes(asset))throw Error('Falta no cache: '+asset);
-}
-console.log('Biblioteca Servita: catálogo, arquivos locais declarados e cache OK.');
-
-const startPages={'constituicoes-osm':43,'regra-santo-agostinho':25,'diretorio-geral':131};
-for(const [id,page] of Object.entries(startPages)){
- if(catalog.documents.find(d=>d.id===id)?.start_page!==page)throw Error('Página inicial incorreta: '+id);
-}
+assert.equal(paths.size,3);
+for(const [id,page] of Object.entries({'constituicoes-osm':43,'regra-santo-agostinho':25,'diretorio-geral':131}))assert.equal(catalog.documents.find(d=>d.id===id).start_page,page);
+assert.equal(new Set(catalog.documents.slice(0,3).map(d=>d.download_path)).size,1);
+assert(core.includes('./library-downloads.js'));
+console.log('Biblioteca: 5 entradas/3 downloads, SHA-256/tamanhos/origem fixada, páginas, espelho e exclusão do APK/CORE OK.');

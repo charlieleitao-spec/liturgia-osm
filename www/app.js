@@ -1270,7 +1270,7 @@ function viewGlobalSearch(){
   const doc=globalSearchIndex?.documents[globalSearchDocument];
   if(doc){
     return '<button class="action-btn" onclick="closeSearchDocument()">← Voltar aos resultados</button><h2>'+escapeHtml(doc.title)+'</h2><p>'+escapeHtml(doc.category+(doc.page?' · página '+doc.page:''))+'</p>'+
-      (doc.url?'<p><a class="action-btn" href="'+escapeHtml(doc.url)+'" target="_blank" rel="noopener">Abrir PDF · página '+doc.page+'</a></p>':'')+
+      (window.OSMLibrary?.valid(doc.source)?'<div data-library-path="'+escapeHtml(doc.source)+'" data-page="'+doc.page+'" data-title="'+escapeHtml(doc.title)+'"></div>':doc.url?'<p><a class="action-btn" href="'+escapeHtml(doc.url)+'" target="_blank" rel="noopener">Abrir PDF · página '+doc.page+'</a></p>':'')+
       '<div class="liturgical-reading"><div class="prayer-block search-document">'+escapeHtml(doc.text)+'</div></div>';
   }
   return '<h2>Buscar no Liturgia OSM</h2><label for="globalSearchInput">Termo, oração ou edição</label><input id="globalSearchInput" class="search-input" type="search" placeholder="Ex.: Coroa, misericórdia, 2024…" value="'+escapeHtml(globalSearchQuery)+'" oninput="updateGlobalSearch(this)"><label for="globalSearchCategory">Pesquisar em</label><select id="globalSearchCategory" class="search-input" onchange="globalSearchCategory=this.value;globalSearchLimit=30;renderGlobalSearchResults()">'+['','Orações','Missas','Ofícios','Santoral','PDFs'].map(category=>'<option value="'+category+'" '+(category===globalSearchCategory?'selected':'')+'>'+(category||'Todos os conteúdos')+'</option>').join('')+'</select><div id="globalSearchResults"></div>';

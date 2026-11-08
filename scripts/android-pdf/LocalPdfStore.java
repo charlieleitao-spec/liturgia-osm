@@ -8,8 +8,16 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 
-/** Opens only packaged PDFs. No HTTP, storage permission or external viewer. */
+/** Opens packaged PDFs or verified persistent library downloads. */
 public final class LocalPdfStore {
+    public static InputStream input(Context context, String path) throws IOException {
+        if (LibraryDownloads.isLibrary(path)) {
+            try {return new java.io.FileInputStream(LibraryDownloads.local(context,path));}
+            catch(Exception error) {throw new IOException(error);}
+        }
+        if(path==null || !path.matches("data/pdfs/(missal|oficios)/[a-z0-9-]+\\.pdf")) throw new IOException("PDF local inválido");
+        return context.getAssets().open("public/"+path);
+    }
     public static PdfRenderer open(Context context, String path) throws IOException {
         if(path==null || !path.matches("data/pdfs/(missal|oficios|biblioteca)/[a-z0-9-]+\\.pdf"))
             throw new IOException("PDF local inválido");
@@ -18,7 +26,7 @@ public final class LocalPdfStore {
         File temporary=File.createTempFile("pdf-", ".tmp", directory);
         File file=new File(directory,path.replace('/', '_'));
         try {
-            try(InputStream input=context.getAssets().open("public/"+path);
+            try(InputStream input=input(context,path);
                 FileOutputStream output=new FileOutputStream(temporary)){
                 byte[] buffer=new byte[16384];int read;
                 while((read=input.read(buffer))!=-1)output.write(buffer,0,read);

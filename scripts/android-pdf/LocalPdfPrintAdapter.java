@@ -30,7 +30,7 @@ public final class LocalPdfPrintAdapter extends PrintDocumentAdapter {
     public static void writeOriginal(Context context,String path,OutputStream output,CancellationSignal cancellation) throws IOException {
         if(path==null||!path.matches("data/pdfs/(missal|oficios|biblioteca)/[a-z0-9-]+\\.pdf"))throw new IOException("PDF local inválido");
         cancellation.throwIfCanceled();
-        try(InputStream input=context.getAssets().open("public/"+path)){
+        try(InputStream input=LocalPdfStore.input(context,path)){
             byte[] buffer=new byte[16384];int read;
             while((read=input.read(buffer))!=-1){cancellation.throwIfCanceled();output.write(buffer,0,read);}
         }

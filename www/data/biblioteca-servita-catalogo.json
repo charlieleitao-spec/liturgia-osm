@@ -1,48 +1,73 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "title": "Biblioteca Servita",
   "language": "pt-BR",
-  "status": "offline",
+  "status": "on-demand",
   "documents": [
     {
       "id": "constituicoes-osm",
       "title": "Constituições da Ordem dos Servos de Maria",
       "edition": "Cúria Geral OSM, 2015",
       "source_group": "volume-osm-2015",
-      "offline_asset": "./data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf",
-      "start_page": 43
+      "start_page": 43,
+      "download_path": "data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf",
+      "download": {
+        "url": "https://raw.githubusercontent.com/charlieleitao-spec/liturgia-osm/3a90e17f8e4faa4055f7b01201c5df71cc727265/www/data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf",
+        "bytes": 967679,
+        "sha256": "f70a1e17c4d6eae3fddcde4dc20e1e723c716b696cbe0b6785dcc15bfbb7eef5"
+      }
     },
     {
       "id": "regra-santo-agostinho",
       "title": "Regra de Santo Agostinho",
       "edition": "Cúria Geral OSM, 2015",
       "source_group": "volume-osm-2015",
-      "offline_asset": "./data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf",
-      "start_page": 25
+      "start_page": 25,
+      "download_path": "data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf",
+      "download": {
+        "url": "https://raw.githubusercontent.com/charlieleitao-spec/liturgia-osm/3a90e17f8e4faa4055f7b01201c5df71cc727265/www/data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf",
+        "bytes": 967679,
+        "sha256": "f70a1e17c4d6eae3fddcde4dc20e1e723c716b696cbe0b6785dcc15bfbb7eef5"
+      }
     },
     {
       "id": "diretorio-geral",
       "title": "Diretório Geral",
       "edition": "Cúria Geral OSM, 2015",
       "source_group": "volume-osm-2015",
-      "offline_asset": "./data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf",
-      "start_page": 131
+      "start_page": 131,
+      "download_path": "data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf",
+      "download": {
+        "url": "https://raw.githubusercontent.com/charlieleitao-spec/liturgia-osm/3a90e17f8e4faa4055f7b01201c5df71cc727265/www/data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf",
+        "bytes": 967679,
+        "sha256": "f70a1e17c4d6eae3fddcde4dc20e1e723c716b696cbe0b6785dcc15bfbb7eef5"
+      }
     },
     {
       "id": "ratio-institutionis",
       "title": "Ratio Institutionis OSM",
       "source_url": "https://servidimaria.net/sitoosm/po/formacao/ratio/texto.pdf",
-      "offline_asset": "./data/pdfs/biblioteca/ratio-institutionis-osm-2015.pdf",
       "edition": "Cúria Geral OSM, 2015",
-      "start_page": 1
+      "start_page": 1,
+      "download_path": "data/pdfs/biblioteca/ratio-institutionis-osm-2015.pdf",
+      "download": {
+        "url": "https://raw.githubusercontent.com/charlieleitao-spec/liturgia-osm/3a90e17f8e4faa4055f7b01201c5df71cc727265/www/data/pdfs/biblioteca/ratio-institutionis-osm-2015.pdf",
+        "bytes": 1755275,
+        "sha256": "21f4575b31c68f8ff160405342319f413f14611ec5f2ecb40b6984255911c72a"
+      }
     },
     {
       "id": "regra-ordem-secular",
       "title": "Regra de Vida da Ordem Secular dos Servos de Maria",
       "source_url": "https://servidimaria.net/sitoosm/po/regrossm.pdf",
-      "offline_asset": "./data/pdfs/biblioteca/regra-vida-ordem-secular-1995.pdf",
       "edition": "Roma, 1995",
-      "start_page": 1
+      "start_page": 1,
+      "download_path": "data/pdfs/biblioteca/regra-vida-ordem-secular-1995.pdf",
+      "download": {
+        "url": "https://raw.githubusercontent.com/charlieleitao-spec/liturgia-osm/3a90e17f8e4faa4055f7b01201c5df71cc727265/www/data/pdfs/biblioteca/regra-vida-ordem-secular-1995.pdf",
+        "bytes": 222594,
+        "sha256": "53285278cd169e3ad91c56c4c1b1811bf7f9530d292497f1b4afcbf24c820418"
+      }
     }
   ]
 }
