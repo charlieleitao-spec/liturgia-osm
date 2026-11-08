@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   build:
-    if: github.event_name != 'pull_request' || !startsWith(github.head_ref, 'release/')
+    if: github.event_name != 'pull_request' || (!startsWith(github.head_ref, 'release/') && !startsWith(github.head_ref, 'optimize/4.9.134-'))
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -235,5 +235,6 @@ jobs:
             identidade.txt
             SHA256SUMS.txt
           if-no-files-found: error
+
 
 
