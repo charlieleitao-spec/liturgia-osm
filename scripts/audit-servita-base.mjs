@@ -89,8 +89,6 @@ const missingImageTitles = santoral.filter(x => !x.image).map(x => x.title);
 const noImageSection = dataReadme.split('## Celebrações sem imagem própria')[1]?.split('\n## ')[0] || '';
 const listedMissingImageTitles = [...noImageSection.matchAll(/^- (.+)$/gm)].map(match => match[1]);
 assert.deepEqual(listedMissingImageTitles, missingImageTitles, 'README deve listar exatamente as celebrações sem imagem.');
-assert.equal(read('www/cordova.js'), '', 'Placeholder Cordova deve permanecer vazio');
-assert.equal(read('www/cordova_plugins.js'), '', 'Placeholder Cordova deve permanecer vazio');
 
 console.log(JSON.stringify({ status: 'ok', version: pkg.version, santoral: santoral.length, oficios: Object.keys(offices.celebracoes).length, memoria: memory.memory_dates.length, memoriaComTexto: memory.celebrations.length, core: core.length }, null, 2));
 

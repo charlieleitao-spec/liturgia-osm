@@ -1,0 +1,23 @@
+{
+  "status": "proposal; requires user confirmation before implementation",
+  "files": [
+    {
+      "filename": "constituicoes-regra-diretorio-osm-2015.pdf",
+      "url": "https://raw.githubusercontent.com/charlieleitao-spec/liturgia-osm/3a90e17f8e4faa4055f7b01201c5df71cc727265/www/data/pdfs/biblioteca/constituicoes-regra-diretorio-osm-2015.pdf",
+      "bytes": 967679,
+      "sha256": "f70a1e17c4d6eae3fddcde4dc20e1e723c716b696cbe0b6785dcc15bfbb7eef5"
+    },
+    {
+      "filename": "ratio-institutionis-osm-2015.pdf",
+      "url": "https://raw.githubusercontent.com/charlieleitao-spec/liturgia-osm/3a90e17f8e4faa4055f7b01201c5df71cc727265/www/data/pdfs/biblioteca/ratio-institutionis-osm-2015.pdf",
+      "bytes": 1755275,
+      "sha256": "21f4575b31c68f8ff160405342319f413f14611ec5f2ecb40b6984255911c72a"
+    },
+    {
+      "filename": "regra-vida-ordem-secular-1995.pdf",
+      "url": "https://raw.githubusercontent.com/charlieleitao-spec/liturgia-osm/3a90e17f8e4faa4055f7b01201c5df71cc727265/www/data/pdfs/biblioteca/regra-vida-ordem-secular-1995.pdf",
+      "bytes": 222594,
+      "sha256": "53285278cd169e3ad91c56c4c1b1811bf7f9530d292497f1b4afcbf24c820418"
+    }
+  ]
+}
