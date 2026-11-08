@@ -66,13 +66,23 @@ for path in sorted((DATA / 'devocoes').glob('*.json')):
         add(title, 'Orações', value, str(path.relative_to(DATA)), ref=[])
 
 # Uma entrada por página mantém a referência exata, inclusive entre edições.
-for path in sorted((DATA / 'pdfs').rglob('*.pdf')):
+pdfs = {p.relative_to(ROOT / 'www').as_posix(): p for p in (DATA / 'pdfs').rglob('*.pdf')}
+# Downloadable books remain searchable before download; originals stay outside www/APK.
+catalog = read('biblioteca-servita-catalogo.json')
+for document in catalog['documents']:
+    if document.get('download_path'):
+        relative = document['download_path']
+        path = ROOT / 'docs/biblioteca-pdfs' / Path(relative).name
+        data = path.read_bytes()
+        assert hashlib.sha256(data).hexdigest() == document['download']['sha256']
+        assert len(data) == document['download']['bytes']
+        pdfs[relative] = path
+for relative, path in sorted(pdfs.items()):
     output = subprocess.run(['pdftotext', '-layout', str(path), '-'], check=True, capture_output=True).stdout.decode('utf-8')
     for page, body in enumerate(output.split('\f'), 1):
         if not body.strip():
             continue
         heading = ' '.join(body.strip().splitlines()[0].split())
-        relative = path.relative_to(ROOT / 'www').as_posix()
         add(f'{heading} · {path.stem}', 'PDFs', body, relative, page=page, url=f'./{relative}#page={page}')
 
 inputs = sorted(p for p in DATA.rglob('*') if p.suffix in ('.json', '.pdf') and p.name != 'search-index.json')

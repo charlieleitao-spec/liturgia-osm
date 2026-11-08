@@ -1,7 +1,7 @@
 name: Gate otimização offline
 on:
   pull_request:
-    branches: ['optimize/**']
+    branches: ['main', 'release/**', 'optimize/**']
 permissions:
   contents: read
 jobs:
@@ -16,9 +16,14 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: npm run search:build
+      - run: git diff --exit-code -- www/data/search-index.json
       - run: npm test
       - run: node scripts/verify-search-equivalence.cjs
+      - run: node scripts/benchmark-search-4.9.134.cjs
+      - run: npx cap add android && npx cap sync android && node scripts/verify-cleanup.mjs --android
       - uses: actions/upload-artifact@v5
         with:
           name: equivalencia-busca
-          path: validation-results/search-equivalence.json
+          path: validation-results/

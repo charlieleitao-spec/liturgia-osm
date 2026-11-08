@@ -12,4 +12,6 @@ with zipfile.ZipFile(before) as old,zipfile.ZipFile(after) as new:
     corpus=json.loads(new.read(prefix+'data/search-index.json'))
     assert len(corpus['documents'])==708
     result={'before_bytes':before.stat().st_size,'stage1_bytes':stage1.stat().st_size,'after_bytes':after.stat().st_size,'saved_since_base':before.stat().st_size-after.stat().st_size,'saved_since_stage1':stage1.stat().st_size-after.stat().st_size,'sha256':hashlib.sha256(after.read_bytes()).hexdigest(),'canonical_data_and_liturgical_pdfs_unchanged':True,'device_tests':'pending'}
+stage2=Path('baseline/stage2/Liturgia-OSM-4.9.134.apk')
+if stage2.exists():result.update(stage2_bytes=stage2.stat().st_size,saved_since_stage2=stage2.stat().st_size-after.stat().st_size)
 Path('validation-results').mkdir(exist_ok=True);Path('validation-results/downloads-size.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))
