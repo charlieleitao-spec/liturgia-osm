@@ -1,0 +1,16 @@
+{
+  "before_bytes": 10154751,
+  "stage1_bytes": 10146310,
+  "after_bytes": 7254968,
+  "saved_since_base": 2899783,
+  "saved_since_stage1": 2891342,
+  "sha256": "186f9fb1249d6df6f35ece0e77dc9645df591ef8266a9a1048c1c92d6f6f9e2e",
+  "canonical_data_and_liturgical_pdfs_unchanged": true,
+  "device_tests": "pending",
+  "stage2_bytes": 7254968,
+  "saved_since_stage2": 0,
+  "run_id": 42445454377,
+  "versionName": "4.9.134",
+  "versionCode": 41051,
+  "certificate_sha256": "5b2b3319cc9f9bb61a14fb8a30e63044db225f7b930fca9568c82854f38b4fe0"
+}
