@@ -1,0 +1,146 @@
+{
+  "environment": {
+    "runtime": "v24.22.1",
+    "platform": "linux",
+    "note": "Local/CI CPU; not A56. Same implementation, cold corpus without IndexedDB; times are informational."
+  },
+  "before": {
+    "bytes": 1567522,
+    "documents": 708,
+    "load_ms": 8.589706000000007,
+    "index_ms": 118.194145,
+    "queries": [
+      {
+        "term": "misericórdia",
+        "results": 128,
+        "median_ms": 6.405265999999983,
+        "p95_ms": 8.449855000000014
+      },
+      {
+        "term": "coroa nossa senhora dores",
+        "results": 10,
+        "median_ms": 2.742791000000011,
+        "p95_ms": 3.368341999999984
+      },
+      {
+        "term": "Regra Vida Ordem Secular",
+        "results": 27,
+        "median_ms": 1.8172170000000278,
+        "p95_ms": 2.166672999999946
+      },
+      {
+        "term": "2024",
+        "results": 1,
+        "median_ms": 0.4277839999999742,
+        "p95_ms": 0.7594340000000557
+      },
+      {
+        "term": "Deus",
+        "results": 508,
+        "median_ms": 14.423451,
+        "p95_ms": 16.14438199999995
+      },
+      {
+        "term": "Paulino",
+        "results": 1,
+        "median_ms": 0.23547400000006746,
+        "p95_ms": 0.4959569999998621
+      },
+      {
+        "term": "Stabat Mater",
+        "results": 2,
+        "median_ms": 0.46859600000016144,
+        "p95_ms": 0.6606749999998556
+      },
+      {
+        "term": "Maria",
+        "results": 510,
+        "median_ms": 14.326434999999947,
+        "p95_ms": 15.714635000000044
+      },
+      {
+        "term": "ressurreição",
+        "results": 49,
+        "median_ms": 3.3986680000000433,
+        "p95_ms": 4.02390000000014
+      },
+      {
+        "term": "servos",
+        "results": 361,
+        "median_ms": 10.761826999999812,
+        "p95_ms": 13.819371000000046
+      }
+    ]
+  },
+  "after": {
+    "bytes": 1567142,
+    "documents": 708,
+    "load_ms": 4.711556000000201,
+    "index_ms": 93.3353189999998,
+    "queries": [
+      {
+        "term": "misericórdia",
+        "results": 128,
+        "median_ms": 6.040917999999692,
+        "p95_ms": 8.46693200000027
+      },
+      {
+        "term": "coroa nossa senhora dores",
+        "results": 10,
+        "median_ms": 2.1713700000000244,
+        "p95_ms": 2.764212000000043
+      },
+      {
+        "term": "Regra Vida Ordem Secular",
+        "results": 27,
+        "median_ms": 1.343442999999752,
+        "p95_ms": 3.066889000000174
+      },
+      {
+        "term": "2024",
+        "results": 1,
+        "median_ms": 0.20774299999993673,
+        "p95_ms": 0.30445800000006784
+      },
+      {
+        "term": "Deus",
+        "results": 508,
+        "median_ms": 14.254887000000053,
+        "p95_ms": 17.576450000000023
+      },
+      {
+        "term": "Paulino",
+        "results": 1,
+        "median_ms": 0.18026199999985693,
+        "p95_ms": 0.6444199999996272
+      },
+      {
+        "term": "Stabat Mater",
+        "results": 2,
+        "median_ms": 0.43742900000006557,
+        "p95_ms": 0.6858520000000681
+      },
+      {
+        "term": "Maria",
+        "results": 510,
+        "median_ms": 13.338697000000138,
+        "p95_ms": 17.71570900000006
+      },
+      {
+        "term": "ressurreição",
+        "results": 49,
+        "median_ms": 3.2509759999998096,
+        "p95_ms": 4.247587000000294
+      },
+      {
+        "term": "servos",
+        "results": 361,
+        "median_ms": 10.497278999999253,
+        "p95_ms": 12.89805299999989
+      }
+    ]
+  },
+  "exact_equivalence": "10 queries × 6 filters; IDs, order, scores, full text and snippets identical",
+  "json_records_with_text": 0,
+  "pdf_text_bytes": 1376974
+}

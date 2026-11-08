@@ -50,7 +50,7 @@
       const button=root.document.createElement('button');button.className='action-btn';button.textContent=ready?'Abrir PDF':'Baixar para uso offline';container.append(button);
       button.onclick=async()=>{
         button.disabled=true;
-        try{if(ready)await open(path,page,title);else{info.textContent='Baixando e verificando SHA-256…';await download(path);await refresh();}}
+        try{if(ready)await open(path,page,title);else{info.textContent='Baixando e verificando o arquivo…';await download(path);await refresh();}}
         catch(error){info.textContent='Não foi possível concluir. Verifique a conexão ou o espaço disponível e tente novamente.';console.error('[Biblioteca]',error);}
         finally{button.disabled=false;}
       };
