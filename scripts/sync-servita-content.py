@@ -29,7 +29,7 @@ def sha256(data):
 def source_data(source):
     raw = (source / "www" / CATALOG).read_bytes()
     catalog = json.loads(raw)
-    if catalog.get("schema_version") != 1 or catalog.get("language") != "pt-BR":
+    if catalog.get("schema_version") not in (1, 2) or catalog.get("language") != "pt-BR":
         raise ValueError("Catálogo: esquema ou idioma incompatível")
     documents = catalog.get("documents")
     if not isinstance(documents, list) or not documents:
@@ -44,7 +44,7 @@ def source_data(source):
         ids.add(ident)
         if not isinstance(doc.get("title"), str) or not doc["title"].strip():
             raise ValueError("Título ausente: " + ident)
-        asset = doc.get("offline_asset", "")
+        asset = doc.get("offline_asset") or "./" + doc.get("download_path", "")
         if not re.fullmatch(r"\./data/pdfs/biblioteca/[a-z0-9-]+\.pdf", asset):
             raise ValueError("Caminho de PDF inválido: " + ident)
         if type(doc.get("start_page")) is not int or doc["start_page"] < 1:
@@ -53,7 +53,16 @@ def source_data(source):
         file = (source / "www" / relative).resolve()
         if not file.is_relative_to((source / "www").resolve()):
             raise ValueError("PDF fora da fonte")
+        if catalog.get("schema_version") == 2:
+            file = source / "docs/biblioteca-pdfs" / Path(relative).name
         data = file.read_bytes()
+        if catalog.get("schema_version") == 2:
+            download = doc["download"]
+            expected_url = "https://raw.githubusercontent.com/" + REPOSITORY + "/"
+            if not re.fullmatch(re.escape(expected_url) + r"[a-f0-9]{40}/www/" + re.escape(relative), download["url"]):
+                raise ValueError("Origem de download inválida")
+            if download["sha256"] != sha256(data) or download["bytes"] != len(data):
+                raise ValueError("Integridade do download inválida")
         if not data.startswith(b"%PDF-"):
             raise ValueError("Arquivo não é PDF: " + relative)
         assets[relative] = {"sha256": sha256(data), "size": len(data)}
@@ -87,6 +96,13 @@ def planned_files(source, target, profile, commit=None):
             data = file.read_bytes()
             if len(data) != metadata["size"] or sha256(data) != metadata["sha256"]:
                 raise ValueError("PDF local divergente; nenhum catálogo foi alterado: " + relative)
+    if catalog.get("schema_version") == 2:
+        catalog["schema_version"] = 1
+        catalog["status"] = "offline"
+        for doc in catalog["documents"]:
+            doc["offline_asset"] = "./" + doc.pop("download_path")
+            doc.pop("download")
+        raw = json_bytes(catalog)
     lock = {
         "schema_version": 1,
         "repository": REPOSITORY,

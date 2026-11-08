@@ -147,6 +147,7 @@
     opening=true;
     try {
       const plugin=cap.Plugins?.LocalPdf||cap.registerPlugin('LocalPdf');
+      if(root.OSMLibrary?.valid(pdf.path)){await root.OSMLibrary.openOrOffer(pdf.path,pdf.page,'Biblioteca Servita');return;}
       await plugin.open({...pdf,title:root.document.querySelector('.proper-mass-reader .hub-card-title, #view h2')?.textContent||'PDF oficial OSM'});
     }catch(error){
       console.error('[PDF local]',error);

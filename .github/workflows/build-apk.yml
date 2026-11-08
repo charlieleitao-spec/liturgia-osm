@@ -3,7 +3,7 @@ name: Build APK Liturgia OSM 4.9.117 — leitor PDF e recursos completos
 on:
   workflow_dispatch:
   pull_request:
-    branches: ['optimize/**', 'fix/114-pdfs-offline']
+    branches: ['optimize/**', '!optimize/4.9.134-*', 'fix/114-pdfs-offline']
 
 permissions:
   contents: read
