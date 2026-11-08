@@ -3,6 +3,7 @@ name: APK teste 4.9.134 — etapa 3
 on:
   push:
     branches: ['optimize/4.9.134-3-search']
+    paths: ['www/**', 'scripts/**', 'package*.json', 'capacitor.config.json', '.github/workflows/**', 'icone-android-liturgia-osm.zip', 'docs/biblioteca-pdfs/**']
 
 permissions:
   contents: read
@@ -10,7 +11,7 @@ permissions:
 
 concurrency:
   group: test-4.9.134-search
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -219,7 +220,7 @@ jobs:
           gh api "repos/charlieleitao-spec/liturgia-osm/actions/artifacts/$ARTIFACT_ID/zip" > baseline/stage1.zip
           mkdir -p baseline/stage1
           unzip -q baseline/stage1.zip -d baseline/stage1
-          STAGE2_ARTIFACT_ID=$(gh api repos/charlieleitao-spec/liturgia-osm/actions/runs/42444728302/artifacts --jq '.artifacts[0].id')
+          STAGE2_ARTIFACT_ID=$(gh api repos/charlieleitao-spec/liturgia-osm/actions/runs/42445182473/artifacts --jq '.artifacts[0].id')
           gh api "repos/charlieleitao-spec/liturgia-osm/actions/artifacts/$STAGE2_ARTIFACT_ID/zip" > baseline/stage2.zip
           mkdir -p baseline/stage2
           unzip -q baseline/stage2.zip -d baseline/stage2
