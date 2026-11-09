@@ -9,6 +9,25 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
  run("openDevo('stabat')");w.scrollTo(0,680);w.OSMPersonalReader.saveCurrent();run("setTab('biblioteca')");w.OSMPersonalReader.open();[...w.document.querySelectorAll('#personalBody button')].find(b=>b.textContent.startsWith('Continuar:')).click();assert.ok(frames.size>0);run("openDevo('via_matris')");flush();assert.equal(run('state.devo'),'via_matris');assert.equal(w.scrollY,0);w.scrollTo(0,210);w.OSMPersonalReader.saveCurrent();assert.equal(w.OSMPersonalData.load(w.localStorage).last.route.key,'via_matris');
  run("openDevo('stabat')");[...w.document.querySelectorAll('.personal-reading-tools button')].find(b=>b.textContent==='Retomar').click();flush();assert.equal(w.scrollY,680);
  console.log('Navegação: retomada explícita funciona, mas uma posição antiga não move a página aberta depois.');
+ // Busca das notas pelo texto inteiro, sem acentos; filtros não regravam os dados.
+ const D=w.OSMPersonalData,storage=w.localStorage,snapshot=storage.getItem(D.KEY),now=w.Date.now;
+ w.Date.now=()=>100;D.saveNote(storage,{type:'prayer',key:'stabat'},'Stabat Mater','Compaixão '+'.'.repeat(200)+' perseverança');
+ w.Date.now=()=>200;D.saveNote(storage,{type:'prayer',key:'via_matris'},'À escuta de Maria','Serviço e oração <img src=x onerror=alert(1)>');
+ w.Date.now=()=>300;D.saveNote(storage,{type:'prayer',key:'deleted'},'Nota excluída','perseverança',true);w.Date.now=now;
+ w.OSMPersonalReader.open();const noteSnapshot=storage.getItem(D.KEY),doc=w.document;
+ const titles=()=>[...doc.querySelectorAll('#personalNoteResults h4')].map(n=>n.textContent);
+ const search=q=>{const input=doc.getElementById('personalNoteSearch');input.value=q;input.dispatchEvent(new w.Event('input'));};
+ const order=value=>{const select=doc.getElementById('personalNoteOrder');select.value=value;select.dispatchEvent(new w.Event('change'));};
+ assert.deepEqual(titles(),['À escuta de Maria','Stabat Mater']);order('oldest');assert.deepEqual(titles(),['Stabat Mater','À escuta de Maria']);order('title');assert.deepEqual(titles(),['À escuta de Maria','Stabat Mater']);
+ search('STABAT perseveranca');assert.deepEqual(titles(),['Stabat Mater']);assert.equal(doc.getElementById('personalNoteCount').textContent,'1 de 2 anotações');
+ search('a ESCUTA oracao');assert.deepEqual(titles(),['À escuta de Maria']);assert.equal(doc.querySelector('#personalNoteResults img'),null);
+ search('inexistente');assert.deepEqual(titles(),[]);assert.match(doc.getElementById('personalNoteResults').textContent,/Nenhuma anotação/);
+ [...doc.querySelectorAll('#personalBody button')].find(b=>b.textContent==='Limpar busca').click();assert.deepEqual(titles(),['À escuta de Maria','Stabat Mater']);assert.equal(doc.activeElement.id,'personalNoteSearch');assert.equal(storage.getItem(D.KEY),noteSnapshot);
+ search('perseveranca');doc.querySelector('#personalNoteResults button').click();assert.match(doc.getElementById('personalNoteText').value,/perseverança$/);
+ doc.getElementById('personalNoteText').value+=' e confiança';[...doc.querySelectorAll('#personalBody button')].find(b=>b.textContent==='Voltar às anotações').click();assert.equal(doc.getElementById('personalNoteSearch').value,'perseveranca');assert.equal(doc.getElementById('personalNoteOrder').value,'title');assert.equal(D.load(storage).notes.length,3);
+ [...doc.querySelectorAll('#personalNoteResults button')].find(b=>b.textContent==='Abrir leitura').click();flush();assert.equal(run('state.devo'),'stabat');assert.ok(!doc.getElementById('personalOverlay').classList.contains('open'));
+ storage.setItem(D.KEY,snapshot);w.OSMPersonalReader.open();assert.equal(doc.getElementById('personalNoteSearch'),null);w.OSMPersonalReader.close();
+ console.log('Anotações: busca por título/conteúdo completo sem acentos, ordenação, exclusões, segurança de texto, edição e abertura filtradas; dados preservados.');
  // O menu de fonte não herda nem recolhe a navegação enquanto está aberto.
  w.document.body.classList.add('scroll-controls-hidden');run('openMainMenu()');assert.ok(!w.document.body.classList.contains('scroll-controls-hidden'));w.document.dispatchEvent(new w.WheelEvent('wheel',{deltaY:20,bubbles:true}));assert.ok(!w.document.body.classList.contains('scroll-controls-hidden'));run('adjustFont(.08)');assert.equal(w.OSMReaderScale.read(w.localStorage),1.08);run('closeMainMenu()');
  const frame=w.document.getElementById('serviteFrame');let child;

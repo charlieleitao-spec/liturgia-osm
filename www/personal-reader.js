@@ -6,6 +6,8 @@
  const $=id=>document.getElementById(id);
  const key=r=>D.routeKey(r);
  const text=node=>(node?.textContent||'').replace(/\s+/g,' ').trim();
+ let noteQuery='',noteOrder='recent';
+ const searchable=value=>value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR');
  function data(){return D.load(localStorage);}
  function notice(message,error=false){const el=$('personalStatus');el.textContent=message;el.setAttribute('role',error?'alert':'status');}
  function safe(action){try{return action();}catch(error){notice(error.message||'Não foi possível acessar os dados pessoais.',true);return null;}}
@@ -102,7 +104,7 @@
   if(home){const p=safe(()=>data().last);if(p){home.querySelector('.personal-access-recent')?.nextElementSibling?.remove();home.querySelector('.personal-access-recent')?.remove();home.append(element('h3','Continuar de onde parei'),button(p.title,()=>resume(p)));}}
  }
  function refreshPreferences(){readerScale=Number(localStorage.getItem('osmReaderScale')||1);lightMode=localStorage.getItem('osmTheme')!=='dark';localStorage.setItem('santoral-osm-theme',lightMode?'light':'dark');localStorage.setItem('santoral-osm-fontsize',String(readerScale*16));applyPreferences();try{const doc=$('serviteFrame').contentDocument;doc.documentElement.style.fontSize=(readerScale*16)+'px';doc.documentElement.setAttribute('data-theme',lightMode?'light':'dark');}catch{}}
- function open(){if(!cancelPosition())saveCurrent();closeMainMenu();noteOrigin=null;noteContext=null;draft=null;backup=null;$('personalBody').replaceChildren();notice('');renderLibrary();openAccessibleDialog('personalOverlay');updateBackButton();}
+ function open(){if(!cancelPosition())saveCurrent();closeMainMenu();noteOrigin=null;noteContext=null;draft=null;backup=null;noteQuery='';noteOrder='recent';$('personalBody').replaceChildren();notice('');renderLibrary();openAccessibleDialog('personalOverlay');updateBackButton();}
  function close(){if(draft&&$('personalNoteText')?.value!==draft.original){if(!saveDraft())return;}closeAccessibleDialog('personalOverlay');backup=null;if(noteOrigin?.isConnected){if(noteOrigin.classList.contains('personal-note-action')){const note=safe(()=>storedNote(noteContext));if(note){noteOrigin.textContent=note.deleted?'Anotar':'Editar nota';noteOrigin.setAttribute('aria-label',note.deleted?'Anotar nesta leitura':'Editar nota desta leitura');}}noteOrigin.focus({preventScroll:true});}noteOrigin=null;noteContext=null;draft=null;updateBackButton();}
  function renderLibrary(){
   const body=$('personalBody');body.replaceChildren();draft=null;backup=null;
@@ -112,7 +114,27 @@
   body.append(element('h3','Minhas anotações'));
   const notes=p.notes.filter(n=>!n.deleted);
   if(!notes.length)body.append(element('p','Abra uma oração e toque em “Anotar”, ao final da leitura, para escrever.'));
-  notes.sort((a,b)=>b.updatedAt-a.updatedAt).forEach(n=>{const row=element('article');row.className='personal-note-item';row.append(element('h4',n.title),element('p',n.text.slice(0,180)),button('Editar anotação',()=>openNote(n)),button('Abrir leitura',()=>resume({route:n.route,title:n.title,point:p.positions.find(x=>key(x.route)===key(n.route))?.point||{y:0,scroller:'window',details:[]}})));body.append(row);});
+  if(notes.length){
+   const controls=element('div');controls.className='personal-note-filters';
+   const searchLabel=element('label','Buscar por título ou conteúdo');searchLabel.htmlFor='personalNoteSearch';
+   const search=element('input');search.id='personalNoteSearch';search.type='search';search.maxLength=240;search.value=noteQuery;search.autocomplete='off';
+   const orderLabel=element('label','Ordenar anotações');orderLabel.htmlFor='personalNoteOrder';
+   const order=element('select');order.id='personalNoteOrder';
+   for(const [value,label] of [['recent','Mais recentes'],['oldest','Mais antigas'],['title','Título (A–Z)']]){const option=element('option',label);option.value=value;order.append(option);}order.value=noteOrder;
+   const count=element('p');count.id='personalNoteCount';count.setAttribute('role','status');count.setAttribute('aria-live','polite');search.setAttribute('aria-controls','personalNoteResults');
+   const results=element('div');results.id='personalNoteResults';
+   function showNotes(){
+    const terms=searchable(noteQuery).trim().split(/\s+/).filter(Boolean);
+    const matches=notes.filter(n=>{const content=searchable(n.title+' '+n.text);return terms.every(term=>content.includes(term));});
+    matches.sort((a,b)=>noteOrder==='title'?a.title.localeCompare(b.title,'pt-BR')||b.updatedAt-a.updatedAt:noteOrder==='oldest'?a.updatedAt-b.updatedAt:b.updatedAt-a.updatedAt);
+    count.textContent=matches.length+' de '+notes.length+' anotações';results.replaceChildren();
+    if(!matches.length)results.append(element('p','Nenhuma anotação encontrada. Altere a busca ou toque em “Limpar busca”.'));
+    matches.forEach(n=>{const row=element('article');row.className='personal-note-item';row.append(element('h4',n.title),element('p',n.text.slice(0,180)),button('Editar anotação',()=>openNote(n)),button('Abrir leitura',()=>resume({route:n.route,title:n.title,point:p.positions.find(x=>key(x.route)===key(n.route))?.point||{y:0,scroller:'window',details:[]}})));results.append(row);});
+   }
+   search.addEventListener('input',()=>{noteQuery=search.value;showNotes();});order.addEventListener('change',()=>{noteOrder=order.value;showNotes();});
+   controls.append(searchLabel,search,button('Limpar busca',()=>{noteQuery='';search.value='';showNotes();search.focus();}),orderLabel,order);
+   body.append(controls,count,results);showNotes();
+  }
   body.append(element('h3','Cópia de segurança'),element('p','Inclui favoritos, recentes, anotações, posições de leitura, tema e tamanho do texto. Guarde o arquivo em um local de sua confiança.'),button('Exportar cópia',exportFile),button('Escolher cópia para restaurar',importFile));
   if(localStorage.getItem(D.RECOVERY))body.append(button('Desfazer última restauração',()=>{body.replaceChildren(element('h3','Conferir recuperação'),element('p','Esta ação recupera os dados anteriores à última restauração e substitui as alterações feitas depois dela. Exporte uma cópia dos dados atuais se quiser preservá-los.'),button('Exportar dados atuais',exportFile),button('Recuperar dados anteriores',()=>{if(safe(()=>{D.undoRestore(localStorage);refreshPreferences();return true;})){renderLibrary();notice('Restauração desfeita. Os dados anteriores foram recuperados.');}}),button('Cancelar',renderLibrary));}));
  }

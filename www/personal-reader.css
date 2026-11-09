@@ -12,3 +12,6 @@
 
 /* Reserva o espaço do Voltar flutuante nos documentos incorporados. */
 body.embedded-resource-mode .personal-reading-tools{margin-bottom:calc(88px + env(safe-area-inset-bottom))}
+
+.personal-note-filters input,.personal-note-filters select{box-sizing:border-box;display:block;width:100%;min-width:0;max-width:100%;min-height:44px;padding:.6rem;border:1px solid currentColor;border-radius:8px;background:var(--bg-panel,#f7f4ed);color:inherit;font:inherit}
+.personal-note-filters .action-btn{margin-top:.5rem}
