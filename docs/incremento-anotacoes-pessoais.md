@@ -22,7 +22,7 @@ Textos litúrgicos, PDFs, assinaturas, identificação Android e versão públic
 - `git diff --check`: aprovado.
 - A tentativa local de Chromium foi bloqueada pelo ambiente. A conferência foi concluída no GitHub Actions: 12 combinações de largura (320/390/768), tema e escala, sem transbordamento; busca, ordenação, edição e abertura offline verificadas em 6 contextos. Capturas em 320 px foram inspecionadas nos temas claro e escuro, incluindo texto ampliado.
 - `verify-unified-readers.mjs`: aprovado na mesma execução.
-- Assinatura estável, identificação Android, ausência dos placeholders Cordova e igualdade byte a byte dos arquivos web incluídos no APK: aprovadas no pipeline. Não se declara teste físico no A56.
+- Assinatura estável, identificação Android, ausência dos placeholders Cordova e igualdade byte a byte dos arquivos web incluídos no APK: aprovadas no pipeline. A validação pelo usuário está registrada abaixo.
 
 ## APK de teste entregue
 
@@ -35,9 +35,11 @@ Execução concluída com sucesso: https://github.com/charlieleitao-spec/liturgi
 - SHA-256: `aad7a9167fa68f022c5e121d849b8ac28cb5947c479fb0e157528fdcfe2a77cb`.
 - Certificado SHA-256: `5b2b3319cc9f9bb61a14fb8a30e63044db225f7b930fca9568c82854f38b4fe0`, igual ao estável.
 
-## Próxima validação no A56
+## Validação pelo usuário no A56
 
-Instalar sobre a versão atual, sem desinstalar. Em **Anotações e cópia de segurança**, conferir as notas existentes, pesquisar uma palavra, trocar a ordem, editar uma nota e abrir a leitura correspondente. Repetir essas ações em modo avião. Aguardar o relato do usuário antes de declarar a validação física ou preparar uma publicação definitiva. Nenhuma release ou tag foi criada.
+Em 9 de novembro de 2026, após receber este APK e as orientações para instalação sobre a versão atual e teste da busca/ordenação também em modo avião, Frei Charlie confirmou: “Tudo ok”. O teste foi aceito com base nesse relato geral; não houve acompanhamento direto do aparelho nem relato separado de cada ação.
+
+A validação do APK de teste está concluída pelo usuário. A integração à main e a publicação definitiva continuam pendentes; esta confirmação não foi tratada como autorização para release ou tag.
 
 ## Sequência dos aplicativos
 
