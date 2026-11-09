@@ -12,7 +12,7 @@ Em **Anotações e cópia de segurança → Minhas anotações**, a lista agora 
 
 A busca e a ordem permanecem ao voltar do editor à lista na mesma sessão. Uma nova abertura dos dados pessoais começa com todas as notas e ordem mais recente. Notas excluídas não aparecem. Filtrar e ordenar não regrava registros; não há migração, envio de notas ou nova dependência de rede. A busca usa dados locais e não exige serviço externo. O cache web foi renovado para distribuir os arquivos alterados.
 
-Textos litúrgicos, PDFs, assinaturas, identificação Android e versão pública permanecem como na base. Esta alteração permanece em branch de trabalho; o APK de teste descrito abaixo foi compilado sem integração à main.
+Textos litúrgicos, PDFs, certificado e identificação Android permanecem preservados. A melhoria foi integrada à main pelo PR #163 e publicada na versão 4.9.135, após o aceite do APK de teste descrito abaixo.
 
 ## Verificação
 
@@ -39,7 +39,20 @@ Execução concluída com sucesso: https://github.com/charlieleitao-spec/liturgi
 
 Em 9 de novembro de 2026, após receber este APK e as orientações para instalação sobre a versão atual e teste da busca/ordenação também em modo avião, Frei Charlie confirmou: “Tudo ok”. O teste foi aceito com base nesse relato geral; não houve acompanhamento direto do aparelho nem relato separado de cada ação.
 
-A validação do APK de teste está concluída pelo usuário. A integração à main e a publicação definitiva continuam pendentes; esta confirmação não foi tratada como autorização para release ou tag.
+A validação do APK de teste foi concluída pelo usuário. Após ser informado de que a integração e a publicação definitiva estavam pendentes, Frei Charlie respondeu “Prossiga”, autorizando o encaminhamento da versão definitiva.
+
+## Publicação definitiva concluída
+
+Em 9 de novembro de 2026, o PR #163 foi integrado à main (commit `acda89bef5d935526fca8e9ca3f1c3da795868ac`). Todas as verificações do PR passaram. A execução de publicação também concluiu com sucesso, incluindo a comparação entre o APK gerado e o download público.
+
+- Release: https://github.com/charlieleitao-spec/liturgia-osm/releases/tag/v4.9.135
+- Execução: https://github.com/charlieleitao-spec/liturgia-osm/actions/runs/42556995734
+- APK: `Liturgia-OSM-4.9.135.apk`; tamanho: 7.255.724 bytes.
+- Pacote: `com.liturgia_osm.app`; versionCode `41054`; versionName `4.9.135`.
+- SHA-256: `bfb4b28a9c093a0d530e20df133c9e2441fb0303d3bf7dc3490c9554a0587293`.
+- Mesmo certificado estável do APK de teste. Código aprovado preservado, com atualização somente dos identificadores de versão/cache, conferida por `scripts/verify-release-4.9.135.py`.
+
+O aceite físico refere-se ao APK de teste 41053. Não foi declarado um teste físico adicional da compilação definitiva 41054.
 
 ## Sequência dos aplicativos
 
