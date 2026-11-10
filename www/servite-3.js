@@ -115,6 +115,7 @@ function renderWithLitanySpacing(text){
 // render a prayer block, separating paragraphs while preserving line breaks inside each paragraph
 function renderPrayer(text){
   const formatted = formatLiturgicalStanzas(text);
+  const varias=/^varias\d+$/.test(state.devo||'');
   const lines=formatted.split('\n'),blocks=[];
   const heading=/^(?:HINO|CANTO|SALMO(?:\s+\d+)?|SALMODIA|INTRODUÇÃO|REFLEXÃO|EVANGELHO(?:\s+DE .+)?|ORAÇÃO|INVOCAÇÕES|CÂNTICO(?: EVANGÉLICO)?|LEITURA BREVE|RESPONSÓRIO BREVE|PRECES|DESPEDIDA)$/i;
   let paragraph=[],poetry=false,preces=false;
@@ -138,6 +139,20 @@ function renderPrayer(text){
   for(const raw of lines){
     const line=normalizeServiteLineBreaks(raw).trim();
     if(!line){if(preces)paragraph.push('');else flush();continue;}
+    if(varias && /^Oração\s*\[reza-se uma das seguintes orações\]$/i.test(line)){
+      flush();
+      poetry=false;preces=false;
+      blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
+      continue;
+    }
+    const formula=varias && line.match(/^(I|II|III)\.\s+(.+)$/);
+    if(formula){
+      flush();
+      poetry=false;preces=false;
+      blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(formula[1]+'.')+'</h4>');
+      paragraph.push(formula[2]);
+      continue;
+    }
     if(heading.test(line)){
       flush();
       poetry=/^(?:HINO|CANTO|SALMO|CÂNTICO)/i.test(line)?line:false;

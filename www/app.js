@@ -222,6 +222,7 @@ function normalizeVigiliaTypography(text){
 
 function renderPrayer(text, options={}){
   const vigilia = options.vigilia === true;
+  const varias = options.varias === true;
   let source = normalizeCopiedLineBreaks(String(text ?? '').replace(/<PARSED TEXT FOR PAGE:\s*\d+\s*\/\s*\d+>/gi, ''));
   if(vigilia){
     source = normalizeVigiliaTypography(source)
@@ -256,6 +257,22 @@ function renderPrayer(text, options={}){
       flushStanza();
       blocks.push('<h5 class="prayer-psalm-caption">'+escapeHtml(line)+'</h5>');
       pendingPsalmCaption = false;
+      continue;
+    }
+    if(varias && /^Oração\s*\[reza-se uma das seguintes orações\]$/i.test(line)){
+      flushStanza();
+      blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
+      hymnMode = false;
+      precesMode = false;
+      continue;
+    }
+    const formula = varias && line.match(/^(I|II|III)\.\s+(.+)$/);
+    if(formula){
+      flushStanza();
+      blocks.push('<h4 class="prayer-formula-title">'+escapeHtml(formula[1]+'.')+'</h4>');
+      hymnMode = false;
+      precesMode = false;
+      stanza.push(formula[2]);
       continue;
     }
     if(PRAYER_CONTEXT_HEADINGS.test(line) || (vigilia && /^(?:Primeira|Segunda) fórmula$/i.test(line))){
@@ -740,7 +757,7 @@ function simpleTextDetail(title, sub, text, backFn, readingClass){
       <div class="detail-divider"></div>
     </div>
     <div class="liturgical-reading fade-in${readerClass}">
-      <div class="prayer-block">${renderPrayer(renderedText, {vigilia:readingClass === 'vigilia-reader'})}</div>
+      <div class="prayer-block">${renderPrayer(renderedText, {vigilia:readingClass === 'vigilia-reader', varias:/^varias\d+$/.test(state.devo||'')})}</div>
     </div>
   `;
 }
