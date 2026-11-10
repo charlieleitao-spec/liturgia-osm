@@ -117,7 +117,7 @@ function renderPrayer(text){
   const formatted = formatLiturgicalStanzas(text);
   const varias=/^varias\d+$/.test(state.devo||'');
   const lines=formatted.split('\n'),blocks=[];
-  const heading=/^(?:HINO|CANTO|SALMO(?:\s+\d+)?|SALMODIA|INTRODUÇÃO|REFLEXÃO|EVANGELHO(?:\s+DE .+)?|ORAÇÃO|INVOCAÇÕES|CÂNTICO(?: EVANGÉLICO)?|LEITURA BREVE|RESPONSÓRIO BREVE|PRECES|DESPEDIDA)$/i;
+  const heading=/^(?:ANTÍFONA|HINO|CANTO|SALMO(?:\s+\d+)?|SALMODIA|INTRODUÇÃO|REFLEXÃO|EVANGELHO(?:\s+DE .+)?|ORAÇÃO|INVOCAÇÕES|CÂNTICO(?: EVANGÉLICO)?|LEITURA BREVE|RESPONSÓRIO BREVE|PRECES|DESPEDIDA)$/i;
   let paragraph=[],poetry=false,preces=false;
   const flush=()=>{
     if(!paragraph.length)return;
@@ -155,6 +155,11 @@ function renderPrayer(text){
     }
     if(heading.test(line)){
       flush();
+      if(varias && /^ANTÍFONA$/i.test(line)){
+        poetry=false;preces=false;
+        blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
+        continue;
+      }
       poetry=/^(?:HINO|CANTO|SALMO|CÂNTICO)/i.test(line)?line:false;
       preces=/^PRECES$/i.test(line);
       blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
