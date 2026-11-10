@@ -242,6 +242,17 @@ function renderPrayer(text, options={}){
   const flushStanza = () => {
     if(!stanza.length) return;
     if(precesMode)blocks.push(OSMPdf.formatIntercessions(stanza.join('\n')));
+    else if(varias && hymnMode==='psalm'){
+      // A linha que continua o versículo não constitui um novo versículo.
+      // Preservar os sinais * e a separação das estrofes da fonte.
+      const verses=[];
+      for(const raw of stanza){
+        const line=raw.trim();
+        if(/^[–—-]\s+/.test(line)||!verses.length)verses.push(line);
+        else verses[verses.length-1]+=' '+line;
+      }
+      blocks.push('<p class="prayer-stanza">'+verses.map(line=>'<span class="liturgical-verse-line">'+prayerLineHtml(line,true)+'</span>').join('')+'</p>');
+    }
     else blocks.push('<p class="prayer-stanza'+(hymnMode==='hymn'?' liturgical-hymn-stanza':'')+'">'+formatPrayerStanza(stanza,vigilia,hymnMode,precesMode)+'</p>');
     stanza = [];
   };
