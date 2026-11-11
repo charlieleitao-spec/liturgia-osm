@@ -114,8 +114,12 @@ function renderWithLitanySpacing(text){
 }
 // render a prayer block, separating paragraphs while preserving line breaks inside each paragraph
 function renderPrayer(text){
-  const formatted = formatLiturgicalStanzas(text);
   const varias=/^varias\d+$/.test(state.devo||'');
+  let formatted = formatLiturgicalStanzas(text);
+  if(varias && formatted.includes('Ó Deus misericordioso, salvação eterna dos que')){
+    formatted=formatted.replace(/por\.\.\.\[diz-se\s+o nome do\(a\) doente\]/,'por... [diz-se o nome do(a) doente]')
+      .replace(/render-vos graças\n\s*\ne proclamar/,'render-vos graças\ne proclamar');
+  }
   const lines=formatted.split('\n'),blocks=[];
   const heading=/^(?:ANTÍFONA|HINO|CANTO|SALMO(?:\s+\d+)?|SALMODIA|INTRODUÇÃO|REFLEXÃO|EVANGELHO(?:\s+DE .+)?|ORAÇÃO|INVOCAÇÕES|CÂNTICO(?: EVANGÉLICO)?|LEITURA BREVE|RESPONSÓRIO BREVE|PRECES|DESPEDIDA)$/i;
   let paragraph=[],poetry=false,preces=false;
