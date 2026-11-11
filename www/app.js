@@ -224,6 +224,10 @@ function renderPrayer(text, options={}){
   const vigilia = options.vigilia === true;
   const varias = options.varias === true;
   let source = normalizeCopiedLineBreaks(String(text ?? '').replace(/<PARSED TEXT FOR PAGE:\s*\d+\s*\/\s*\d+>/gi, ''));
+  if(varias && source.includes('Ó Deus misericordioso, salvação eterna dos que')){
+    source=source.replace(/por\.\.\.\[diz-se\s+o nome do\(a\) doente\]/,'por... [diz-se o nome do(a) doente]')
+      .replace(/render-vos graças\n\s*\ne proclamar/,'render-vos graças\ne proclamar');
+  }
   if(vigilia){
     source = normalizeVigiliaTypography(source)
       .replace(/^(Primeira fórmula|Segunda fórmula)\n[ \t]*Santa Maria,?\n[ \t]*(Senhora Dos Seus Servos|Serva Do Senhor)/im,
