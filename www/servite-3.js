@@ -126,7 +126,15 @@ function renderPrayer(text){
     const speaker=/^(?:D\.|T\.|C\.|R[./]|V[./]|A\.|B\.|L\d?:|L\.)\s*/;
     const verse=/^(?:[–—=]\s*|\d{1,3}\s*[†*])/;
     let joined;
-    if(poetry)joined=clean.map(line=>liturgicalLineHtml(line,/^(?:SALMO|CÂNTICO)/i.test(poetry))).join('<br>');
+    if(poetry && varias && /^SALMO/i.test(poetry)){
+      const verses=[];
+      for(const line of clean){
+        if(/^[–—-]\\s+/.test(line)||!verses.length)verses.push(line);
+        else verses[verses.length-1]+=' '+line;
+      }
+      joined=verses.map(line=>liturgicalLineHtml(line,true)).join('<br>');
+    }
+    else if(poetry)joined=clean.map(line=>liturgicalLineHtml(line,/^(?:SALMO|CÂNTICO)/i.test(poetry))).join('<br>');
     else if(clean.some(speaker.test.bind(speaker))){
       const turns=[];
       for(const line of clean){if(speaker.test(line)||verse.test(line)||!turns.length)turns.push(line);else turns[turns.length-1]+=' '+line;}
