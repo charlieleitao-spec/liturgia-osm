@@ -23,7 +23,7 @@ for (const marker of ['Antífona', 'Salmo 129', 'Oração [reza-se uma das segui
 }
 assert.ok(defuntos.indexOf('Antífona') < defuntos.indexOf('Salmo 129'));
 assert.ok(defuntos.indexOf('Salmo 129') < defuntos.indexOf('Oração [reza-se uma das seguintes orações]'));
-assert.equal((defuntos.match(/^\s*-\s/gm) || []).length, 11, 'Revisar contagem de versículos do Salmo 129');
+assert.equal((defuntos.match(/^\s*-\s/gm) || []).length, 9, 'Revisar contagem de linhas iniciadas por hífen no Salmo 129');
 assert.equal((text('Bênção da refeição').match(/^(?:Comum|Nas festas marianas|Nas visitas de familiares e amigos|Nos momentos de alegria)$/gm) || []).length, 4);
 for (const [name, code] of [['principal', app], ['servita', servite]]) {
   assert.match(code, /const formula\s*=\s*varias\s*&&\s*line\.match\(\/\^\(I\|II\|III\)/, 'Separação de fórmulas no leitor ' + name);
