@@ -129,7 +129,7 @@ function renderPrayer(text){
     if(poetry && varias && /^SALMO/i.test(poetry)){
       const verses=[];
       for(const line of clean){
-        if(/^[–—-]\\s+/.test(line)||!verses.length)verses.push(line);
+        if(/^[–—-]\s+/.test(line)||!verses.length)verses.push(line);
         else verses[verses.length-1]+=' '+line;
       }
       joined=verses.map(line=>liturgicalLineHtml(line,true)).join('<br>');
