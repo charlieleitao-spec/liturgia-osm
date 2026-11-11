@@ -224,6 +224,10 @@ function renderPrayer(text, options={}){
   const vigilia = options.vigilia === true;
   const varias = options.varias === true;
   let source = normalizeCopiedLineBreaks(String(text ?? '').replace(/<PARSED TEXT FOR PAGE:\s*\d+\s*\/\s*\d+>/gi, ''));
+  if(varias && source.includes('Ó Deus misericordioso, salvação eterna dos que')){
+    source=source.replace(/por\.\.\.\[diz-se\s+o nome do\(a\) doente\]/,'por... [diz-se o nome do(a) doente]')
+      .replace(/render-vos graças\n\s*\ne proclamar/,'render-vos graças\ne proclamar');
+  }
   if(vigilia){
     source = normalizeVigiliaTypography(source)
       .replace(/^(Primeira fórmula|Segunda fórmula)\n[ \t]*Santa Maria,?\n[ \t]*(Senhora Dos Seus Servos|Serva Do Senhor)/im,
@@ -242,6 +246,17 @@ function renderPrayer(text, options={}){
   const flushStanza = () => {
     if(!stanza.length) return;
     if(precesMode)blocks.push(OSMPdf.formatIntercessions(stanza.join('\n')));
+    else if(varias && hymnMode==='psalm'){
+      // A linha que continua o versículo não constitui um novo versículo.
+      // Preservar os sinais * e a separação das estrofes da fonte.
+      const verses=[];
+      for(const raw of stanza){
+        const line=raw.trim();
+        if(/^[–—-]\s+/.test(line)||!verses.length)verses.push(line);
+        else verses[verses.length-1]+=' '+line;
+      }
+      blocks.push('<p class="prayer-stanza">'+verses.map(line=>'<span class="liturgical-verse-line">'+prayerLineHtml(line,true)+'</span>').join('')+'</p>');
+    }
     else blocks.push('<p class="prayer-stanza'+(hymnMode==='hymn'?' liturgical-hymn-stanza':'')+'">'+formatPrayerStanza(stanza,vigilia,hymnMode,precesMode)+'</p>');
     stanza = [];
   };

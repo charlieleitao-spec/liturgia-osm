@@ -114,10 +114,14 @@ function renderWithLitanySpacing(text){
 }
 // render a prayer block, separating paragraphs while preserving line breaks inside each paragraph
 function renderPrayer(text){
-  const formatted = formatLiturgicalStanzas(text);
   const varias=/^varias\d+$/.test(state.devo||'');
+  let formatted = formatLiturgicalStanzas(text);
+  if(varias && formatted.includes('Ó Deus misericordioso, salvação eterna dos que')){
+    formatted=formatted.replace(/por\.\.\.\[diz-se\s+o nome do\(a\) doente\]/,'por... [diz-se o nome do(a) doente]')
+      .replace(/render-vos graças\n\s*\ne proclamar/,'render-vos graças\ne proclamar');
+  }
   const lines=formatted.split('\n'),blocks=[];
-  const heading=/^(?:HINO|CANTO|SALMO(?:\s+\d+)?|SALMODIA|INTRODUÇÃO|REFLEXÃO|EVANGELHO(?:\s+DE .+)?|ORAÇÃO|INVOCAÇÕES|CÂNTICO(?: EVANGÉLICO)?|LEITURA BREVE|RESPONSÓRIO BREVE|PRECES|DESPEDIDA)$/i;
+  const heading=/^(?:ANTÍFONA|HINO|CANTO|SALMO(?:\s+\d+)?|SALMODIA|INTRODUÇÃO|REFLEXÃO|EVANGELHO(?:\s+DE .+)?|ORAÇÃO|INVOCAÇÕES|CÂNTICO(?: EVANGÉLICO)?|LEITURA BREVE|RESPONSÓRIO BREVE|PRECES|DESPEDIDA)$/i;
   let paragraph=[],poetry=false,preces=false;
   const flush=()=>{
     if(!paragraph.length)return;
@@ -126,7 +130,15 @@ function renderPrayer(text){
     const speaker=/^(?:D\.|T\.|C\.|R[./]|V[./]|A\.|B\.|L\d?:|L\.)\s*/;
     const verse=/^(?:[–—=]\s*|\d{1,3}\s*[†*])/;
     let joined;
-    if(poetry)joined=clean.map(line=>liturgicalLineHtml(line,/^(?:SALMO|CÂNTICO)/i.test(poetry))).join('<br>');
+    if(poetry && varias && /^SALMO/i.test(poetry)){
+      const verses=[];
+      for(const line of clean){
+        if(/^[–—-]\s+/.test(line)||!verses.length)verses.push(line);
+        else verses[verses.length-1]+=' '+line;
+      }
+      joined=verses.map(line=>liturgicalLineHtml(line,true)).join('<br>');
+    }
+    else if(poetry)joined=clean.map(line=>liturgicalLineHtml(line,/^(?:SALMO|CÂNTICO)/i.test(poetry))).join('<br>');
     else if(clean.some(speaker.test.bind(speaker))){
       const turns=[];
       for(const line of clean){if(speaker.test(line)||verse.test(line)||!turns.length)turns.push(line);else turns[turns.length-1]+=' '+line;}
@@ -155,6 +167,11 @@ function renderPrayer(text){
     }
     if(heading.test(line)){
       flush();
+      if(varias && /^ANTÍFONA$/i.test(line)){
+        poetry=false;preces=false;
+        blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
+        continue;
+      }
       poetry=/^(?:HINO|CANTO|SALMO|CÂNTICO)/i.test(line)?line:false;
       preces=/^PRECES$/i.test(line);
       blocks.push('<h4 class="prayer-text-heading">'+escapeHtml(line)+'</h4>');
