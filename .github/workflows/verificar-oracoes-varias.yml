@@ -1,0 +1,35 @@
+name: Verificar Orações Várias (PR)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/verify-various-prayers*.mjs'
+      - 'www/data/devocoes/oracoes-varias.json'
+      - 'www/app.js'
+      - 'www/servite-3.js'
+      - '.github/workflows/verificar-oracoes-varias.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Obter código da revisão
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Conferir sintaxe
+        run: |
+          node --check scripts/verify-various-prayers.mjs
+          node --check scripts/verify-various-prayers-invariants.mjs
+      - name: Conferir integridade das Orações Várias
+        run: |
+          node scripts/verify-various-prayers.mjs
+          node scripts/verify-various-prayers-invariants.mjs
