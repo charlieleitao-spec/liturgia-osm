@@ -82,9 +82,9 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
  assert.doesNotMatch(child.w.document.querySelector('.laudes-content').textContent, /II Vésperas|Magnificat/);
  await openChild(`oficio:${sorrowfulMotherId}:vesperas`);
  const vespers = child.w.document.querySelector('.vesperas-content .today-servita-reader');
- assert.match(vespers.querySelector('.liturgical-hour-heading').textContent, /II Vésperas/);
- assert.equal(vespers.querySelector('.reading-ref').textContent, 'Ap 21,1-5a');
- assert.equal(vespers.querySelectorAll('.liturgical-intercession-petition').length, 5);
+ assert.deepEqual(Array.from(vespers.querySelectorAll('.liturgical-hour-heading'), node => node.textContent), ['I Vésperas', 'II Vésperas']);
+ assert.deepEqual(Array.from(vespers.querySelectorAll('.reading-ref'), node => node.textContent), ['Hb 5,7-9', 'Ap 21,1-5a']);
+ assert.equal(vespers.querySelectorAll('.liturgical-intercession-petition').length, 10);
  assert.match(vespers.textContent, /Magnificat/);
  assert.doesNotMatch(vespers.textContent, /Benedictus/);
  const deceasedId = run('SANTORAL.find(saint => saint.month === 11 && saint.day === 17)._id');
@@ -225,6 +225,17 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
    assert.equal(vespers.querySelectorAll('.liturgical-prayer').length, 2);
   }
  }
- console.log('Vésperas verificadas em quinze celebrações, incluindo as oito remissões à salmodia ferial.');
+ await openChild(`oficio:${deceasedId}:vesperas`);
+ const deceasedVespers = child.w.document.querySelector('.vesperas-content .today-servita-reader');
+ assert.deepEqual(Array.from(deceasedVespers.querySelectorAll('.psalm-title'), node => node.textContent), [
+  'Salmo 15 — O Senhor é a porção da minha herança',
+  'Salmo 33 (2-11) — O Senhor é a salvação dos justos',
+  'Cântico (1Pd 2,21-24) — Cristo, servo do Pai, entrega-se livremente à sua paixão'
+ ]);
+ assert.equal(deceasedVespers.querySelector('.reading-ref').textContent, 'Rm 8,14-17');
+ assert.equal(deceasedVespers.querySelectorAll('.response').length, 5);
+ assert.equal(deceasedVespers.querySelectorAll('.liturgical-intercession-petition').length, 5);
+ assert.match(deceasedVespers.textContent, /glória dos vossos servos/);
+ console.log('Vésperas verificadas nos 17 formulários fixos, incluindo as duas Horas de Nossa Senhora das Dores.');
  child.dom.window.close();a.dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});
