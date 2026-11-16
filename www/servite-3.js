@@ -96,7 +96,7 @@ function liturgicalLineHtml(value, verse=false){
     if(number){prefix+='<sup class="verse-number">'+number[1]+'</sup> ';text=text.slice(number[0].length).trimStart();}
   }
   let html=escapeHtml(text);
-  html=html.replace(/^((?:\d+ª\s*)?(?:Ant\.(?:\s*\d+)?|Antífona)|D\.|T\.|C\.|R[./]|V[./]|A\.|B\.|L\d?:|L\.|℣\.?|℟\.?)(?=\s|[A-Za-zÀ-ÿ]|$)\s*/, '<span class="rubric">$1</span> ');
+  html=html.replace(/^((?:\d+ª\s*)?(?:Ant\.(?:\s*\d+)?|Antífona\b)|D\.|T\.|C\.|R[./]|V[./]|A\.|B\.|L\d?:|L\.|℣\.?|℟\.?)(?=\s|[A-Za-zÀ-ÿ]|$)\s*/, '<span class="rubric">$1</span> ');
   // Rubric signs remain with the following word when the screen wraps.
   html=html.replace(/(<span class="rubric">[^<]+<\/span>) ([^\s<]+)/g,'<span class="liturgical-cue">$1 $2</span>');
   html=html.replace(/([^\s<>]+)\s+([*†])(?=\s|$)/g,'<span class="liturgical-cue">$1 $2</span>');
@@ -291,10 +291,10 @@ function renderLiturgicalHourContent(text){
     if(!block) startBlock('');
     if(currentHead==='PRECES'){precesLines.push(line);return;}
 
-    if(/^(?:Ant\.|Antífona)\s*\d*/i.test(line)){ stanza=null; add(line,'antiphon'); return; }
+    if(/^(?:Ant\.|Antífona\b)\s*\d*/i.test(line)){ stanza=null; add(line,'antiphon'); return; }
     if(/^(Salmo|Cântico|C[âa]ntico)\s+/i.test(line)){ stanza=null; currentHead='SALMODIA'; add(line,'psalm-title'); return; }
     if(/^(V\.|R\.|℣\.|℟\.)\s*/.test(line)){ stanza=null; add(line, 'response'+(/^(?:R[./]|℟)/.test(line)?' liturgical-response':'')); return; }
-    if(/^(Escolhe-se|Salmos? do|Salmos? e cântico|Como no (?:Comum|Ordinário|Próprio)|Do Comum|Quando esta memória|Antífona e salmos|Salmodia complementar)/i.test(line)){
+    if(/^(Escolhe-se|Salmos? do|Salmos? e (?:cântico|antífonas)|Antífonas e salmos|Como no (?:Comum|Ordinário|Próprio)|Do Comum|Quando esta memória|Antífona e salmos|Salmodia complementar)/i.test(line)){
       stanza=null; add(line,'rubric'); return;
     }
     if(/^(PRIMEIRA LEITURA|SEGUNDA LEITURA|LEITURA BREVE)$/.test(currentHead)){

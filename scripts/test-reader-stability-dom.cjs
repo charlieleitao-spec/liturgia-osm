@@ -98,6 +98,28 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
  assert.equal(deceased.querySelector('.reading-ref').textContent, 'Rm 8,8-11');
  assert.equal(deceased.querySelectorAll('.response').length, 5);
  assert.equal(deceased.querySelectorAll('.liturgical-intercession-petition').length, 5);
- console.log('Laudes verificadas em nove celebrações e II Vésperas de Nossa Senhora das Dores em aba própria.');
+ const monteSenarioId = run('SANTORAL.find(saint => saint.month === 9 && saint.day === 22)._id');
+ await openChild(`oficio:${monteSenarioId}:laudes`);
+ const monteSenario = child.w.document.querySelector('.laudes-content .today-servita-reader');
+ assert.equal(monteSenario.querySelector('.reading-ref').textContent, 'Is 56,7');
+ assert.equal(monteSenario.querySelectorAll('.response').length, 5);
+ assert.equal(monteSenario.querySelectorAll('.liturgical-intercession-petition').length, 5);
+ assert.deepEqual(Array.from(monteSenario.querySelectorAll('.litblock > .rubric'), node => node.textContent), [
+  'Do Comum da Dedicação de uma Igreja (cf. Breviário romano).',
+  'Antífonas e salmos do dia da semana corrente.',
+  'Benedictus',
+  'Na basílica de Monte Senário',
+  'Fora da basílica de Monte Senário'
+ ]);
+ const joaquimId = run('SANTORAL.find(saint => saint.month === 2 && saint.day === 3)._id');
+ await openChild(`oficio:${joaquimId}:laudes`);
+ const joaquim = child.w.document.querySelector('.laudes-content .today-servita-reader');
+ assert.deepEqual(Array.from(joaquim.querySelectorAll('.litblock > .rubric'), node => node.textContent), [
+  'Do Comum dos Santos e Bem-aventurados da nossa Ordem, p. 489.',
+  'Salmos e antífonas do dia da semana corrente.',
+  'Benedictus'
+ ]);
+ assert.match(joaquim.querySelector('.antiphon').textContent, /habite em mim a força de Cristo/);
+ console.log('Laudes verificadas em onze celebrações, incluindo as rubricas de Monte Senário e Joaquim de Sena.');
  child.dom.window.close();a.dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});
