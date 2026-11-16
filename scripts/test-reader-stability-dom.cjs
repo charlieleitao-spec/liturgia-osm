@@ -256,6 +256,13 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
    assert.match(office.textContent, /nenhum bem eu posso achar fora de vós/);
   }
  }
+ const seriesHtml = child.run("renderLiturgicalHourContent('SALMODIA\\nSérie A\\nAnt. 1 Primeira antífona\\nSérie B (tempo pascal)\\nAnt. 1 Segunda antífona\\nSérie C\\nAnt. 1 Terceira antífona')");
+ const seriesRoot = child.w.document.createElement('div');
+ seriesRoot.innerHTML = seriesHtml;
+ assert.deepEqual(Array.from(seriesRoot.querySelectorAll('.litblock > .rubric'), node => node.textContent), ['Série A', 'Série B (tempo pascal)', 'Série C']);
+ assert.equal(seriesRoot.querySelectorAll('.antiphon').length, 3);
+ assert.equal(seriesRoot.querySelectorAll('.psalm-verse').length, 0);
+ console.log('Séries alternativas da salmodia reconhecidas como rubricas, sem modificar antífonas.');
  console.log('Ofício das Leituras de Todos os Santos e dos Sete Santos Fundadores verificado.');
  child.dom.window.close();a.dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});
