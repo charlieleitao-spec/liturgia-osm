@@ -262,6 +262,17 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
  assert.deepEqual(Array.from(seriesRoot.querySelectorAll('.litblock > .rubric'), node => node.textContent), ['Série A', 'Série B (tempo pascal)', 'Série C']);
  assert.equal(seriesRoot.querySelectorAll('.antiphon').length, 3);
  assert.equal(seriesRoot.querySelectorAll('.psalm-verse').length, 0);
+ const offices = JSON.parse(fs.readFileSync(path.join(root,'data/oficios-osm.json'),'utf8')).celebracoes;
+ for (const date of ['01-12','05-04','06-19']) {
+  const source = offices[date].material.horas.oficio_leituras.texto;
+  const expected = [...source.matchAll(/^Série [ABC](?:\\s*\\([^\\n)]*\\))?\\s*$/gmi)].map(match => match[0].trim());
+  const rendered = child.run('renderLiturgicalHourContent('+JSON.stringify(source)+')');
+  const rootNode = child.w.document.createElement('div');rootNode.innerHTML=rendered;
+  const rubrics = Array.from(rootNode.querySelectorAll('.litblock > .rubric'), node => node.textContent);
+  for (const label of expected) assert.ok(rubrics.includes(label), date+': rubrica ausente '+label);
+  assert.equal(expected.length, date==='01-12'?3:2, date+': número inesperado de séries alternativas');
+ }
+ console.log('Rubricas de séries alternativas conferidas também nos formulários reais de Pucci, Peregrino e Juliana.');
  console.log('Séries alternativas da salmodia reconhecidas como rubricas, sem modificar antífonas.');
  console.log('Ofício das Leituras de Todos os Santos e dos Sete Santos Fundadores verificado.');
  child.dom.window.close();a.dom.window.close();
