@@ -237,5 +237,25 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
  assert.equal(deceasedVespers.querySelectorAll('.liturgical-intercession-petition').length, 5);
  assert.match(deceasedVespers.textContent, /glória dos vossos servos/);
  console.log('Vésperas verificadas nos 17 formulários fixos, incluindo as duas Horas de Nossa Senhora das Dores.');
+ for (const [id, transition, alternative] of [
+  [allSaintsId, /Amai o Senhor, vós que nele acreditais/, /Das Constituições dos frades Servos/],
+  [foundersId, /Se permanecerdes fiéis à minha Palavra/, /Da "Legenda" sobre a origem da Ordem/]
+ ]) {
+  await openChild(`oficio:${id}:oficio`);
+  const office = child.w.document.querySelector('.oficio-leituras-content .today-servita-reader');
+  const headings = Array.from(office.querySelectorAll('.litheading'), node => node.textContent);
+  assert.deepEqual(headings, ['HINO', 'SALMODIA', 'Oração sálmica', 'Oração sálmica', 'Oração sálmica', 'PRIMEIRA LEITURA', 'RESPONSÓRIO', 'SEGUNDA LEITURA', 'RESPONSÓRIO', 'Leitura alternativa', 'RESPONSÓRIO', 'ORAÇÃO']);
+  assert.equal(office.querySelectorAll('.psalm-title').length, 3);
+  assert.equal(office.querySelectorAll('.response').length, 11);
+  assert.match(office.querySelector('.response').textContent, transition);
+  assert.match(Array.from(office.querySelectorAll('.reading-ref')).at(-1).textContent, alternative);
+  assert.ok(Array.from(office.querySelectorAll('.litblock > .rubric')).some(node => node.textContent === 'Hino Te Deum, p. 36.'));
+  assert.ok(office.querySelector('.liturgical-prayer'));
+  if (id === allSaintsId) {
+   assert.equal(Array.from(office.querySelectorAll('.antiphon')).filter(node => /^[ABC]\. /.test(node.textContent)).length, 15);
+   assert.match(office.textContent, /nenhum bem eu posso achar fora de vós/);
+  }
+ }
+ console.log('Ofício das Leituras de Todos os Santos e dos Sete Santos Fundadores verificado.');
  child.dom.window.close();a.dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});

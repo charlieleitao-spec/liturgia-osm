@@ -183,7 +183,7 @@ function renderPrayer(text){
   return blocks.join('');
 }
 
-const LITURGICAL_HEAD_RE = /^(?:\d+[.)-]?\s*)?(HINO|SALMODIA|PRIMEIRA LEITURA|SEGUNDA LEITURA|LEITURA BREVE|RESPONS[ÓO]RIO(?: BREVE)?(?:\s+.*)?|C[ÂA]NTICO EVANG[ÉE]LICO|PRECES|PAI[- ]NOSSO|ORA[ÇC][ÃA]O|CONCLUS[ÃA]O)\s*[:.-]?\s*$/i;
+const LITURGICAL_HEAD_RE = /^(?:\d+[.)-]?\s*)?(HINO|SALMODIA|PRIMEIRA LEITURA|SEGUNDA LEITURA|LEITURA ALTERNATIVA|LEITURA BREVE|RESPONS[ÓO]RIO(?: BREVE)?(?:\s+.*)?|C[ÂA]NTICO EVANG[ÉE]LICO|PRECES|PAI[- ]NOSSO|ORA[ÇC][ÃA]O|CONCLUS[ÃA]O)\s*[:.-]?\s*$/i;
 
 // Estrutura o ofício sem alterar, completar ou reconstruir o texto-fonte.
 // Linhas e estrofes procedem exclusivamente das quebras existentes na fonte.
@@ -282,6 +282,7 @@ function renderLiturgicalHourContent(text){
       startBlock(line);
       return;
     }
+    if(/^Hino Te Deum, p\. \d+\.?$/i.test(line)){startBlock('');add(line,'rubric');return;}
     if((match = line.match(/^HINO\b\s*(\([^)]*\))?\s*(.*)$/i))){
       startBlock('HINO');
       if(match[1]) add(match[1].slice(1,-1).trim(), 'rubric');
@@ -292,13 +293,13 @@ function renderLiturgicalHourContent(text){
     if(currentHead==='PRECES'){precesLines.push(line);return;}
     if(currentHead==='HINO' && /^Ou:$/i.test(line)){stanza=null;add(line,'rubric');return;}
 
-    if(/^(?:Ant\.|Antífona\b)\s*\d*/i.test(line)){ stanza=null; add(line,'antiphon'); return; }
+    if(/^(?:Ant\.|Antífona\b)\s*\d*/i.test(line) || (/^[ABC]\. /.test(line) && block.lastElementChild?.classList.contains('antiphon'))){ stanza=null; add(line,'antiphon'); return; }
     if(/^(Salmo|Cântico|C[âa]ntico)\s+/i.test(line)){ stanza=null; currentHead='SALMODIA'; add(line,'psalm-title'); return; }
     if(/^(V\.|R\.|℣\.|℟\.)\s*/.test(line)){ stanza=null; add(line, 'response'+(/^(?:R[./]|℟)/.test(line)?' liturgical-response':'')); return; }
     if(/^(Escolhe-se|Salmos? do|Salmos? e (?:cântico|antífonas)|Antífonas e salmos|Como no (?:Comum|Ordinário|Próprio)|Do Comum|Quando esta memória|Antífona e salmos|Salmodia complementar)/i.test(line)){
       stanza=null; add(line,'rubric'); return;
     }
-    if(/^(PRIMEIRA LEITURA|SEGUNDA LEITURA|LEITURA BREVE)$/.test(currentHead)){
+    if(/^(PRIMEIRA LEITURA|SEGUNDA LEITURA|LEITURA ALTERNATIVA|LEITURA BREVE)$/.test(currentHead)){
       if(splitReadingLine(line)) return;
       if(/^(Da|Do|Dos|Das)\s+/.test(line) && line.length < 180) add(line,'reading-ref');
       else addProse(line,'reading-body');
