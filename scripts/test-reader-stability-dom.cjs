@@ -256,6 +256,24 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
    assert.match(office.textContent, /nenhum bem eu posso achar fora de vós/);
   }
  }
+ for (const [month, day, rubric, transition, alternative] of [
+  [1, 12, /p\. 490, ou do Comum dos Pastores, p\. 510/, /Sê vigilante contigo/, /Totalmente voltado para Deus/],
+  [5, 4, /da nossa Ordem, p\. 489/, /Convertei-vos e fazei penitência/, /Trago em meu corpo o sofrimento de Jesus/]
+ ]) {
+  const id = run(`SANTORAL.find(saint => saint.month === ${month} && saint.day === ${day})._id`);
+  await openChild(`oficio:${id}:oficio`);
+  const office = child.w.document.querySelector('.oficio-leituras-content .today-servita-reader');
+  const headings = Array.from(office.querySelectorAll('.litheading'), node => node.textContent);
+  assert.deepEqual(headings, ['HINO', 'SALMODIA', 'PRIMEIRA LEITURA', 'RESPONSÓRIO', 'SEGUNDA LEITURA', 'RESPONSÓRIO', 'Leitura alternativa', 'RESPONSÓRIO', 'ORAÇÃO']);
+  assert.deepEqual(Array.from(office.querySelectorAll('.litblock > .rubric'), node => node.textContent).filter(text => text.startsWith('Série')), ['Série A', 'Série B', 'Série C']);
+  assert.match(office.querySelector('.litblock > .rubric').textContent, rubric);
+  assert.match(office.querySelector('.response').textContent, transition);
+  assert.equal(office.querySelectorAll('.antiphon').length, 9);
+  assert.equal(office.querySelectorAll('.response').length, 11);
+  assert.equal(office.querySelector('.psalm-title'), null);
+  assert.match(office.textContent, alternative);
+  assert.ok(office.querySelector('.liturgical-prayer'));
+ }
  const seriesHtml = child.run("renderLiturgicalHourContent('SALMODIA\\nSérie A\\nAnt. 1 Primeira antífona\\nSérie B (tempo pascal)\\nAnt. 1 Segunda antífona\\nSérie C\\nAnt. 1 Terceira antífona')");
  const seriesRoot = child.w.document.createElement('div');
  seriesRoot.innerHTML = seriesHtml;
@@ -270,10 +288,10 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
   const rootNode = child.w.document.createElement('div');rootNode.innerHTML=rendered;
   const rubrics = Array.from(rootNode.querySelectorAll('.litblock > .rubric'), node => node.textContent);
   for (const label of expected) assert.ok(rubrics.includes(label), date+': rubrica ausente '+label);
-  assert.equal(expected.length, date==='01-12'?3:2, date+': número inesperado de séries alternativas');
+  assert.equal(expected.length, date==='06-19'?2:3, date+': número inesperado de séries alternativas');
  }
  console.log('Rubricas de séries alternativas conferidas também nos formulários reais de Pucci, Peregrino e Juliana.');
  console.log('Séries alternativas da salmodia reconhecidas como rubricas, sem modificar antífonas.');
- console.log('Ofício das Leituras de Todos os Santos e dos Sete Santos Fundadores verificado.');
+ console.log('Ofício das Leituras verificado em quatro celebrações, incluindo Pucci e São Peregrino.');
  child.dom.window.close();a.dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});
