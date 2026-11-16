@@ -41,29 +41,36 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
  run('serviteAdjustFont(1)');assert.equal(w.OSMReaderScale.read(w.localStorage),1.16);assert.equal(child.w.document.documentElement.style.fontSize,'18.56px');assert.equal(run('readerScale'),1.16);child.run("setOficioTab('laudes')");assert.equal(child.w.document.documentElement.style.fontSize,'18.56px');run('serviteAdjustFont(-1)');assert.equal(w.OSMReaderScale.read(w.localStorage),1.08);
  child.w.OSMResourceContext.ready=false;run('updateServiteFontControls()');assert.ok([...w.document.querySelectorAll('[data-servite-font]')].every(b=>b.disabled));run('serviteAdjustFont(1)');assert.equal(w.OSMReaderScale.read(w.localStorage),1.08);child.w.OSMResourceContext.ready=true;run('updateServiteFontControls()');assert.ok([...w.document.querySelectorAll('[data-servite-font]')].every(b=>!b.disabled));w.OSMReaderScale.write(w.localStorage,2);run('updateServiteFontControls()');assert.equal(w.document.querySelector('[data-servite-font="1"]').disabled,true);assert.equal(w.document.querySelector('[data-servite-font="-1"]').disabled,false);
  console.log('Fonte: 108%→116%→108%, persistência ao navegar, sincronia com menu principal e controles bloqueados durante carga/no limite.');
- const feastId = run('SANTORAL.find(saint => saint.month === 11 && saint.day === 16)._id');
- await openChild(`oficio:${feastId}:laudes`);
- const laudes = child.w.document.querySelector('.laudes-content .today-servita-reader');
- const headings = Array.from(laudes.querySelectorAll('.litheading'), node => node.textContent);
- assert.deepEqual(headings, ['HINO', 'SALMODIA', 'LEITURA BREVE', 'RESPONSÓRIO BREVE', 'Cântico evangélico', 'PRECES', 'ORAÇÃO']);
- assert.equal(laudes.querySelector('.reading-ref').textContent, 'Rm 15,2.5-6');
- assert.match(laudes.querySelector('.reading-body').textContent, /de nosso Senhor Jesus Cristo\.$/);
- assert.equal(laudes.querySelectorAll('.response').length, 5);
- assert.equal(laudes.querySelectorAll('.liturgical-intercession-petition').length, 5);
- assert.match(laudes.querySelector('.liturgical-intercession-rubric').textContent, /Pai Nosso/);
- const salmodia = laudes.querySelectorAll('.litblock')[1];
- const psalmTitles = Array.from(salmodia.querySelectorAll('.psalm-title'), node => node.textContent);
- assert.deepEqual(psalmTitles, [
-  'Salmo 62,2-9 — Sede de Deus',
-  'Cântico (Dn 3,57-88.56) — Louvor das criaturas ao Senhor',
-  'Salmo 149 — A alegria e o louvor dos santos'
- ]);
- const antiphons = Array.from(salmodia.querySelectorAll('.antiphon'), node => node.textContent);
- assert.equal(antiphons.length, 6);
- assert.deepEqual([antiphons[0], antiphons[2], antiphons[4]], [antiphons[1], antiphons[3], antiphons[5]]);
- assert.equal(salmodia.textContent.match(/Glória ao Pai, ao Filho e ao Espírito Santo/g).length, 2);
- const benedictus = laudes.querySelectorAll('.litblock')[4];
- assert.match(benedictus.querySelector('.psalm-stanza').textContent, /Bendito seja o Senhor Deus/);
- console.log('Todos os Santos da Ordem: leitura, responsório, Benedictus e cinco preces no leitor de Laudes.');
+ const celebrations = [
+  {month: 11, day: 16, reference: 'Rm 15,2.5-6', readingEnd: /de nosso Senhor Jesus Cristo\.$/, petitions: 5},
+  {month: 2, day: 17, reference: 'Ef 4,32; 5,2', readingEnd: /sacrifício de agradável odor\.$/, petitions: 5},
+  {month: 5, day: 4, reference: '2Cor 5,14-17', readingEnd: /um mundo novo se fez\.$/, petitions: 4}
+ ];
+ for (const {month, day, reference, readingEnd, petitions} of celebrations) {
+  const feastId = run(`SANTORAL.find(saint => saint.month === ${month} && saint.day === ${day})._id`);
+  await openChild(`oficio:${feastId}:laudes`);
+  const laudes = child.w.document.querySelector('.laudes-content .today-servita-reader');
+  const headings = Array.from(laudes.querySelectorAll('.litheading'), node => node.textContent);
+  assert.deepEqual(headings, ['HINO', 'SALMODIA', 'LEITURA BREVE', 'RESPONSÓRIO BREVE', 'Cântico evangélico', 'PRECES', 'ORAÇÃO']);
+  assert.equal(laudes.querySelector('.reading-ref').textContent, reference);
+  assert.match(laudes.querySelector('.reading-body').textContent, readingEnd);
+  assert.equal(laudes.querySelectorAll('.response').length, 5);
+  assert.equal(laudes.querySelectorAll('.liturgical-intercession-petition').length, petitions);
+  assert.match(laudes.querySelector('.liturgical-intercession-rubric').textContent, /Pai Nosso/i);
+  const salmodia = laudes.querySelectorAll('.litblock')[1];
+  const psalmTitles = Array.from(salmodia.querySelectorAll('.psalm-title'), node => node.textContent);
+  assert.deepEqual(psalmTitles, [
+   'Salmo 62,2-9 — Sede de Deus',
+   'Cântico (Dn 3,57-88.56) — Louvor das criaturas ao Senhor',
+   'Salmo 149 — A alegria e o louvor dos santos'
+  ]);
+  const antiphons = Array.from(salmodia.querySelectorAll('.antiphon'), node => node.textContent);
+  assert.equal(antiphons.length, 6);
+  assert.deepEqual([antiphons[0], antiphons[2], antiphons[4]], [antiphons[1], antiphons[3], antiphons[5]]);
+  assert.equal(salmodia.textContent.match(/Glória ao Pai, ao Filho e ao Espírito Santo/g).length, 2);
+  const benedictus = laudes.querySelectorAll('.litblock')[4];
+  assert.match(benedictus.querySelector('.psalm-stanza').textContent, /Bendito seja o Senhor Deus/);
+ }
+ console.log('Laudes: salmodia, leitura, responsório, Benedictus e preces verificados nas três celebrações.');
  child.dom.window.close();a.dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});
