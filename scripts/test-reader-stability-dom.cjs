@@ -48,6 +48,7 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
   {month: 6, day: 19, reference: 'Gl 2,19b-20', readingEnd: /a si mesmo por mim\.$/, petitions: 4, alternative: /Alegre vossa Igreja/},
   {month: 8, day: 23, reference: '2Cor 4,5-6', readingEnd: /resplandece na face de Cristo\.$/, petitions: 5},
   {month: 8, day: 28, reference: '1Cor 2,5-7.9-10', readingEnd: /as profundezas de Deus\.$/, petitions: 5},
+  {month: 9, day: 15, reference: '2Tm 2,10-13', readingEnd: /pode renegar-se a si mesmo\.$/, petitions: 5, alternative: /quisestes que a Virgem Mãe participasse/},
  ];
  for (const {month, day, reference, readingEnd, petitions, alternative} of celebrations) {
   const feastId = run(`SANTORAL.find(saint => saint.month === ${month} && saint.day === ${day})._id`);
@@ -75,6 +76,15 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
   const benedictus = laudes.querySelectorAll('.litblock')[4];
   assert.match(benedictus.querySelector('.psalm-stanza').textContent, /Bendito seja o Senhor Deus/);
  }
- console.log('Laudes: salmodia, leitura, responsório, Benedictus e preces verificados nas seis celebrações.');
+ const sorrowfulMotherId = run('SANTORAL.find(saint => saint.month === 9 && saint.day === 15)._id');
+ assert.doesNotMatch(child.w.document.querySelector('.laudes-content').textContent, /II Vésperas|Magnificat/);
+ await openChild(`oficio:${sorrowfulMotherId}:vesperas`);
+ const vespers = child.w.document.querySelector('.vesperas-content .today-servita-reader');
+ assert.match(vespers.querySelector('.liturgical-hour-heading').textContent, /II Vésperas/);
+ assert.equal(vespers.querySelector('.reading-ref').textContent, 'Ap 21,1-5a');
+ assert.equal(vespers.querySelectorAll('.liturgical-intercession-petition').length, 5);
+ assert.match(vespers.textContent, /Magnificat/);
+ assert.doesNotMatch(vespers.textContent, /Benedictus/);
+ console.log('Laudes verificadas em sete celebrações e II Vésperas de Nossa Senhora das Dores em aba própria.');
  child.dom.window.close();a.dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});
