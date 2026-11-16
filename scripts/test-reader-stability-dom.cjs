@@ -120,6 +120,26 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
   'Benedictus'
  ]);
  assert.match(joaquim.querySelector('.antiphon').textContent, /habite em mim a força de Cristo/);
- console.log('Laudes verificadas em onze celebrações, incluindo as rubricas de Monte Senário e Joaquim de Sena.');
+ const ferialLauds = [
+  [2, 19, /Do Comum das Virgens ou das Santas religiosas/, /Salmos e antífonas do dia/, /a Bem-aventurada Isabel/],
+  [5, 8, /Do Comum de Nossa Senhora/, /^Salmos do dia da semana corrente\.$/, /Autor da graça/],
+  [5, 12, /da nossa Ordem, p\. 489/, /Salmos e antífonas do dia/, /o vosso servo Francisco/],
+  [5, 30, /da nossa Ordem, p\. 489/, /Salmos e antífonas do dia/, /Bem-aventurado Tiago Filipe/],
+  [9, 6, /da nossa Ordem, p\. 489/, /^Antífonas e salmos do dia/, /Bem-aventurado Boaventura/],
+  [10, 25, /da nossa Ordem, p\. 489/, /Salmos e antífonas do dia/, /João Angelo/]
+ ];
+ for (const [month, day, common, psalmody, prayer] of ferialLauds) {
+  const id = run(`SANTORAL.find(saint => saint.month === ${month} && saint.day === ${day})._id`);
+  await openChild(`oficio:${id}:laudes`);
+  const lauds = child.w.document.querySelector('.laudes-content .today-servita-reader');
+  const rubrics = Array.from(lauds.querySelectorAll('.litblock > .rubric'), node => node.textContent);
+  assert.match(rubrics[0], common);
+  assert.match(rubrics[1], psalmody);
+  assert.equal(rubrics[2], 'Benedictus');
+  assert.match(lauds.querySelector('.liturgical-prayer').textContent, prayer);
+  assert.equal(lauds.querySelector('.psalm-title'), null);
+  if (month === 5 && day === 30) assert.match(lauds.querySelector('.antiphon').textContent, /T\.P\. Aleluia/);
+ }
+ console.log('Laudes verificadas nos 17 formulários fixos, incluindo as remissões ao Comum e à salmodia ferial.');
  child.dom.window.close();a.dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});
