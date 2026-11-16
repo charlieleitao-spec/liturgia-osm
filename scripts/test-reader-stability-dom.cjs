@@ -51,7 +51,19 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
  assert.equal(laudes.querySelectorAll('.response').length, 5);
  assert.equal(laudes.querySelectorAll('.liturgical-intercession-petition').length, 5);
  assert.match(laudes.querySelector('.liturgical-intercession-rubric').textContent, /Pai Nosso/);
- assert.match(laudes.querySelector('.psalm-stanza').textContent, /Bendito seja o Senhor Deus/);
+ const salmodia = laudes.querySelectorAll('.litblock')[1];
+ const psalmTitles = Array.from(salmodia.querySelectorAll('.psalm-title'), node => node.textContent);
+ assert.deepEqual(psalmTitles, [
+  'Salmo 62,2-9 — Sede de Deus',
+  'Cântico (Dn 3,57-88.56) — Louvor das criaturas ao Senhor',
+  'Salmo 149 — A alegria e o louvor dos santos'
+ ]);
+ const antiphons = Array.from(salmodia.querySelectorAll('.antiphon'), node => node.textContent);
+ assert.equal(antiphons.length, 6);
+ assert.deepEqual([antiphons[0], antiphons[2], antiphons[4]], [antiphons[1], antiphons[3], antiphons[5]]);
+ assert.equal(salmodia.textContent.match(/Glória ao Pai, ao Filho e ao Espírito Santo/g).length, 2);
+ const benedictus = laudes.querySelectorAll('.litblock')[4];
+ assert.match(benedictus.querySelector('.psalm-stanza').textContent, /Bendito seja o Senhor Deus/);
  console.log('Todos os Santos da Ordem: leitura, responsório, Benedictus e cinco preces no leitor de Laudes.');
  child.dom.window.close();a.dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});
