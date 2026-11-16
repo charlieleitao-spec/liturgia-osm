@@ -199,6 +199,32 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
    assert.deepEqual(Array.from(vespers.querySelectorAll('.liturgical-hour-heading'), node => node.textContent), ['I Vésperas', 'Vésperas']);
   }
  }
- console.log('Vésperas verificadas em sete celebrações, incluindo Santa Juliana, São Filipe e Santo Agostinho.');
+ const ferialVespers = [
+  [2, 3, /da nossa Ordem, p\. 489/, /o Bem-aventurado Joaquim/],
+  [2, 19, /Do Comum das Virgens ou das Santas religiosas/, /a Bem-aventurada Isabel/],
+  [5, 8, /Do Comum de Nossa Senhora/, /Autor da graça/],
+  [5, 12, /da nossa Ordem, p\. 489/, /o vosso servo Francisco/],
+  [5, 30, /da nossa Ordem, p\. 489/, /Bem-aventurado Tiago Filipe/],
+  [9, 6, /da nossa Ordem, p\. 489/, /Bem-aventurado Boaventura/],
+  [9, 22, /Do Comum da Dedicação de uma Igreja/, /no alto do Monte Senário/],
+  [10, 25, /da nossa Ordem, p\. 489/, /João Angelo/]
+ ];
+ for (const [month, day, common, prayer] of ferialVespers) {
+  const id = run(`SANTORAL.find(saint => saint.month === ${month} && saint.day === ${day})._id`);
+  await openChild(`oficio:${id}:vesperas`);
+  const vespers = child.w.document.querySelector('.vesperas-content .today-servita-reader');
+  const rubrics = Array.from(vespers.querySelectorAll('.litblock > .rubric'), node => node.textContent);
+  assert.match(rubrics[0], common);
+  assert.match(rubrics[1], /dia da semana corrente/);
+  assert.equal(rubrics[2], 'Magnificat');
+  assert.match(vespers.querySelector('.liturgical-prayer').textContent, prayer);
+  assert.equal(vespers.querySelector('.psalm-title'), null);
+  if (month === 5 && day === 30) assert.match(vespers.querySelector('.antiphon').textContent, /T\.P\. Aleluia/);
+  if (month === 9 && day === 22) {
+   assert.deepEqual(rubrics.slice(3), ['Na basílica de Monte Senário', 'Fora da basílica de Monte Senário']);
+   assert.equal(vespers.querySelectorAll('.liturgical-prayer').length, 2);
+  }
+ }
+ console.log('Vésperas verificadas em quinze celebrações, incluindo as oito remissões à salmodia ferial.');
  child.dom.window.close();a.dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});
