@@ -290,6 +290,7 @@ function renderLiturgicalHourContent(text){
     }
     if(!block) startBlock('');
     if(currentHead==='PRECES'){precesLines.push(line);return;}
+    if(currentHead==='HINO' && /^Ou:$/i.test(line)){stanza=null;add(line,'rubric');return;}
 
     if(/^(?:Ant\.|Antífona\b)\s*\d*/i.test(line)){ stanza=null; add(line,'antiphon'); return; }
     if(/^(Salmo|Cântico|C[âa]ntico)\s+/i.test(line)){ stanza=null; currentHead='SALMODIA'; add(line,'psalm-title'); return; }

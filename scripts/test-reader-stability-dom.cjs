@@ -141,5 +141,27 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
   if (month === 5 && day === 30) assert.match(lauds.querySelector('.antiphon').textContent, /T\.P\. Aleluia/);
  }
  console.log('Laudes verificadas nos 17 formulários fixos, incluindo as remissões ao Comum e à salmodia ferial.');
+ const allSaintsId = run('SANTORAL.find(saint => saint.month === 11 && saint.day === 16)._id');
+ await openChild(`oficio:${allSaintsId}:vesperas`);
+ const allSaintsVespers = child.w.document.querySelector('.vesperas-content .today-servita-reader');
+ assert.equal(allSaintsVespers.querySelector('.reading-ref').textContent, 'Ap 7,14b-17');
+ assert.deepEqual(Array.from(allSaintsVespers.querySelectorAll('.psalm-title'), node => node.textContent), [
+  'Salmo 112 — Louvai o nome do Senhor', 'Salmo 115 — Ação de graças no templo', 'Cântico (Ef 1,3-10) — Ao Deus Salvador'
+ ]);
+ assert.equal(allSaintsVespers.querySelectorAll('.liturgical-intercession-petition').length, 5);
+ assert.equal(allSaintsVespers.querySelector('.litblock > .rubric').textContent, 'Ou:');
+ assert.match(allSaintsVespers.textContent, /Como cantar-vos, felizes, ó santos/);
+ assert.match(allSaintsVespers.textContent, /espírito de amoroso serviço/);
+
+ const foundersId = run('SANTORAL.find(saint => saint.month === 2 && saint.day === 17)._id');
+ await openChild(`oficio:${foundersId}:vesperas`);
+ const foundersVespers = child.w.document.querySelector('.vesperas-content .today-servita-reader');
+ const eveningHeadings = Array.from(foundersVespers.querySelectorAll('.liturgical-hour-heading'), node => node.textContent);
+ assert.deepEqual(eveningHeadings, ['I Vésperas', 'II Vésperas']);
+ assert.match(foundersVespers.textContent, /da nossa Ordem, p\. 503/);
+ assert.match(foundersVespers.querySelector('.reading-ref').textContent, /Cl 3,16-17/);
+ assert.match(foundersVespers.textContent, /dando por ele graças a Deus Pai\./);
+ assert.equal(foundersVespers.querySelectorAll('.liturgical-intercession-petition').length, 10);
+ console.log('Vésperas de Todos os Santos e dos Sete Santos Fundadores verificadas.');
  child.dom.window.close();a.dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});
