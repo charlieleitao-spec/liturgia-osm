@@ -259,7 +259,9 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
  for (const [month, day, rubric, transition, alternative] of [
   [1, 12, /p\. 490, ou do Comum dos Pastores, p\. 510/, /Sê vigilante contigo/, /Totalmente voltado para Deus/],
   [5, 4, /da nossa Ordem, p\. 489/, /Convertei-vos e fazei penitência/, /Trago em meu corpo o sofrimento de Jesus/],
-  [6, 19, /Comum das Virgens.*p\. 490/, /Jamais me desviei dos mandamentos do Senhor/, /Mãe e modelo das comunidades femininas dos Servos de Maria/]
+  [6, 19, /Comum das Virgens.*p\. 490/, /Jamais me desviei dos mandamentos do Senhor/, /Mãe e modelo das comunidades femininas dos Servos de Maria/],
+  [8, 23, /Comum dos Pastores.*p\. 490/, /Dai-me a sabedoria/, /Deus olhou para a humildade do seu servo/],
+  [8, 28, /Comum dos Pastores.*p\. 490/, /Cantarei eternamente vossa bondade/, /Somos pastores e servos/]
  ]) {
   const id = run(`SANTORAL.find(saint => saint.month === ${month} && saint.day === ${day})._id`);
   await openChild(`oficio:${id}:oficio`);
@@ -293,6 +295,6 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
  }
  console.log('Rubricas de séries alternativas conferidas também nos formulários reais de Pucci, Peregrino e Juliana.');
  console.log('Séries alternativas da salmodia reconhecidas como rubricas, sem modificar antífonas.');
- console.log('Ofício das Leituras verificado em cinco celebrações, incluindo Santa Juliana.');
+ console.log('Ofício das Leituras verificado em sete celebrações.');
  child.dom.window.close();a.dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});
