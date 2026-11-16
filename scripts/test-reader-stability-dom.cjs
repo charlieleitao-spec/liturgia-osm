@@ -258,7 +258,8 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
  }
  for (const [month, day, rubric, transition, alternative] of [
   [1, 12, /p\. 490, ou do Comum dos Pastores, p\. 510/, /Sê vigilante contigo/, /Totalmente voltado para Deus/],
-  [5, 4, /da nossa Ordem, p\. 489/, /Convertei-vos e fazei penitência/, /Trago em meu corpo o sofrimento de Jesus/]
+  [5, 4, /da nossa Ordem, p\. 489/, /Convertei-vos e fazei penitência/, /Trago em meu corpo o sofrimento de Jesus/],
+  [6, 19, /Comum das Virgens.*p\. 490/, /Jamais me desviei dos mandamentos do Senhor/, /Mãe e modelo das comunidades femininas dos Servos de Maria/]
  ]) {
   const id = run(`SANTORAL.find(saint => saint.month === ${month} && saint.day === ${day})._id`);
   await openChild(`oficio:${id}:oficio`);
@@ -288,10 +289,10 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
   const rootNode = child.w.document.createElement('div');rootNode.innerHTML=rendered;
   const rubrics = Array.from(rootNode.querySelectorAll('.litblock > .rubric'), node => node.textContent);
   for (const label of expected) assert.ok(rubrics.includes(label), date+': rubrica ausente '+label);
-  assert.equal(expected.length, date==='06-19'?2:3, date+': número inesperado de séries alternativas');
+  assert.equal(expected.length, 3, date+': número inesperado de séries alternativas');
  }
  console.log('Rubricas de séries alternativas conferidas também nos formulários reais de Pucci, Peregrino e Juliana.');
  console.log('Séries alternativas da salmodia reconhecidas como rubricas, sem modificar antífonas.');
- console.log('Ofício das Leituras verificado em quatro celebrações, incluindo Pucci e São Peregrino.');
+ console.log('Ofício das Leituras verificado em cinco celebrações, incluindo Santa Juliana.');
  child.dom.window.close();a.dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});
