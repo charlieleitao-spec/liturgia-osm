@@ -277,7 +277,7 @@ function renderLiturgicalHourContent(text){
       }
       return;
     }
-    if(/^Oração sálmica$/i.test(line)){startBlock(line);return;}
+    if(/^Oração (?:sálmica|sobre o cântico)$/i.test(line)){startBlock(line);return;}
     if(LITURGICAL_HEAD_RE.test(line)){
       startBlock(line);
       return;
@@ -307,7 +307,7 @@ function renderLiturgicalHourContent(text){
       addStanzaLine(line);
       return;
     }
-    if(/^(ORAÇÃO(?: SÁLMICA)?|PAI[- ]NOSSO|CONCLUSÃO)$/.test(currentHead)){
+    if(/^(ORAÇÃO(?: SÁLMICA| SOBRE O CÂNTICO)?|PAI[- ]NOSSO|CONCLUSÃO)$/.test(currentHead)){
       addProse(line,'liturgical-prayer');
       return;
     }
