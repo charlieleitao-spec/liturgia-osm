@@ -282,6 +282,7 @@ function renderLiturgicalHourContent(text){
       startBlock(line);
       return;
     }
+    if(/^Série [ABC](?:\s*\([^\n)]*\))?\s*$/i.test(line)){stanza=null;add(line,'rubric');return;}
     if(/^Hino Te Deum, p\. \d+\.?$/i.test(line)){startBlock('');add(line,'rubric');return;}
     if((match = line.match(/^HINO\b\s*(\([^)]*\))?\s*(.*)$/i))){
       startBlock('HINO');
