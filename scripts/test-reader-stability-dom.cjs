@@ -180,6 +180,25 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
   assert.match(vespers.querySelector('.liturgical-intercession-rubric').textContent, /Pai Nosso/i);
   assert.ok(vespers.querySelector('.liturgical-prayer'));
  }
- console.log('Vésperas verificadas em quatro celebrações, incluindo Pucci e São Peregrino.');
+ const eveningForms = [
+  [6, 19, ['Ct 8,6-7a', 'Ap 3,20-21'], /Comum das Virgens/, 10],
+  [8, 23, ['Fl 4,4-7'], /Comum dos Pastores, p\. 512, ou do Comum dos Santos/, 5],
+  [8, 28, ['Gl 5,13-14'], /Comum dos Pastores, p\. 512/, 4]
+ ];
+ for (const [month, day, references, rubric, petitions] of eveningForms) {
+  const id = run(`SANTORAL.find(saint => saint.month === ${month} && saint.day === ${day})._id`);
+  await openChild(`oficio:${id}:vesperas`);
+  const vespers = child.w.document.querySelector('.vesperas-content .today-servita-reader');
+  assert.deepEqual(Array.from(vespers.querySelectorAll('.reading-ref'), node => node.textContent), references);
+  assert.match(vespers.textContent, rubric);
+  assert.equal(vespers.querySelectorAll('.response').length, references.length * 5);
+  assert.equal(vespers.querySelectorAll('.liturgical-intercession-petition').length, petitions);
+  assert.equal(vespers.querySelectorAll('.litblock > .rubric:not(.liturgical-cue)').length >= references.length, true);
+  if (day === 19) {
+   assert.match(vespers.textContent, /Para os que celebram a solenidade/);
+   assert.deepEqual(Array.from(vespers.querySelectorAll('.liturgical-hour-heading'), node => node.textContent), ['I Vésperas', 'Vésperas']);
+  }
+ }
+ console.log('Vésperas verificadas em sete celebrações, incluindo Santa Juliana, São Filipe e Santo Agostinho.');
  child.dom.window.close();a.dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});
