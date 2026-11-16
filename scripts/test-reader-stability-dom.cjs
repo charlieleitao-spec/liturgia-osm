@@ -44,9 +44,12 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
  const celebrations = [
   {month: 11, day: 16, reference: 'Rm 15,2.5-6', readingEnd: /de nosso Senhor Jesus Cristo\.$/, petitions: 5},
   {month: 2, day: 17, reference: 'Ef 4,32; 5,2', readingEnd: /sacrifício de agradável odor\.$/, petitions: 5},
-  {month: 5, day: 4, reference: '2Cor 5,14-17', readingEnd: /um mundo novo se fez\.$/, petitions: 4}
+  {month: 5, day: 4, reference: '2Cor 5,14-17', readingEnd: /um mundo novo se fez\.$/, petitions: 4},
+  {month: 6, day: 19, reference: 'Gl 2,19b-20', readingEnd: /a si mesmo por mim\.$/, petitions: 4, alternative: /Alegre vossa Igreja/},
+  {month: 8, day: 23, reference: '2Cor 4,5-6', readingEnd: /resplandece na face de Cristo\.$/, petitions: 5},
+  {month: 8, day: 28, reference: '1Cor 2,5-7.9-10', readingEnd: /as profundezas de Deus\.$/, petitions: 5},
  ];
- for (const {month, day, reference, readingEnd, petitions} of celebrations) {
+ for (const {month, day, reference, readingEnd, petitions, alternative} of celebrations) {
   const feastId = run(`SANTORAL.find(saint => saint.month === ${month} && saint.day === ${day})._id`);
   await openChild(`oficio:${feastId}:laudes`);
   const laudes = child.w.document.querySelector('.laudes-content .today-servita-reader');
@@ -68,9 +71,10 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
   assert.equal(antiphons.length, 6);
   assert.deepEqual([antiphons[0], antiphons[2], antiphons[4]], [antiphons[1], antiphons[3], antiphons[5]]);
   assert.equal(salmodia.textContent.match(/Glória ao Pai, ao Filho e ao Espírito Santo/g).length, 2);
+  if(alternative)assert.match(laudes.querySelectorAll('.litblock')[6].textContent, alternative);
   const benedictus = laudes.querySelectorAll('.litblock')[4];
   assert.match(benedictus.querySelector('.psalm-stanza').textContent, /Bendito seja o Senhor Deus/);
  }
- console.log('Laudes: salmodia, leitura, responsório, Benedictus e preces verificados nas três celebrações.');
+ console.log('Laudes: salmodia, leitura, responsório, Benedictus e preces verificados nas seis celebrações.');
  child.dom.window.close();a.dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});

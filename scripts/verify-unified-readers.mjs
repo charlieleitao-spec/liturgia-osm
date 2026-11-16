@@ -30,7 +30,7 @@ function inspect(value,path=''){
   }else if(value&&typeof value==='object')for(const [key,item]of Object.entries(value))inspect(item,path+'/'+key);
 }
 inspect(offices);
-assert.equal(preces.length,40);
+assert.equal(preces.length,43);
 const hours=[];
 for(const [date,record]of Object.entries(offices.celebracoes))for(const [hour,item]of Object.entries(record.material?.horas||{})){
   const collect=(value,label)=>{
