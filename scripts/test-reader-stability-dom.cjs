@@ -237,9 +237,11 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
  assert.equal(deceasedVespers.querySelectorAll('.liturgical-intercession-petition').length, 5);
  assert.match(deceasedVespers.textContent, /glória dos vossos servos/);
  console.log('Vésperas verificadas nos 17 formulários fixos, incluindo as duas Horas de Nossa Senhora das Dores.');
- for (const [id, transition, alternative] of [
+ for (const [id, transition, alternative, hasTeDeum = true] of [
   [allSaintsId, /Amai o Senhor, vós que nele acreditais/, /Das Constituições dos frades Servos/],
-  [foundersId, /Se permanecerdes fiéis à minha Palavra/, /Da "Legenda" sobre a origem da Ordem/]
+  [foundersId, /Se permanecerdes fiéis à minha Palavra/, /Da "Legenda" sobre a origem da Ordem/],
+  [sorrowfulMotherId, /em vossas mãos entreguei a minha vida/, /Ad Caeli Reginam/],
+  [deceasedId, /Quem tem ouvidos/, /para a comemoração dos defuntos/, false]
  ]) {
   await openChild(`oficio:${id}:oficio`);
   const office = child.w.document.querySelector('.oficio-leituras-content .today-servita-reader');
@@ -249,8 +251,11 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
   assert.equal(office.querySelectorAll('.response').length, 11);
   assert.match(office.querySelector('.response').textContent, transition);
   assert.match(Array.from(office.querySelectorAll('.reading-ref')).at(-1).textContent, alternative);
-  assert.ok(Array.from(office.querySelectorAll('.litblock > .rubric')).some(node => node.textContent === 'Hino Te Deum, p. 36.'));
+  assert.equal(Array.from(office.querySelectorAll('.litblock > .rubric')).some(node => node.textContent === 'Hino Te Deum, p. 36.'), hasTeDeum);
   assert.ok(office.querySelector('.liturgical-prayer'));
+  if (id === sorrowfulMotherId || id === deceasedId) {
+   assert.equal(Array.from(office.querySelectorAll('.antiphon')).filter(node => /^[ABC]\. /.test(node.textContent)).length, 18);
+  }
   if (id === allSaintsId) {
    assert.equal(Array.from(office.querySelectorAll('.antiphon')).filter(node => /^[ABC]\. /.test(node.textContent)).length, 15);
    assert.match(office.textContent, /nenhum bem eu posso achar fora de vós/);
@@ -295,6 +300,6 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
  }
  console.log('Rubricas de séries alternativas conferidas também nos formulários reais de Pucci, Peregrino e Juliana.');
  console.log('Séries alternativas da salmodia reconhecidas como rubricas, sem modificar antífonas.');
- console.log('Ofício das Leituras verificado em sete celebrações.');
+ console.log('Ofício das Leituras verificado em nove celebrações.');
  child.dom.window.close();a.dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});
