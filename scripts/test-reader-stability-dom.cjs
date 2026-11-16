@@ -162,6 +162,24 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
  assert.match(foundersVespers.querySelector('.reading-ref').textContent, /Cl 3,16-17/);
  assert.match(foundersVespers.textContent, /dando por ele graças a Deus Pai\./);
  assert.equal(foundersVespers.querySelectorAll('.liturgical-intercession-petition').length, 10);
- console.log('Vésperas de Todos os Santos e dos Sete Santos Fundadores verificadas.');
+ const commonVespers = [
+  [1, 12, 'Rm 12,9-16', /^Dos Servos de Maria$/, /Não sejais sábios a vossos próprios olhos\./],
+  [5, 4, 'Rm 8,18-21', /^Ó Peregrino, irmão nosso e amigo,$/, /liberdade gloriosa dos filhos de Deus\./]
+ ];
+ for (const [month, day, reference, hymn, reading] of commonVespers) {
+  const id = run(`SANTORAL.find(saint => saint.month === ${month} && saint.day === ${day})._id`);
+  await openChild(`oficio:${id}:vesperas`);
+  const vespers = child.w.document.querySelector('.vesperas-content .today-servita-reader');
+  assert.match(vespers.querySelector('.hymn-stanza-line').textContent, hymn);
+  assert.match(vespers.querySelector('.litblock > .rubric').textContent, /Comum dos Santos e Bem-aventurados da nossa Ordem, p\. 503/);
+  assert.equal(vespers.querySelector('.psalm-title'), null);
+  assert.equal(vespers.querySelector('.reading-ref').textContent, reference);
+  assert.match(vespers.querySelector('.reading-body').textContent, reading);
+  assert.equal(vespers.querySelectorAll('.response').length, 5);
+  assert.equal(vespers.querySelectorAll('.liturgical-intercession-petition').length, 5);
+  assert.match(vespers.querySelector('.liturgical-intercession-rubric').textContent, /Pai Nosso/i);
+  assert.ok(vespers.querySelector('.liturgical-prayer'));
+ }
+ console.log('Vésperas verificadas em quatro celebrações, incluindo Pucci e São Peregrino.');
  child.dom.window.close();a.dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});
