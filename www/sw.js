@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.136-personal-v2-fontes-s21-assets-pr150-mariano1-padrao2-search3';
+const CACHE = 'liturgia-osm-v4.9.137-teste1-personal-v2-fontes-s21-assets-pr150-mariano1-padrao2-search3';
 const CORE = [
   "./media/emblema-osm.svg",
   "./media/ornamento-final.svg",
@@ -20,7 +20,6 @@ const CORE = [
   "./pdf-links.js",
   "./library-downloads.js",
   "./reminders.js",
-  "./widget-links.js",
   "./servite.html",
   "./servite.css",
   "./servite-1.js",

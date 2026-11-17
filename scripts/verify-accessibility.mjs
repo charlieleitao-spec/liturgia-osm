@@ -17,7 +17,9 @@ try{
   assert.equal(await dialog.locator(':focus').count(),1,'Shift+Tab must wrap focus inside the unified menu');
   await page.keyboard.press('Tab');
   assert.equal(await dialog.getByRole('button',{name:/Buscar textos e documentos/}).evaluate(n=>n===document.activeElement),true,'Tab returns to first navigation action');
-  for(let i=0;i<20;i++)await dialog.getByRole('button',{name:'Aumentar tamanho do texto',exact:true}).click();
+  const increase=dialog.getByRole('button',{name:'Aumentar tamanho do texto',exact:true});
+  for(let i=0;i<13;i++)await increase.click();
+  assert.equal(await increase.isDisabled(),true);
   assert.equal(await dialog.locator('.reader-scale-value').textContent(),'200%');
   await page.keyboard.press('Escape');
   assert.equal(await menu.getAttribute('aria-expanded'),'false');

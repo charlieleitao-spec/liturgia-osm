@@ -146,9 +146,6 @@ jobs:
       - name: Integrar leitor PDF Android offline
         run: node scripts/patch-android-pdf.mjs
 
-      - name: Gerar widgets Android
-        run: node scripts/patch-android-widget.mjs
-
       - name: Aplicar ícone Servita
         run: |
           mkdir -p icones-extraidos

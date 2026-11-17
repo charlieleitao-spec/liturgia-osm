@@ -60,7 +60,6 @@
  function load(storage){const raw=storage.getItem(KEY);return raw?personal(JSON.parse(raw)):empty();}
  function save(storage,p){storage.setItem(KEY,JSON.stringify(personal(p)));}
  function upsert(list,value){const k=routeKey(value.route),out=[value,...list.filter(x=>routeKey(x.route)!==k)];if(out.length>MAX_ENTRIES)throw Error('Limite de registros pessoais atingido. Exporte uma cópia antes de continuar.');return out;}
- function saveNote(storage,r,title,text,deleted=false){const p=load(storage);const e=entry({route:r,title,text,deleted,updatedAt:Date.now()},true);p.notes=upsert(p.notes,e);save(storage,p);return e;}
  function savePosition(storage,r,title,value){const p=load(storage),e=entry({route:r,title,point:value,updatedAt:Date.now()});p.positions=upsert(p.positions,e).slice(0,200);p.last=e;save(storage,p);return e;}
  function favorite(k){if(typeof k!=='string'||! /^(saint:\d{1,6}|prayer:[a-zA-Z0-9_.-]{1,100})$/.test(k))throw Error('Favorito inválido.');return k;}
  function legacy(storage){
@@ -103,5 +102,5 @@
   try{applyValues(storage,plan.values)}catch(error){try{applyValues(storage,before)}catch{throw Error('Armazenamento indisponível durante a recuperação. A cópia anterior está preservada para desfazer.');}throw Error('Não foi possível restaurar. Os dados anteriores foram mantidos.');}return plan.summary;
  }
  function undoRestore(storage){const raw=storage.getItem(RECOVERY);if(!raw)throw Error('Não há restauração para desfazer.');const data=JSON.parse(raw),keys=[KEY,...LEGACY];if(keys.some(k=>!Object.hasOwn(data,k)||!(data[k]===null||typeof data[k]==='string')))throw Error('Cópia de recuperação inválida.');const before=snapshot(storage);try{applyValues(storage,Object.fromEntries(keys.map(k=>[k,data[k]])))}catch(error){applyValues(storage,before);throw Error('Não foi possível desfazer; os dados atuais foram mantidos.');}storage.removeItem(RECOVERY);}
- return {KEY,RECOVERY,MAX_BYTES,MAX_NOTE,route,routeKey,noteKey,point,empty,load,saveNote,savePosition,exportBackup,parseBackup,planRestore,restore,undoRestore};
+ return {KEY,RECOVERY,MAX_BYTES,route,routeKey,point,empty,load,savePosition,exportBackup,parseBackup,planRestore,restore,undoRestore};
 });
