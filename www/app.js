@@ -1478,6 +1478,12 @@ function updateBackButton(){
   button.hidden=!(subpage||nonHomeTab);
 }
 
+if('ResizeObserver' in window){
+  new ResizeObserver(([entry])=>{
+    document.documentElement.style.setProperty('--app-header-height',entry.target.offsetHeight+'px');
+  }).observe(document.querySelector('.topbar'));
+}
+
 function backFromHeader(){
   if(smartBack())document.getElementById('view').focus({preventScroll:true});
 }
