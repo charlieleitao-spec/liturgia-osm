@@ -341,7 +341,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.136';
+const APP_VERSION = '4.9.137';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -356,7 +356,10 @@ function applyPreferences(){
   document.documentElement.style.colorScheme = lightMode ? 'light' : 'dark';
   const themeMeta=document.querySelector('meta[name=theme-color]'); if(themeMeta) themeMeta.content=lightMode?'#f7f4ed':'#0c1827';
   document.querySelectorAll('.menu-theme').forEach(button=>button.setAttribute('aria-pressed',String(!lightMode)));
-  const b=document.getElementById('themeBtn'); if(b) b.textContent = lightMode ? '☾' : '☼'; document.querySelectorAll('.reader-scale-value').forEach(rv=>rv.textContent=Math.round(readerScale*100)+'%');
+  document.querySelectorAll('.reader-scale-value').forEach(rv=>rv.textContent=Math.round(readerScale*100)+'%');
+  document.querySelectorAll('[data-menu-font]').forEach(button=>{
+    button.disabled=Number(button.dataset.menuFont)<0?readerScale<=OSMReaderScale.MIN:readerScale>=OSMReaderScale.MAX;
+  });
 }
 function adjustFont(delta){
   window.OSMPersonalReader?.cancelPosition();
@@ -419,7 +422,7 @@ function getCapacitorPlugin(name){
 }
 
 
-function setTab(tab){
+function setTab(tab,section){
   if(tab==='vida') tab='hoje';
   const allowed=['busca','hoje','calendario','santoral','liturgia','oracoes','biblioteca','sobre'];
   if(!allowed.includes(tab)) return;
@@ -427,7 +430,8 @@ function setTab(tab){
   dailyPrayerOpen480=null;
   localStorage.setItem('osmLastTab',tab);
   state.detailId=null;state.devo=null;state.devoSub=null;
-  if(tab!=='liturgia')state.liturgiaDetail=null;
+  state.liturgiaDetail=null;
+  if(tab==='liturgia'&&section)state.liturgiaSection=section;
   state.prayerSection='praticas';state.prayerCategory=null;memoriaSelectedDate=null;
   render();window.scrollTo(0,0);
 }
@@ -494,17 +498,13 @@ function viewHoje(){
     const label=saint?'Celebração de hoje':'Próxima celebração';
     celebrationCard='<button class="home-celebration card fade-in" onclick="openDetail('+celebration._id+')" aria-label="Abrir '+escapeHtml(celebration.title)+'">'+
       saintImageHtml(celebration,false)+
-      '<span class="home-celebration-text"><span class="rank">'+label+'</span><b>'+celebrationNameHtml(celebration.title,celebration)+'</b><span class="date-line">'+escapeHtml(celebration.date)+'</span></span><span class="chev">›</span></button>'+
-      '<div class="hub-shortcuts" aria-label="Atalhos da celebração">'+
-      '<button onclick="openSaintSection('+celebration._id+',\'vida\')">Vida</button>'+
-      '<button onclick="openSaintSection('+celebration._id+',\'liturgia\')">Liturgia</button>'+
-      '<button onclick="openSaintSection('+celebration._id+',\'oracao\')">Oração</button></div>';
+      '<span class="home-celebration-text"><span class="rank">'+label+'</span><b>'+celebrationNameHtml(celebration.title,celebration)+'</b><span class="date-line">'+escapeHtml(celebration.date)+'</span></span><span class="chev">›</span></button>';
   }
   const prayer=dailyPrayerSuggestion();
   return '<section class="liturgical-hero home-hero fade-in"><div class="liturgical-kicker">Ordem dos Servos de Maria</div><div class="home-date-line"><strong>'+today.day+'</strong><span>'+escapeHtml(MONTHS[today.month-1])+'</span></div><div class="liturgical-sub">'+escapeHtml(today.weekday)+'</div></section>'+
     '<div class="section-title home-heading">Acesso rápido</div><div class="hub-shortcuts home-quick-actions" aria-label="Acessos rápidos da liturgia">'+
     '<button onclick="openDailyLiturgy()" aria-label="Consultar Missa do dia">Missa do dia</button>'+
-    '<button onclick="setTab(\'liturgia\');setLiturgiaSection(\'horas\')" aria-label="Consultar Ofício próprio dos Servos de Maria">Ofício OSM</button>'+
+    '<button onclick="setTab(\'liturgia\',\'horas\')" aria-label="Consultar Ofício próprio dos Servos de Maria">Ofício OSM</button>'+
     '<button onclick="setTab(\'santoral\')" aria-label="Consultar Santoral">Santoral</button></div>'+
     '<div class="section-title home-heading">Celebração Servita</div>'+celebrationCard+
     
@@ -1469,26 +1469,26 @@ function viewBiblioteca(){
     <div class="section-title">Favoritos</div>${favorites.length?resultRows(favorites):'<div class="empty-state">Toque na estrela de uma oração ou celebração para guardá-la aqui.</div>'}
     <div class="section-title">Últimos acessados</div>${recent.length?resultRows(recent):'<div class="empty-state">Os conteúdos consultados aparecerão aqui.</div>'}`;
 }
-let APP_NAV_STACK=[];
-let APP_LAST_TAB=state && state.tab ? state.tab : 'hoje';
 function updateBackButton(){
-  const button=document.getElementById('floatingBack');
+  const button=document.getElementById('headerBack');
   if(!button) return;
-  const platform=window.Capacitor?.getPlatform?.()||'';
-  const androidApp=!!window.Capacitor?.isNativePlatform?.()&&(platform==='android'||/Android/i.test(navigator.userAgent));
   const hasDetail=state.detailId!==null&&state.detailId!==undefined;
-  const overlay=['serviteOverlay','mainMenuOverlay','dailyLiturgyOverlay','personalOverlay'].some(id=>document.getElementById(id)?.classList.contains('open'));
   const subpage=hasDetail||!!state.devo||state.devoSub!==null&&state.devoSub!==undefined||!!dailyPrayerOpen480||!!memoriaSelectedDate||!!state.liturgiaDetail;
   const nonHomeTab=state.tab!=='vida'&&state.tab!=='hoje';
-  const visible=!androidApp&&!overlay&&(subpage||nonHomeTab);
-  button.classList.toggle('show',visible);
-  const label=hasDetail?'Voltar à origem':'Voltar para Hoje';
-  button.setAttribute('aria-label',label);
-  button.title=label;
+  button.hidden=!(subpage||nonHomeTab);
+}
+
+if('ResizeObserver' in window){
+  new ResizeObserver(([entry])=>{
+    document.documentElement.style.setProperty('--app-header-height',entry.target.offsetHeight+'px');
+  }).observe(document.querySelector('.topbar'));
+}
+
+function backFromHeader(){
+  if(smartBack())document.getElementById('view').focus({preventScroll:true});
 }
 
 function smartBack(){
-  if(document.getElementById('personalOverlay')?.classList.contains('open')){window.OSMPersonalReader.close();return true;}
   const menu=document.getElementById('mainMenuOverlay');
   const servite=document.getElementById('serviteOverlay');
   const mass=document.getElementById('dailyLiturgyOverlay');
@@ -1502,7 +1502,6 @@ function smartBack(){
   if(state.devoSub!==null&&state.devoSub!==undefined){closeDevo();return true;}
   if(state.devo){closeDevo();return true;}
   if(state.detailId!==null&&state.detailId!==undefined){closeDetail();return true;}
-  if(state.tab==='liturgia'&&state.liturgiaSection==='horas'){setLiturgiaSection('missa');return true;}
   if(state.tab!=='hoje'){setTab('vida');return true;}
   return false;
 }
@@ -1580,7 +1579,6 @@ document.getElementById('serviteFrame').addEventListener('load',()=>{
     }
   });}catch(error){console.warn('[Liturgia OSM] Foco do recurso indisponível.',error);}
 });
-function serviteReload(){if(!currentServiteView)return;window.OSMPersonalReader?.resourceOpening();document.querySelectorAll('[data-servite-font]').forEach(button=>button.disabled=true);document.getElementById('serviteFrame').contentWindow.location.replace(new URL(serviteUrl(currentServiteView)+'&reload='+Date.now(),location.href).href);}
 window.addEventListener('popstate',event=>{
   const resourceOpen=document.getElementById('serviteOverlay')?.classList.contains('open');
   if(resourceOpen||serviteHistoryReturnPending){
@@ -1596,26 +1594,14 @@ window.addEventListener('popstate',event=>{
   const crest=document.querySelector('.crest');
   if(crest) crest.innerHTML='<img src="icon-192.png" alt="Emblema dos Servos de Maria">';
 
-  function recentCard(){
-    const item=recents()[0];
-    if(!item) return '';
-    const action=item.type==='saint'?`openSaint(${item.key})`:prayerActionForKey(String(item.key));
-    return `<div class="section-title home-heading">Continuar</div>
-      <div class="card continue-card fade-in" onclick="${action}">
-        <div class="continue-mark">↻</div><div class="continue-text"><small>Último conteúdo consultado</small><b>${escapeHtml(item.title)}</b><span>${escapeHtml(item.sub||'Liturgia OSM')}</span></div><div class="chev">›</div>
-      </div>`;
-  }
-
-  
-
   const menu=document.querySelector('.main-menu');
   if(menu) menu.innerHTML=`<div class="main-menu-head"><h3 id="mainMenuTitle">Menu</h3><button class="tool-btn" onclick="closeMainMenu()" aria-label="Fechar menu">✕</button></div>
-    <div class="menu-section menu-section-first"><div class="menu-label">Biblioteca</div><button class="menu-action menu-wide menu-entry" onclick="closeMainMenu();openGlobalSearch()">Buscar textos e documentos <span aria-hidden="true">›</span></button><button class="menu-action menu-wide menu-entry" onclick="closeMainMenu();setTab('biblioteca')">Favoritos e recentes <span aria-hidden="true">›</span></button></div>
-    <div class="menu-section"><div class="menu-label">Recursos da família servita</div><a class="menu-action menu-wide menu-entry menu-resource-link" href="https://liturgiadiaria.edicoescnbb.com.br/" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event,this.href)">Liturgia brasileira · CNBB <span aria-hidden="true">›</span></a><a class="menu-action menu-wide menu-entry menu-resource-link" href="https://www.vozes.com.br/blog/folhinha-2022-publicacao-traz-curiosidades-e-evangelizacao-para-o-seu-dia-a-dia" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event,this.href)">Folhinha · apresentação da Editora Vozes <span aria-hidden="true">›</span></a><a class="menu-action menu-wide menu-entry" href="./biblioteca-servita.html">Biblioteca Servita <span aria-hidden="true">›</span></a><button class="menu-action menu-wide menu-entry" onclick="closeMainMenu();openServite('regra')">Ordem Secular · Regra de Vida <span aria-hidden="true">›</span></button><a class="menu-action menu-wide menu-entry menu-resource-link" href="https://somosservos.blogspot.com/p/aplicativos-servitas.html#caminho-servita-app" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event,this.href)">Caminho Servita <span aria-hidden="true">›</span></a><a class="menu-action menu-wide menu-entry menu-resource-link" href="https://charlieleitao-spec.github.io/somos-servos-app/recursos.html" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event,this.href)">Oração, formação e memória <span aria-hidden="true">›</span></a></div>
-    <div class="menu-section"><div class="menu-label">Ajustes de leitura</div><div class="menu-row menu-font-controls"><button class="menu-action" onclick="adjustFont(-0.08)" aria-label="Diminuir tamanho do texto">A−</button><span class="reader-scale-value" role="status" aria-label="Tamanho do texto">100%</span><button class="menu-action" onclick="adjustFont(0.08)" aria-label="Aumentar tamanho do texto">A+</button><button class="menu-action" onclick="resetFont()" aria-label="Restaurar tamanho padrão do texto">Padrão</button></div><button class="menu-action menu-wide menu-theme" aria-label="Tema escuro" aria-pressed="false" onclick="toggleTheme()">☼ / ☾ Alternar tema claro ou escuro</button></div>
+    <div class="menu-section menu-section-first"><button class="menu-action menu-wide menu-entry" onclick="closeMainMenu();openGlobalSearch()">Buscar textos e documentos <span aria-hidden="true">›</span></button><button class="menu-action menu-wide menu-entry" onclick="closeMainMenu();setTab('biblioteca')">Favoritos e recentes <span aria-hidden="true">›</span></button><a class="menu-action menu-wide menu-entry" href="./biblioteca-servita.html">Biblioteca Servita <span aria-hidden="true">›</span></a><button class="menu-action menu-wide menu-entry" onclick="closeMainMenu();openServite('regra')">Ordem Secular · Regra de Vida <span aria-hidden="true">›</span></button></div>
+    <div class="menu-section"><div class="menu-label">Ajustes de leitura</div><div class="menu-row menu-font-controls"><button class="menu-action" data-menu-font="-1" onclick="adjustFont(-OSMReaderScale.STEP)" aria-label="Diminuir tamanho do texto">A−</button><span class="reader-scale-value" role="status" aria-label="Tamanho do texto">100%</span><button class="menu-action" data-menu-font="1" onclick="adjustFont(OSMReaderScale.STEP)" aria-label="Aumentar tamanho do texto">A+</button><button class="menu-action" onclick="resetFont()" aria-label="Restaurar tamanho padrão do texto">Padrão</button></div><button class="menu-action menu-wide menu-theme" aria-label="Tema escuro" aria-pressed="false" onclick="toggleTheme()">☼ / ☾ Alternar tema claro ou escuro</button></div>
+    <details class="menu-section menu-about-details"><summary>Fontes e recursos externos</summary><a class="menu-action menu-wide menu-entry menu-resource-link" href="https://liturgiadiaria.edicoescnbb.com.br/" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event,this.href)">Liturgia brasileira · CNBB <span aria-hidden="true">›</span></a><a class="menu-action menu-wide menu-entry menu-resource-link" href="https://www.vozes.com.br/blog/folhinha-2022-publicacao-traz-curiosidades-e-evangelizacao-para-o-seu-dia-a-dia" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event,this.href)">Folhinha · apresentação da Editora Vozes <span aria-hidden="true">›</span></a><a class="menu-action menu-wide menu-entry menu-resource-link" href="https://somosservos.blogspot.com/p/aplicativos-servitas.html#caminho-servita-app" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event,this.href)">Caminho Servita <span aria-hidden="true">›</span></a><a class="menu-action menu-wide menu-entry menu-resource-link" href="https://charlieleitao-spec.github.io/somos-servos-app/recursos.html" target="_blank" rel="noopener noreferrer" onclick="return openExternalLink(event,this.href)">Oração, formação e memória <span aria-hidden="true">›</span></a></details>
     <div id="reminderSettings" class="menu-section" hidden><div class="menu-label">Lembrete de celebrações</div><div class="reminder-panel"><label class="reminder-switch-row" for="reminderEnabled"><span><strong>Receber lembrete</strong><small>Somente nas celebrações próprias da Ordem</small></span><input id="reminderEnabled" type="checkbox" role="switch" disabled></label><label class="reminder-time-row" for="reminderTime"><span>Horário do lembrete</span><input id="reminderTime" type="time" value="07:00" required disabled></label><p id="reminderStatus" role="status">Desligado. Apenas nos dias com celebração própria.</p></div></div>
     <details class="menu-section menu-about-details"><summary>Sobre, créditos e redes sociais</summary><div class="menu-about-content">${viewSobre()}</div></details>
-    <div class="menu-section menu-footer"><div class="menu-status"><span class="connection-dot"></span><span>Versão ${APP_VERSION} · Missa e Ofício próprios OSM disponíveis offline</span></div></div>`;
+    <div class="menu-section menu-footer"><div class="menu-status"><span class="connection-dot"></span><span>Versão ${APP_VERSION}</span></div></div>`;
 
   try{window.OSMReminders?.init();}catch(error){console.warn('[Lembrete OSM] Inicialização indisponível.',error);const status=document.getElementById('reminderStatus');if(status)status.textContent='Lembrete indisponível. Feche e abra o aplicativo para tentar novamente.';}
   window.addEventListener('online',()=>{if(state.tab==='hoje')render();});
@@ -1728,8 +1714,6 @@ window.addEventListener('popstate',event=>{
   window.closeDailyLiturgy=function(){closeAccessibleDialog('dailyLiturgyOverlay');if(document.body.classList.contains('celebration-mode'))toggleCelebrationMode();if(window.updateCelebrationButton)window.updateCelebrationButton();};
   window.moveDailyDate=function(amount){const date=new Date(selectedDate+'T12:00:00');date.setDate(date.getDate()+amount);loadDailyLiturgy(localISO(date));};
   
-  const menu=document.querySelector('.main-menu');
-  if(menu){const status=menu.querySelector('.menu-status span:last-child');if(status)status.textContent=`Versão ${APP_VERSION} · Missa e Ofício próprios OSM disponíveis offline`;}
   window.addEventListener('online',()=>{if(document.getElementById('dailyLiturgyOverlay').classList.contains('open'))loadDailyLiturgy(selectedDate);});
   render();
 })();
@@ -1756,7 +1740,6 @@ async function loadCanonicalSantoral(){
     const requestedCelebration=new URLSearchParams(window.location.search).get('celebracao');
     if(requestedCelebration!==null&&SANTORAL.some(item=>Number(item.id)===Number(requestedCelebration))){state.tab='santoral';state.detailOriginTab='santoral';state.detailId=Number(requestedCelebration);}
     santoralReady=true;
-    window.OSMWidgetLinks?.setData(SANTORAL,id=>{closeMainMenu();openDetail(id);});
     window.OSMReminders?.setData(SANTORAL,id=>{closeMainMenu();openDetail(id);});
   }catch(error){
     santoralReady=false;
@@ -1786,7 +1769,6 @@ async function loadCanonicalOffices(){
   render();
 }
 window.loadCanonicalOffices=loadCanonicalOffices;
-window.OSMWidgetLinks?.init();
 loadCanonicalSantoral();
 /* END SCRIPT BLOCK: canonicalSantoral495 */
 
@@ -1932,8 +1914,7 @@ loadCanonicalSantoral();
     });
   };
   window.openLiturgiaSection=function(section){
-    state.liturgiaSection=section==='horas'?'horas':'missa';
-    setTab('liturgia');
+    setTab('liturgia',section==='horas'?'horas':'missa');
   };
 
   installAndroidBackHandler();

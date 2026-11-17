@@ -1023,7 +1023,7 @@ function viewRegra(){
     const text = isIntro ? r.intro : r.chapters[state.regraChapter].text;
     const reader = isIntro ? `<div class="card fade-in"><div class="prayer-block">${renderPrayer(text)}</div></div>` : `<div class="rule-reader fade-in">${renderRuleArticles(text)}</div>`;
     return `
-      <button class="regra-floating-back" onclick="backFromRegra485()" aria-label="Voltar">
+      <button class="back-btn" onclick="backFromRegra485()" aria-label="Voltar aos capítulos">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
         ${escapeHtml(ptText('back'))}
       </button>
@@ -1035,10 +1035,7 @@ function viewRegra(){
     `;
   }
   return `
-    <button class="regra-floating-back" onclick="backFromRegra485()" aria-label="Voltar">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6l-6 6 6 6"/></svg>
-      <span>${escapeHtml(ptText('back'))}</span>
-    </button>
+    ${window.parent===window?`<button class="back-btn" onclick="backFromRegra485()">← ${escapeHtml(ptText('back'))}</button>`:''}
     <div class="detail-header fade-in">
       <h2 style="font-size:1.625rem;">${escapeHtml(ptText('regraTitle'))}</h2>
       <div class="date-line">${escapeHtml(ptText('regraSub'))}</div>

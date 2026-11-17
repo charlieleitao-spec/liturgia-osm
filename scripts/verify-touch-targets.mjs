@@ -19,7 +19,7 @@ try{
     await page.setViewportSize({width,height:844});
     for(const theme of ['light','dark']){
       await page.evaluate(theme=>{lightMode=theme==='light';applyPreferences();setTab('calendario');},theme);
-      await targets(page.locator('#menuBtn,#tabbar button'),'Main navigation');
+      await targets(page.locator('#headerBack,#menuBtn,#tabbar button'),'Main navigation');
       await targets(page.locator('.calendar-toolbar button,.calendar-toolbar select'),'Calendar toolbar');
       const calendar=page.locator('.calendar-presented');
       assert.equal(await calendar.evaluate(n=>n.scrollWidth<=n.clientWidth+1),true,`Calendar clipped: ${width}/${theme}`);
@@ -43,8 +43,8 @@ try{
       await page.getByRole('button',{name:'Ordem Secular · Regra de Vida',exact:true}).click();
       await targets(page.locator('.servite-head button'),'Embedded reader toolbar');
       const frame=page.frameLocator('#serviteFrame');
-      await frame.locator('.regra-floating-back').waitFor();
-      await targets(frame.locator('.regra-floating-back'),'Resource return control');
+      await frame.getByText('Capítulo I',{exact:true}).click();
+      await targets(frame.getByRole('button',{name:'Voltar aos capítulos'}),'Resource return control');
       await page.getByRole('button',{name:'Fechar recurso',exact:true}).click();
       await page.evaluate(()=>{setTab('liturgia');setLiturgiaSection('horas');});
       await page.locator('.liturgia-resource-detail').evaluateAll(nodes=>nodes.forEach(n=>n.open=true));

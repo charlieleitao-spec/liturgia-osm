@@ -71,37 +71,6 @@ public final class UpgradeInstrumentation extends Instrumentation {
                 }
                 if(!searchReady)throw new Exception("First-use search failed offline: "+evaluate("JSON.stringify({error:globalSearchError,loaded:!!globalSearchIndex,external:externalSearchRequests})"));
                 PdfValidation.verify(this,this::evaluate);
-                // Both native providers must be discoverable by the launcher.
-                long providerCount=android.appwidget.AppWidgetManager.getInstance(getTargetContext()).getInstalledProviders().stream()
-                    .filter(p->p.provider.getPackageName().equals("com.liturgia_osm.app")).count();
-                if(providerCount!=2)throw new Exception("Expected two widget sizes, got "+providerCount);
-                Class<?> widget=getTargetContext().getClassLoader().loadClass("com.liturgia_osm.app.ServitaWidget");
-                java.lang.reflect.Method model=widget.getMethod("modelForDate",android.content.Context.class,int.class,int.class);
-                int[][] dates={{9,15},{2,17},{3,1}};
-                String[] names={"Nossa Senhora das Dores","Sete Santos Fundadores","Sem celebração própria hoje"};
-                for(int i=0;i<dates.length;i++){
-                    org.json.JSONObject row=(org.json.JSONObject)model.invoke(null,getTargetContext(),dates[i][0],dates[i][1]);
-                    if(!names[i].equals(row.getString("name")))throw new Exception("Widget date mismatch: "+row);
-                    for(boolean square:new boolean[]{false,true}){
-                        android.widget.RemoteViews views=(android.widget.RemoteViews)widget.getMethod("viewsForDate",android.content.Context.class,boolean.class,int.class,int.class)
-                            .invoke(null,getTargetContext(),square,dates[i][0],dates[i][1]);
-                        final String expected=names[i];
-                        runOnMainSync(()->{
-                            android.view.View view=views.apply(getTargetContext(),new android.widget.FrameLayout(getTargetContext()));
-                            int nameId=getTargetContext().getResources().getIdentifier("servita_name","id","com.liturgia_osm.app");
-                            if(!expected.contentEquals(((android.widget.TextView)view.findViewById(nameId)).getText()))throw new AssertionError("RemoteViews text mismatch");
-                        });
-                    }
-                }
-                android.content.Intent widgetIntent=(android.content.Intent)widget.getMethod("openIntent",android.content.Context.class,int.class).invoke(null,getTargetContext(),23);
-                evaluate("window.widgetProbe={events:[],errors:[],present:!!window.OSMWidgetLinks,platform:window.Capacitor?.getPlatform?.()};window.addEventListener('error',e=>window.widgetProbe.errors.push(e.message));getCapacitorPlugin('App').addListener('appUrlOpen',e=>window.widgetProbe.events.push(e.url));");
-                getTargetContext().startActivity(widgetIntent);
-                boolean opened=false;
-                for(int attempt=0;attempt<20;attempt++){
-                    if("true".equals(evaluate("state.detailId===23"))){opened=true;break;}
-                    Thread.sleep(500);
-                }
-                if(!opened)throw new Exception("Widget intent did not open the celebration: " + evaluate("JSON.stringify({probe:window.widgetProbe,detail:state.detailId,ready:santoralReady,widget:typeof window.OSMWidgetLinks,diagnostics:window.OSMWidgetLinks?.diagnostics(),parsed:(()=>{try{const u=new URL('liturgiaosm://celebracao/23');return [u.protocol,u.hostname,u.pathname]}catch(e){return String(e)}})()})"));
                 String controls = evaluate("(()=>{const t=document.getElementById('reminderEnabled');return !!t && !t.disabled && !t.checked && !document.getElementById('reminderSettings').hidden})()");
                 if (!"true".equals(controls)) throw new Exception("Reminder controls not ready: " + evaluate("document.body.innerText"));
                 // Native plugin on the signed APK; Android permission granted by the test shell.

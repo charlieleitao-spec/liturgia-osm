@@ -9,6 +9,11 @@ const browser=await chromium.launch({executablePath:process.env.CHROME_BIN||unde
 const results=[];
 async function check(page,frame,name){
  const bar=frame.locator('.personal-reading-tools');
+ const reading=frame.locator('#view');
+ assert.equal(await reading.locator('.personal-note-action,textarea').count(),0);
+ await reading.evaluate(view=>{view.scrollTop=view.scrollHeight;view.ownerDocument.defaultView.scrollTo(0,view.ownerDocument.documentElement.scrollHeight);});
+ await page.evaluate(()=>{OSMPersonalReader.saveCurrent();OSMPersonalReader.afterRender(document.getElementById('serviteOverlay').classList.contains('open'));});
+ assert.equal(await bar.getByRole('button',{name:'Retomar',exact:true}).count(),1);
  const geometry=await bar.evaluate(el=>{
   const b=el.querySelector('button'),s=getComputedStyle(b),view=el.parentElement;
   return {last:el===view.lastElementChild,position:getComputedStyle(el).position,font:s.fontSize,background:s.backgroundColor,border:s.borderWidth,height:b.getBoundingClientRect().height,width:b.getBoundingClientRect().width,overflow:document.documentElement.scrollWidth>innerWidth+1};
@@ -16,8 +21,7 @@ async function check(page,frame,name){
  assert.equal(geometry.last,true,'As ações precisam vir depois do conteúdo');
  assert.equal(geometry.position,'static');assert.equal(geometry.font,'14px');assert.equal(geometry.border,'0px');assert.equal(geometry.background,'rgba(0, 0, 0, 0)');assert.equal(geometry.overflow,false);assert.ok(geometry.height>=44&&geometry.height<=48);assert.ok(geometry.width<120);
  await bar.scrollIntoViewIfNeeded();
- await page.evaluate(()=>{OSMPersonalReader.saveCurrent();OSMPersonalReader.afterRender(document.getElementById('serviteOverlay').classList.contains('open'));});
- await bar.scrollIntoViewIfNeeded();
+
  for(const b of await bar.locator('button').all())assert.equal(await b.evaluate(el=>{const r=el.getBoundingClientRect();return document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('button')===el;}),true,'Cada comando deve estar livre de sobreposição');
  await page.screenshot({animations:'disabled',path:output+'/'+name+'.png'});return geometry;
 }
@@ -31,15 +35,19 @@ try{
   const frame=page.frameLocator('#serviteFrame'),name=width+'-'+scale+'-'+theme;
   await page.screenshot({animations:'disabled',path:output+'/regra-inicio-'+name+'.png'});
   const regra=await check(page,frame,'regra-final-'+name);
-  if(width===320&&scale===1&&theme==='light'){
-   await frame.locator('.personal-note-action').tap();const input=page.locator('#personalNoteText');await input.tap();await page.keyboard.type('Nota pelo comando discreto.');assert.equal(await input.inputValue(),'Nota pelo comando discreto.');await page.getByRole('button',{name:'Salvar anotação',exact:true}).tap();await page.getByRole('button',{name:'Fechar dados pessoais',exact:true}).tap();assert.equal(await frame.locator('.personal-note-action').textContent(),'Editar nota');
-  }
   await frame.getByText('Capítulo I',{exact:true}).tap();const chapter=await check(page,frame,'capitulo-final-'+name);
   await page.getByRole('button',{name:'Fechar recurso',exact:true}).tap();await page.evaluate(()=>openDevo('stabat'));
   await page.screenshot({animations:'disabled',path:output+'/stabat-inicio-'+name+'.png'});
-  const stabat=await check(page,page.locator('#view'),'stabat-final-'+name);
+  const stabat=await check(page,page,'stabat-final-'+name);
+  const back=page.getByRole('button',{name:'Voltar',exact:true});
+  assert.equal(await back.evaluate(button=>{
+   const r=button.getBoundingClientRect();
+   return r.width>=44&&r.height>=44&&r.top>=0&&document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)===button;
+  }),true);
+  await back.tap();
+  assert.equal(await page.evaluate(()=>state.devo),null);
   results.push({width,scale,theme,regra,chapter,stabat});await c.close();
  }
- await fs.writeFile(output+'/result.json',JSON.stringify({browser:browser.version(),results},null,2));console.log('Layout conferido em 12 combinações de largura, fonte e tema; toque e escrita pelo novo comando confirmados.');
+ await fs.writeFile(output+'/result.json',JSON.stringify({browser:browser.version(),results},null,2));console.log('Layout conferido em 12 combinações de largura, fonte e tema; retomada de leitura e botão Voltar confirmados.');
 }catch(error){await fs.writeFile(output+'/failure.txt',String(error.stack||error));throw error;}
 finally{await browser.close();server.kill();}
