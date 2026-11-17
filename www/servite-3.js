@@ -96,7 +96,7 @@ function liturgicalLineHtml(value, verse=false){
     if(number){prefix+='<sup class="verse-number">'+number[1]+'</sup> ';text=text.slice(number[0].length).trimStart();}
   }
   let html=escapeHtml(text);
-  html=html.replace(/^((?:\d+ª\s*)?(?:Ant\.(?:\s*\d+)?|Antífona)|D\.|T\.|C\.|R[./]|V[./]|A\.|B\.|L\d?:|L\.|℣\.?|℟\.?)(?=\s|[A-Za-zÀ-ÿ]|$)\s*/, '<span class="rubric">$1</span> ');
+  html=html.replace(/^((?:\d+ª\s*)?(?:Ant\.(?:\s*\d+)?|Antífona\b)|D\.|T\.|C\.|R[./]|V[./]|A\.|B\.|L\d?:|L\.|℣\.?|℟\.?)(?=\s|[A-Za-zÀ-ÿ]|$)\s*/, '<span class="rubric">$1</span> ');
   // Rubric signs remain with the following word when the screen wraps.
   html=html.replace(/(<span class="rubric">[^<]+<\/span>) ([^\s<]+)/g,'<span class="liturgical-cue">$1 $2</span>');
   html=html.replace(/([^\s<>]+)\s+([*†])(?=\s|$)/g,'<span class="liturgical-cue">$1 $2</span>');
@@ -183,7 +183,7 @@ function renderPrayer(text){
   return blocks.join('');
 }
 
-const LITURGICAL_HEAD_RE = /^(?:\d+[.)-]?\s*)?(HINO|SALMODIA|PRIMEIRA LEITURA|SEGUNDA LEITURA|LEITURA BREVE|RESPONS[ÓO]RIO(?: BREVE)?(?:\s+.*)?|C[ÂA]NTICO EVANG[ÉE]LICO|PRECES|PAI[- ]NOSSO|ORA[ÇC][ÃA]O|CONCLUS[ÃA]O)\s*[:.-]?\s*$/i;
+const LITURGICAL_HEAD_RE = /^(?:\d+[.)-]?\s*)?(HINO|SALMODIA|PRIMEIRA LEITURA|SEGUNDA LEITURA|LEITURA ALTERNATIVA|LEITURA BREVE|RESPONS[ÓO]RIO(?: BREVE)?(?:\s+.*)?|C[ÂA]NTICO EVANG[ÉE]LICO|PRECES|PAI[- ]NOSSO|ORA[ÇC][ÃA]O|CONCLUS[ÃA]O)\s*[:.-]?\s*$/i;
 
 // Estrutura o ofício sem alterar, completar ou reconstruir o texto-fonte.
 // Linhas e estrofes procedem exclusivamente das quebras existentes na fonte.
@@ -277,11 +277,13 @@ function renderLiturgicalHourContent(text){
       }
       return;
     }
-    if(/^Oração sálmica$/i.test(line)){startBlock(line);return;}
+    if(/^Oração (?:sálmica|sobre o cântico)$/i.test(line)){startBlock(line);return;}
     if(LITURGICAL_HEAD_RE.test(line)){
       startBlock(line);
       return;
     }
+    if(/^Série [ABC](?:\s*\([^\n)]*\))?\s*$/i.test(line)){stanza=null;add(line,'rubric');return;}
+    if(/^Hino Te Deum, p\. \d+\.?$/i.test(line)){startBlock('');add(line,'rubric');return;}
     if((match = line.match(/^HINO\b\s*(\([^)]*\))?\s*(.*)$/i))){
       startBlock('HINO');
       if(match[1]) add(match[1].slice(1,-1).trim(), 'rubric');
@@ -290,14 +292,15 @@ function renderLiturgicalHourContent(text){
     }
     if(!block) startBlock('');
     if(currentHead==='PRECES'){precesLines.push(line);return;}
+    if(currentHead==='HINO' && /^Ou:$/i.test(line)){stanza=null;add(line,'rubric');return;}
 
-    if(/^(?:Ant\.|Antífona)\s*\d*/i.test(line)){ stanza=null; add(line,'antiphon'); return; }
+    if(/^(?:Ant\.|Antífona\b)\s*\d*/i.test(line) || (/^[ABC]\. /.test(line) && block.lastElementChild?.classList.contains('antiphon'))){ stanza=null; add(line,'antiphon'); return; }
     if(/^(Salmo|Cântico|C[âa]ntico)\s+/i.test(line)){ stanza=null; currentHead='SALMODIA'; add(line,'psalm-title'); return; }
     if(/^(V\.|R\.|℣\.|℟\.)\s*/.test(line)){ stanza=null; add(line, 'response'+(/^(?:R[./]|℟)/.test(line)?' liturgical-response':'')); return; }
-    if(/^(Escolhe-se|Salmos? do|Salmos? e cântico|Como no (?:Comum|Ordinário|Próprio)|Do Comum|Quando esta memória|Antífona e salmos|Salmodia complementar)/i.test(line)){
+    if(/^(Escolhe-se|Salmos? do|Salmos? e (?:cântico|antífonas)|Antífonas e salmos|Como no (?:Comum|Ordinário|Próprio)|Do Comum|Quando esta memória|Antífona e salmos|Salmodia complementar)/i.test(line)){
       stanza=null; add(line,'rubric'); return;
     }
-    if(/^(PRIMEIRA LEITURA|SEGUNDA LEITURA|LEITURA BREVE)$/.test(currentHead)){
+    if(/^(PRIMEIRA LEITURA|SEGUNDA LEITURA|LEITURA ALTERNATIVA|LEITURA BREVE)$/.test(currentHead)){
       if(splitReadingLine(line)) return;
       if(/^(Da|Do|Dos|Das)\s+/.test(line) && line.length < 180) add(line,'reading-ref');
       else addProse(line,'reading-body');
@@ -307,7 +310,7 @@ function renderLiturgicalHourContent(text){
       addStanzaLine(line);
       return;
     }
-    if(/^(ORAÇÃO(?: SÁLMICA)?|PAI[- ]NOSSO|CONCLUSÃO)$/.test(currentHead)){
+    if(/^(ORAÇÃO(?: SÁLMICA| SOBRE O CÂNTICO)?|PAI[- ]NOSSO|CONCLUSÃO)$/.test(currentHead)){
       addProse(line,'liturgical-prayer');
       return;
     }
