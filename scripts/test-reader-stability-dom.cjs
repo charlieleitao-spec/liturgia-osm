@@ -280,6 +280,7 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
   assert.equal(office.querySelectorAll('.response').length, 11);
   assert.equal(office.querySelector('.psalm-title'), null);
   assert.match(office.textContent, alternative);
+  if (month === 8 && day === 23) assert.match(office.textContent, /3,1-3\.13-24/);
   assert.ok(office.querySelector('.liturgical-prayer'));
  }
  const seriesHtml = child.run("renderLiturgicalHourContent('SALMODIA\\nSérie A\\nAnt. 1 Primeira antífona\\nSérie B (tempo pascal)\\nAnt. 1 Segunda antífona\\nSérie C\\nAnt. 1 Terceira antífona')");
@@ -300,6 +301,30 @@ function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf
  }
  console.log('Rubricas de séries alternativas conferidas também nos formulários reais de Pucci, Peregrino e Juliana.');
  console.log('Séries alternativas da salmodia reconhecidas como rubricas, sem modificar antífonas.');
- console.log('Ofício das Leituras verificado em nove celebrações.');
+
+ for (const date of [
+  '01-15', '02-03', '02-19', '05-08', '05-11', '05-12', '05-30', '06-27',
+  '07-04', '07-13', '08-31', '09-01', '09-06', '09-22', '10-25', '12-10',
+  '12-15',
+ ]) {
+  const [month, day] = date.split('-').map(Number);
+  const id = run(`SANTORAL.find(saint => saint.month === ${month} && saint.day === ${day})._id`);
+  await openChild(`oficio:${id}:oficio`);
+  const office = child.w.document.querySelector('.oficio-leituras-content .today-servita-reader');
+  assert.ok(office, date);
+  const headings = Array.from(office.querySelectorAll('.litheading'), node => node.textContent);
+  const expected = ['SALMODIA', 'SEGUNDA LEITURA', 'RESPONSÓRIO', 'Leitura alternativa', 'RESPONSÓRIO', 'ORAÇÃO'];
+  if (date === '05-08') expected.unshift('HINO');
+  if (date === '09-22') expected.push('ORAÇÃO');
+  assert.deepEqual(headings, expected, date);
+  assert.match(office.querySelector('.litblock > .rubric').textContent, /^Do Comum .+semana corrente/);
+  assert.equal(office.querySelectorAll('.response').length, 6, date);
+  assert.ok(office.querySelector('.liturgical-prayer'), date);
+  if (date === '09-22') {
+   assert.equal(office.querySelectorAll('.liturgical-prayer').length, 2);
+   assert.match(office.textContent, /Fora da basílica de Monte Senário/);
+  }
+ }
+ console.log('Ofício das Leituras verificado em 26 celebrações.');
  child.dom.window.close();a.dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});
