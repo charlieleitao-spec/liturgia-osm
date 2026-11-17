@@ -431,30 +431,6 @@ body.direct-office-view .hour-tab-content{padding:0!important;border:0!important
 .today-servita-reader .reading-ref,.today-servita-reader .reading-title,.today-servita-reader .reading-body{text-align:center}
 @media(min-width:480px){.office-hours-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
-/* id="regraFloatingBack486" */
-.regra-floating-back{
- position:fixed!important;
- right:18px!important;
- bottom:22px!important;
- z-index:9999!important;
- display:flex!important;
- align-items:center!important;
- gap:6px!important;
- min-height:46px!important;
- padding:0 15px!important;
- border:1px solid var(--border)!important;
- border-radius:24px!important;
- background:var(--surface)!important;
- color:var(--text)!important;
- box-shadow:0 4px 18px rgba(0,0,0,.18)!important;
- font:600 .9rem/1 Georgia,'Times New Roman',serif!important;
- cursor:pointer!important;
-}
-.regra-floating-back:active{transform:scale(.97)}
-@media(max-width:420px){
- .regra-floating-back{right:14px!important;bottom:18px!important}
-}
-
 /* Regra de Vida: leitura confortável dos artigos */
 .rule-reader{
   width:100%;
@@ -509,7 +485,7 @@ body.embedded-resource-mode #app{min-height:100vh}
 
 /* Controles compactos com área de toque ampliada. */
 .theme-toggle,.settings-btn,.home-return,.font-btn,.chip,.toggle-btn,
-.back-btn,.btn-link,.regra-floating-back,.hour-tab-btn,.tab-btn{
+.back-btn,.btn-link,.hour-tab-btn,.tab-btn{
   min-width:44px;min-height:44px;
 }
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{
