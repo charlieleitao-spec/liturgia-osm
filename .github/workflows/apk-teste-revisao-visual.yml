@@ -1,4 +1,4 @@
-name: APK de teste — Liturgia OSM 4.9.137-teste1
+name: APK de teste — Liturgia OSM 4.9.137-teste2
 
 on:
   workflow_dispatch:
@@ -92,8 +92,8 @@ jobs:
 
       - name: Definir versão e segurança
         run: |
-          sed -i 's/versionCode [0-9][0-9]*/versionCode 41063/' android/app/build.gradle
-          sed -i 's/versionName "[^"]*"/versionName "4.9.137-teste1"/' android/app/build.gradle
+          sed -i 's/versionCode [0-9][0-9]*/versionCode 41064/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "4.9.137-teste2"/' android/app/build.gradle
           python3 - <<'PY'
           from pathlib import Path
           p = Path('android/app/build.gradle')
@@ -164,17 +164,17 @@ jobs:
           ./gradlew assembleRelease
 
       - name: Nomear APK
-        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.137-teste1.apk
+        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.137-teste2.apk
 
       - name: Conferir assinatura e todos os arquivos offline
         run: |
           APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
-          "$APKSIGNER" verify --verbose --print-certs Liturgia-OSM-4.9.137-teste1.apk > assinatura.txt
+          "$APKSIGNER" verify --verbose --print-certs Liturgia-OSM-4.9.137-teste2.apk > assinatura.txt
           grep -q 'certificate SHA-256 digest: 5b2b3319cc9f9bb61a14fb8a30e63044db225f7b930fca9568c82854f38b4fe0' assinatura.txt
           AAPT="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/aapt"
-          "$AAPT" dump badging Liturgia-OSM-4.9.137-teste1.apk > identidade.txt
-          grep -q "package: name='com.liturgia_osm.app' versionCode='41063' versionName='4.9.137-teste1'" identidade.txt
-          "$AAPT" dump xmltree Liturgia-OSM-4.9.137-teste1.apk AndroidManifest.xml > manifesto.txt
+          "$AAPT" dump badging Liturgia-OSM-4.9.137-teste2.apk > identidade.txt
+          grep -q "package: name='com.liturgia_osm.app' versionCode='41064' versionName='4.9.137-teste2'" identidade.txt
+          "$AAPT" dump xmltree Liturgia-OSM-4.9.137-teste2.apk AndroidManifest.xml > manifesto.txt
           if grep -Eqi 'appwidget|Servita(Square)?Widget' manifesto.txt; then
             echo "::error::O APK ainda declara um widget"
             exit 1
@@ -182,31 +182,33 @@ jobs:
           python3 - <<'PYCHECK'
           from pathlib import Path
           import zipfile
-          with zipfile.ZipFile('Liturgia-OSM-4.9.137-teste1.apk') as apk:
+          with zipfile.ZipFile('Liturgia-OSM-4.9.137-teste2.apk') as apk:
               for p in Path('www').rglob('*'):
                   if p.is_file():
                       assert apk.read('assets/public/'+p.relative_to('www').as_posix())==p.read_bytes(), str(p)
               app = apk.read('assets/public/app.js').decode('utf-8')
-              assert "const APP_VERSION = '4.9.137-teste1';" in app
+              assert "const APP_VERSION = '4.9.137-teste2';" in app
               assert 'OSMPdf.formatIntercessions' in app
               shared = apk.read('assets/public/pdf-links.js').decode('utf-8')
               assert 'function formatIntercessions' in shared
               assert 'OSMPdf.formatIntercessions' in apk.read('assets/public/servite-3.js').decode('utf-8')
-              assert 'liturgia-osm-v4.9.137-teste1-' in apk.read('assets/public/sw.js').decode('utf-8')
+              assert 'liturgia-osm-v4.9.137-teste2-' in apk.read('assets/public/sw.js').decode('utf-8')
               assert not {'assets/public/widget-links.js', 'assets/santoral-widget.json'}.intersection(apk.namelist())
-              assert 'personalNoteText' not in apk.read('assets/public/personal-reader.js').decode('utf-8')
+              reader = apk.read('assets/public/personal-reader.js').decode('utf-8')
+              assert all(marker not in reader for marker in ('personalNoteText', 'Cópia de segurança', 'PersonalBackup'))
+              assert all(b'PersonalBackupPlugin' not in apk.read(name) for name in apk.namelist() if name.endswith('.dex'))
           print('Todos os arquivos web/offline preservados byte a byte no APK; identidade e remoções confirmadas.')
           PYCHECK
 
       - name: Calcular resumo do APK
-        run: sha256sum Liturgia-OSM-4.9.137-teste1.apk > SHA256SUMS.txt
+        run: sha256sum Liturgia-OSM-4.9.137-teste2.apk > SHA256SUMS.txt
 
       - name: Guardar APK de teste
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.9.137-teste1
+          name: Liturgia-OSM-4.9.137-teste2
           path: |
-            Liturgia-OSM-4.9.137-teste1.apk
+            Liturgia-OSM-4.9.137-teste2.apk
             assinatura.txt
             identidade.txt
             SHA256SUMS.txt

@@ -1,22 +1,88 @@
-const assert=require('node:assert/strict');
-const test=require('node:test');
-const D=require('../www/personal-data.js');
-class Store{constructor(){this.map=new Map();this.fail=null;}getItem(k){return this.map.get(k)??null;}setItem(k,v){if(this.fail?.(k))throw Error('quota');this.map.set(k,String(v));}removeItem(k){this.map.delete(k);}}
-const r={type:'prayer',key:'coroa',sub:'formula2'},p={y:812,scroller:'window',details:['chapter','@2'],anchor:{index:4,text:'Oração de Maria',offset:-13}};
-const oldNote={route:r,title:'Coroa',text:'Intenção pessoal: família.',deleted:false,updatedAt:1};
-const make=(notes=[oldNote])=>{const s=new Store();s.setItem(D.KEY,JSON.stringify({...D.empty(),notes}));D.savePosition(s,r,'Coroa',p);s.setItem('osmFavoritesV4','["prayer:coroa","saint:0"]');s.setItem('osmRecentV4',JSON.stringify([{k:'saint:0',type:'saint',key:0,title:'Celebração',sub:'Data',ts:1}]));s.setItem('osmTheme','dark');s.setItem('osmReaderScale','1.24');return s;};
-const json=()=>D.parseBackup(D.exportBackup(make()));
-test('cópia completa preserva notas, posição, seções, favoritos e preferências',()=>{const a=make(),b=new Store();D.restore(b,D.parseBackup(D.exportBackup(a)));assert.deepEqual(D.load(b),D.load(a));for(const k of ['osmFavoritesV4','osmRecentV4','osmTheme','osmReaderScale'])assert.equal(b.getItem(k),a.getItem(k));});
-test('retomada distingue horas, partes da oração e mistérios',()=>{const a={type:'resource',view:'oficio:0:laudes',state:{tab:'santoral',detailId:0,showOficio:true,oficioTab:'laudes',finalAntifona:'sub'}};assert.notEqual(D.routeKey(a),D.routeKey({...a,state:{...a.state,oficioTab:'vesperas'}}));assert.notEqual(D.routeKey(r),D.routeKey({...r,sub:'formula1'}));const s=new Store();D.savePosition(s,a,'Laudes',p);assert.deepEqual(D.load(s).last.route,D.route(a));});
-test('restauração preserva notas, exclusões e última leitura locais em conflito',()=>{const b=json(),s=make([{...oldNote,text:'Minha revisão local',deleted:true}]);const last={type:'saint',id:2};D.savePosition(s,last,'Outro santo',p);const plan=D.planRestore(s,b,false);assert.equal(plan.summary.conflicts,1);D.restore(s,b,false);assert.equal(D.load(s).notes[0].text,'Minha revisão local');assert.equal(D.load(s).notes[0].deleted,true);assert.deepEqual(D.load(s).last.route,last);});
-test('preferências são opcionais e favoritos são unidos sem duplicar',()=>{const s=new Store();s.setItem('osmFavoritesV4','["saint:3","prayer:coroa"]');s.setItem('osmTheme','light');D.restore(s,json(),false);assert.equal(s.getItem('osmTheme'),'light');assert.deepEqual(JSON.parse(s.getItem('osmFavoritesV4')),['saint:3','prayer:coroa','saint:0']);});
-test('desfazer restauração recupera valores anteriores, inclusive chaves ausentes',()=>{const s=new Store();s.setItem('osmTheme','light');D.restore(s,json());D.undoRestore(s);assert.equal(s.getItem('osmTheme'),'light');assert.equal(s.getItem(D.KEY),null);assert.equal(s.getItem('osmFavoritesV4'),null);assert.equal(s.getItem(D.RECOVERY),null);});
-test('falha parcial de armazenamento recupera o estado anterior',()=>{const s=make(),before=new Map(s.map);let once=true;s.fail=k=>k==='osmRecentV4'&&once&&(once=false,true);assert.throws(()=>D.restore(s,json()),/dados anteriores/);for(const[k,v]of before)assert.equal(s.getItem(k),v);});
-test('sem espaço para recuperação nenhuma chave pessoal é alterada',()=>{const s=make(),before=new Map(s.map);s.fail=k=>k===D.RECOVERY;assert.throws(()=>D.restore(s,json()));assert.deepEqual(s.map,before);});
-test('JSON inválido, versão futura e cópia de outro app são recusados',()=>{assert.throws(()=>D.parseBackup('{'));for(const change of [{schema:2},{app:'outro'},{createdDate:'2026-02-30'}])assert.throws(()=>D.parseBackup(JSON.stringify({...json(),...change})));});
-test('rotas importadas não podem conter URLs, ações ou caminhos arbitrários',()=>{for(const route of [{type:'url',url:'https://example.com'},{type:'resource',view:'javascript:alert(1)'},{type:'resource',view:'regra',state:{tab:'arbitraria'}},{type:'search',source:'../../secrets',title:'x'},{type:'prayer',key:"x');alert(1)"}])assert.throws(()=>D.route(route));assert.deepEqual(D.route({...r,onclick:'alert(1)',__proto__:{bad:true}}),r);});
-test('campos adicionais nunca são escritos como chaves de armazenamento',()=>{const b=json();b.library.evil='x';b.personal.notes[0].onclick='alert(1)';b.arbitraryStorage={token:'exposto'};const s=new Store();D.restore(s,b);assert.equal(s.getItem('token'),null);assert.equal(D.load(s).notes[0].onclick,undefined);});
-test('limites de tamanho contam UTF-8 e notas excessivas são recusadas',()=>{assert.throws(()=>D.parseBackup('é'.repeat(D.MAX_BYTES/2+1)),/grande/);const oversized=json();oversized.personal.notes[0].text='a'.repeat(12001);assert.throws(()=>D.parseBackup(JSON.stringify(oversized)));const b=json();b.personal.notes=Array.from({length:501},()=>b.personal.notes[0]);assert.throws(()=>D.parseBackup(JSON.stringify(b)));});
-test('registros duplicados e coordenadas inválidas são recusados',()=>{const b=json();b.personal.notes.push(b.personal.notes[0]);assert.throws(()=>D.parseBackup(JSON.stringify(b)),/duplicados/);for(const value of [{...p,y:-1},{...p,anchor:{index:1,text:'x',offset:Infinity}},{...p,details:['<x>']}])assert.throws(()=>D.point(value));});
-test('dados locais corrompidos nunca são substituídos silenciosamente',()=>{const s=new Store();s.setItem(D.KEY,'quebrado');assert.throws(()=>D.savePosition(s,r,'Coroa',p));assert.throws(()=>D.restore(s,json()));assert.equal(s.getItem(D.KEY),'quebrado');});
-test('posição mais recente é única por rota e o histórico fica limitado',()=>{const s=new Store();for(let i=0;i<205;i++)D.savePosition(s,{type:'saint',id:i},'Santo '+i,p);assert.equal(D.load(s).positions.length,200);assert.equal(D.load(s).last.route.id,204);});
+const assert = require('node:assert/strict');
+const test = require('node:test');
+const D = require('../www/personal-data.js');
+
+const recovery = 'osmPersonalRestoreRecoveryV1';
+const route = {type:'prayer',key:'coroa',sub:'formula2'};
+const point = {y:812,scroller:'window',details:['chapter','@2'],anchor:{index:4,text:'Oração de Maria',offset:-13}};
+const position = {route,title:'Coroa',updatedAt:1,point};
+const prior = {schema:1,positions:[position],last:position};
+const note = {route,title:'Coroa',updatedAt:1,text:'Anotação antiga',deleted:false};
+
+function storage(entries = []) {
+  const map = new Map(entries);
+  return {
+    map,
+    getItem: key => map.get(key) ?? null,
+    setItem: (key,value) => map.set(key,String(value)),
+    removeItem: key => map.delete(key)
+  };
+}
+
+test('atualização apaga notas já salvas e a recuperação, preservando os demais dados', () => {
+  const original = JSON.stringify({...prior,notes:[note,{...note,deleted:true}]});
+  const retained = [
+    ['osmFavoritesV4','["prayer:coroa"]'],
+    ['osmRecentV4','[{"k":"prayer:coroa","type":"prayer","key":"coroa","title":"Coroa","ts":1}]'],
+    ['osmTheme','dark'],
+    ['osmReaderScale','1.24'],
+    ['outraChave','intacta']
+  ];
+  const s = storage([[D.KEY,original],[recovery,JSON.stringify({[D.KEY]:original})],...retained]);
+
+  D.removeLegacyNotes(s);
+  assert.deepEqual(JSON.parse(s.getItem(D.KEY)),prior);
+  assert.deepEqual(D.load(s),prior);
+  assert.equal(s.getItem(recovery),null);
+  for (const [key,value] of retained) assert.equal(s.getItem(key),value);
+
+  const saved = new Map(s.map);
+  D.removeLegacyNotes(s);
+  assert.deepEqual(s.map,saved);
+});
+
+test('instalação nova não cria registros e uma atualização incompleta pode ser retomada', () => {
+  const s = storage();
+  D.removeLegacyNotes(s);
+  assert.equal(s.map.size,0);
+
+  const legacy = JSON.stringify({...prior,notes:[note]});
+  s.setItem(D.KEY,legacy);
+  s.setItem(recovery,legacy);
+  const setItem = s.setItem;
+  s.setItem = () => { throw Error('Armazenamento temporariamente indisponível'); };
+  assert.throws(() => D.removeLegacyNotes(s));
+  assert.equal(s.getItem(D.KEY),legacy);
+  assert.equal(s.getItem(recovery),null);
+
+  s.setItem = setItem;
+  D.removeLegacyNotes(s);
+  assert.deepEqual(D.load(s),prior);
+  assert.equal(Object.hasOwn(JSON.parse(s.getItem(D.KEY)),'notes'),false);
+});
+
+test('salvar uma posição conserva a última leitura e não volta a gravar anotações', () => {
+  const s = storage([[D.KEY,JSON.stringify({...prior,notes:[note]})]]);
+  const next = {type:'saint',id:0};
+  D.savePosition(s,next,'Celebração',point);
+  const saved = JSON.parse(s.getItem(D.KEY));
+  assert.equal(Object.hasOwn(saved,'notes'),false);
+  assert.deepEqual(saved.last.route,next);
+  assert.deepEqual(saved.positions[1],position);
+});
+
+test('rotas incompatíveis e coordenadas inválidas continuam sendo recusadas', () => {
+  assert.throws(() => D.route({type:'resource',view:'javascript:alert(1)'}));
+  assert.throws(() => D.route({type:'search',source:'../../arquivo',title:'x'}));
+  assert.throws(() => D.point({...point,y:-1}));
+  assert.throws(() => D.savePosition(storage([[D.KEY,'inválido']]),route,'Coroa',point));
+});
+
+test('a posição mais recente é única por rota e o histórico fica limitado', () => {
+  const s = storage();
+  for (let i=0;i<205;i++) D.savePosition(s,{type:'saint',id:i},'Santo '+i,point);
+  D.savePosition(s,{type:'saint',id:204},'Santo 204',point);
+  assert.equal(D.load(s).positions.length,200);
+  assert.equal(D.load(s).last.route.id,204);
+  assert.equal(D.load(s).positions.filter(entry=>entry.route.id===204).length,1);
+});

@@ -341,7 +341,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.137-teste1';
+const APP_VERSION = '4.9.137-teste2';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();
@@ -1489,7 +1489,6 @@ function backFromHeader(){
 }
 
 function smartBack(){
-  if(document.getElementById('personalOverlay')?.classList.contains('open')){window.OSMPersonalReader.close();return true;}
   const menu=document.getElementById('mainMenuOverlay');
   const servite=document.getElementById('serviteOverlay');
   const mass=document.getElementById('dailyLiturgyOverlay');

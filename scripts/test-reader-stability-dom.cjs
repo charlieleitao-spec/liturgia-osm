@@ -3,26 +3,29 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),asse
 const root=path.resolve(__dirname,'../www'),tick=()=>new Promise(r=>setTimeout(r,40));
 function env(file){const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf8'),{url:'https://charlieleitao-spec.github.io/liturgia-osm/'+file,runScripts:'outside-only',pretendToBeVisual:true});const w=dom.window;w.TextEncoder=TextEncoder;w.scrollTo=(x,y)=>{w.scrollY=y;};w.fetch=async url=>({ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,String(url).replace(/^\.\//,'')),'utf8'))});const ctx=dom.getInternalVMContext(),run=s=>vm.runInContext(s,ctx),load=f=>run(fs.readFileSync(path.join(root,f),'utf8'));return {dom,w,run,load};}
 (async()=>{
- const a=env('index.html'),{w,run,load}=a;load('reader-scale.js');load('data/load-devotions.js');await w.loadOSMDevotionalData();for(const f of ['personal-data.js','personal-reader.js','search.js','reminders.js','pdf-links.js','app.js'])load(f);w.OSMPersonalReader.init();await tick();await tick();
+ const a=env('index.html'),{w,run,load}=a;load('reader-scale.js');load('data/load-devotions.js');await w.loadOSMDevotionalData();for(const f of ['personal-data.js','personal-reader.js','search.js','reminders.js','pdf-links.js','app.js'])load(f);const D=w.OSMPersonalData,storage=w.localStorage,doc=w.document;
+ const recovery='osmPersonalRestoreRecoveryV1';
+ const oldRoute={type:'prayer',key:'stabat',sub:null};
+ const oldPosition={route:oldRoute,title:'Stabat Mater',updatedAt:1,point:{y:680,scroller:'window',details:[]}};
+ const previous=JSON.stringify({schema:1,positions:[oldPosition],last:oldPosition,notes:[{route:oldRoute,title:'Stabat Mater',text:'Anotação anterior',deleted:false,updatedAt:1}]});
+ storage.setItem(D.KEY,previous);storage.setItem(recovery,JSON.stringify({[D.KEY]:previous}));
+ w.OSMPersonalReader.init();await tick();await tick();
+ assert.equal(Object.hasOwn(JSON.parse(storage.getItem(D.KEY)),'notes'),false);
+ assert.equal(storage.getItem(recovery),null);
+ assert.deepEqual(JSON.parse(storage.getItem(D.KEY)).last,oldPosition);
  // Retomada explícita que é cancelada por uma navegação posterior.
  const frames=new Map();let seq=0;w.requestAnimationFrame=cb=>{frames.set(++seq,cb);return seq;};w.cancelAnimationFrame=id=>frames.delete(id);const flush=()=>{for(let i=0;frames.size&&i<10;i++){const tasks=[...frames.values()];frames.clear();tasks.forEach(fn=>fn());}assert.equal(frames.size,0);};
- run("openDevo('stabat')");w.scrollTo(0,680);w.OSMPersonalReader.saveCurrent();run("setTab('biblioteca')");w.OSMPersonalReader.open();[...w.document.querySelectorAll('#personalBody button')].find(b=>b.textContent.startsWith('Continuar:')).click();assert.ok(frames.size>0);run("openDevo('via_matris')");flush();assert.equal(run('state.devo'),'via_matris');assert.equal(w.scrollY,0);w.scrollTo(0,210);w.OSMPersonalReader.saveCurrent();assert.equal(w.OSMPersonalData.load(w.localStorage).last.route.key,'via_matris');
+ doc.querySelector('.home-personal-access button.personal-access-item').click();assert.ok(frames.size>0);run("openDevo('via_matris')");flush();assert.equal(run('state.devo'),'via_matris');assert.equal(w.scrollY,0);w.scrollTo(0,210);w.OSMPersonalReader.saveCurrent();assert.equal(w.OSMPersonalData.load(w.localStorage).last.route.key,'via_matris');
  run("openDevo('stabat')");[...w.document.querySelectorAll('.personal-reading-tools button')].find(b=>b.textContent==='Retomar').click();flush();assert.equal(w.scrollY,680);
  console.log('Navegação: retomada explícita funciona, mas uma posição antiga não move a página aberta depois.');
- // Dados salvos pela versão anterior continuam disponíveis na cópia de segurança.
- const D=w.OSMPersonalData,storage=w.localStorage,doc=w.document;
- const oldNote={route:{type:'prayer',key:'stabat',sub:null},title:'Stabat Mater',text:'Anotação anterior',deleted:false,updatedAt:1};
- storage.setItem(D.KEY,JSON.stringify({...D.load(storage),notes:[oldNote]}));
- run("openDevo('stabat')");w.OSMPersonalReader.saveCurrent();w.OSMPersonalReader.open();
- assert.equal(doc.querySelector('#personalBody textarea,.personal-note-action'),null);
+ run("setTab('biblioteca')");
+ assert.equal(doc.querySelector('#personalOverlay,.personal-note-action'),null);
+ assert.doesNotMatch(doc.getElementById('view').textContent,/Cópia de segurança/);
  assert.equal(w.OSMWidgetLinks,undefined);
- assert.equal(doc.getElementById('personalTitle').textContent,'Cópia de segurança');
- assert.deepEqual(JSON.parse(D.exportBackup(storage)).personal.notes,[oldNote]);
- w.OSMPersonalReader.close();
  run("setTab('liturgia','horas')");assert.equal(run('state.liturgiaSection'),'horas');
  run('backFromHeader()');assert.equal(run('state.tab'),'hoje');
  assert.equal(doc.getElementById('headerBack').hidden,true);
- console.log('Dados anteriores preservados na cópia e retorno do Ofício direto ao Início.');
+ console.log('Anotações antigas removidas na primeira abertura; retorno do Ofício direto ao Início.');
  // O menu de fonte não herda nem recolhe a navegação enquanto está aberto.
  w.document.body.classList.add('scroll-controls-hidden');run('openMainMenu()');assert.ok(!w.document.body.classList.contains('scroll-controls-hidden'));w.document.dispatchEvent(new w.WheelEvent('wheel',{deltaY:20,bubbles:true}));assert.ok(!w.document.body.classList.contains('scroll-controls-hidden'));run('adjustFont(.08)');assert.equal(w.OSMReaderScale.read(w.localStorage),1.08);run('closeMainMenu()');
  const frame=w.document.getElementById('serviteFrame');let child;

@@ -1,14 +1,18 @@
-/* Retomada e cópias pessoais. Os textos canônicos permanecem somente para leitura. */
+/* Retomada de leitura. Os textos canônicos permanecem somente para leitura. */
 (function(){
  'use strict';
  const D=window.OSMPersonalData;
- let ready=false,active=null,resourceActive=null,pending=null,restoring=false,timer=null,backup=null,restoreTask=null;
+ let ready=false,active=null,resourceActive=null,pending=null,restoring=false,timer=null,restoreTask=null;
  const $=id=>document.getElementById(id);
  const key=r=>D.routeKey(r);
  const text=node=>(node?.textContent||'').replace(/\s+/g,' ').trim();
  function data(){return D.load(localStorage);}
- function notice(message,error=false){const el=$('personalStatus');el.textContent=message;el.setAttribute('role',error?'alert':'status');}
- function safe(action){try{return action();}catch(error){notice(error.message||'Não foi possível acessar os dados pessoais.',true);return null;}}
+ function warn(message){
+  const warning=$('personalStorageWarning');
+  warning.textContent=message;
+  warning.hidden=false;
+ }
+ function safe(action){try{return action();}catch(error){warn('Não foi possível acessar os dados de leitura.');return null;}}
  function element(tag,content){const el=document.createElement(tag);if(content!==undefined)el.textContent=content;return el;}
  function button(label,action){const b=element('button',label);b.type='button';b.className='action-btn';b.addEventListener('click',action);return b;}
  function titleFor(doc=document){return (text(doc.querySelector('#view .detail-title,#view h1,#view h2'))||'Leitura OSM').slice(0,240);}
@@ -52,7 +56,7 @@
   if(s)s.scrollTop=Math.max(0,y);else win.scrollTo(0,Math.max(0,y));
  }
  function saveOne(item,win){if(item&&!restoring)D.savePosition(localStorage,item.route,item.title,capture(win));}
- function saveCurrent(){if(!ready||restoring)return;try{if(resourceActive)saveOne(resourceActive,$('serviteFrame').contentWindow);else saveOne(active,window);}catch(error){$('personalStorageWarning').hidden=false;$('personalStorageWarning').textContent='Não foi possível guardar a leitura. Abra “Cópia de segurança” para conferir o armazenamento.';}}
+ function saveCurrent(){if(!ready||restoring)return;try{if(resourceActive)saveOne(resourceActive,$('serviteFrame').contentWindow);else saveOne(active,window);}catch{warn('Não foi possível guardar a posição de leitura.');}}
  function scheduleSave(){clearTimeout(timer);timer=setTimeout(saveCurrent,450);}
  function cancelPosition(){if(!restoreTask)return false;cancelAnimationFrame(restoreTask.first);cancelAnimationFrame(restoreTask.second);restoreTask=null;restoring=false;return true;}
  function schedulePosition(win,p){
@@ -85,48 +89,17 @@
   if(resource){
    resourceActive=resourceDescriptor();
    readingTools($('serviteFrame').contentDocument,resourceActive,$('serviteFrame').contentWindow);
-   if(pending&&resourceActive){const item=pending;pending=null;restoring=true;try{$('serviteFrame').contentWindow.OSMResourceContext.restore(item.route.state);resourceActive=resourceDescriptor();}catch(error){restoring=false;open();notice(error.message||'Não foi possível retomar este recurso.',true);return;}finally{restoring=false;}schedulePosition($('serviteFrame').contentWindow,item.point);}
+   if(pending&&resourceActive){const item=pending;pending=null;restoring=true;try{$('serviteFrame').contentWindow.OSMResourceContext.restore(item.route.state);resourceActive=resourceDescriptor();}catch(error){restoring=false;warn(error.message||'Não foi possível retomar este recurso.');return;}finally{restoring=false;}schedulePosition($('serviteFrame').contentWindow,item.point);}
    return;
   }
   active=descriptor();
   readingTools(document,active,window);
-  if(state.tab==='biblioteca'){
-   const section=element('section');section.className='personal-library';section.append(button('Cópia de segurança',open));$('view').append(section);
-  }
   const home=document.querySelector('.home-personal-access');
   if(home){const p=safe(()=>data().last);if(p){home.querySelector('.personal-access-recent')?.nextElementSibling?.remove();home.querySelector('.personal-access-recent')?.remove();const shortcut=button(p.title,()=>resume(p));shortcut.className='personal-access-item';home.append(element('h3','Continuar de onde parei'),shortcut);}}
  }
- function refreshPreferences(){readerScale=Number(localStorage.getItem('osmReaderScale')||1);lightMode=localStorage.getItem('osmTheme')!=='dark';localStorage.setItem('santoral-osm-theme',lightMode?'light':'dark');localStorage.setItem('santoral-osm-fontsize',String(readerScale*16));applyPreferences();try{const doc=$('serviteFrame').contentDocument;doc.documentElement.style.fontSize=(readerScale*16)+'px';doc.documentElement.setAttribute('data-theme',lightMode?'light':'dark');}catch{}}
- function open(){if(!cancelPosition())saveCurrent();closeMainMenu();notice('');renderLibrary();openAccessibleDialog('personalOverlay');updateBackButton();}
- function close(){closeAccessibleDialog('personalOverlay');backup=null;updateBackButton();}
- function renderLibrary(){
-  const body=$('personalBody');body.replaceChildren();backup=null;
-  const p=safe(data);if(!p)return;
-  body.append(element('p','Dados guardados somente neste aparelho. Exporte uma cópia para levá-los a outro aparelho ou recuperá-los após uma reinstalação.'));
-  if(p.last)body.append(button('Continuar: '+p.last.title,()=>resume(p.last)));
-  body.append(element('p','A cópia inclui favoritos, recentes, posições de leitura, preferências e anotações antigas, quando houver.'),button('Exportar cópia',exportFile),button('Escolher cópia para restaurar',importFile));
-  if(localStorage.getItem(D.RECOVERY))body.append(button('Desfazer última restauração',()=>{body.replaceChildren(element('h3','Conferir recuperação'),element('p','Esta ação recupera os dados anteriores à última restauração e substitui as alterações feitas depois dela. Exporte uma cópia dos dados atuais se quiser preservá-los.'),button('Exportar dados atuais',exportFile),button('Recuperar dados anteriores',()=>{if(safe(()=>{D.undoRestore(localStorage);refreshPreferences();return true;})){renderLibrary();notice('Restauração desfeita. Os dados anteriores foram recuperados.');}}),button('Cancelar',renderLibrary));}));
- }
- function nativeBackup(){return window.Capacitor?.isNativePlatform?.()?getCapacitorPlugin('PersonalBackup'):null;}
- async function exportFile(){
-  try{saveCurrent();const content=D.exportBackup(localStorage),filename='liturgia-osm-pessoal-'+new Date().toISOString().slice(0,10)+'.json',plugin=nativeBackup();
-   if(window.Capacitor?.isNativePlatform?.()){if(!plugin)throw Error('Exportação indisponível nesta versão do aplicativo.');const result=await plugin.save({content,filename});notice(result.cancelled?'Exportação cancelada.': 'Cópia salva no local escolhido.');}
-   else{const url=URL.createObjectURL(new Blob([content],{type:'application/json'})),a=element('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);notice('Arquivo preparado para download. Confira se foi salvo.');}
-  }catch(error){notice(error.message||'Não foi possível exportar a cópia.',true);}
- }
- async function importFile(){
-  try{const plugin=nativeBackup();if(window.Capacitor?.isNativePlatform?.()){if(!plugin)throw Error('Importação indisponível nesta versão do aplicativo.');const result=await plugin.read();if(result.cancelled){notice('Importação cancelada.');return;}preview(result.content);}
-   else{const input=element('input');input.type='file';input.accept='.json,application/json';input.addEventListener('change',async()=>{try{const file=input.files[0];if(!file)return;if(file.size>D.MAX_BYTES)throw Error('Arquivo muito grande. Limite de 2 MB.');preview(await file.text());}catch(error){notice(error.message,true);}finally{input.remove();}});input.hidden=true;document.body.append(input);input.click();}
-  }catch(error){notice(error.message||'Não foi possível abrir a cópia.',true);}
- }
- function preview(content){
-  backup=D.parseBackup(content);const plan=D.planRestore(localStorage,backup),body=$('personalBody');body.replaceChildren();notice('Confira os dados antes de restaurar.');
-  body.append(element('h3','Conferir restauração'),element('p','Cópia de '+backup.createdDate+'. Novos registros: '+plan.summary.notesAdded+' anotações, '+plan.summary.favoritesAdded+' favoritos e '+plan.summary.positionsAdded+' posições.'),element('p',plan.summary.conflicts+' anotações diferentes. As versões já existentes neste aparelho serão mantidas. A última leitura local também será preservada.'));
-  const label=element('label'),check=element('input');check.type='checkbox';check.checked=true;label.append(check,document.createTextNode(' Restaurar também tema e tamanho do texto'));body.append(label,button('Restaurar esta cópia',()=>{if(safe(()=>{D.restore(localStorage,backup,check.checked);refreshPreferences();return true;})){renderLibrary();notice('Cópia restaurada. Os dados existentes foram preservados. Você pode desfazer a restauração abaixo.');}}),button('Cancelar',renderLibrary));
- }
  async function resume(item){
   try{
-   const r=D.route(item.route);if(!$('personalOverlay').classList.contains('open'))saveCurrent();else close();
+   const r=D.route(item.route);saveCurrent();
    if(r.type==='resource'){
     if($('serviteOverlay').classList.contains('open')&&currentServiteView===r.view&&$('serviteFrame').contentWindow.OSMResourceContext?.ready){restoring=true;try{$('serviteFrame').contentWindow.OSMResourceContext.restore(r.state);resourceActive=resourceDescriptor();}finally{restoring=false;}schedulePosition($('serviteFrame').contentWindow,item.point);}
     else{pending=item;openServite(r.view);}return;
@@ -143,17 +116,15 @@
     else if(r.type==='search'){loadGlobalSearch();if(globalSearchLoading)await globalSearchLoading;const i=globalSearchIndex?.documents.findIndex(x=>x.source===r.source&&x.title===r.title&&(x.page??null)===r.page);if(!(i>=0))throw Error('Este documento não está disponível nesta edição.');setTab('busca');openSearchDocument(i);}
    }finally{restoring=false;}
    schedulePosition(window,D.point(item.point));
-  }catch(error){pending=null;restoring=false;open();notice(error.message||'Não foi possível retomar esta leitura.',true);}
+  }catch(error){pending=null;restoring=false;warn(error.message||'Não foi possível retomar esta leitura.');}
  }
  function init(){
   if(ready)return;ready=true;
-  const overlay=element('div');overlay.id='personalOverlay';overlay.className='main-menu-overlay personal-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-labelledby','personalTitle');overlay.setAttribute('aria-hidden','true');overlay.tabIndex=-1;
-  const panel=element('section');panel.className='personal-panel';const head=element('div');head.className='personal-head';const h=element('h2','Cópia de segurança');h.id='personalTitle';const c=button('Fechar',close);c.setAttribute('aria-label','Fechar dados pessoais');head.append(h,c);const status=element('p');status.id='personalStatus';status.setAttribute('role','status');const body=element('div');body.id='personalBody';panel.append(head,status,body);overlay.append(panel);document.body.append(overlay);
   const warning=element('p');warning.id='personalStorageWarning';warning.className='personal-storage-warning';warning.setAttribute('role','alert');warning.hidden=true;document.body.append(warning);
+  try{D.removeLegacyNotes(localStorage);}catch{warn('Não foi possível concluir a remoção dos dados antigos.');}
   window.addEventListener('scroll',scheduleSave,true);window.addEventListener('pagehide',saveCurrent);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveCurrent();});
   $('serviteFrame').addEventListener('load',()=>{try{const win=$('serviteFrame').contentWindow;win.addEventListener('scroll',scheduleSave,true);win.addEventListener('servite-ready',()=>afterRender(true));if(win.OSMResourceContext?.ready)afterRender(true);}catch{}});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&overlay.classList.contains('open')){e.preventDefault();e.stopImmediatePropagation();close();}},true);
   afterRender();
  }
- window.OSMPersonalReader={init,beforeRender,afterRender,open,close,saveCurrent,cancelPosition,resourceClosed(){if(!cancelPosition())saveCurrent();resourceActive=null;},resourceOpening(){if(!cancelPosition())saveCurrent();resourceActive=null;}};
+ window.OSMPersonalReader={init,beforeRender,afterRender,saveCurrent,cancelPosition,resourceClosed(){if(!cancelPosition())saveCurrent();resourceActive=null;},resourceOpening(){if(!cancelPosition())saveCurrent();resourceActive=null;}};
 })();
