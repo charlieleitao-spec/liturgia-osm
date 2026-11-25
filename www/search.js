@@ -39,7 +39,7 @@
     });
   }
   async function readPdfTexts(){
-    const response=await fetch('./data/search-pdf-texts.gz');
+    const response=await fetch('./data/search-pdf-texts.bin');
     if(!response.ok||!response.body)throw new Error('Textos de PDF indisponíveis');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
   }

@@ -10,7 +10,7 @@ assert.deepEqual(Object.keys(corpus.sources).sort(),sources,'Fontes adicionadas/
 for(const [path,hash] of Object.entries(corpus.sources)){
   assert.equal(crypto.createHash('sha256').update(fs.readFileSync('www/'+path)).digest('hex'),hash,'Regerar índice: '+path);
 }
-const pdfPayload=gunzipSync(fs.readFileSync('www/data/search-pdf-texts.gz'));
+const pdfPayload=gunzipSync(fs.readFileSync('www/data/search-pdf-texts.bin'));
 assert.equal(crypto.createHash('sha256').update(pdfPayload).digest('hex'),corpus.pdfTextRevision);
 assert(corpus.documents.every(row=>!Object.hasOwn(row,'text')));
 let pdfReads=0;

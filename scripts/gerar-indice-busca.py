@@ -92,7 +92,8 @@ for relative, path in sorted(pdfs.items()):
 inputs = sorted(p for p in DATA.rglob('*') if p.suffix in ('.json', '.pdf') and p.name != 'search-index.json')
 sources = {p.relative_to(ROOT / 'www').as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}
 pdf_payload = json.dumps(pdf_texts, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
-with (DATA / 'search-pdf-texts.gz').open('wb') as output:
+# AAPT treats .gz assets specially. Preserve gzip bytes with an opaque .bin suffix.
+with (DATA / 'search-pdf-texts.bin').open('wb') as output:
     with gzip.GzipFile(filename='', fileobj=output, mode='wb', mtime=0) as compressed:
         compressed.write(pdf_payload)
 result = dict(schema=3, sources=sources, pdfTextRevision=hashlib.sha256(pdf_payload).hexdigest(), documents=records)

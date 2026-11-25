@@ -33,7 +33,7 @@ const CORE = [
   "./data/memoria-liturgica.json",
   "./data/missas-osm.json",
   "./data/search-index.json",
-  "./data/search-pdf-texts.gz",
+  "./data/search-pdf-texts.bin",
   "./data/load-devotions.js",
   "./data/devocoes/adoracao.json",
   "./data/devocoes/antifonas.json",
