@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.139-teste1-busca-offline';
+const CACHE = 'liturgia-osm-v4.9.139-busca-offline';
 const CORE = [
   "./media/emblema-osm.svg",
   "./media/ornamento-final.svg",
