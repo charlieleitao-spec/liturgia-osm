@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 const removed = ['cordova.js', 'cordova_plugins.js', 'ALTERACOES-SIMPLIFICACAO.md',
-  'data/pdfs/biblioteca/README.md', 'media/EMBLEMA-FONTE.txt', 'media/benincasa-montepulciano-CREDITOS.md'];
+  'data/pdfs/biblioteca/README.md', 'media/fonts/cinzel-normal-latin-ext.woff2', 'media/EMBLEMA-FONTE.txt', 'media/benincasa-montepulciano-CREDITOS.md'];
 const roots = ['www'];
 if (process.argv.includes('--android')) roots.push('android/app/src/main/assets/public');
 for (const root of roots) {

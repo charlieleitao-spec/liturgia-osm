@@ -13,7 +13,7 @@ try {
   await page.goto('http://127.0.0.1:8772/');
   await page.waitForFunction(()=>typeof santoralReady!=='undefined'&&santoralReady);
   await page.evaluate(async()=>{await navigator.serviceWorker.ready;});
-  assert.equal(indexRequests,0,'Índice não é solicitado na abertura nem no precache');
+  assert.equal(indexRequests,0,'A página não carrega o corpus de busca na abertura');
   await page.evaluate(()=>openGlobalSearch());
   await page.waitForFunction(()=>!!globalSearchIndex);
   assert.ok(indexRequests>0,'Índice solicitado ao abrir a busca');

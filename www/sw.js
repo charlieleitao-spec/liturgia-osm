@@ -1,4 +1,4 @@
-const CACHE = 'liturgia-osm-v4.9.138-personal-v2-fontes-s21-assets-pr150-mariano1-padrao2-search3';
+const CACHE = 'liturgia-osm-v4.9.139-teste1-busca-offline';
 const CORE = [
   "./media/emblema-osm.svg",
   "./media/ornamento-final.svg",
@@ -32,6 +32,8 @@ const CORE = [
   "./data/oficios-osm.json",
   "./data/memoria-liturgica.json",
   "./data/missas-osm.json",
+  "./data/search-index.json",
+  "./data/search-pdf-texts.gz",
   "./data/load-devotions.js",
   "./data/devocoes/adoracao.json",
   "./data/devocoes/antifonas.json",
@@ -57,7 +59,6 @@ const CORE = [
   "./media/servite-11.webp",
   "./media/servite-12.webp",
   "./media/fonts/fonts.css",
-  "./media/fonts/cinzel-normal-latin-ext.woff2",
   "./media/fonts/cinzel-normal-latin.woff2",
   "./media/servite-13.webp",
   "./media/andre-sansepolcro.webp",

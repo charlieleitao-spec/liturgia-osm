@@ -38,10 +38,15 @@
       } catch {finish(null);}
     });
   }
-  async function loadDocuments(corpus,readJSON,cache=corpusCache){
+  async function readPdfTexts(){
+    const response=await fetch('./data/search-pdf-texts.gz');
+    if(!response.ok||!response.body)throw new Error('Textos de PDF indisponíveis');
+    return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
+  }
+  async function loadDocuments(corpus,readJSON,cache=corpusCache,readTexts=readPdfTexts){
     if(corpus.schema===1)return corpus.documents;
-    if(corpus.schema!==2)throw new Error('Formato de busca incompatível');
-    const revision=JSON.stringify([corpus.schema,corpus.sources]);
+    if(corpus.schema!==2&&corpus.schema!==3)throw new Error('Formato de busca incompatível');
+    const revision=JSON.stringify([corpus.schema,corpus.sources,corpus.pdfTextRevision]);
     const cached=await cache('read');
     if(cached?.revision===revision&&Array.isArray(cached.documents)&&cached.documents.length===corpus.documents.length)return cached.documents;
     const read=readJSON||async function(source){
@@ -50,7 +55,14 @@
       return response.json();
     };
     const sources=new Map();
+    let pdfTexts;
     const documents=await Promise.all(corpus.documents.map(async document=>{
+      if(corpus.schema===3&&Object.hasOwn(document,'pdfText')){
+        const {pdfText,...record}=document;
+        const texts=await (pdfTexts||=Promise.resolve().then(readTexts));
+        if(!Array.isArray(texts)||!Number.isInteger(pdfText)||typeof texts[pdfText]!=='string')throw new Error('Texto de PDF inválido');
+        return {...record,text:texts[pdfText]};
+      }
       if(!Array.isArray(document.ref))return {...document};
       const {ref,...record}=document;
       if(!Object.hasOwn(corpus.sources,'data/'+record.source)||!record.source.endsWith('.json')||record.source.includes('..'))throw new Error('Fonte inválida');
@@ -67,9 +79,10 @@
   }
   function createIndex(documents){
     const postings=new Map();
-    const normalized=documents.map(doc=>normalize(doc.title+' '+doc.source+' '+doc.text));
+    const searchable=doc=>[doc.title,doc.source,doc.text,doc.date,doc.date?.split('-').reverse().join('/')].filter(Boolean).join(' ');
+    const normalized=documents.map(doc=>normalize(searchable(doc)));
     documents.forEach((doc,id)=>{
-      new Set(words(doc.title+' '+doc.source+' '+doc.text)).forEach(word=>{
+      new Set(words(searchable(doc))).forEach(word=>{
         if(!postings.has(word))postings.set(word,new Set());
         postings.get(word).add(id);
       });
