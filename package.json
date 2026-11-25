@@ -1,6 +1,6 @@
 {
   "name": "liturgia-osm",
-  "version": "4.9.138",
+  "version": "4.9.139",
   "private": true,
   "scripts": {
     "android:add": "npx cap add android",
@@ -9,6 +9,7 @@
     "capacitor:sync:after": "node scripts/cleanup-android-assets.mjs",
     "test:reader-stability": "node --test scripts/test-reader-stability.cjs && node scripts/test-reader-stability-dom.cjs",
     "test:personal": "node --test scripts/test-personal-data.cjs",
+    "liturgia:importar": "python3 scripts/revisar-dados-liturgicos.py --write && npm run search:build",
     "search:build": "python3 scripts/gerar-indice-busca.py"
   },
   "dependencies": {

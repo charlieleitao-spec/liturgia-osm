@@ -160,17 +160,9 @@ function prayerLineHtml(line, vigilia=false){
   return liturgicalLineHtml(line,vigilia);
 }
 function normalizeCopiedLineBreaks(value){
-  const source=String(value??'').replace(/\r\n?/g,'\n');
-  const joined=source.replace(/([^\s-]+)-\n[ \t]*([^\s-]+)/g,(match,left,right,offset,whole)=>{
-    const suffix=(right.match(/^[A-Za-zÀ-ÿ]+/)||[''])[0].toLocaleLowerCase('pt-BR');
-    const keepsHyphen=/\d$/.test(left)&&/^\d/.test(right)
-      ||/^(?:o|a|as|la|las|lhe|lhes|lo|los|me|na|nas|no|nos|se|te|vos|os)$/i.test(suffix)&&(left.length>=4||/[áàâéêíóôúãõrszu]$/i.test(left))
-      ||whole[offset-1]==='-'&&/^(?:ei|ás|á|emos|eis|ão|ia|ias|íamos|íeis|iam)$/i.test(suffix)
-      ||/^(?:bem|mal|todo|toda|mestre)$/i.test(left);
-    return left+(keepsHyphen?'-':'')+right;
-  });
-  return joined.split('\n').map(line=>line.replace(/[ \t]+([,.;:!?])/g,'$1').replace(/[ \t]{2,}/g,' ').replace(/[ \t]+$/,'')).join('\n');
+  return String(value??'').replace(/\r\n?/g,'\n');
 }
+
 function formatPrayerStanza(lines, vigilia, hymnMode, preces=false){
   const clean=lines.map(line=>normalizeCopiedLineBreaks(line).trim());
   if(hymnMode) return clean.map(line=>'<span class="'+(hymnMode==='psalm'?'liturgical-verse-line':'liturgical-hymn-line')+'">'+prayerLineHtml(line,hymnMode==='psalm')+'</span>').join('');
@@ -341,7 +333,7 @@ function dailyPrayerSuggestion(date=new Date()){
 }
 
 // ===================== state =====================
-const APP_VERSION = '4.9.138';
+const APP_VERSION = '4.9.139';
 const storedTab = localStorage.getItem('osmLastTab');
 const validTabs = ['hoje','calendario','santoral','oracoes','biblioteca','sobre'];
 const dailySuggestion = dailyPrayerSuggestion();

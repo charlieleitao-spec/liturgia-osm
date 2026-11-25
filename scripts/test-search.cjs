@@ -1,6 +1,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const crypto=require('node:crypto');
+const {gunzipSync}=require('node:zlib');
 const {createIndex,loadDocuments}=require('../www/search.js');
 (async()=>{
 const corpus=JSON.parse(fs.readFileSync('www/data/search-index.json'));
@@ -9,12 +10,19 @@ assert.deepEqual(Object.keys(corpus.sources).sort(),sources,'Fontes adicionadas/
 for(const [path,hash] of Object.entries(corpus.sources)){
   assert.equal(crypto.createHash('sha256').update(fs.readFileSync('www/'+path)).digest('hex'),hash,'Regerar índice: '+path);
 }
-const documents=await loadDocuments(corpus,async source=>JSON.parse(fs.readFileSync('www/data/'+source)));
+const pdfPayload=gunzipSync(fs.readFileSync('www/data/search-pdf-texts.bin'));
+assert.equal(crypto.createHash('sha256').update(pdfPayload).digest('hex'),corpus.pdfTextRevision);
+assert(corpus.documents.every(row=>!Object.hasOwn(row,'text')));
+let pdfReads=0;
+const documents=await loadDocuments(corpus,async source=>JSON.parse(fs.readFileSync('www/data/'+source)),
+  async()=>null,async()=>{pdfReads++;return JSON.parse(pdfPayload);});
+assert.equal(pdfReads,1);
 const index=createIndex(documents);
 const downloadable=new Set(JSON.parse(fs.readFileSync('www/data/biblioteca-servita-catalogo.json')).documents.map(d=>d.download_path));
 assert(index.search('coroa nossa senhora dores','Orações').some(x=>x.doc.title.includes('Coroa')));
 assert.deepEqual(index.search('misericórdia').map(x=>x.id),index.search('MISERICORDIA').map(x=>x.id));
 assert(index.search('2024').length>0);
+assert(index.search('15/12','Santoral').some(x=>x.doc.date==='12-15'&&x.doc.title.includes('Boaventura')));
 assert(index.search('Regra Vida Ordem Secular','Orações').length>0);
 assert(index.search('Deus','PDFs').every(x=>x.doc.page>0&&(fs.existsSync('www/'+x.doc.source)||downloadable.has(x.doc.source))));
 assert(index.search('Deus','PDFs').length>0);

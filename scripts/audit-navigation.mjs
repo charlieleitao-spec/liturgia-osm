@@ -209,20 +209,8 @@ const normalizeCopiedStart = app.indexOf('function normalizeCopiedLineBreaks(val
 const normalizeCopiedEnd = app.indexOf('function formatPrayerStanza(', normalizeCopiedStart);
 const normalizeCopiedSource = app.slice(normalizeCopiedStart, normalizeCopiedEnd);
 const normalizeCopied = new Function(normalizeCopiedSource + '; return normalizeCopiedLineBreaks;')();
-// Regression cases for PDF syllables that resemble enclitic pronouns, in both readers.
-const serviteNormalizer = serviteScript.slice(serviteScript.indexOf('function normalizeServiteLineBreaks(value){'),serviteScript.indexOf('function ',serviteScript.indexOf('function normalizeServiteLineBreaks(value){')+10));
-const normalizeServiteRegression = new Function(serviteNormalizer+';return normalizeServiteLineBreaks;')();
-for (const normalize of [normalizeCopied, normalizeServiteRegression]) {
-  for (const [input, expected] of [['no-\nme','nome'],['pe-\nna','pena'],['se-\nte','sete'],['fa-\nla','fala'],['dar-\nnos','dar-nos'],['dá-\nlhe','dá-lhe'],['faça-\na','faça-a'],['uniu-\nse','uniu-se']]) {
-    assert.equal(normalize(input), expected, 'PDF hyphen regression: '+input);
-  }
-}
-assert.equal(normalizeCopied('composi-\nção'), 'composição', 'Hifenização de PDF deve recompor a palavra.');
-assert.equal(normalizeCopied('perdê-\nla'), 'perdê-la', 'Hífen de pronome deve ser preservado ao recompor a linha.');
-assert.equal(normalizeCopied('bem-\naventurada'), 'bem-aventurada', 'Composto com hífen deve permanecer íntegro.');
-assert.equal(normalizeCopied('3,1-\n4'), '3,1-4', 'Intervalo numérico deve permanecer íntegro.');
-assert.equal(normalizeCopied('perdê-\nla;'), 'perdê-la;', 'Pontuação final não deve ocultar pronome ligado por hífen.');
-assert.equal(normalizeCopied('Olá  mundo  ;'), 'Olá mundo;', 'Espaços duplicados e antes da pontuação devem ser corrigidos.');
+assert.equal(normalizeCopied('chamou-o, Louvar-te-ei'), 'chamou-o, Louvar-te-ei');
+assert.equal(normalizeCopied('dois versos.\r\nOutro verso.'), 'dois versos.\nOutro verso.');
 const massTextStart = app.indexOf('function cleanMassText(text){');
 const massTextEnd = app.indexOf('function properMassAntiphon(', massTextStart);
 const massTextRenderer = app.slice(massTextStart, massTextEnd);

@@ -1,4 +1,5 @@
 """Gera corpus offline; requer Poppler (pdftotext). Não altera as fontes."""
+import gzip
 import hashlib
 import json
 import re
@@ -8,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / 'www/data'
 records = []
+pdf_texts = []
 ignored = {'image', 'id', 'santoral_id', 'schema_version', 'description', 'categoria',
            'genero', 'grau_confirmado', 'tipo_material', 'editorial_notes'}
 
@@ -28,7 +30,8 @@ def add(title, category, value, source, ref=None, **extra):
     if body:
         record = dict(title=title, category=category, source=source, **extra)
         if ref is None:
-            record['text'] = body
+            record['pdfText'] = len(pdf_texts)
+            pdf_texts.append(body)
         else:
             record['ref'] = ref
         records.append(record)
@@ -40,13 +43,14 @@ def read(name):
 
 saints = read('santoral.json')
 for index, item in enumerate(saints):
-    add(item['title'], 'Santoral', item, 'santoral.json', ref=[index])
+    date = f'{item["month"]:02d}-{item["day"]:02d}'
+    add(item['title'], 'Santoral', item, 'santoral.json', ref=[index], date=date)
 for index, item in enumerate(read('missas-osm.json')['celebrations']):
-    add(item['title'] + ' · Missa', 'Missas', item, 'missas-osm.json', ref=['celebrations', index])
+    add(item['title'] + ' · Missa', 'Missas', item, 'missas-osm.json', ref=['celebrations', index], **({'date': item['date']} if re.fullmatch(r'\d{2}-\d{2}', item['date']) else {}))
 offices = read('oficios-osm.json')
 for date, item in offices['celebracoes'].items():
     saint = next((s for s in saints if s['id'] == item.get('id')), {})
-    add(saint.get('title', date) + ' · Ofício', 'Ofícios', item, 'oficios-osm.json', ref=['celebracoes', date])
+    add(saint.get('title', date) + ' · Ofício', 'Ofícios', item, 'oficios-osm.json', ref=['celebracoes', date], date=date)
 for key in ['celebracoes_moveis', 'sabados_marianos_pdf']:
     for index, item in enumerate(offices[key]):
         add(item.get('title') or item.get('titulo') or 'Ofício mariano', 'Ofícios', item, 'oficios-osm.json', ref=[key, index])
@@ -87,6 +91,11 @@ for relative, path in sorted(pdfs.items()):
 
 inputs = sorted(p for p in DATA.rglob('*') if p.suffix in ('.json', '.pdf') and p.name != 'search-index.json')
 sources = {p.relative_to(ROOT / 'www').as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}
-result = dict(schema=2, sources=sources, documents=records)
+pdf_payload = json.dumps(pdf_texts, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
+# AAPT treats .gz assets specially. Preserve gzip bytes with an opaque .bin suffix.
+with (DATA / 'search-pdf-texts.bin').open('wb') as output:
+    with gzip.GzipFile(filename='', fileobj=output, mode='wb', mtime=0) as compressed:
+        compressed.write(pdf_payload)
+result = dict(schema=3, sources=sources, pdfTextRevision=hashlib.sha256(pdf_payload).hexdigest(), documents=records)
 (DATA / 'search-index.json').write_text(json.dumps(result, ensure_ascii=False, separators=(',', ':')))
 print(f'{len(records)} entradas; {len(sources)} fontes; {(DATA / "search-index.json").stat().st_size} bytes')
