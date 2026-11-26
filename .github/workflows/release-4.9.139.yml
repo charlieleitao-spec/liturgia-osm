@@ -1,15 +1,15 @@
-name: Preparar e publicar Liturgia OSM 4.9.139
+name: Compilar APK de teste do Ofício Próprio OSM
 
 on:
   push:
-    branches: [main]
+    branches: [test/apk-oficio-proprio-173]
     paths: ['.github/workflows/release-4.9.139.yml']
 
 permissions:
   contents: read
 
 concurrency:
-  group: release-4.9.139-${{ github.ref }}
+  group: apk-oficio-proprio-173-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -41,20 +41,9 @@ jobs:
       - name: Instalar dependências sem alterar o lock aprovado
         run: npm ci --ignore-scripts --no-audit --no-fund
 
-      - name: Conferir correspondência com a fonte da compilação validada no Samsung A56
+      - name: Conferir a origem da PR 173
         run: |
-          python3 - <<'PYAPPROVED'
-          from pathlib import Path
-          import subprocess
-
-          approved = '51ed28c706d3c7e8d3b9a9dc6141770828088f9b'
-          version_files = {'package.json', 'package-lock.json', 'www/app.js', 'www/sw.js'}
-          changed = set(subprocess.check_output(['git', 'diff', '--name-only', approved, '--', 'www', 'scripts', 'data', 'docs/biblioteca-pdfs', 'capacitor.config.json', 'icone-android-liturgia-osm.zip', 'package.json', 'package-lock.json'], text=True).splitlines())
-          assert changed == version_files, f'Arquivos de execução divergentes: {changed ^ version_files}'
-          for name in version_files:
-              before = subprocess.check_output(['git', 'show', f'{approved}:{name}'])
-              assert Path(name).read_bytes() == before.replace(b'4.9.139-teste1', b'4.9.139'), name
-          PYAPPROVED
+          git diff --exit-code 73df62acc73fd8e27e91f632c63a55b6d0ae1ae1 -- www/ scripts/ data/ capacitor.config.json package.json package-lock.json icone-android-liturgia-osm.zip
 
       - name: Conferir navegação, dados pessoais e recursos offline
         env:
@@ -69,6 +58,11 @@ jobs:
           node scripts/verify-accessibility.mjs
           node scripts/verify-search.mjs
           git diff --exit-code 51ed28c706d3c7e8d3b9a9dc6141770828088f9b -- www/data/ www/media/ www/liturgical-reader.css www/pdf-links.js www/search.js
+
+      - name: Identificar a versão de teste
+        run: |
+          sed -i "s/const APP_VERSION = '4.9.139';/const APP_VERSION = '4.9.140-teste1';/" www/app.js
+          sed -i 's/liturgia-osm-v4.9.139-/liturgia-osm-v4.9.140-teste1-/' www/sw.js
 
       - name: Criar projeto Android
         run: npx cap add android
@@ -107,8 +101,8 @@ jobs:
 
       - name: Definir versão e segurança
         run: |
-          sed -i 's/versionCode [0-9][0-9]*/versionCode 41069/' android/app/build.gradle
-          sed -i 's/versionName "[^"]*"/versionName "4.9.139"/' android/app/build.gradle
+          sed -i 's/versionCode [0-9][0-9]*/versionCode 41070/' android/app/build.gradle
+          sed -i 's/versionName "[^"]*"/versionName "4.9.140-teste1"/' android/app/build.gradle
           python3 - <<'PY'
           from pathlib import Path
           p = Path('android/app/build.gradle')
@@ -181,17 +175,17 @@ jobs:
           ./gradlew assembleRelease
 
       - name: Nomear APK
-        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.139.apk
+        run: cp android/app/build/outputs/apk/release/app-release.apk Liturgia-OSM-4.9.140-teste1.apk
 
       - name: Conferir assinatura e todos os arquivos offline
         run: |
           APKSIGNER="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/apksigner"
-          "$APKSIGNER" verify --verbose --print-certs Liturgia-OSM-4.9.139.apk > assinatura.txt
+          "$APKSIGNER" verify --verbose --print-certs Liturgia-OSM-4.9.140-teste1.apk > assinatura.txt
           grep -q 'certificate SHA-256 digest: 5b2b3319cc9f9bb61a14fb8a30e63044db225f7b930fca9568c82854f38b4fe0' assinatura.txt
           AAPT="${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | sort -V | tail -1)/aapt"
-          "$AAPT" dump badging Liturgia-OSM-4.9.139.apk > identidade.txt
-          grep -q "package: name='com.liturgia_osm.app' versionCode='41069' versionName='4.9.139'" identidade.txt
-          "$AAPT" dump xmltree Liturgia-OSM-4.9.139.apk AndroidManifest.xml > manifesto.txt
+          "$AAPT" dump badging Liturgia-OSM-4.9.140-teste1.apk > identidade.txt
+          grep -q "package: name='com.liturgia_osm.app' versionCode='41070' versionName='4.9.140-teste1'" identidade.txt
+          "$AAPT" dump xmltree Liturgia-OSM-4.9.140-teste1.apk AndroidManifest.xml > manifesto.txt
           if grep -Eqi 'appwidget|Servita(Square)?Widget' manifesto.txt; then
             echo "::error::O APK ainda declara um widget"
             exit 1
@@ -199,17 +193,17 @@ jobs:
           python3 - <<'PYCHECK'
           from pathlib import Path
           import zipfile
-          with zipfile.ZipFile('Liturgia-OSM-4.9.139.apk') as apk:
+          with zipfile.ZipFile('Liturgia-OSM-4.9.140-teste1.apk') as apk:
               for p in Path('www').rglob('*'):
                   if p.is_file():
                       assert apk.read('assets/public/'+p.relative_to('www').as_posix())==p.read_bytes(), str(p)
               app = apk.read('assets/public/app.js').decode('utf-8')
-              assert "const APP_VERSION = '4.9.139';" in app
+              assert "const APP_VERSION = '4.9.140-teste1';" in app
               assert 'OSMPdf.formatIntercessions' in app
               shared = apk.read('assets/public/pdf-links.js').decode('utf-8')
               assert 'function formatIntercessions' in shared
               assert 'OSMPdf.formatIntercessions' in apk.read('assets/public/servite-3.js').decode('utf-8')
-              assert 'liturgia-osm-v4.9.139-' in apk.read('assets/public/sw.js').decode('utf-8')
+              assert 'liturgia-osm-v4.9.140-teste1-' in apk.read('assets/public/sw.js').decode('utf-8')
               assert not {'assets/public/widget-links.js', 'assets/santoral-widget.json'}.intersection(apk.namelist())
               reader = apk.read('assets/public/personal-reader.js').decode('utf-8')
               assert all(marker not in reader for marker in ('personalNoteText', 'Cópia de segurança', 'PersonalBackup'))
@@ -218,43 +212,16 @@ jobs:
           PYCHECK
 
       - name: Calcular resumo do APK
-        run: sha256sum Liturgia-OSM-4.9.139.apk > SHA256SUMS.txt
+        run: sha256sum Liturgia-OSM-4.9.140-teste1.apk > SHA256SUMS.txt
 
-      - name: Guardar APK oficial verificado
+      - name: Guardar APK de teste verificado
         uses: actions/upload-artifact@v5
         with:
-          name: Liturgia-OSM-4.9.139-oficial
+          name: Liturgia-OSM-4.9.140-teste1
           path: |
-            Liturgia-OSM-4.9.139.apk
+            Liturgia-OSM-4.9.140-teste1.apk
             assinatura.txt
             identidade.txt
             SHA256SUMS.txt
           if-no-files-found: error
 
-  publish:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          persist-credentials: false
-      - uses: actions/download-artifact@v5
-        with:
-          name: Liturgia-OSM-4.9.139-oficial
-      - name: Publicar APK verificado
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          sha256sum --check SHA256SUMS.txt
-          if git ls-remote --exit-code --tags origin refs/tags/v4.9.139 >/dev/null; then
-            echo "::error::A tag v4.9.139 já existe."
-            exit 1
-          fi
-          gh release create v4.9.139 Liturgia-OSM-4.9.139.apk SHA256SUMS.txt assinatura.txt identidade.txt --target "$GITHUB_SHA" --title 'Liturgia OSM 4.9.139' --notes-file docs/releases/4.9.139.md --latest
-      - name: Conferir APK baixado da publicação
-        run: |
-          curl --fail --location --retry 5 --retry-all-errors --retry-delay 5 --output /tmp/Liturgia-OSM-4.9.139.apk https://github.com/charlieleitao-spec/liturgia-osm/releases/download/v4.9.139/Liturgia-OSM-4.9.139.apk
-          cmp Liturgia-OSM-4.9.139.apk /tmp/Liturgia-OSM-4.9.139.apk
