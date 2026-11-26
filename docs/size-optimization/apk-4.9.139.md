@@ -25,3 +25,17 @@ O Santoral e os Ofícios têm as mesmas 32 chaves fixas e os mesmos IDs associad
 Há 20 ocorrências de “género” ou “géneros” em 14 campos, incluindo transcrições que repetem o texto já estruturado. A grafia aparece no Ofício de 4, 8 e 30 de maio, 27 de junho, 15 de setembro, 16 de novembro e nas transcrições dos Sábados Marianos de Advento, Tempo Pascal e Tempo Comum conforme o índice do JSON. As grafias da fonte foram preservadas para cotejo editorial.
 
 `npm run liturgia:importar` lista divergências, aplica os ajustes de transcrição conhecidos nos dados e regenera a busca. `python3 scripts/revisar-dados-liturgicos.py --check` confere a base sem gravar arquivos.
+
+## Cotejo dos cinco registros sem textos próprios locais
+
+Em 26 de novembro de 2026, a edição italiana da Liturgia das Horas publicada pela Cúria Geral permitiu distinguir as seguintes situações.
+
+| Data | Celebração | Evidência documental |
+| --- | --- | --- |
+| 08-04 | Frei Paulino M. Baldassarri | Registro biográfico de servo de Deus. Sem formulário próprio identificado no índice litúrgico consultado. |
+| 07-01 | Beato Fernando Maria Baccilieri | O [formulário oficial italiano](https://servidimaria.net/sitoosm/it/testi-osm/libri-liturgici-osm/litore/ferdinando.pdf) remete ao Comum de pastores ou de santos e beatos da Ordem com exceções, entre elas a segunda leitura do Ofício das Leituras. |
+| 08-25 | Frei Egídio Maria Moscini | Registro biográfico de servo de Deus. Sem formulário próprio identificado no índice litúrgico consultado. |
+| 09-05 | Beata Maria Madalena da Paixão (Starace) | O [formulário oficial italiano](https://servidimaria.net/sitoosm/it/testi-osm/libri-liturgici-osm/litore/maddalena.pdf) remete ao Comum e apresenta textos próprios, inclusive a segunda leitura. |
+| 09-17 | Beata Cecília Eusepi | O [formulário oficial italiano](https://servidimaria.net/sitoosm/it/testi-osm/libri-liturgici-osm/litore/cecilia.pdf) remete ao Comum das virgens e apresenta segunda leitura própria. |
+
+O acesso fica no Santoral, na aba Liturgia das celebrações com edição italiana localizada. Os PDFs oficiais são links externos, identificados pelo idioma e pela necessidade de conexão. O Comum local em português continua acessível. A incorporação dos textos próprios em português depende da edição autorizada. Fonte do calendário: [Liturgia delle Ore OSM](https://servidimaria.net/sitoosm/it/testi-osm/libri-liturgici-osm/liturgia-delle-ore-osm.html).
