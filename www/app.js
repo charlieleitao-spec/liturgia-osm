@@ -1830,8 +1830,18 @@ loadCanonicalSantoral();
         hours.map(function(pair){return officeHourButtonHtml(s,pair,'hub-action');}).join('')+
         '</div>'+OSMPdf.officeResources(officeRecordForSaint(s))+'</div>';
     }else if(officeRecordForSaint(s)?.tipo_material==='sem_material_proprio'){
-      office='<div class="hub-card"><div class="hub-card-title">Liturgia das Horas</div>'+ 
-        hubEmpty('Sem material próprio: usar o Comum.')+
+      const officialFile={'07-01':'ferdinando','09-05':'maddalena','09-17':'cecilia'}[dateKey(s)];
+      const officialOffice=officialFile
+        ?'https://servidimaria.net/sitoosm/it/testi-osm/libri-liturgici-osm/litore/'+officialFile+'.pdf'
+        :'';
+      const note=officialOffice
+        ?'Textos próprios em edição italiana da Cúria Geral. O Comum permanece disponível em português.'
+        :'Sem textos próprios cadastrados.';
+      const reference=officialOffice
+        ?'<div class="liturgia-resource-actions">'+liturgiaResourceAction('Consultar o PDF oficial em italiano (online)',officialOffice)+'</div>'
+        :'';
+      office='<div class="hub-card"><div class="hub-card-title">Liturgia das Horas</div>'+
+        hubEmpty(note)+reference+
         '<button class="hub-action" style="margin-top:10px" onclick="openServite(\'oficio\')">Abrir Ofício Comum <span>›</span></button></div>';
     }else{
       office='<div class="hub-card"><div class="hub-card-title">Textos próprios do Ofício</div>'+hubEmpty('Não há horas próprias cadastradas; usar o Comum.')+
