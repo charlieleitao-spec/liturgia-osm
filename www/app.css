@@ -1126,6 +1126,7 @@ body.scroll-controls-hidden:has(#dailyLiturgyOverlay.open) .celebration-toggle{t
 #view .calendar-agenda-heading h2{margin:0;font-size:18px;font-weight:normal;color:var(--paper);}
 #view .calendar-agenda-heading>span{font-size:12px;color:var(--text-muted);}
 #view .calendar-month-entry{display:flex;align-items:center;gap:12px;min-height:72px;padding:12px 2px;text-decoration:none;border-bottom:1px solid var(--line);color:var(--paper);}
+#view button.calendar-month-entry{width:100%;background:none;border-top:0;border-left:0;border-right:0;text-align:left;}
 #view .calendar-month-entry time{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:0 0 38px;gap:3px;color:var(--gold);}
 #view .calendar-month-entry time b{font-size:25px;line-height:1;font-weight:normal;font-variant-numeric:tabular-nums;}
 #view .calendar-month-entry time small{font-size:11px;color:var(--text-muted);}
