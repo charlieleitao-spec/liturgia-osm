@@ -29,6 +29,15 @@ function celebrationGradeLabel(value){
   const normalized=raw.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR').split(' · ')[0].trim().replace(/\s+/g,'_');
   return CELEBRATION_GRADE_LABELS[normalized]||'';
 }
+// Graus particulares do Calendário Perpétuo OSM, pp. 226 e seguintes.
+const OSM_PARTICULAR_GRADES={
+  '06-19':'Solenidade para as monjas e as irmãs',
+  '07-01':'Festa para as Servas de Maria de Galeazza',
+  '07-13':'Solenidade para as Mínimas da Bem-aventurada Virgem Maria das Dores',
+  '09-01':'Memória para as monjas e as irmãs',
+  '09-05':'Festa para as Irmãs Servas de Maria da Compaixão',
+  '10-03':'Festa para as monjas'
+};
 function saintDisplayGrade(s){
   if(s?.categoria==='servo_de_deus')return 'Memória biográfica';
   return celebrationGradeLabel(s?.grau);
@@ -321,6 +330,30 @@ function easterSunday(year){
   const day=((h+l-7*m+114)%31)+1;
   return new Date(year,month,day,12,0,0);
 }
+// Calendário Perpétuo OSM, p. 225.
+const VIRGEM_AO_PE_DA_CRUZ_RULE='sexta-feira_depois_do_v_domingo_da_quaresma';
+function dateOfVirgemAoPeDaCruz(year){
+  const date=easterSunday(year);
+  date.setDate(date.getDate()-9);
+  return date;
+}
+function additionalOSMCelebrations(year){
+  const movingDate=dateOfVirgemAoPeDaCruz(year);
+  return [
+    {month:3,day:19,title:'São José, esposo da Bem-aventurada Virgem Maria',
+      date:'19 de março',grau:'solenidade',note:'Padroeiro secundário da Ordem'},
+    {month:movingDate.getMonth()+1,day:movingDate.getDate(),
+      title:'Bem-aventurada Virgem Maria ao Pé da Cruz',
+      date:movingDate.toLocaleDateString('pt-BR',{day:'numeric',month:'long'}),
+      grau:'festa',dateRule:VIRGEM_AO_PE_DA_CRUZ_RULE}
+  ];
+}
+function calendarMassAction(celebration){
+  if(!celebration.dateRule)return '';
+  const records=window.MISSAS_OSM?.celebrations||[];
+  const index=records.findIndex(item=>item.date_rule===celebration.dateRule);
+  return index<0?'':"openLiturgiaDetail('missa',"+index+")";
+}
 function isPaschalSeason(date=new Date()){
   const easter=easterSunday(date.getFullYear());
   const pentecost=new Date(easter); pentecost.setDate(easter.getDate()+49); pentecost.setHours(23,59,59,999);
@@ -483,7 +516,9 @@ function dailyOSMCard(){
 function viewHoje(){
   const today=todayInfo();
   const saint=findSaintForToday();
-  const next=saint?null:findNextSaint();
+  const additional=additionalOSMCelebrations(new Date().getFullYear())
+    .find(item=>item.month===today.month&&item.day===today.day);
+  const next=saint||additional?null:findNextSaint();
   const celebration=saint||next;
   let celebrationCard='<div class="empty-state">Não há celebração servita cadastrada para hoje.</div>';
   if(celebration){
@@ -491,6 +526,16 @@ function viewHoje(){
     celebrationCard='<button class="home-celebration card fade-in" onclick="openDetail('+celebration._id+')" aria-label="Abrir '+escapeHtml(celebration.title)+'">'+
       saintImageHtml(celebration,false)+
       '<span class="home-celebration-text"><span class="rank">'+label+'</span><b>'+celebrationNameHtml(celebration.title,celebration)+'</b><span class="date-line">'+escapeHtml(celebration.date)+'</span></span><span class="chev">›</span></button>';
+  }
+  if(additional){
+    const action=calendarMassAction(additional);
+    const card='<span class="home-celebration-text"><span class="rank">Calendário próprio OSM</span><b>'+
+      escapeHtml(additional.title)+'</b><span class="date-line">'+
+      escapeHtml(celebrationSubtitle(additional))+(additional.note?' · '+escapeHtml(additional.note):'')+'</span></span>';
+    const additionalCard=action
+      ? '<button class="home-celebration card fade-in" onclick="'+action+'">'+card+'</button>'
+      : '<div class="home-celebration card fade-in">'+card+'</div>';
+    celebrationCard=saint?celebrationCard+additionalCard:additionalCard;
   }
   const prayer=dailyPrayerSuggestion();
   return '<section class="liturgical-hero home-hero fade-in"><div class="liturgical-kicker">Ordem dos Servos de Maria</div><div class="home-date-line"><strong>'+today.day+'</strong><span>'+escapeHtml(MONTHS[today.month-1])+'</span></div><div class="liturgical-sub">'+escapeHtml(today.weekday)+'</div></section>'+
@@ -576,12 +621,20 @@ function liturgiaCelebrations(type){
   return SANTORAL.map(s=>({saint:s,mass:records.find(item=>item.date===liturgiaDateKey(s)||(item.santoral_id!==undefined&&String(item.santoral_id)===String(s.id)))}))
     .filter(entry=>entry.mass&&!entry.mass.date_rule&&entry.mass.group!=='Santa Maria no Sábado');
 }
+function massCalendarLabel(item,saint){
+  if(saint)return saintDisplayGrade(saint);
+  if(item?.date_rule===VIRGEM_AO_PE_DA_CRUZ_RULE)return 'Festa';
+  return item?.rank||'';
+}
+function marianSaturdayMassRubric(){
+  return '<p class="reader-note">No Advento, até 16 de dezembro inclusive, e no Tempo Comum, celebra-se como memória obrigatória. No Tempo do Natal e no Tempo Pascal, como memória facultativa. A rubrica ressalva a ocorrência de outra memória obrigatória.</p>';
+}
 function renderLiturgiaCelebrationList(tipo,entries){
   const rows=entries.map(entry=>{
     const saint=entry.saint,item=entry.mass;
     const title=celebrationTitleText(saint?.title||item?.title||'Celebração própria',saint);
     const date=saint?.date||item?.display_date||item?.date_label||item?.date||'';
-    const rank=saint?saintDisplayGrade(saint):(item?.rank||'');
+    const rank=massCalendarLabel(item,saint);
     const subtitleParts=[date,rank].map(x=>String(x||'').trim()).filter(Boolean);
     // Nas Missas marianas o grupo já aparece no título da seção: não o repetir no subtítulo.
     const normalizedSubtitleParts=item?.group==='Santa Maria no Sábado'
@@ -608,6 +661,12 @@ function openSantoralOfficeHour(saintId,hour){
   if(title) title.textContent=(saint?saint.title+' — ':'')+label;
 }
 function calendarCelebrationRow(s){
+  if(s._id===undefined){
+    const action=calendarMassAction(s);
+    return '<article class="calendar-celebration-row">'+escapeHtml(s.title)+' · '+
+      escapeHtml(saintDisplayGrade(s))+(s.note?' · '+escapeHtml(s.note):'')+
+      (action?' <button class="action-btn" onclick="'+action+'">Abrir Missa própria</button>':'')+'</article>';
+  }
   return `<article class="calendar-celebration-row"><a class="calendar-celebration-link" href="?celebracao=${s._id}" onclick="event.preventDefault();openSaint(${s._id})"><span class="calendar-celebration-day">${String(s.day).padStart(2,"0")}</span> ${celebrationNameHtml(s.title,s)}</a></article>`;
 }
 
@@ -632,12 +691,14 @@ function onSearch(val){ state.search=val; render(); }
 function viewDetail(id){
   const s = SANTORAL.find(x=>x._id===id);
   if(!s) return `<div class="no-results">Não encontrado.</div>`;
+  const particularGrade=OSM_PARTICULAR_GRADES[officeDateKey(s)];
   return `
     ${saintImageHtml(s,true)}
     <div class="detail-header fade-in">
       ${saintRankSubtitle(s)?`<div class="rank">${escapeHtml(saintRankSubtitle(s))}</div>`:''}
       <h2>${celebrationNameHtml(s.title,s)}</h2>
-      <div class="date-line">${escapeHtml(s.date)}</div>
+      <div class="date-line">${escapeHtml(celebrationSubtitle(s))}</div>
+      ${particularGrade?`<p class="reader-note">${escapeHtml(particularGrade)}</p>`:''}
       <div class="action-row"><button class="action-btn" onclick="shareSaint(${s._id})">Partilhar celebração</button></div>
       <div class="detail-divider"></div>
     </div>
@@ -1035,9 +1096,8 @@ function openMarianSaturdayOffices(){
   });
 }
 function movableOfficeDate(item){
-  if(item.date_rule==='sexta-feira_depois_do_v_domingo_da_quaresma'){
-    const date=easterSunday(new Date().getFullYear());
-    date.setDate(date.getDate()-9);
+  if(item.date_rule===VIRGEM_AO_PE_DA_CRUZ_RULE){
+    const date=dateOfVirgemAoPeDaCruz(new Date().getFullYear());
     return new Intl.DateTimeFormat('pt-BR',{dateStyle:'long'}).format(date);
   }
   return item.date_label||'Data móvel';
@@ -1213,11 +1273,14 @@ function renderLiturgiaDetail(tipo,reference){
     const records=window.MISSAS_OSM?.celebrations||[];
     const item=records[Number(reference)];
     if(!item){state.liturgiaDetail=null;return '';}
-    const saint=SANTORAL.find(s=>String(s.month).padStart(2,'0')+'-'+String(s.day).padStart(2,'0')===item.date)||{};
-    const title=celebrationTitleText(saint.title||item.title||'Missa própria',saint);
-    const date=item.display_date||saint.date||item.date_label||item.date||'Data móvel';
+    const saint=SANTORAL.find(s=>liturgiaDateKey(s)===item.date);
+    const title=celebrationTitleText(saint?.title||item.title||'Missa própria',saint);
+    const date=item.display_date||saint?.date||item.date_label||item.date||'Data móvel';
+    const isMarianSaturday=item.group==='Santa Maria no Sábado';
+    const rank=isMarianSaturday?'':massCalendarLabel(item,saint);
     return '<div class="section-title">Missa própria OSM</div><div class="proper-mass-reader"><div class="hub-card-title">'+escapeHtml(title)+'</div>'+
-      '<p class="reader-note">'+escapeHtml(date)+(item.rank?' · '+escapeHtml(item.rank):'')+'</p>'+
+      '<p class="reader-note">'+escapeHtml(date)+(rank?' · '+escapeHtml(rank):'')+'</p>'+
+      (isMarianSaturday?marianSaturdayMassRubric():'')+
       ((item.local_pdf_url||item.pdf_url)?'<p><a class="reader-note" href="'+escapeHtml(item.local_pdf_url||item.pdf_url)+'" target="_blank" rel="noopener">PDF oficial OSM</a></p>':'')+renderProperMassContent(item)+'<p class="hub-source">Fonte: '+escapeHtml(item.source||'fonte não informada')+'</p></div>';
   }
   state.liturgiaDetail=null;
@@ -1244,7 +1307,7 @@ function viewLiturgia(){
   return switcher+`<header class="liturgia-own-heading"><h1>Missa própria OSM</h1><p>Celebrações com textos próprios da Missa</p><span aria-hidden="true"></span></header>
     ${renderLiturgiaCelebrationList('missa',canonicalMasses)}`+
     (movableRows.length?'<div class="section-title">Missas de celebrações móveis</div>'+renderLiturgiaCelebrationList('missa',movableRows):'')+
-    (marianSaturdayRows.length?'<div class="section-title">Missas de Santa Maria no Sábado</div>'+renderLiturgiaCelebrationList('missa',marianSaturdayRows):'');
+    (marianSaturdayRows.length?'<div class="section-title">Missas de Santa Maria no Sábado</div>'+marianSaturdayMassRubric()+renderLiturgiaCelebrationList('missa',marianSaturdayRows):'');
 }
 
 
@@ -1418,7 +1481,7 @@ function viewSantoralIndex(showTitle=true){
 }
 function viewCalendario(){
   const y=calDate.getFullYear(),m=calDate.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),today=new Date();
-  const monthSaints=SANTORAL.filter(s=>s.month===m+1).sort((a,b)=>a.day-b.day);
+  const monthSaints=[...SANTORAL,...additionalOSMCelebrations(y)].filter(s=>s.month===m+1).sort((a,b)=>a.day-b.day);
   const weekdays=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
   let cells='';
   for(let i=0;i<first;i++)cells+='<div class="cal-day empty" aria-hidden="true"></div>';
@@ -1434,7 +1497,12 @@ function viewCalendario(){
   }
   const monthRows=monthSaints.map(s=>{
     const weekday=weekdays[new Date(y,m,s.day).getDay()];
-    return `<a class="calendar-month-entry" href="?celebracao=${s._id}" onclick="event.preventDefault();openSaint(${s._id})"><time datetime="${y}-${String(m+1).padStart(2,'0')}-${String(s.day).padStart(2,'0')}"><b>${String(s.day).padStart(2,'0')}</b><small>${weekday}</small></time><span class="calendar-entry-name">${celebrationNameHtml(s.title,s)}<small>${escapeHtml(saintDisplayGrade(s))}</small></span><span class="calendar-entry-arrow" aria-hidden="true">›</span></a>`;
+    const label=`<time datetime="${y}-${String(m+1).padStart(2,'0')}-${String(s.day).padStart(2,'0')}"><b>${String(s.day).padStart(2,'0')}</b><small>${weekday}</small></time><span class="calendar-entry-name">${celebrationNameHtml(s.title,s)}<small>${escapeHtml(saintDisplayGrade(s))}${s.note?' · '+escapeHtml(s.note):''}</small></span>`;
+    const arrow='<span class="calendar-entry-arrow" aria-hidden="true">›</span>';
+    if(s._id===undefined){
+      return `<button type="button" class="calendar-month-entry" onclick="selectCalendarDay(${y},${m},${s.day})">${label}${arrow}</button>`;
+    }
+    return `<a class="calendar-month-entry" href="?celebracao=${s._id}" onclick="event.preventDefault();openSaint(${s._id})">${label}${arrow}</a>`;
   }).join('');
   const indexOpen=calendarIndexOpen||state.tab==='santoral'||!!(state.search||state.alpha);
   return `<section class="calendar-simple calendar-presented" aria-label="Calendário de celebrações"><div class="calendar-toolbar"><button class="cal-nav" onclick="calDate=new Date(${y},${m-1},1);selectedCalDate=null;render()" aria-label="Mês anterior">‹</button><select class="calendar-month-select" aria-label="Selecionar mês" onchange="setCalendarMonth(this.value)">${MONTHS.map((n,i)=>`<option value="${i}" ${i===m?'selected':''}>${n[0].toUpperCase()+n.slice(1)} ${y}</option>`).join('')}</select><button class="cal-nav" onclick="calDate=new Date(${y},${m+1},1);selectedCalDate=null;render()" aria-label="Próximo mês">›</button><button class="today-chip" onclick="goCalendarToday()">Hoje</button></div><div class="calendar-grid">${weekdays.map(x=>`<div class="cal-head">${x}</div>`).join('')}${cells}</div><div class="calendar-key"><span aria-hidden="true"></span>Celebração OSM</div></section>${dayBlock}<section class="calendar-month-agenda" aria-label="Celebrações do mês"><div class="calendar-agenda-heading"><h2>Neste mês</h2><span>${monthSaints.length} ${monthSaints.length===1?'celebração':'celebrações'}</span></div>${monthRows||'<p class="calendar-month-empty">Sem celebrações próprias OSM neste mês.</p>'}</section><details class="calendar-santoral-index" ${indexOpen?'open':''}><summary onclick="calendarIndexOpen=!this.parentElement.open">Consultar todo o Santoral</summary>${viewSantoralIndex(false)}</details>`;
@@ -1934,7 +2002,7 @@ loadCanonicalSantoral();
   }).then(function(data){
     if(data.schema_version!==1||!Array.isArray(data.celebrations))throw new Error('Cadastro de Missas próprias inválido');
     window.MISSAS_OSM=data;
-    if(state.detailId!==null&&state.detailId!==undefined||state.tab==='liturgia')render();
+    if(['hoje','calendario','santoral','liturgia'].includes(state.tab))render();
   }).catch(function(error){console.info('[Liturgia OSM] Missas próprias ainda sem registros conferidos.',error);});
   render();
 })();
